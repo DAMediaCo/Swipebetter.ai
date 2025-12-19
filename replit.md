@@ -69,3 +69,23 @@ Preferred communication style: Simple, everyday language.
 - **Lucide React**: Icon library
 - **React Hook Form + Zod**: Form handling and validation
 - **Embla Carousel**: Image carousel functionality
+
+## Recent Changes (December 2024)
+
+### Input Validation
+- Added Zod validation schemas for all API endpoints in `server/routes.ts`
+- Profile analysis validates: platform (enum), gender (enum), intent (enum), screenshots (1-5 images, max 10MB each)
+- Reply analysis validates: tone (enum), screenshots (1-3 images, max 10MB each)
+- Checkout validates: priceId (must start with "price_")
+
+### Security Limits
+- **MAX_SCREENSHOTS**: 5 for profile analysis, 3 for reply analysis
+- **MAX_SCREENSHOT_SIZE**: 10MB per base64-encoded image
+- **FREE_ANALYSES_LIMIT**: 3 analyses before requiring Pro subscription
+
+### Important Notes
+- Frontend option values must exactly match Zod enum literals to avoid 400 errors
+- Platform options: "Tinder", "Hinge", "Bumble", "Coffee Meets Bagel", "Other"
+- Gender options: "Man", "Woman", "Non-binary"
+- Intent options: "Relationship", "Casual Dating", "Friendship", "Not Sure"
+- Tone options: "flirty", "witty", "confident", "thoughtful"
