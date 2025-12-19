@@ -124,9 +124,23 @@ export async function setupAuth(app: Express) {
     const domain = getDomain(req);
     console.log("[AUTH] Callback received, domain:", domain);
     ensureStrategy(domain);
-    passport.authenticate(`replitauth:${domain}`, {
-      successReturnToOrRedirect: "/",
-      failureRedirect: "/",
+    passport.authenticate(`replitauth:${domain}`, (err: any, user: any, info: any) => {
+      if (err) {
+        console.error("[AUTH] Callback error:", err);
+        return res.redirect("/");
+      }
+      if (!user) {
+        console.error("[AUTH] No user returned, info:", info);
+        return res.redirect("/");
+      }
+      req.logIn(user, (loginErr) => {
+        if (loginErr) {
+          console.error("[AUTH] Login error:", loginErr);
+          return res.redirect("/");
+        }
+        console.log("[AUTH] Login successful for user");
+        return res.redirect("/");
+      });
     })(req, res, next);
   });
 
