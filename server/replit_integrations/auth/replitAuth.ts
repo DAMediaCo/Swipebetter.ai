@@ -102,19 +102,31 @@ export async function setupAuth(app: Express) {
   passport.serializeUser((user: Express.User, cb) => cb(null, user));
   passport.deserializeUser((user: Express.User, cb) => cb(null, user));
 
+  const getDomain = (req: any) => {
+    // Use x-forwarded-host header or fall back to REPLIT_DEV_DOMAIN
+    const forwardedHost = req.get('x-forwarded-host');
+    if (forwardedHost) return forwardedHost;
+    if (process.env.REPLIT_DEV_DOMAIN) return process.env.REPLIT_DEV_DOMAIN;
+    return req.hostname;
+  };
+
   app.get("/api/login", (req, res, next) => {
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    const domain = getDomain(req);
+    console.log("[AUTH] Login initiated, domain:", domain);
+    ensureStrategy(domain);
+    passport.authenticate(`replitauth:${domain}`, {
       prompt: "login consent",
       scope: ["openid", "email", "profile", "offline_access"],
     })(req, res, next);
   });
 
   app.get("/api/callback", (req, res, next) => {
-    ensureStrategy(req.hostname);
-    passport.authenticate(`replitauth:${req.hostname}`, {
+    const domain = getDomain(req);
+    console.log("[AUTH] Callback received, domain:", domain);
+    ensureStrategy(domain);
+    passport.authenticate(`replitauth:${domain}`, {
       successReturnToOrRedirect: "/",
-      failureRedirect: "/api/login",
+      failureRedirect: "/",
     })(req, res, next);
   });
 
