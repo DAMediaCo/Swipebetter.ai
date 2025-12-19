@@ -72,9 +72,9 @@ export function useCustomerPortal() {
 }
 
 export function logout() {
-  window.location.href = "/api/auth/logout";
+  window.location.href = "/api/logout";
 }
 
 export function login() {
-  window.location.href = "/api/auth/login";
+  window.location.href = "/api/login";
 }
