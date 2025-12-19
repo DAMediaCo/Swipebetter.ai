@@ -1,0 +1,181 @@
+MASTER PROMPT FOR REPLIT AI
+
+Project Name: SwipeBetter.ai
+Domain: https://swipebetter.ai
+
+Build a fully functional, ultra mobile first B2C AI web application called SwipeBetter.ai. This product helps users improve dating profiles and generate message replies using screenshots and minimal inputs. The experience must be optimized for iPhone Safari first, fast, simple, and usable with one hand. The product should feel like a native mobile app, not a desktop website.
+
+PRIMARY VALUE PROPOSITION
+SwipeBetter.ai helps users get more matches and better conversations on dating apps by fixing their profiles and replies using AI. Users upload screenshots, select a few options, click one button, and get improved results in under 30 seconds.
+
+CORE FEATURES
+
+1) PROFILE FIX FEATURE
+Route: /fix-profile
+
+Flow:
+Step 1: Screenshot Upload
+- Allow upload of 1 to 3 screenshots of a dating profile
+- Accept jpg, png, webp
+- Max 10MB per image
+- Show thumbnails with remove option
+- Support camera upload and photo library upload on mobile
+
+Step 2: Simple Selections
+- Platform selector: Hinge, Tinder, Bumble
+- Gender selector: Man, Woman
+- Intent selector: Casual dating, Relationship
+- Tone selector (single choice): Confident, Funny, Chill, Direct, Romantic
+
+Step 3: Generate Results
+Button: “Fix My Profile”
+
+AI must:
+- Extract visible text from screenshots
+- Ignore app UI elements
+- Preserve user facts and personality
+- Remove negativity, desperation, self deprecation
+- Match platform specific norms and character limits
+- Avoid cringe, sexual, or try hard language
+
+Output:
+1) Improved Bio (platform optimized)
+2) Improved Prompt Answers
+   - For Hinge: generate 3 optimized prompt answers and suggest 3 good prompts
+   - For Tinder and Bumble: generate a single optimized bio
+3) 5 First Message Openers based on the improved profile
+- Openers must be natural, non creepy, non sexual, and human sounding
+
+Each output block must have a copy to clipboard button.
+
+2) REPLY FIX FEATURE
+Route: /fix-reply
+
+Flow:
+Step 1: Upload 1 screenshot of the last message received
+- Optional upload of 1 additional screenshot for context
+
+Step 2: Tone selector
+- Confident, Funny, Chill, Direct, Romantic
+
+Step 3: Generate Reply
+Button: “Generate Reply”
+
+Output:
+- 1 primary suggested reply
+- 2 alternate replies labeled “Safer” and “Bolder”
+- Replies must match message length and energy
+- Avoid over investing, interview questions, emojis unless appropriate
+- No explanations, no coaching text
+
+3) PRICING AND MONETIZATION
+
+Pricing model:
+- Free usage without account
+- Paid subscription via Stripe
+
+Free Tier:
+- No login required
+- Allow either 1 profile fix OR 2 reply generations total
+- After free usage, show paywall
+
+Paid Plans:
+Monthly Plan:
+- Price: $7.99 per month
+- Includes 2 profile fixes per month
+- Includes 20 reply generations per month
+
+Annual Plan:
+- Price: $59 per year
+- Same usage limits as monthly
+- Marketed as “Save 37% with annual”
+
+Rules:
+- Monthly plan is default selection
+- Annual plan is optional upsell
+- Do not display usage counters publicly
+- Enforce limits silently server side
+- Reset usage monthly even for annual users
+- Implement rate limiting and cooldowns to prevent abuse
+
+Stripe Setup:
+- Use Stripe Checkout
+- Products: SwipeBetter Monthly, SwipeBetter Annual
+- Webhooks to manage subscription status
+- Require account creation only after user hits free limit
+
+4) AUTH AND USER ACCOUNTS
+- Optional passwordless login using email magic link
+- Free users do not need accounts
+- Paid users must have accounts
+- Store user usage counts, subscription status, and timestamps
+
+5) SEO REQUIREMENTS (CRITICAL)
+
+The site must be indexable and SEO first.
+
+Public indexable pages:
+- Homepage
+- /fix-profile
+- /fix-reply
+- /fix-hinge-profile
+- /fix-tinder-profile
+- /fix-bumble-profile
+- /what-to-reply-on-dating-apps
+- /why-not-getting-matches
+
+Each page must:
+- Have proper meta title and description
+- Contain static explanatory content plus the tool UI
+- Be crawlable without login
+- Use clean URLs and semantic HTML
+- Target long tail, problem based search intent
+
+Do NOT hide the tool behind auth walls for SEO pages.
+
+6) UI AND UX REQUIREMENTS
+
+- Mobile first design
+- Large tap targets and buttons
+- Sticky bottom primary CTA on mobile
+- Step based flows with max 3 steps
+- Skeleton loaders and progress indicators during AI generation
+- Clean, modern, neutral design
+- No clutter, no sidebars
+- Dark mode optional but not required
+
+7) TECH STACK
+
+- Next.js 14+ App Router
+- TypeScript
+- Tailwind CSS
+- PostgreSQL (Neon or Supabase)
+- Prisma ORM
+- Stripe for payments
+- Cloudflare R2 or Supabase Storage for images
+- OpenAI compatible multimodal model for vision + text
+
+8) AI SAFETY AND QUALITY RULES
+
+AI must:
+- Never sound robotic
+- Never mention being an AI
+- Never give dating advice explanations
+- Never escalate sexually
+- Never shame or judge users
+- Never invent personal details
+- Focus on clarity, confidence, and natural tone
+
+9) PERFORMANCE AND MAINTENANCE
+
+- Optimize images and bundles
+- Lazy load non critical components
+- Handle errors gracefully
+- Log AI errors and Stripe webhook failures
+- Keep the system low maintenance and passive
+
+FINAL GOAL
+
+Deliver a production ready, SEO optimized, subscription based, ultra mobile friendly AI web app for https://swipebetter.ai that can scale to high volume users profitably with minimal ongoing involvement.
+
+Build everything end to end.
