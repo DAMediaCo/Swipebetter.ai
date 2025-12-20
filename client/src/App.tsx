@@ -65,7 +65,12 @@ function PageViewTracker() {
   }, []);
 
   useEffect(() => {
-    trackPageView(location, document.title);
+    // Small delay to allow page title to update after route change
+    const timeout = setTimeout(() => {
+      const title = document.title || "SwipeBetter.ai";
+      trackPageView(location, title);
+    }, 100);
+    return () => clearTimeout(timeout);
   }, [location]);
 
   return null;

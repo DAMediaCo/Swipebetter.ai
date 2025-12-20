@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,6 +40,10 @@ export default function ReplyFix() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const user = authData?.user;
+
+  useEffect(() => {
+    document.title = "Fix My Reply - SwipeBetter.ai";
+  }, []);
 
   const [step, setStep] = useState(0);
   const [images, setImages] = useState<string[]>([]);

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +12,10 @@ export default function Home() {
   const { data: authData } = useAuth();
   const user = authData?.user;
   const [location] = useLocation();
+
+  useEffect(() => {
+    document.title = "SwipeBetter.ai - AI Dating Profile Coach";
+  }, []);
 
   const handleToolClick = (toolType: "profile" | "reply") => {
     trackToolEntry(toolType, location);

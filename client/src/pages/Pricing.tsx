@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,10 @@ export default function Pricing() {
   const checkoutMutation = useCheckout();
   const portalMutation = useCustomerPortal();
   const user = authData?.user;
+
+  useEffect(() => {
+    document.title = "Pricing - SwipeBetter.ai";
+  }, []);
 
   const { data: productsData, isLoading: productsLoading } = useQuery<{ data: Product[] }>({
     queryKey: ["/api/products-with-prices"],
