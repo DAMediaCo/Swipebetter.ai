@@ -110,6 +110,9 @@ export default function Pricing() {
           <p className="text-muted-foreground max-w-md mx-auto">
             Choose the plan that works best for you.
           </p>
+          <p className="text-sm text-muted-foreground">
+            Most users upgrade to Unlimited after their first fix.
+          </p>
         </div>
 
         {isSubscribed ? (
@@ -198,18 +201,14 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary relative overflow-visible flex flex-col">
+            <Card className="border-primary border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-3 py-1">
-                  <Star className="w-3 h-3 mr-1" />
+                <Badge className="bg-primary text-primary-foreground px-4 py-1.5">
+                  <Star className="w-3.5 h-3.5 mr-1.5" />
                   Best Value
                 </Badge>
               </div>
-              <div className="absolute top-4 right-4">
-                <Badge variant="secondary" className="text-xs">Save 57%</Badge>
-              </div>
-              <CardHeader className="text-center pb-2">
-                <div className="h-6" />
+              <CardHeader className="text-center pb-2 pt-8">
                 <CardTitle className="text-xl">Unlimited Annual</CardTitle>
                 <p className="text-sm text-muted-foreground">Best savings</p>
               </CardHeader>
@@ -218,7 +217,7 @@ export default function Pricing() {
                   <span className="text-4xl font-bold">$99</span>
                   <span className="text-muted-foreground">/year</span>
                   <p className="text-sm text-primary font-medium mt-1">
-                    $8.25/mo billed annually
+                    Save 57% – $8.25/mo billed annually
                   </p>
                 </div>
                 <ul className="text-sm space-y-2 text-left flex-1">
