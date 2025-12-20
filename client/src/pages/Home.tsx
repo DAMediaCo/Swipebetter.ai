@@ -2,8 +2,9 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Zap, Heart, Star, Check } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Zap, Check } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { TestimonialsRotator } from "@/components/TestimonialsRotator";
 
 export default function Home() {
   const { data: authData } = useAuth();
@@ -24,30 +25,21 @@ export default function Home() {
           </Badge>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-            Get More Matches with{" "}
-            <span className="text-primary">AI-Powered</span> Profile Feedback
+            Get More Matches. Say the Right Thing.{" "}
+            <span className="text-primary">Look Better Doing It.</span>
           </h1>
           
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Upload your dating profile screenshots and get instant, actionable suggestions to improve your bio, photos, and conversation game.
+            AI-powered feedback for your dating profile and replies. Private, fast, and built to actually help.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            {user ? (
-              <Link href="/fix-profile">
-                <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-profile-hero">
-                  <Camera className="w-5 h-5 mr-2" />
-                  Fix My Profile
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/auth">
-                <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-get-started">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Get Started
-                </Button>
-              </Link>
-            )}
+            <Link href="/fix-profile">
+              <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-profile-hero">
+                <Camera className="w-5 h-5 mr-2" />
+                Fix My Profile
+              </Button>
+            </Link>
             <Link href="/fix-reply">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-reply-hero">
                 <MessageSquare className="w-5 h-5 mr-2" />
@@ -188,25 +180,11 @@ export default function Home() {
       </section>
 
       <section className="py-16 md:py-24 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="flex justify-center gap-1">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <Star key={i} className="w-6 h-6 fill-primary text-primary" />
-            ))}
-          </div>
-          <blockquote className="text-xl md:text-2xl font-medium italic">
-            "I went from barely getting any matches to having multiple conversations every day. The bio suggestions were exactly what I needed."
-          </blockquote>
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <Heart className="w-5 h-5 text-primary" />
-            </div>
-            <div className="text-left">
-              <p className="font-semibold">Alex M.</p>
-              <p className="text-sm text-muted-foreground">SwipeBetter User</p>
-            </div>
-          </div>
-        </div>
+        <TestimonialsRotator />
+        <p className="text-sm text-muted-foreground text-center mt-8 flex items-center justify-center gap-2">
+          <Shield className="w-4 h-4" />
+          Your screenshots are private and deleted after processing.
+        </p>
       </section>
 
       <section className="py-16 md:py-24 px-4">

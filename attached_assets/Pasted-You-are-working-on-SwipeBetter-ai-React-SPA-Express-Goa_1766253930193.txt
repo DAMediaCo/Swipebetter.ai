@@ -1,0 +1,74 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Polish the homepage for clarity, trust, and conversion.
+Do NOT change routing or core functionality.
+
+====================================================
+HOMEPAGE HERO TWEAK
+====================================================
+
+Update the homepage hero copy to be more outcome-driven.
+
+Replace the main headline with:
+“Get More Matches. Say the Right Thing. Look Better Doing It.”
+
+Subheadline:
+“AI-powered feedback for your dating profile and replies. Private, fast, and built to actually help.”
+
+Keep both CTAs:
+- Fix My Profile
+- Fix My Reply
+
+====================================================
+ROTATING REVIEWS (AUTO-ROTATE)
+====================================================
+
+Add a rotating testimonials component to the homepage.
+
+Requirements:
+- Display 1 review at a time
+- Auto-rotate every 4–5 seconds
+- Smooth fade or slide transition
+- No user interaction required
+- Mobile friendly
+
+Create a reusable component:
+TestimonialsRotator.jsx
+
+Add exactly 10 reviews (hardcoded array for now):
+
+1) “I went from barely any matches to actual conversations in a day.”
+2) “The bio rewrite felt like something I would say, just better.”
+3) “This saved me from overthinking every reply.”
+4) “Way more useful than asking friends for advice.”
+5) “I didn’t expect the photo feedback to be this accurate.”
+6) “Finally understood why my profile wasn’t working.”
+7) “Replies sounded natural, not AI-ish.”
+8) “Worth the $9 instantly.”
+9) “I matched with people I actually wanted to talk to.”
+10) “Simple, fast, and weirdly effective.”
+
+Each review should show:
+- Quote text
+- Name (use first name + last initial, e.g. Alex M.)
+- Small subtext: “SwipeBetter User”
+
+Rotate automatically using setInterval or equivalent.
+Pause rotation if component unmounts.
+
+====================================================
+TRUST REINFORCEMENT
+====================================================
+
+Ensure this line is visible near the testimonial section:
+“Your screenshots are private and deleted after processing.”
+
+====================================================
+DELIVERABLE
+====================================================
+
+- Updated hero copy
+- Rotating testimonials live
+- No layout breaking
+- Clean transitions
