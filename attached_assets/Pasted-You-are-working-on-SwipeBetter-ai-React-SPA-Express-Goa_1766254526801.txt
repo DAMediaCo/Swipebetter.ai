@@ -1,0 +1,125 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Create the FIRST SEO content page that will serve as the master template for all future dating tips pages.
+
+This page MUST be indexable by Google.
+
+====================================================
+PAGE DETAILS
+====================================================
+
+URL:
+- /tinder-bio-guide
+
+Page title (meta title, max 60 chars):
+How to Write a Tinder Bio That Gets Matches
+
+Meta description (max 155 chars):
+Learn how to write a Tinder bio that actually works, with real examples, tips, and common mistakes to avoid.
+
+H1:
+How to Write a Tinder Bio That Actually Works
+
+====================================================
+CONTENT REQUIREMENTS
+====================================================
+
+Total length:
+- 900 to 1,200 words
+
+Tone:
+- Helpful
+- Practical
+- No pickup artist language
+- No cringe
+- No fluff
+
+Target audience:
+- Regular dating app users
+- Men and women
+- Looking for better matches, not tricks
+
+====================================================
+CONTENT STRUCTURE (STRICT)
+====================================================
+
+1) Introduction
+- Explain why most Tinder bios fail
+- Set expectation: clarity, authenticity, and structure matter
+
+2) What a Good Tinder Bio Does
+- Clear personality
+- Easy conversation hooks
+- Sets expectations
+
+3) Tinder Bio Length (What Actually Works)
+- Short vs medium bios
+- When longer bios make sense
+
+4) Good Tinder Bio Examples (Before vs After)
+- 3 short BEFORE bios (boring, generic)
+- 3 improved AFTER bios (natural, confident)
+Label them clearly.
+
+5) Common Tinder Bio Mistakes
+- Trying too hard
+- Listing traits instead of showing them
+- Inside jokes no one understands
+
+6) Simple Tinder Bio Framework
+- One sentence about you
+- One sentence about interests or lifestyle
+- One light hook or invitation
+
+7) When to Rewrite Your Bio
+- Low matches
+- Dead conversations
+- Profile feels outdated
+
+8) CTA BLOCK (IMPORTANT)
+Insert a clear CTA block here with heading:
+
+“Want Personalized Feedback on Your Tinder Bio?”
+
+CTA text:
+“Upload your profile screenshots and get AI-powered feedback tailored to you.”
+
+Buttons:
+- Fix My Profile → /fix-profile
+
+9) Short FAQ (2–3 questions)
+Example questions:
+- Does this work for other dating apps?
+- Should I mention hobbies?
+- How often should I update my bio?
+
+====================================================
+INTERNAL LINKING
+====================================================
+
+Within the content, naturally link to:
+- /fix-profile (at least 2 times)
+- /fix-reply (at least 1 time)
+
+Do NOT overlink.
+Links should feel natural.
+
+====================================================
+TECH & SEO REQUIREMENTS
+====================================================
+
+- Page must be indexable (NO noindex)
+- Use proper semantic HTML (h1, h2, h3)
+- Mobile-friendly spacing
+- No popups
+- No gated content
+
+====================================================
+DELIVERABLE
+====================================================
+
+- One fully live SEO page at /tinder-bio-guide
+- Clean layout
+- Content readable and helpful
+- CTA visible and functional

@@ -15,6 +15,7 @@ import ReplyResults from "@/pages/ReplyResults";
 import ReplyUpgrade from "@/pages/ReplyUpgrade";
 import Pricing from "@/pages/Pricing";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
+import TinderBioGuide from "@/pages/TinderBioGuide";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/fix-reply/upgrade" component={ReplyUpgrade} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
+      <Route path="/tinder-bio-guide" component={TinderBioGuide} />
       <Route component={NotFound} />
     </Switch>
   );

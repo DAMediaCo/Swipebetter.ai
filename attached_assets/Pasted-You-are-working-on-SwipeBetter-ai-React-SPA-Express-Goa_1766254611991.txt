@@ -1,0 +1,122 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Create additional SEO content pages by DUPLICATING the existing
+/tinder-bio-guide page as a template.
+
+DO NOT redesign layouts.
+DO NOT introduce new components.
+DO NOT change routing logic.
+
+Each new page should reuse the SAME structure, styling, and CTA blocks
+as /tinder-bio-guide, with only content and metadata changed.
+
+====================================================
+PAGES TO CREATE
+====================================================
+
+Create the following pages:
+
+1) /hinge-prompts-men
+2) /hinge-prompts-women
+3) /bumble-opener-lines
+4) /dating-app-photos
+5) /hinge-profile-tips
+6) /bumble-bio-examples
+7) /tinder-photo-order
+8) /what-to-text-after-matching
+9) /revive-dead-conversation
+
+Each page must be indexable by Google.
+
+====================================================
+CONTENT RULES (ALL PAGES)
+====================================================
+
+- Length: 900–1200 words each
+- Tone:
+  Helpful, practical, modern
+  No pickup artist language
+  No cringe
+  No fluff
+
+- Audience:
+  Regular dating app users (men and women)
+  Looking for real matches and conversations
+
+- Use clear sections with H2/H3 headings
+- Use lists and short paragraphs for mobile readability
+
+====================================================
+PAGE-SPECIFIC REQUIREMENTS
+====================================================
+
+For EACH page:
+
+- Update:
+  - Meta title (≤ 60 chars)
+  - Meta description (≤ 155 chars)
+  - H1 headline (must closely match keyword intent)
+
+- Include:
+  - Examples (before/after, good vs bad, or sample messages)
+  - Common mistakes section
+  - Simple framework or guidelines section
+
+- CTA BLOCK (reuse existing CTA component):
+  Heading should match intent, examples:
+  - “Want Personalized Hinge Prompt Feedback?”
+  - “Want Better Dating App Photos?”
+  - “Not Sure What to Text Next?”
+
+  CTA buttons:
+  - Link primarily to /fix-profile for profile-related pages
+  - Link primarily to /fix-reply for messaging-related pages
+  - Secondary link to the other tool where relevant
+
+====================================================
+PRIMARY CTA MAPPING
+====================================================
+
+Profile-focused pages → CTA to /fix-profile:
+- /hinge-prompts-men
+- /hinge-prompts-women
+- /dating-app-photos
+- /hinge-profile-tips
+- /bumble-bio-examples
+- /tinder-photo-order
+
+Reply-focused pages → CTA to /fix-reply:
+- /bumble-opener-lines
+- /what-to-text-after-matching
+- /revive-dead-conversation
+
+====================================================
+INTERNAL LINKING
+====================================================
+
+Each page must:
+- Link to /fix-profile at least once
+- Link to /fix-reply at least once
+- Avoid excessive linking
+
+====================================================
+SEO & TECH REQUIREMENTS
+====================================================
+
+- Pages MUST be indexable (no noindex)
+- Use semantic HTML
+- No popups
+- No gated content
+- No ads
+- Mobile-friendly spacing
+
+====================================================
+DELIVERABLE
+====================================================
+
+- All pages live and accessible
+- Footer links already pointing correctly
+- Content unique per page
+- No broken navigation
+- No layout regressions
