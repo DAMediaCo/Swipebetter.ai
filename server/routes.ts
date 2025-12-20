@@ -98,7 +98,7 @@ export async function registerRoutes(
       }));
 
       const response = await grok.chat.completions.create({
-        model: "grok-4.1-fast-non-reasoning",
+        model: "grok-2-vision-1212",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
@@ -190,7 +190,7 @@ export async function registerRoutes(
       }));
 
       const response = await grok.chat.completions.create({
-        model: "grok-4.1-fast-non-reasoning",
+        model: "grok-2-vision-1212",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
