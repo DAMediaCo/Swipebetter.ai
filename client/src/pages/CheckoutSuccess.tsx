@@ -1,15 +1,76 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { queryClient } from "@/lib/queryClient";
-import { CheckCircle, Sparkles, ArrowRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { CheckCircle, Sparkles, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function CheckoutSuccess() {
+  const [verifying, setVerifying] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-    queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+    const verifyCheckout = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+      
+      if (!sessionId) {
+        setError("No session ID found");
+        setVerifying(false);
+        return;
+      }
+
+      try {
+        await apiRequest("POST", "/api/verify-checkout", { sessionId });
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+        setVerifying(false);
+      } catch (err) {
+        setError("Failed to verify payment. Please contact support.");
+        setVerifying(false);
+      }
+    };
+
+    verifyCheckout();
   }, []);
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-8 pb-6 text-center space-y-6">
+            <Skeleton className="w-20 h-20 rounded-full mx-auto" />
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-48 mx-auto" />
+              <Skeleton className="h-4 w-64 mx-auto" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-8 pb-6 text-center space-y-6">
+            <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
+              <AlertCircle className="w-10 h-10 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold">Something went wrong</h1>
+              <p className="text-muted-foreground">{error}</p>
+            </div>
+            <Link href="/pricing">
+              <Button variant="outline" className="w-full">Back to Pricing</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">

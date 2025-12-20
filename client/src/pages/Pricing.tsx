@@ -214,15 +214,6 @@ export default function Pricing() {
           </div>
         )}
 
-        {!isSubscribed && subscriptionData && (
-          <Card className="mt-8 bg-muted/50">
-            <CardContent className="py-4 text-center">
-              <p className="text-sm">
-                <strong>{subscriptionData.freeAnalysesRemaining}</strong> free analyses remaining
-              </p>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );

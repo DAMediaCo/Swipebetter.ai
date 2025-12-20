@@ -62,8 +62,8 @@ export default function ReplyFix() {
     onError: (error: any) => {
       if (error.message?.includes("403")) {
         toast({
-          title: "Free limit reached",
-          description: "Upgrade to Pro for unlimited analyses.",
+          title: "Subscription required",
+          description: "Upgrade to Pro to use this feature.",
           variant: "destructive",
         });
       } else {
@@ -140,15 +140,15 @@ export default function ReplyFix() {
         </div>
 
         {!subscriptionData?.canAnalyze && (
-          <Card className="mb-6 border-destructive/50 bg-destructive/5">
+          <Card className="mb-6 border-primary/50 bg-primary/5">
             <CardContent className="py-4 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-destructive" />
+              <Sparkles className="w-5 h-5 text-primary" />
               <div className="flex-1">
-                <p className="font-medium text-sm">Free limit reached</p>
-                <p className="text-xs text-muted-foreground">Upgrade to continue analyzing</p>
+                <p className="font-medium text-sm">Pro subscription required</p>
+                <p className="text-xs text-muted-foreground">Subscribe to access AI-powered analysis</p>
               </div>
               <Link href="/pricing">
-                <Button size="sm" data-testid="button-upgrade-banner">Upgrade</Button>
+                <Button size="sm" data-testid="button-upgrade-banner">Subscribe</Button>
               </Link>
             </CardContent>
           </Card>

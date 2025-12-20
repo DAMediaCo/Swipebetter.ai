@@ -89,7 +89,7 @@ Preferred communication style: Simple, everyday language.
 ### Security Limits
 - **MAX_SCREENSHOTS**: 5 for profile analysis, 3 for reply analysis
 - **MAX_SCREENSHOT_SIZE**: 10MB per base64-encoded image
-- **FREE_ANALYSES_LIMIT**: 3 analyses before requiring Pro subscription
+- **Subscription Required**: Users must have an active Pro subscription to use analysis features (no free tier)
 
 ### Important Notes
 - Frontend option values must exactly match Zod enum literals to avoid 400 errors

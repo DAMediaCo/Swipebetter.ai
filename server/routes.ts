@@ -14,7 +14,6 @@ const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 
-const FREE_ANALYSES_LIMIT = 3;
 const MAX_SCREENSHOTS = 5;
 const MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024; // 10MB base64
 
@@ -43,17 +42,12 @@ export async function registerRoutes(
 
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     const subscription = await storage.getUserSubscription(req.session.userId);
-    if (!subscription) {
-      return res.json({ subscription: null, canAnalyze: true, freeAnalysesRemaining: FREE_ANALYSES_LIMIT });
-    }
-    
-    const isActive = subscription.status === "active";
-    const freeAnalysesRemaining = Math.max(0, FREE_ANALYSES_LIMIT - (subscription.freeAnalysesUsed || 0));
+    const isActive = subscription?.status === "active";
     
     res.json({ 
-      subscription,
-      canAnalyze: isActive || freeAnalysesRemaining > 0,
-      freeAnalysesRemaining: isActive ? Infinity : freeAnalysesRemaining
+      subscription: subscription || null,
+      canAnalyze: isActive,
+      isSubscribed: isActive
     });
   });
 
@@ -69,17 +63,12 @@ export async function registerRoutes(
       const { platform, gender, intent, screenshots } = parseResult.data;
       const userId = req.session.userId;
 
-      let subscription = await storage.getUserSubscription(userId);
-      if (!subscription) {
-        subscription = await storage.createUserSubscription({ userId });
-      }
+      const subscription = await storage.getUserSubscription(userId);
+      const isSubscribed = subscription?.status === "active";
 
-      const isSubscribed = subscription.status === "active";
-      const freeAnalysesRemaining = FREE_ANALYSES_LIMIT - (subscription.freeAnalysesUsed || 0);
-
-      if (!isSubscribed && freeAnalysesRemaining <= 0) {
+      if (!isSubscribed) {
         return res.status(403).json({ 
-          error: "Free analyses limit reached",
+          error: "Subscription required",
           requiresSubscription: true 
         });
       }
@@ -137,14 +126,9 @@ export async function registerRoutes(
         improvements: analysis.improvements,
       });
 
-      if (!isSubscribed) {
-        await storage.incrementFreeAnalysesUsed(userId);
-      }
-
       res.json({ 
         analysis: savedAnalysis,
-        parsed: analysis,
-        freeAnalysesRemaining: isSubscribed ? Infinity : freeAnalysesRemaining - 1
+        parsed: analysis
       });
     } catch (error) {
       console.error("Profile analysis error:", error);
@@ -164,17 +148,12 @@ export async function registerRoutes(
       const { tone, screenshots } = parseResult.data;
       const userId = req.session.userId;
 
-      let subscription = await storage.getUserSubscription(userId);
-      if (!subscription) {
-        subscription = await storage.createUserSubscription({ userId });
-      }
+      const subscription = await storage.getUserSubscription(userId);
+      const isSubscribed = subscription?.status === "active";
 
-      const isSubscribed = subscription.status === "active";
-      const freeAnalysesRemaining = FREE_ANALYSES_LIMIT - (subscription.freeAnalysesUsed || 0);
-
-      if (!isSubscribed && freeAnalysesRemaining <= 0) {
+      if (!isSubscribed) {
         return res.status(403).json({ 
-          error: "Free analyses limit reached",
+          error: "Subscription required",
           requiresSubscription: true 
         });
       }
@@ -228,14 +207,9 @@ export async function registerRoutes(
         conversationContext: analysis.conversationContext,
       });
 
-      if (!isSubscribed) {
-        await storage.incrementFreeAnalysesUsed(userId);
-      }
-
       res.json({ 
         analysis: savedAnalysis,
-        parsed: analysis,
-        freeAnalysesRemaining: isSubscribed ? Infinity : freeAnalysesRemaining - 1
+        parsed: analysis
       });
     } catch (error) {
       console.error("Reply analysis error:", error);
@@ -346,6 +320,57 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Checkout error:", error);
       res.status(500).json({ error: "Failed to create checkout session" });
+    }
+  });
+
+  app.post("/api/verify-checkout", requireAuth, async (req: any, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId || typeof sessionId !== 'string') {
+        return res.status(400).json({ error: "Session ID required" });
+      }
+
+      const userId = req.session.userId;
+      const stripe = await getUncachableStripeClient();
+      
+      const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['subscription']
+      });
+
+      if (session.payment_status !== 'paid') {
+        return res.status(400).json({ error: "Payment not completed" });
+      }
+
+      const subscription = session.subscription as any;
+      if (!subscription) {
+        return res.status(400).json({ error: "No subscription found" });
+      }
+
+      const customerId = session.customer as string;
+      
+      let userSub = await storage.getUserSubscription(userId);
+      if (userSub?.stripeCustomerId && userSub.stripeCustomerId !== customerId) {
+        return res.status(403).json({ error: "Session does not belong to this user" });
+      }
+      
+      if (!userSub) {
+        userSub = await storage.createUserSubscription({ userId });
+      }
+      
+      await storage.updateUserSubscription(userId, {
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: subscription.id,
+        status: 'active',
+        plan: 'pro',
+        currentPeriodEnd: subscription.current_period_end 
+          ? new Date(subscription.current_period_end * 1000) 
+          : null,
+      });
+
+      res.json({ success: true, status: 'active' });
+    } catch (error) {
+      console.error("Verify checkout error:", error);
+      res.status(500).json({ error: "Failed to verify checkout" });
     }
   });
 

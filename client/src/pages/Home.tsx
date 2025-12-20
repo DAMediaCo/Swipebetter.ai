@@ -44,7 +44,7 @@ export default function Home() {
               <Link href="/auth">
                 <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-get-started">
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Get Started Free
+                  Get Started
                 </Button>
               </Link>
             )}
@@ -58,7 +58,7 @@ export default function Home() {
           
           <p className="text-sm text-muted-foreground pt-4 flex items-center justify-center gap-2">
             <Shield className="w-4 h-4" />
-            3 free analyses, no credit card required
+            Your screenshots are private and secure
           </p>
         </div>
       </section>
@@ -228,7 +228,7 @@ export default function Home() {
             <Link href="/auth">
               <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-free">
                 <Zap className="w-5 h-5 mr-2" />
-                Start Free
+                Get Started
               </Button>
             </Link>
           )}
