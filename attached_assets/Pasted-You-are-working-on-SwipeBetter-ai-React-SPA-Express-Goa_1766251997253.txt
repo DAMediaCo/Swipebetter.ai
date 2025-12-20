@@ -1,0 +1,144 @@
+You are working on SwipeBetter.ai (React SPA + Express). 
+Goal: Upgrade the two core tool pages to be high-converting “money pages” without changing the existing URLs:
+- /fix-profile
+- /fix-reply
+
+Do NOT create new routes in this task. Do NOT change URLs.
+This is a UI + UX + content build inside the existing pages.
+
+====================================================
+PAGE 1: /fix-profile (Money Page)
+====================================================
+
+A) Above the fold layout
+1) Headline:
+“Fix Your Dating Profile. Get More Matches.”
+2) Subheadline:
+“Upload screenshots. Get a score, photo feedback, and a better bio in minutes.”
+3) Primary CTA button:
+“Upload Profile Screenshots”
+4) Secondary CTA:
+“See Example Results” (scrolls to examples section)
+
+B) Score breakdown section (must be visible without scrolling too far)
+Create a “Score Breakdown” card with:
+- Overall score (0–100)
+- 3 to 5 sub scores that roll up into the overall score.
+Use these sub scores:
+1) Bio
+2) Photos
+3) Clarity
+4) Authenticity
+5) Match Appeal
+
+Implementation:
+- If the current backend only returns one overall score, create a client-side breakdown with reasonable defaults for now. Example:
+Bio 72, Photos 68, Clarity 75, Authenticity 78, Match Appeal 70
+- If real subscores exist in the payload, display them instead.
+
+C) Before and after bio rewrites (critical)
+Create a “Before → After Bio Rewrites” section with 3 example pairs.
+
+Rules:
+- Use realistic sample “before” bios (short, dull, generic).
+- Use improved “after” bios that are more engaging and confident.
+- Keep them tasteful and mainstream.
+- No adult content.
+
+Include a “Copy” button on each After bio.
+
+D) Example output section (proof)
+Create an “Example Results” section that looks like the actual output UI, but labeled as “Example”.
+Include:
+- Example Overall Score
+- Example Bio Suggestions (3 bullets)
+- Example Photo Feedback (2–3 bullets)
+- Example Top Improvements (3 bullets)
+
+E) How it works (short)
+Three steps:
+1) Upload screenshots
+2) Get AI analysis
+3) Apply changes and get more matches
+
+F) FAQ (simple)
+Reuse the “Common Questions” FAQ component if it exists.
+
+====================================================
+PAGE 2: /fix-reply (Money Page)
+====================================================
+
+A) Above the fold layout
+1) Headline:
+“Fix Your Reply. Keep the Conversation Going.”
+2) Subheadline:
+“Paste the chat. Pick a tone. Get 3 replies that sound like you.”
+3) Primary CTA:
+“Paste Conversation”
+4) Secondary CTA:
+“See Reply Examples” (scrolls)
+
+B) Tone presets (3 presets)
+Create a Tone Picker UI with 3 buttons or cards:
+1) Playful
+2) Flirty
+3) Confident
+
+Behavior:
+- Selecting a tone changes the demo reply examples and becomes the default tone for generation.
+
+C) “Paste convo, get replies” demo (interactive feel, even if mock)
+Add a Demo section with:
+- Left: a textarea prefilled with a short sample conversation
+- Right: generated replies area with 3 reply options
+
+When user clicks “Generate Replies”:
+- If the backend already supports reply generation, call the existing API.
+- If not, simulate with pre-written replies that change based on selected tone (must still look real and useful).
+
+Include “Copy” buttons on each suggested reply.
+
+D) Example reply sets (proof)
+Create “Example Replies” section showing 3 short scenarios:
+- After matching opener
+- Restarting a dead convo
+- Setting up a date
+
+Each scenario shows:
+- Conversation snippet
+- 3 suggested replies
+- Tone selector affects results
+
+E) Trust section
+Add a small trust bar or reuse existing:
+- Private & Secure
+- Deleted after processing
+- No account sharing required
+
+F) FAQ
+Reuse same FAQ component.
+
+====================================================
+SHARED REQUIREMENTS
+====================================================
+
+Design:
+- Match current SwipeBetter style.
+- Mobile-first spacing.
+- Keep it clean and conversion-focused.
+- Make primary CTA always visible near top.
+
+Components:
+- Create reusable components where possible:
+  - TrustBar
+  - FAQAccordion
+  - ExampleCard
+  - CopyButton
+  - TonePicker
+  - ScoreBreakdown
+
+No new dependencies unless absolutely necessary.
+If you need icons, use whatever is already in the project. If none exists, use simple inline SVG or text.
+
+Implementation details:
+- U

@@ -7,6 +7,9 @@ import { ImageUpload } from "@/components/ImageUpload";
 import { TrustBar } from "@/components/TrustBar";
 import { PrivacyNote } from "@/components/PrivacyNote";
 import { PrivacyFAQ } from "@/components/PrivacyFAQ";
+import { ConvoDemo } from "@/components/ConvoDemo";
+import { ExampleReplies } from "@/components/ExampleReplies";
+import { HowItWorks } from "@/components/HowItWorks";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
@@ -18,7 +21,8 @@ import {
   Heart,
   Flame,
   Smile,
-  Brain
+  Brain,
+  ArrowDown
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,7 +40,7 @@ export default function ReplyFix() {
   const [, setLocation] = useLocation();
   const user = authData?.user;
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [images, setImages] = useState<string[]>([]);
   const [tone, setTone] = useState("");
 
@@ -77,6 +81,18 @@ export default function ReplyFix() {
     return false;
   };
 
+  const scrollToDemo = () => {
+    document.getElementById('reply-demo')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const startAnalysis = () => {
+    if (!user) {
+      setLocation('/auth');
+      return;
+    }
+    setStep(1);
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -85,23 +101,68 @@ export default function ReplyFix() {
     );
   }
 
-  if (!user) {
+  if (step === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-8 pb-6 text-center space-y-4">
-            <MessageSquare className="w-12 h-12 text-primary mx-auto" />
-            <h2 className="text-xl font-bold">Sign in to Fix Your Replies</h2>
-            <p className="text-muted-foreground">
-              Get AI-generated reply suggestions for your dating conversations.
-            </p>
-            <Link href="/auth">
-              <Button className="w-full" data-testid="button-login-reply">
-                Sign In to Continue
+      <div className="min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 py-8 space-y-16">
+          <div className="mb-6">
+            <Link href="/">
+              <Button variant="ghost" size="icon" data-testid="button-back">
+                <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+
+          <section className="text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+              Fix Your Reply.<br />
+              <span className="text-primary">Keep the Conversation Going.</span>
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Paste the chat. Pick a tone. Get 3 replies that sound like you.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                size="lg" 
+                onClick={startAnalysis}
+                className="py-6 px-8"
+                data-testid="button-start-paste"
+              >
+                <MessageSquare className="w-5 h-5 mr-2" />
+                Paste Conversation
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={scrollToDemo}
+                className="py-6 px-8"
+                data-testid="button-see-reply-examples"
+              >
+                See Reply Examples
+                <ArrowDown className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+            <div className="pt-4">
+              <TrustBar />
+            </div>
+          </section>
+
+          <section>
+            <HowItWorks variant="reply" />
+          </section>
+
+          <section>
+            <ConvoDemo />
+          </section>
+
+          <section>
+            <ExampleReplies />
+          </section>
+
+          <section>
+            <PrivacyFAQ />
+          </section>
+        </div>
       </div>
     );
   }
@@ -110,11 +171,14 @@ export default function ReplyFix() {
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-6 flex items-center justify-between">
-          <Link href="/">
-            <Button variant="ghost" size="icon" data-testid="button-back">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setStep(step > 1 ? step - 1 : 0)}
+            data-testid="button-back"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
           <div className="flex items-center gap-2">
             {[1, 2].map((i) => (
               <div
@@ -195,19 +259,9 @@ export default function ReplyFix() {
         </div>
       </div>
 
-      {step <= 2 && (
+      {step >= 1 && step <= 2 && (
         <div className="fixed bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background border-t border-border safe-bottom">
           <div className="max-w-2xl mx-auto flex gap-3">
-            {step > 1 && (
-              <Button
-                variant="outline"
-                onClick={() => setStep(step - 1)}
-                className="flex-1"
-                data-testid="button-back-step"
-              >
-                Back
-              </Button>
-            )}
             <Button
               onClick={() => {
                 if (step < 2) {
