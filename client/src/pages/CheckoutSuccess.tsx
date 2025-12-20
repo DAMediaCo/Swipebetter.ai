@@ -34,6 +34,7 @@ export default function CheckoutSuccess() {
             toolType: "both",
             price: pendingPurchase.price,
             transactionId: sessionId,
+            priceId: pendingPurchase.priceId,
           });
         }
         

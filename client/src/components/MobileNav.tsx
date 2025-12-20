@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Home, User, MessageSquare, CreditCard } from "lucide-react";
-import { trackToolEntry } from "@/lib/analytics";
+import { trackToolEntry, shouldTrackToolEntry } from "@/lib/analytics";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home", toolType: null },
@@ -12,8 +12,8 @@ const navItems = [
 export function MobileNav() {
   const [location] = useLocation();
 
-  const handleNavClick = (toolType: "profile" | "reply" | null) => {
-    if (toolType) {
+  const handleNavClick = (toolType: "profile" | "reply" | null, targetPath: string) => {
+    if (toolType && shouldTrackToolEntry(targetPath, location)) {
       trackToolEntry(toolType, location);
     }
   };
@@ -25,7 +25,7 @@ export function MobileNav() {
           const isActive = location === item.href || 
             (item.href !== "/" && location.startsWith(item.href));
           return (
-            <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType)}>
+            <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType, item.href)}>
               <div
                 className={`flex flex-col items-center justify-center px-4 py-2 touch-target cursor-pointer transition-colors ${
                   isActive

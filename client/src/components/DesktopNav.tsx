@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
-import { trackToolEntry } from "@/lib/analytics";
+import { trackToolEntry, shouldTrackToolEntry } from "@/lib/analytics";
 
 const navItems = [
   { href: "/fix-profile", label: "Fix Profile", toolType: "profile" as const },
@@ -25,8 +25,8 @@ export function DesktopNav() {
   const logoutMutation = useLogout();
   const user = authData?.user;
 
-  const handleNavClick = (toolType: "profile" | "reply" | null) => {
-    if (toolType) {
+  const handleNavClick = (toolType: "profile" | "reply" | null, targetPath: string) => {
+    if (toolType && shouldTrackToolEntry(targetPath, location)) {
       trackToolEntry(toolType, location);
     }
   };
@@ -44,7 +44,7 @@ export function DesktopNav() {
           {navItems.map((item) => {
             const isActive = location === item.href;
             return (
-              <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType)}>
+              <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType, item.href)}>
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}

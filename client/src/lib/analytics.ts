@@ -78,6 +78,7 @@ interface PendingPurchase {
   planType: "starter" | "monthly" | "annual";
   price: number;
   priceId: string;
+  productName: string;
 }
 
 export function storePendingPurchase(data: PendingPurchase) {
@@ -98,6 +99,7 @@ interface PurchaseParams {
   toolType: "profile" | "reply" | "both";
   price: number;
   transactionId: string;
+  priceId: string;
 }
 
 export function trackPurchaseCompleted(params: PurchaseParams) {
@@ -123,6 +125,7 @@ export function trackPurchaseCompleted(params: PurchaseParams) {
     currency: "USD",
     items: [
       {
+        item_id: params.priceId,
         item_name: itemName,
         item_category: itemCategory,
         price: params.price,
@@ -130,4 +133,8 @@ export function trackPurchaseCompleted(params: PurchaseParams) {
       },
     ],
   });
+}
+
+export function shouldTrackToolEntry(targetPath: string, currentPath: string): boolean {
+  return targetPath !== currentPath;
 }
