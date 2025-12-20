@@ -11,11 +11,12 @@ import {
 import { useAuth } from "@/lib/auth";
 import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
+import { trackToolEntry } from "@/lib/analytics";
 
 const navItems = [
-  { href: "/fix-profile", label: "Fix Profile" },
-  { href: "/fix-reply", label: "Fix Reply" },
-  { href: "/pricing", label: "Pricing" },
+  { href: "/fix-profile", label: "Fix Profile", toolType: "profile" as const },
+  { href: "/fix-reply", label: "Fix Reply", toolType: "reply" as const },
+  { href: "/pricing", label: "Pricing", toolType: null },
 ];
 
 export function DesktopNav() {
@@ -23,6 +24,12 @@ export function DesktopNav() {
   const { data: authData, isLoading } = useAuth();
   const logoutMutation = useLogout();
   const user = authData?.user;
+
+  const handleNavClick = (toolType: "profile" | "reply" | null) => {
+    if (toolType) {
+      trackToolEntry(toolType, location);
+    }
+  };
 
   return (
     <nav className="hidden md:flex items-center justify-between h-16 px-8 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -37,7 +44,7 @@ export function DesktopNav() {
           {navItems.map((item) => {
             const isActive = location === item.href;
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType)}>
                 <Button
                   variant={isActive ? "secondary" : "ghost"}
                   data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
+import { trackPreviewViewed } from "@/lib/analytics";
 import { 
   ArrowLeft, 
   Clipboard, 
@@ -31,6 +32,7 @@ export default function ProfileResults() {
       return;
     }
     setResult(data);
+    trackPreviewViewed("profile");
   }, [setLocation]);
 
   useEffect(() => {

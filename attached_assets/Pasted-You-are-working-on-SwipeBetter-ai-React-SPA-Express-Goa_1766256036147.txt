@@ -1,0 +1,144 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Implement GA4 tracking with Measurement ID: G-GSBS999F1M
+Track the core funnel: View → Tool Entry → Engagement → Paywall → Purchase.
+
+Do NOT change existing routes or business logic.
+Do NOT send any personal data, screenshots, or conversation text to GA.
+
+====================================================
+1) INSTALL GA4 (gtag.js)
+====================================================
+
+Add GA4 using gtag.js with this ID:
+G-GSBS999F1M
+
+In the React app, load the gtag script once globally (on app boot).
+Use a safe approach that works with SPA routing.
+
+Implement:
+- window.dataLayer initialization
+- function gtag(){dataLayer.push(arguments);}
+- gtag("js", new Date());
+- gtag("config", "G-GSBS999F1M", { send_page_view: false });
+
+We will manually send page_view events on route changes.
+
+====================================================
+2) SPA PAGE VIEW TRACKING (React Router)
+====================================================
+
+On every route change (location.pathname change):
+Fire:
+gtag("event", "page_view", {
+  page_path: location.pathname,
+  page_title: document.title
+});
+
+Pages to ensure are tracked:
+- /
+- /fix-profile
+- /fix-reply
+- /pricing
+- All SEO pages in footer
+- Any internal upgrade or results pages if present
+
+====================================================
+3) CUSTOM FUNNEL EVENTS
+====================================================
+
+Create a small analytics helper, for example:
+src/lib/analytics.js
+
+Export a function:
+track(eventName, params)
+
+In dev mode only, console.log every tracked event.
+
+Implement these events:
+
+A) tool_entry
+When user clicks any CTA that routes into a tool:
+- Fix My Profile
+- Try Profile Fix
+- Fix Profile nav button
+- Fix My Reply
+- Try Reply Fix
+- Fix Reply nav button
+
+Params:
+- tool_type: "profile" | "reply"
+- source_page: current path (window.location.pathname)
+
+B) analysis_started
+When user starts analysis:
+- Profile: clicks analyze/upload submit
+- Reply: clicks generate/analyze submit
+
+Params:
+- tool_type: "profile" | "reply"
+
+C) preview_viewed
+When user sees preview-only results (locked content):
+Params:
+- tool_type: "profile" | "reply"
+
+D) paywall_viewed
+When upgrade modal or upgrade page is shown:
+Params:
+- tool_type: "profile" | "reply"
+
+E) purchase_completed
+When payment succeeds:
+Params:
+- plan_type: "starter" | "monthly" | "annual"
+- tool_type: "profile" | "reply" | "both"
+- price: number
+- currency: "USD"
+
+====================================================
+4) GA4 ECOMMERCE PURCHASE EVENT
+====================================================
+
+Also send GA4 recommended event:
+event name: "purchase"
+
+Include:
+- transaction_id
+- value
+- currency: "USD"
+- items: [
+    {
+      item_name: "Starter Fix" | "Unlimited Monthly" | "Unlimited Annual",
+      item_category: "one_time" | "subscription",
+      price: number,
+      quantity: 1
+    }
+  ]
+
+IMPORTANT:
+Do not include any user input text or images in GA events.
+
+====================================================
+5) VERIFICATION
+====================================================
+
+Make sure events fire in this sequence:
+
+- page_view on load and navigation
+- tool_entry when clicking tool CTAs
+- analysis_started on submission
+- preview_viewed when locked results show
+- paywall_viewed when upgrade UI appears
+- purchase + purchase_completed after successful payment
+
+====================================================
+DELIVERABLES
+====================================================
+
+- GA4 installed with ID G-GSBS999F1M
+- Page views tracked correctly for SPA
+- Funnel events tracked with correct parameters
+- Purchases tracked with plan breakdown
+- No PII sent to GA4

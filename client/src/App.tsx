@@ -1,10 +1,12 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { MobileNav } from "@/components/MobileNav";
 import { DesktopNav } from "@/components/DesktopNav";
+import { initGA, trackPageView } from "@/lib/analytics";
 import Home from "@/pages/Home";
 import Auth from "@/pages/Auth";
 import ProfileFix from "@/pages/ProfileFix";
@@ -55,10 +57,25 @@ function Router() {
   );
 }
 
+function PageViewTracker() {
+  const [location] = useLocation();
+
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  useEffect(() => {
+    trackPageView(location, document.title);
+  }, [location]);
+
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <PageViewTracker />
         <DesktopNav />
         <main className="pb-16 md:pb-0">
           <Router />

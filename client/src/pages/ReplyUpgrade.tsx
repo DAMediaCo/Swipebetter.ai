@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { StepIndicator } from "@/components/StepIndicator";
 import { ArrowLeft, Sparkles, Check, Crown } from "lucide-react";
 import { loadAnalysis } from "@/lib/analysisStorage";
+import { trackPaywallViewed } from "@/lib/analytics";
 
 export default function ReplyUpgrade() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,8 @@ export default function ReplyUpgrade() {
       setLocation('/fix-reply');
       return;
     }
+
+    trackPaywallViewed("reply");
 
     const meta = document.createElement('meta');
     meta.name = 'robots';

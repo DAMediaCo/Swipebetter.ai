@@ -13,6 +13,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
+import { trackAnalysisStarted } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
 import { 
   Sparkles, 
@@ -42,6 +43,7 @@ export default function ProfileFix() {
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
+      trackAnalysisStarted("profile");
       const response = await apiRequest("POST", "/api/analyze-profile", {
         platform,
         gender,

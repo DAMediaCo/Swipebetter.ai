@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth, useSubscription, useCheckout, useCustomerPortal } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Link } from "wouter";
+import { storePendingPurchase } from "@/lib/analytics";
 import { 
   ArrowLeft, 
   Check, 
@@ -52,11 +53,12 @@ export default function Pricing() {
 
   const isSubscribed = subscriptionData?.subscription?.status === "active";
 
-  const handleCheckout = (priceId: string) => {
+  const handleCheckout = (priceId: string, planType: "starter" | "monthly" | "annual", price: number) => {
     if (!user) {
       setLocation("/auth");
       return;
     }
+    storePendingPurchase({ planType, price, priceId });
     checkoutMutation.mutate(priceId);
   };
 
@@ -160,7 +162,7 @@ export default function Pricing() {
                 <Button
                   className="w-full py-6 mt-6"
                   variant="outline"
-                  onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id)}
+                  onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id, "starter", 9)}
                   disabled={checkoutMutation.isPending || !oneTimePrice}
                   data-testid="button-checkout-onetime"
                 >
@@ -192,7 +194,7 @@ export default function Pricing() {
                 <Button
                   className="w-full py-6 mt-6"
                   variant="outline"
-                  onClick={() => monthlyPrice && handleCheckout(monthlyPrice.id)}
+                  onClick={() => monthlyPrice && handleCheckout(monthlyPrice.id, "monthly", 19)}
                   disabled={checkoutMutation.isPending || !monthlyPrice}
                   data-testid="button-checkout-monthly"
                 >
@@ -230,7 +232,7 @@ export default function Pricing() {
                 </ul>
                 <Button
                   className="w-full py-6 mt-6"
-                  onClick={() => annualPrice && handleCheckout(annualPrice.id)}
+                  onClick={() => annualPrice && handleCheckout(annualPrice.id, "annual", 99)}
                   disabled={checkoutMutation.isPending || !annualPrice}
                   data-testid="button-checkout-annual"
                 >

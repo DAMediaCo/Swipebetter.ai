@@ -1,14 +1,20 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Zap, Check } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { TestimonialsRotator } from "@/components/TestimonialsRotator";
+import { trackToolEntry } from "@/lib/analytics";
 
 export default function Home() {
   const { data: authData } = useAuth();
   const user = authData?.user;
+  const [location] = useLocation();
+
+  const handleToolClick = (toolType: "profile" | "reply") => {
+    trackToolEntry(toolType, location);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -34,13 +40,13 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link href="/fix-profile">
+            <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
               <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-profile-hero">
                 <Camera className="w-5 h-5 mr-2" />
                 Fix My Profile
               </Button>
             </Link>
-            <Link href="/fix-reply">
+            <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-reply-hero">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Fix My Reply
@@ -136,7 +142,7 @@ export default function Home() {
                       Profile score rating
                     </li>
                   </ul>
-                  <Link href="/fix-profile">
+                  <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                     <Button className="w-full" data-testid="button-try-profile-fix">
                       Try Profile Fix
                     </Button>
@@ -167,7 +173,7 @@ export default function Home() {
                       Copy & paste ready
                     </li>
                   </ul>
-                  <Link href="/fix-reply">
+                  <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
                     <Button variant="outline" className="w-full" data-testid="button-try-reply-fix">
                       Try Reply Fix
                     </Button>
@@ -196,13 +202,13 @@ export default function Home() {
             Join thousands of users who have improved their dating profiles with AI-powered feedback.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/fix-profile">
+            <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
               <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-profile">
                 <Camera className="w-5 h-5 mr-2" />
                 Fix My Profile
               </Button>
             </Link>
-            <Link href="/fix-reply">
+            <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
               <Button variant="outline" size="lg" className="text-lg px-8 py-6" data-testid="button-start-reply">
                 <MessageSquare className="w-5 h-5 mr-2" />
                 Fix My Reply

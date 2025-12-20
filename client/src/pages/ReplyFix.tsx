@@ -13,6 +13,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
+import { trackAnalysisStarted } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
 import { 
   Sparkles, 
@@ -46,6 +47,7 @@ export default function ReplyFix() {
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
+      trackAnalysisStarted("reply");
       const response = await apiRequest("POST", "/api/analyze-reply", {
         tone,
         screenshots: images,

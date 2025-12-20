@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
+import { trackPreviewViewed } from "@/lib/analytics";
 import { 
   ArrowLeft, 
   Clipboard, 
@@ -28,6 +29,7 @@ export default function ReplyResults() {
       return;
     }
     setResult(data);
+    trackPreviewViewed("reply");
   }, [setLocation]);
 
   useEffect(() => {

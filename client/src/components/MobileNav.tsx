@@ -1,15 +1,22 @@
 import { Link, useLocation } from "wouter";
 import { Home, User, MessageSquare, CreditCard } from "lucide-react";
+import { trackToolEntry } from "@/lib/analytics";
 
 const navItems = [
-  { href: "/", icon: Home, label: "Home" },
-  { href: "/fix-profile", icon: User, label: "Profile" },
-  { href: "/fix-reply", icon: MessageSquare, label: "Reply" },
-  { href: "/pricing", icon: CreditCard, label: "Pricing" },
+  { href: "/", icon: Home, label: "Home", toolType: null },
+  { href: "/fix-profile", icon: User, label: "Profile", toolType: "profile" as const },
+  { href: "/fix-reply", icon: MessageSquare, label: "Reply", toolType: "reply" as const },
+  { href: "/pricing", icon: CreditCard, label: "Pricing", toolType: null },
 ];
 
 export function MobileNav() {
   const [location] = useLocation();
+
+  const handleNavClick = (toolType: "profile" | "reply" | null) => {
+    if (toolType) {
+      trackToolEntry(toolType, location);
+    }
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-bottom md:hidden">
@@ -18,7 +25,7 @@ export function MobileNav() {
           const isActive = location === item.href || 
             (item.href !== "/" && location.startsWith(item.href));
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType)}>
               <div
                 className={`flex flex-col items-center justify-center px-4 py-2 touch-target cursor-pointer transition-colors ${
                   isActive

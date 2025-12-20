@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { retrievePendingPurchase, trackPurchaseCompleted } from "@/lib/analytics";
 import { CheckCircle, Sparkles, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function CheckoutSuccess() {
@@ -25,6 +26,17 @@ export default function CheckoutSuccess() {
         await apiRequest("POST", "/api/verify-checkout", { sessionId });
         queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+        
+        const pendingPurchase = retrievePendingPurchase();
+        if (pendingPurchase) {
+          trackPurchaseCompleted({
+            planType: pendingPurchase.planType,
+            toolType: "both",
+            price: pendingPurchase.price,
+            transactionId: sessionId,
+          });
+        }
+        
         setVerifying(false);
       } catch (err) {
         setError("Failed to verify payment. Please contact support.");

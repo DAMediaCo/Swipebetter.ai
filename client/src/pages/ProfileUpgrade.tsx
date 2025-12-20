@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { StepIndicator } from "@/components/StepIndicator";
 import { ArrowLeft, Sparkles, Check, Crown } from "lucide-react";
 import { loadAnalysis } from "@/lib/analysisStorage";
+import { trackPaywallViewed } from "@/lib/analytics";
 
 export default function ProfileUpgrade() {
   const [, setLocation] = useLocation();
@@ -15,6 +16,8 @@ export default function ProfileUpgrade() {
       setLocation('/fix-profile');
       return;
     }
+
+    trackPaywallViewed("profile");
 
     const meta = document.createElement('meta');
     meta.name = 'robots';
