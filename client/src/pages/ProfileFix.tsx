@@ -20,11 +20,18 @@ import {
   ArrowLeft, 
   Camera,
   Upload,
-  ArrowDown
+  ArrowDown,
+  HelpCircle
 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 
-const platforms = ["Tinder", "Hinge", "Bumble", "Coffee Meets Bagel", "Other"];
+const platforms = ["Tinder", "Hinge", "Bumble", "Grindr", "Coffee Meets Bagel", "Other"];
 const genders = ["Man", "Woman", "Non-binary"];
 const intents = ["Relationship", "Casual Dating", "Friendship", "Not Sure"];
 
@@ -44,6 +51,7 @@ export default function ProfileFix() {
   const [platform, setPlatform] = useState("");
   const [gender, setGender] = useState("");
   const [intent, setIntent] = useState("");
+  const [isEnm, setIsEnm] = useState(false);
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
@@ -53,6 +61,7 @@ export default function ProfileFix() {
         gender,
         intent,
         screenshots: images,
+        enm: isEnm,
       });
       return response.json();
     },
@@ -243,6 +252,30 @@ export default function ProfileFix() {
             {step === 1 && (
               <div className="space-y-4">
                 <ImageUpload images={images} onChange={setImages} maxImages={5} />
+                
+                <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+                  <Checkbox
+                    id="enm-toggle"
+                    checked={isEnm}
+                    onCheckedChange={(checked) => setIsEnm(checked === true)}
+                    data-testid="checkbox-enm"
+                  />
+                  <label 
+                    htmlFor="enm-toggle" 
+                    className="text-sm font-medium cursor-pointer flex-1"
+                  >
+                    This is an ENM/Poly profile
+                  </label>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>Selecting this helps us tailor your feedback for ethical non-monogamy profiles.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                
                 <PrivacyNote />
               </div>
             )}

@@ -83,7 +83,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold">1. Upload Screenshots</h3>
                 <p className="text-sm text-muted-foreground">
-                  Take screenshots of your dating profile from any app - Tinder, Hinge, Bumble, or others.
+                  Take screenshots of your dating profile from any app - Tinder, Hinge, Bumble, Grindr, or others.
                 </p>
               </CardContent>
             </Card>

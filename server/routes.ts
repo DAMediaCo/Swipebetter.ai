@@ -18,15 +18,17 @@ const MAX_SCREENSHOTS = 5;
 const MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024; // 10MB base64
 
 const profileAnalysisSchema = z.object({
-  platform: z.enum(["Tinder", "Hinge", "Bumble", "Coffee Meets Bagel", "Other"]),
+  platform: z.enum(["Tinder", "Hinge", "Bumble", "Grindr", "Coffee Meets Bagel", "Other"]),
   gender: z.enum(["Man", "Woman", "Non-binary"]),
   intent: z.enum(["Relationship", "Casual Dating", "Friendship", "Not Sure"]),
   screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).min(1).max(MAX_SCREENSHOTS),
+  enm: z.boolean().optional(),
 });
 
 const replyAnalysisSchema = z.object({
   tone: z.enum(["flirty", "witty", "confident", "thoughtful"]),
   screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).min(1).max(3),
+  enm: z.boolean().optional(),
 });
 
 const checkoutSchema = z.object({

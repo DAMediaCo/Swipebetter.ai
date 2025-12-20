@@ -109,7 +109,8 @@ Preferred communication style: Simple, everyday language.
 
 ### Important Notes
 - Frontend option values must exactly match Zod enum literals to avoid 400 errors
-- Platform options: "Tinder", "Hinge", "Bumble", "Coffee Meets Bagel", "Other"
+- Platform options: "Tinder", "Hinge", "Bumble", "Grindr", "Coffee Meets Bagel", "Other"
+- ENM flag: Optional `enm: boolean` field for ethical non-monogamy profiles
 - Gender options: "Man", "Woman", "Non-binary"
 - Intent options: "Relationship", "Casual Dating", "Friendship", "Not Sure"
 - Tone options: "flirty", "witty", "confident", "thoughtful"

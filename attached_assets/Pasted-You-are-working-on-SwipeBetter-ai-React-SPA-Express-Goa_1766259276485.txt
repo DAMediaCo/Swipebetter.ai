@@ -1,0 +1,62 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Add Grindr as a supported dating app across the site and surface an ENM (Ethical Non‑Monogamy) option for users who want feedback tailored to ENM profiles. This is a copy/UX update—do not change routing or pricing.
+
+====================================================
+1. HOMEPAGE COPY UPDATES
+====================================================
+
+- Update the “who it’s for” or subheadline line to include Grindr alongside Tinder, Hinge, and Bumble.  
+  Example:  
+  “Built for Hinge, Tinder, Bumble, and now Grindr.”
+
+- If you have a section listing apps, add Grindr there with the same styling as existing apps.
+
+====================================================
+2. TRUST & FAQ UPDATES
+====================================================
+
+- Add a new FAQ item (appearing in the common FAQ component on both Fix Profile and Fix Reply pages):
+
+  **Q:** Does this work for Grindr and ENM/poly relationships?  
+  **A:** Yes. SwipeBetter works with Grindr just like it does with Hinge, Tinder, and Bumble. It also understands ethical non‑monogamy (ENM) profiles and can generate suggestions that respect poly dynamics.
+
+- If any existing FAQ answers mention Tinder, Hinge, or Bumble, extend them to include Grindr.
+
+====================================================
+3. ENM OPTION (OPTIONAL TOGGLE)
+====================================================
+
+Add a simple toggle or checkbox on both Fix Profile and Fix Reply entry pages:
+
+- Label: “This is an ENM/Poly profile”  
+- Place the toggle near the upload/paste area.
+- Default state: off (unchecked).
+- When toggled on, include a flag in the analysis request payload (e.g., `{ enm: true }`) so backend can adjust scoring/replies if supported.
+- If the backend doesn’t yet handle ENM specifically, simply pass the flag without affecting results; copy can say: “We’re ENM‑friendly—more nuanced feedback is coming soon.”
+
+Make sure the toggle is clearly explained (e.g. a tooltip or small helper text: “Selecting this helps us tailor your feedback for ethical non‑monogamy profiles.”)
+
+====================================================
+4. CTA & MARKETING COPY
+====================================================
+
+- In any marketing or hero section where you mention the supported apps, append “and Grindr”.
+- If you list benefits (like “More matches, better replies”), add a line or bullet: “ENM‑friendly” or “Built for monogamous and poly relationships”.
+
+====================================================
+5. SEO & FOOTER LINKS (IF APPLICABLE)
+====================================================
+
+- If you have SEO pages that mention specific apps, consider future‑proofing by using generic language (“top dating apps”) or adding Grindr where relevant.
+- No need to create new SEO pages yet; just ensure internal links are not app‑exclusive.
+
+====================================================
+DELIVERABLES
+====================================================
+
+- Grindr is mentioned wherever Hinge/Tinder/Bumble are mentioned on the main pages.
+- New FAQ entry about Grindr and ENM is live.
+- ENM toggle appears on Fix Profile and Fix Reply pages (with helper text).
+- Site copy remains clean, consistent, and conversion‑focused.
