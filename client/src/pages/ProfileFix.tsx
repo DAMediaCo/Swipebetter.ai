@@ -161,6 +161,15 @@ export default function ProfileFix() {
           <section>
             <PrivacyFAQ />
           </section>
+
+          <section className="text-center py-8 border-t border-border">
+            <p className="text-muted-foreground mb-4">Need help with replies instead?</p>
+            <Link href="/fix-reply">
+              <Button variant="outline" data-testid="link-fix-reply-cross">
+                Try Fix My Reply
+              </Button>
+            </Link>
+          </section>
         </div>
       </div>
     );

@@ -254,6 +254,22 @@ export default function Pricing() {
           </div>
         )}
 
+        <div className="mt-12 pt-8 border-t border-border text-center space-y-4">
+          <p className="text-muted-foreground">Ready to try it out?</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/fix-profile">
+              <Button variant="outline" data-testid="link-fix-profile">
+                Fix My Profile
+              </Button>
+            </Link>
+            <Link href="/fix-reply">
+              <Button variant="outline" data-testid="link-fix-reply">
+                Fix My Reply
+              </Button>
+            </Link>
+          </div>
+        </div>
+
       </div>
     </div>
   );

@@ -195,31 +195,74 @@ export default function Home() {
           <p className="text-muted-foreground text-lg max-w-lg mx-auto">
             Join thousands of users who have improved their dating profiles with AI-powered feedback.
           </p>
-          {user ? (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/fix-profile">
-              <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-now">
-                <Zap className="w-5 h-5 mr-2" />
-                Start Now
+              <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-profile">
+                <Camera className="w-5 h-5 mr-2" />
+                Fix My Profile
               </Button>
             </Link>
-          ) : (
-            <Link href="/auth">
-              <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-free">
-                <Zap className="w-5 h-5 mr-2" />
-                Get Started
+            <Link href="/fix-reply">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6" data-testid="button-start-reply">
+                <MessageSquare className="w-5 h-5 mr-2" />
+                Fix My Reply
               </Button>
             </Link>
-          )}
+          </div>
         </div>
       </section>
 
-      <footer className="py-8 px-4 border-t border-border">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span>SwipeBetter.ai</span>
+      <footer className="py-12 px-4 border-t border-border">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span className="font-semibold">SwipeBetter.ai</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                AI-powered feedback for your dating profile and replies.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Features</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link href="/fix-profile" className="hover-elevate">Fix My Profile</Link>
+                </li>
+                <li>
+                  <Link href="/fix-reply" className="hover-elevate">Fix My Reply</Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="hover-elevate">Pricing</Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Dating Tips</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link href="/hinge-prompts-men" className="hover-elevate">Hinge Prompts for Men</Link>
+                </li>
+                <li>
+                  <Link href="/hinge-prompts-women" className="hover-elevate">Hinge Prompts for Women</Link>
+                </li>
+                <li>
+                  <Link href="/tinder-bio-guide" className="hover-elevate">Tinder Bio Guide</Link>
+                </li>
+                <li>
+                  <Link href="/bumble-opener-lines" className="hover-elevate">Bumble Opener Lines</Link>
+                </li>
+                <li>
+                  <Link href="/dating-app-photos" className="hover-elevate">Dating App Photos</Link>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p>Your screenshots are private and deleted after processing.</p>
+          <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <p>Your screenshots are private and deleted after processing.</p>
+            <p>© {new Date().getFullYear()} SwipeBetter.ai</p>
+          </div>
         </div>
       </footer>
     </div>
