@@ -133,18 +133,20 @@ export default function Pricing() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <Card>
+          <div className="grid md:grid-cols-3 gap-6 mb-8 items-stretch">
+            <Card className="flex flex-col">
               <CardHeader className="text-center pb-2">
+                <div className="h-6" />
                 <CardTitle className="text-xl">Starter Fix</CardTitle>
                 <p className="text-sm text-muted-foreground">One-time purchase</p>
               </CardHeader>
-              <CardContent className="text-center space-y-6">
-                <div>
+              <CardContent className="flex flex-col flex-1 text-center">
+                <div className="mb-6">
                   <span className="text-4xl font-bold">$9</span>
                   <span className="text-muted-foreground"> one-time</span>
+                  <p className="text-sm text-transparent mt-1">placeholder</p>
                 </div>
-                <ul className="text-sm space-y-2 text-left">
+                <ul className="text-sm space-y-2 text-left flex-1">
                   {oneTimeFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -153,7 +155,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6"
+                  className="w-full py-6 mt-6"
                   variant="outline"
                   onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id)}
                   disabled={checkoutMutation.isPending || !oneTimePrice}
@@ -164,18 +166,19 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="flex flex-col">
               <CardHeader className="text-center pb-2">
-                <Badge variant="secondary" className="mx-auto mb-2">Most Flexible</Badge>
+                <Badge variant="secondary" className="mx-auto mb-2 h-6 flex items-center">Most Flexible</Badge>
                 <CardTitle className="text-xl">Unlimited Monthly</CardTitle>
                 <p className="text-sm text-muted-foreground">Cancel anytime</p>
               </CardHeader>
-              <CardContent className="text-center space-y-6">
-                <div>
+              <CardContent className="flex flex-col flex-1 text-center">
+                <div className="mb-6">
                   <span className="text-4xl font-bold">$19</span>
                   <span className="text-muted-foreground">/month</span>
+                  <p className="text-sm text-transparent mt-1">placeholder</p>
                 </div>
-                <ul className="text-sm space-y-2 text-left">
+                <ul className="text-sm space-y-2 text-left flex-1">
                   {unlimitedFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -184,7 +187,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6"
+                  className="w-full py-6 mt-6"
                   variant="outline"
                   onClick={() => monthlyPrice && handleCheckout(monthlyPrice.id)}
                   disabled={checkoutMutation.isPending || !monthlyPrice}
@@ -195,7 +198,7 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary relative overflow-visible">
+            <Card className="border-primary relative overflow-visible flex flex-col">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <Badge className="bg-primary text-primary-foreground px-3 py-1">
                   <Star className="w-3 h-3 mr-1" />
@@ -205,19 +208,20 @@ export default function Pricing() {
               <div className="absolute top-4 right-4">
                 <Badge variant="secondary" className="text-xs">Save 57%</Badge>
               </div>
-              <CardHeader className="text-center pb-2 pt-8">
+              <CardHeader className="text-center pb-2">
+                <div className="h-6" />
                 <CardTitle className="text-xl">Unlimited Annual</CardTitle>
                 <p className="text-sm text-muted-foreground">Best savings</p>
               </CardHeader>
-              <CardContent className="text-center space-y-6">
-                <div>
+              <CardContent className="flex flex-col flex-1 text-center">
+                <div className="mb-6">
                   <span className="text-4xl font-bold">$99</span>
                   <span className="text-muted-foreground">/year</span>
                   <p className="text-sm text-primary font-medium mt-1">
                     $8.25/mo billed annually
                   </p>
                 </div>
-                <ul className="text-sm space-y-2 text-left">
+                <ul className="text-sm space-y-2 text-left flex-1">
                   {unlimitedFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -226,7 +230,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6"
+                  className="w-full py-6 mt-6"
                   onClick={() => annualPrice && handleCheckout(annualPrice.id)}
                   disabled={checkoutMutation.isPending || !annualPrice}
                   data-testid="button-checkout-annual"
