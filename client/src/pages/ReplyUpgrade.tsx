@@ -1,12 +1,21 @@
 import { useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StepIndicator } from "@/components/StepIndicator";
 import { ArrowLeft, Sparkles, Check, Crown } from "lucide-react";
+import { loadAnalysis } from "@/lib/analysisStorage";
 
 export default function ReplyUpgrade() {
+  const [, setLocation] = useLocation();
+
   useEffect(() => {
+    const analysis = loadAnalysis('reply');
+    if (!analysis) {
+      setLocation('/fix-reply');
+      return;
+    }
+
     const meta = document.createElement('meta');
     meta.name = 'robots';
     meta.content = 'noindex';
@@ -14,7 +23,7 @@ export default function ReplyUpgrade() {
     return () => {
       document.head.removeChild(meta);
     };
-  }, []);
+  }, [setLocation]);
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
