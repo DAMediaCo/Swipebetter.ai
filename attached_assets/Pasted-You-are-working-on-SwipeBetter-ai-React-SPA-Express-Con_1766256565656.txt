@@ -1,0 +1,108 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Context:
+GA4 is already installed and firing with Measurement ID G-GSBS999F1M.
+Basic funnel events are already implemented.
+
+Goal:
+Add GA4 purchase tracking that fires ONLY after a successful Stripe payment.
+Do NOT reimplement GA4 setup.
+Do NOT duplicate existing analytics logic.
+
+====================================================
+STRIPE PURCHASE TRACKING (UPGRADE ONLY)
+====================================================
+
+We are using Stripe Checkout (redirect flow).
+
+When Stripe redirects back to the app after payment success:
+
+1) Identify the existing success return page or handler.
+   Example:
+   /checkout/success?session_id=cs_test_...
+
+2) On that success page load:
+   - Extract session_id from URL
+   - Call backend endpoint:
+     GET /api/stripe/verify-session?session_id=...
+
+3) Backend:
+   - Use Stripe SDK to retrieve the Checkout Session:
+     stripe.checkout.sessions.retrieve(session_id, {
+       expand: ["line_items"]
+     })
+
+   - Verify:
+     session.payment_status === "paid"
+
+   - Return to client:
+     {
+       plan_type: "starter" | "monthly" | "annual",
+       price: number,
+       currency: "USD",
+       tool_type: "profile" | "reply" | "both",
+       transaction_id: session.id
+     }
+
+====================================================
+GA4 EVENTS TO FIRE (CLIENT)
+====================================================
+
+ONLY after backend verification succeeds:
+
+A) Custom event
+track("purchase_completed", {
+  plan_type,
+  tool_type,
+  price,
+  currency: "USD"
+});
+
+B) GA4 ecommerce event
+gtag("event", "purchase", {
+  transaction_id,
+  value: price,
+  currency: "USD",
+  items: [
+    {
+      item_name:
+        plan_type === "starter"
+          ? "Starter Fix"
+          : plan_type === "monthly"
+          ? "Unlimited Monthly"
+          : "Unlimited Annual",
+      item_category:
+        plan_type === "starter"
+          ? "one_time"
+          : "subscription",
+      price: price,
+      quantity: 1
+    }
+  ]
+});
+
+====================================================
+IMPORTANT RULES
+====================================================
+
+- Do NOT fire purchase events:
+  - On checkout button click
+  - On redirect to Stripe
+  - On failed or canceled sessions
+
+- Fire purchase events ONLY after:
+  Stripe confirms payment_status === "paid"
+
+- Do NOT send:
+  - Screenshots
+  - Conversation text
+  - User PII
+
+====================================================
+DELIVERABLE
+====================================================
+
+- GA4 purchase events fire correctly for Stripe payments
+- Each purchase is tracked once
+- Plan type and price are accurate
+- Existing analytics remain untouched

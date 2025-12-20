@@ -80,6 +80,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes (December 2024)
 
+### GA4 Analytics Integration
+- **Measurement ID**: G-GSBS999F1M
+- **Implementation**: `client/src/lib/analytics.ts`
+- **Tracked Events**:
+  - `page_view` - Automatic on SPA route changes via wouter's useLocation
+  - `tool_entry` - When users navigate to /fix-profile or /fix-reply (with deduplication guard)
+  - `analysis_started` - When user initiates profile or reply analysis
+  - `preview_viewed` - When results page loads
+  - `paywall_viewed` - When upgrade page loads
+  - `purchase_completed` - Custom event with plan details
+  - `purchase` - GA4 ecommerce event with transaction_id, value, currency, items array
+- **Purchase Tracking Flow**: Pricing.tsx stores pending purchase data (planType, price from Stripe, priceId, productName) in sessionStorage, CheckoutSuccess.tsx retrieves and fires purchase events
+
 ### Input Validation
 - Added Zod validation schemas for all API endpoints in `server/routes.ts`
 - Profile analysis validates: platform (enum), gender (enum), intent (enum), screenshots (1-5 images, max 10MB each)
