@@ -16,6 +16,15 @@ import ReplyUpgrade from "@/pages/ReplyUpgrade";
 import Pricing from "@/pages/Pricing";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import TinderBioGuide from "@/pages/TinderBioGuide";
+import HingePromptsMen from "@/pages/HingePromptsMen";
+import HingePromptsWomen from "@/pages/HingePromptsWomen";
+import BumbleOpenerLines from "@/pages/BumbleOpenerLines";
+import DatingAppPhotos from "@/pages/DatingAppPhotos";
+import HingeProfileTips from "@/pages/HingeProfileTips";
+import BumbleBioExamples from "@/pages/BumbleBioExamples";
+import TinderPhotoOrder from "@/pages/TinderPhotoOrder";
+import WhatToTextAfterMatching from "@/pages/WhatToTextAfterMatching";
+import ReviveDeadConversation from "@/pages/ReviveDeadConversation";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -32,6 +41,15 @@ function Router() {
       <Route path="/pricing" component={Pricing} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/tinder-bio-guide" component={TinderBioGuide} />
+      <Route path="/hinge-prompts-men" component={HingePromptsMen} />
+      <Route path="/hinge-prompts-women" component={HingePromptsWomen} />
+      <Route path="/bumble-opener-lines" component={BumbleOpenerLines} />
+      <Route path="/dating-app-photos" component={DatingAppPhotos} />
+      <Route path="/hinge-profile-tips" component={HingeProfileTips} />
+      <Route path="/bumble-bio-examples" component={BumbleBioExamples} />
+      <Route path="/tinder-photo-order" component={TinderPhotoOrder} />
+      <Route path="/what-to-text-after-matching" component={WhatToTextAfterMatching} />
+      <Route path="/revive-dead-conversation" component={ReviveDeadConversation} />
       <Route component={NotFound} />
     </Switch>
   );

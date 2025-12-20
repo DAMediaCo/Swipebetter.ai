@@ -214,7 +214,7 @@ export default function Home() {
 
       <footer className="py-12 px-4 border-t border-border">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Sparkles className="w-4 h-4 text-primary" />
@@ -239,8 +239,11 @@ export default function Home() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Dating Tips</h4>
+              <h4 className="font-semibold mb-4">Profile Tips</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link href="/tinder-bio-guide" className="hover-elevate">Tinder Bio Guide</Link>
+                </li>
                 <li>
                   <Link href="/hinge-prompts-men" className="hover-elevate">Hinge Prompts for Men</Link>
                 </li>
@@ -248,13 +251,30 @@ export default function Home() {
                   <Link href="/hinge-prompts-women" className="hover-elevate">Hinge Prompts for Women</Link>
                 </li>
                 <li>
-                  <Link href="/tinder-bio-guide" className="hover-elevate">Tinder Bio Guide</Link>
+                  <Link href="/bumble-bio-examples" className="hover-elevate">Bumble Bio Examples</Link>
                 </li>
+                <li>
+                  <Link href="/dating-app-photos" className="hover-elevate">Dating App Photos</Link>
+                </li>
+                <li>
+                  <Link href="/hinge-profile-tips" className="hover-elevate">Hinge Profile Tips</Link>
+                </li>
+                <li>
+                  <Link href="/tinder-photo-order" className="hover-elevate">Tinder Photo Order</Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Messaging Tips</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
                   <Link href="/bumble-opener-lines" className="hover-elevate">Bumble Opener Lines</Link>
                 </li>
                 <li>
-                  <Link href="/dating-app-photos" className="hover-elevate">Dating App Photos</Link>
+                  <Link href="/what-to-text-after-matching" className="hover-elevate">What to Text After Matching</Link>
+                </li>
+                <li>
+                  <Link href="/revive-dead-conversation" className="hover-elevate">Revive Dead Conversations</Link>
                 </li>
               </ul>
             </div>
