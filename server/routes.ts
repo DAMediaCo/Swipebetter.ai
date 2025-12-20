@@ -100,7 +100,7 @@ export async function registerRoutes(
       }));
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5.1",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
@@ -197,7 +197,7 @@ export async function registerRoutes(
       }));
 
       const response = await openai.chat.completions.create({
-        model: "gpt-5.1",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
