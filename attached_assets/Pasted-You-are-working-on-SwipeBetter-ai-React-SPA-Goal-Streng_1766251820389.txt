@@ -1,0 +1,91 @@
+You are working on SwipeBetter.ai (React SPA). 
+Goal: Strengthen trust and reduce friction by adding clear privacy, security, and FAQ messaging on both Fix Profile and Fix Reply pages.
+
+DO NOT change URLs or core functionality.
+This is a UI + copy update only.
+
+--------------------------------------------------
+SECTION 1: TRUST BAR (ABOVE THE FOLD)
+--------------------------------------------------
+On BOTH pages:
+- /fix-profile
+- /fix-reply
+
+Add a small horizontal “Trust Bar” directly under the main headline or CTA.
+
+Trust bar should include 3 short statements with simple icons (lock, trash, lightning):
+
+• Private & Secure  
+• Screenshots deleted after processing  
+• No account sharing required  
+
+Copy rules:
+- Keep wording simple and confident.
+- No legal jargon.
+- No footnotes.
+- This must be visible without scrolling.
+
+--------------------------------------------------
+SECTION 2: MOVE & REINFORCE PRIVACY MESSAGE
+--------------------------------------------------
+You already mention deletion at the bottom of the page.
+
+Do the following:
+- Keep the footer mention.
+- ALSO surface this line higher on the page (near upload or input area):
+
+“Your screenshots are processed securely and automatically deleted after analysis.”
+
+If screenshots are never stored long-term, say so clearly.
+Do NOT overpromise. If deletion happens after processing, state exactly that.
+
+--------------------------------------------------
+SECTION 3: SIMPLE FAQ BLOCK
+--------------------------------------------------
+Add a short FAQ section near the bottom of BOTH pages.
+
+Structure:
+- Title: “Common Questions”
+- 3 to 4 expandable FAQ items (accordion style if UI library exists, otherwise static).
+
+FAQ content (use exactly this wording unless technically inaccurate):
+
+Q: Will this work for Hinge, Tinder, and Bumble?  
+A: Yes. SwipeBetter works with all major dating apps including Hinge, Tinder, Bumble, and others.
+
+Q: Do you store my screenshots or conversations?  
+A: No. Screenshots and conversations are processed to generate feedback, then deleted. We do not permanently store your uploads.
+
+Q: How long does it take?  
+A: Most results are generated in under a minute.
+
+Q: Do I need to log in to my dating app?  
+A: No. We never ask for your dating app login or account access.
+
+If any answer above is not technically accurate, adjust ONLY that answer. Do not remove the question.
+
+--------------------------------------------------
+SECTION 4: UI & STYLE RULES
+--------------------------------------------------
+- Match existing typography and spacing.
+- Keep it clean and minimal.
+- This should feel reassuring, not salesy.
+- No popups or modals.
+- Mobile-first spacing.
+
+--------------------------------------------------
+SECTION 5: IMPLEMENTATION NOTES
+--------------------------------------------------
+- Reuse components if possible between Fix Profile and Fix Reply.
+- Name component something reusable like:
+  TrustBar.jsx
+  PrivacyFAQ.jsx
+- Do not introduce new dependencies unless already used in the project.
+
+--------------------------------------------------
+DELIVERABLE
+--------------------------------------------------
+- Trust bar visible above the fold on both pages
+- Privacy copy reinforced near input/upload
+- FAQ section added and readable on mobile
+- No change to existing behavior or routing

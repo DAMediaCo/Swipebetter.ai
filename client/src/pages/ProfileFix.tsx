@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUpload } from "@/components/ImageUpload";
-import { StepIndicator } from "@/components/StepIndicator";
+import { TrustBar } from "@/components/TrustBar";
+import { PrivacyNote } from "@/components/PrivacyNote";
+import { PrivacyFAQ } from "@/components/PrivacyFAQ";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
@@ -131,6 +133,10 @@ export default function ProfileFix() {
           <div className="w-9" />
         </div>
 
+        <div className="mb-6">
+          <TrustBar />
+        </div>
+
         {!subscriptionData?.canAnalyze && (
           <Card className="mb-6 border-primary/50 bg-primary/5">
             <CardContent className="py-4 flex items-center gap-3">
@@ -162,7 +168,10 @@ export default function ProfileFix() {
             
             <CardContent className="space-y-6 pt-4">
               {step === 1 && (
-                <ImageUpload images={images} onChange={setImages} maxImages={5} />
+                <div className="space-y-4">
+                  <ImageUpload images={images} onChange={setImages} maxImages={5} />
+                  <PrivacyNote />
+                </div>
               )}
 
               {step === 2 && (
@@ -223,6 +232,10 @@ export default function ProfileFix() {
               )}
             </CardContent>
           </Card>
+
+        <div className="mt-8">
+          <PrivacyFAQ />
+        </div>
       </div>
 
       {step <= 3 && (
