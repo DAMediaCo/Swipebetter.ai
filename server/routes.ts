@@ -9,9 +9,9 @@ import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 
-const openai = new OpenAI({
-  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
-  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+const grok = new OpenAI({
+  apiKey: process.env.XAI_API_KEY,
+  baseURL: "https://api.x.ai/v1",
 });
 
 const MAX_SCREENSHOTS = 5;
@@ -88,8 +88,8 @@ export async function registerRoutes(
         image_url: { url: img }
       }));
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+      const response = await grok.chat.completions.create({
+        model: "grok-4.1-fast-non-reasoning",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
@@ -175,8 +175,8 @@ export async function registerRoutes(
         image_url: { url: img }
       }));
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+      const response = await grok.chat.completions.create({
+        model: "grok-4.1-fast-non-reasoning",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
