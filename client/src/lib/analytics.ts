@@ -12,13 +12,26 @@ function isDev() {
   return import.meta.env.DEV;
 }
 
+function isDebugMode() {
+  if (typeof window === "undefined") return false;
+  const params = new URLSearchParams(window.location.search);
+  return params.get("debug_mode") === "true";
+}
+
 export function track(eventName: string, params?: Record<string, unknown>) {
-  if (isDev()) {
-    console.log("[GA4]", eventName, params);
+  const debugMode = isDebugMode();
+  
+  const eventParams = {
+    ...params,
+    ...(debugMode ? { debug_mode: true } : {}),
+  };
+
+  if (isDev() || debugMode) {
+    console.log("[GA4]", eventName, eventParams);
   }
 
   if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("event", eventName, params);
+    window.gtag("event", eventName, eventParams);
   }
 }
 

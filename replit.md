@@ -82,15 +82,18 @@ Preferred communication style: Simple, everyday language.
 
 ### GA4 Analytics Integration
 - **Measurement ID**: G-GSBS999F1M
-- **Implementation**: `client/src/lib/analytics.ts`
+- **Implementation**: 
+  - GA4 script in `client/index.html` head with `send_page_view: false` (disables automatic tracking for SPA)
+  - Manual tracking via `client/src/lib/analytics.ts`
 - **Tracked Events**:
-  - `page_view` - Automatic on SPA route changes via wouter's useLocation
+  - `page_view` - Manual tracking on SPA route changes via wouter's useLocation in PageViewTracker component
   - `tool_entry` - When users navigate to /fix-profile or /fix-reply (with deduplication guard)
   - `analysis_started` - When user initiates profile or reply analysis
   - `preview_viewed` - When results page loads
   - `paywall_viewed` - When upgrade page loads
   - `purchase_completed` - Custom event with plan details
   - `purchase` - GA4 ecommerce event with transaction_id, value, currency, items array (includes item_id)
+- **Debug Mode**: Add `?debug_mode=true` to URL to enable GA4 DebugView events and console logging
 - **Purchase Tracking Flow**: Backend verifies Stripe payment_status === 'paid' via /api/verify-checkout and returns purchase data (plan_type, price, currency, transaction_id, price_id). CheckoutSuccess.tsx fires GA4 events only after backend verification confirms payment success.
 
 ### Input Validation

@@ -1,0 +1,129 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Context:
+- GA4 Measurement ID: G-GSBS999F1M
+- GA4 code already exists but Google is not reliably detecting it.
+- This is a React SPA (no full page reloads).
+
+Goal:
+Ensure GA4 is properly loaded, detectable, and tracking page views correctly in a React SPA.
+
+Do NOT change routes or business logic.
+Do NOT remove existing analytics helpers unless explicitly replaced.
+Do NOT send any personal data to GA4.
+
+====================================================
+STEP 1: ENSURE GTAG IS LOADED CORRECTLY
+====================================================
+
+Confirm the GA4 gtag snippet is placed in the STATIC HTML entry point
+(e.g. public/index.html), NOT inside a React component.
+
+The snippet must exist inside <head>:
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSBS999F1M"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "G-GSBS999F1M", { send_page_view: false });
+</script>
+
+Important:
+- The script must load before React hydrates.
+- Do not conditionally load this script.
+
+====================================================
+STEP 2: SPA PAGE VIEW TRACKING (REQUIRED)
+====================================================
+
+Because this is a React SPA, GA4 will NOT automatically detect navigation.
+
+Implement manual page_view tracking using React Router.
+
+In the top-level router component:
+
+- Use useLocation()
+- Fire a page_view event whenever location.pathname changes
+
+Example behavior (do NOT copy verbatim if structure differs):
+
+On route change:
+gtag("event", "page_view", {
+  page_path: location.pathname,
+  page_title: document.title
+});
+
+This must fire for:
+- /
+- /fix-profile
+- /fix-reply
+- /pricing
+- ALL SEO pages
+- Any upgrade or result pages
+
+====================================================
+STEP 3: FAIL-SAFE GUARD
+====================================================
+
+Before calling gtag():
+- Check that window.gtag exists
+- Fail silently if it does not (no crashes)
+
+Example behavior:
+if (window.gtag) { fire event }
+
+====================================================
+STEP 4: DEBUG MODE FOR VERIFICATION
+====================================================
+
+Add GA4 debug support during testing.
+
+If URL includes:
+?debug_mode=true
+
+Then:
+- Include debug_mode: true in all GA events
+- Log events to console in development only
+
+This allows events to appear in GA4 DebugView.
+
+====================================================
+STEP 5: VERIFICATION REQUIREMENTS
+====================================================
+
+After implementation, verify GA4 ONLY using:
+
+Google Analytics → Admin → DebugView
+
+NOT:
+- Tag Assistant warnings
+- “Tag not detected” banners
+(these are unreliable for SPAs)
+
+Expected DebugView events:
+- page_view
+- tool_entry (when clicking Fix Profile / Fix Reply)
+- analysis_started
+- preview_viewed
+- paywall_viewed
+- purchase (after Stripe success)
+
+====================================================
+IMPORTANT RULES
+====================================================
+
+- Do NOT send screenshots, bios, conversations, or PII
+- Do NOT re-add gtag multiple times
+- Do NOT rely on automatic page tracking
+- Manual page_view events are REQUIRED
+
+====================================================
+DELIVERABLE
+====================================================
+
+- GA4 reliably detectable
+- page_view events firing on route changes
+- Events visible in GA4 DebugView
+- No duplicate page views
+- No regressions in app behavior
