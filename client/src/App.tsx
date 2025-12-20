@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -59,12 +59,19 @@ function Router() {
 
 function PageViewTracker() {
   const [location] = useLocation();
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
     initGA();
   }, []);
 
   useEffect(() => {
+    // Skip tracking on first load since gtag config sends automatic page_view
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      return;
+    }
+    
     // Small delay to allow page title to update after route change
     const timeout = setTimeout(() => {
       const title = document.title || "SwipeBetter.ai";

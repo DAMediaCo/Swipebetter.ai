@@ -83,10 +83,10 @@ Preferred communication style: Simple, everyday language.
 ### GA4 Analytics Integration
 - **Measurement ID**: G-GSBS999F1M
 - **Implementation**: 
-  - GA4 script in `client/index.html` head with `send_page_view: false` (disables automatic tracking for SPA)
-  - Manual tracking via `client/src/lib/analytics.ts`
+  - GA4 script in `client/index.html` head with automatic page_view on initial load
+  - Manual tracking via `client/src/lib/analytics.ts` for SPA route changes
 - **Tracked Events**:
-  - `page_view` - Manual tracking on SPA route changes via wouter's useLocation in PageViewTracker component
+  - `page_view` - Automatic on initial page load, manual tracking on SPA route changes via PageViewTracker component
   - `tool_entry` - When users navigate to /fix-profile or /fix-reply (with deduplication guard)
   - `analysis_started` - When user initiates profile or reply analysis
   - `preview_viewed` - When results page loads
