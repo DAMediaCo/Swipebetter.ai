@@ -35,6 +35,7 @@ export function getSession() {
     cookie: {
       httpOnly: true,
       secure: true,
+      sameSite: 'lax',
       maxAge: sessionTtl,
     },
   });
@@ -138,8 +139,14 @@ export async function setupAuth(app: Express) {
           console.error("[AUTH] Login error:", loginErr);
           return res.redirect("/");
         }
-        console.log("[AUTH] Login successful for user");
-        return res.redirect("/");
+        // Ensure session is saved before redirecting
+        req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error("[AUTH] Session save error:", saveErr);
+          }
+          console.log("[AUTH] Login successful for user, session saved");
+          return res.redirect("/");
+        });
       });
     })(req, res, next);
   });
