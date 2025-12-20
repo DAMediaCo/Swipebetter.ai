@@ -36,6 +36,7 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   plan: text("plan"),
   status: text("status").default("inactive"),
   freeAnalysesUsed: integer("free_analyses_used").default(0),
+  oneTimeCredits: integer("one_time_credits").default(0),
   currentPeriodEnd: timestamp("current_period_end"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),

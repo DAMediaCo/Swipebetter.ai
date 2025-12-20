@@ -12,7 +12,8 @@ import {
   Sparkles, 
   Crown,
   Zap,
-  Shield
+  Shield,
+  Star
 } from "lucide-react";
 
 interface Price {
@@ -47,6 +48,7 @@ export default function Pricing() {
   const mainProduct = products[0];
   const monthlyPrice = mainProduct?.prices.find(p => p.recurring?.interval === "month");
   const annualPrice = mainProduct?.prices.find(p => p.recurring?.interval === "year");
+  const oneTimePrice = mainProduct?.prices.find(p => !p.recurring);
 
   const isSubscribed = subscriptionData?.subscription?.status === "active";
 
@@ -58,13 +60,20 @@ export default function Pricing() {
     checkoutMutation.mutate(priceId);
   };
 
-  const features = [
+  const unlimitedFeatures = [
     "Unlimited profile analyses",
     "Unlimited reply suggestions",
     "All dating platforms supported",
     "Advanced AI feedback",
     "Priority support",
-    "Profile score tracking",
+  ];
+
+  const oneTimeFeatures = [
+    "One full Fix Profile OR Fix Reply",
+    "Full results unlocked",
+    "Copy buttons enabled",
+    "No expiration",
+    "No subscription required",
   ];
 
   if (authLoading || subLoading || productsLoading) {
@@ -81,7 +90,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8 flex items-center">
           <Link href="/">
             <Button variant="ghost" size="icon" data-testid="button-back">
@@ -96,10 +105,10 @@ export default function Pricing() {
             SwipeBetter Pro
           </Badge>
           <h1 className="text-3xl md:text-4xl font-bold">
-            Upgrade Your Dating Game
+            Unlock Your Full Results
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Get unlimited AI-powered profile feedback and reply suggestions.
+            Choose the plan that works best for you.
           </p>
         </div>
 
@@ -124,19 +133,56 @@ export default function Pricing() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardHeader className="text-center pb-2">
-                <CardTitle className="text-xl">Monthly</CardTitle>
+                <CardTitle className="text-xl">Starter Fix</CardTitle>
+                <p className="text-sm text-muted-foreground">One-time purchase</p>
+              </CardHeader>
+              <CardContent className="text-center space-y-6">
+                <div>
+                  <span className="text-4xl font-bold">$9</span>
+                  <span className="text-muted-foreground"> one-time</span>
+                </div>
+                <ul className="text-sm space-y-2 text-left">
+                  {oneTimeFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  className="w-full py-6"
+                  variant="outline"
+                  onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id)}
+                  disabled={checkoutMutation.isPending || !oneTimePrice}
+                  data-testid="button-checkout-onetime"
+                >
+                  {checkoutMutation.isPending ? "Loading..." : "Get Starter Fix"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="text-center pb-2">
+                <Badge variant="secondary" className="mx-auto mb-2">Most Flexible</Badge>
+                <CardTitle className="text-xl">Unlimited Monthly</CardTitle>
                 <p className="text-sm text-muted-foreground">Cancel anytime</p>
               </CardHeader>
               <CardContent className="text-center space-y-6">
                 <div>
-                  <span className="text-4xl font-bold">
-                    ${monthlyPrice ? (monthlyPrice.unit_amount / 100).toFixed(2) : "7.99"}
-                  </span>
+                  <span className="text-4xl font-bold">$19</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
+                <ul className="text-sm space-y-2 text-left">
+                  {unlimitedFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
                 <Button
                   className="w-full py-6"
                   variant="outline"
@@ -149,24 +195,36 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-bl-lg">
-                Save 38%
+            <Card className="border-primary relative overflow-visible">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="bg-primary text-primary-foreground px-3 py-1">
+                  <Star className="w-3 h-3 mr-1" />
+                  Best Value
+                </Badge>
               </div>
-              <CardHeader className="text-center pb-2">
-                <CardTitle className="text-xl">Annual</CardTitle>
-                <p className="text-sm text-muted-foreground">Best value</p>
+              <div className="absolute top-4 right-4">
+                <Badge variant="secondary" className="text-xs">Save 57%</Badge>
+              </div>
+              <CardHeader className="text-center pb-2 pt-8">
+                <CardTitle className="text-xl">Unlimited Annual</CardTitle>
+                <p className="text-sm text-muted-foreground">Best savings</p>
               </CardHeader>
               <CardContent className="text-center space-y-6">
                 <div>
-                  <span className="text-4xl font-bold">
-                    ${annualPrice ? (annualPrice.unit_amount / 100).toFixed(0) : "59"}
-                  </span>
+                  <span className="text-4xl font-bold">$99</span>
                   <span className="text-muted-foreground">/year</span>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Just ${annualPrice ? (annualPrice.unit_amount / 100 / 12).toFixed(2) : "4.92"}/mo
+                  <p className="text-sm text-primary font-medium mt-1">
+                    $8.25/mo billed annually
                   </p>
                 </div>
+                <ul className="text-sm space-y-2 text-left">
+                  {unlimitedFeatures.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
                 <Button
                   className="w-full py-6"
                   onClick={() => annualPrice && handleCheckout(annualPrice.id)}
@@ -181,27 +239,6 @@ export default function Pricing() {
           </div>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
-              Everything in Pro
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              {features.map((feature, index) => (
-                <li key={index} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-primary" />
-                  </div>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
         {!isSubscribed && (
           <div className="mt-8 text-center space-y-3">
             <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -209,7 +246,7 @@ export default function Pricing() {
               <span>Secure payment via Stripe</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              Cancel anytime. No questions asked.
+              Cancel subscriptions anytime. No questions asked.
             </p>
           </div>
         )}

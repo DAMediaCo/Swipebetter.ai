@@ -81,18 +81,18 @@ export default function ProfileUpgrade() {
             <Button
               variant="outline"
               className="w-full"
-              data-testid="button-continue-free"
+              data-testid="button-view-preview"
             >
-              Continue Free
+              View Preview
             </Button>
           </Link>
           <Link href="/pricing" className="flex-1">
             <Button
               className="w-full"
-              data-testid="button-upgrade-now"
+              data-testid="button-unlock-now"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Upgrade Now
+              Unlock Full Results
             </Button>
           </Link>
         </div>

@@ -30,6 +30,8 @@ export interface IStorage {
   createUserSubscription(data: InsertUserSubscription): Promise<UserSubscription>;
   updateUserSubscription(userId: string, data: Partial<InsertUserSubscription>): Promise<UserSubscription | undefined>;
   incrementFreeAnalysesUsed(userId: string): Promise<void>;
+  addOneTimeCredits(userId: string, credits: number): Promise<void>;
+  decrementOneTimeCredits(userId: string): Promise<void>;
 
   getStripeProduct(productId: string): Promise<any>;
   listProducts(active?: boolean): Promise<any[]>;
@@ -106,6 +108,33 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date()
       })
       .where(eq(userSubscriptions.userId, userId));
+  }
+
+  async addOneTimeCredits(userId: string, credits: number): Promise<void> {
+    const existing = await this.getUserSubscription(userId);
+    if (existing) {
+      const currentCredits = existing.oneTimeCredits || 0;
+      await db.update(userSubscriptions)
+        .set({ 
+          oneTimeCredits: currentCredits + credits,
+          updatedAt: new Date()
+        })
+        .where(eq(userSubscriptions.userId, userId));
+    } else {
+      await this.createUserSubscription({ userId, oneTimeCredits: credits });
+    }
+  }
+
+  async decrementOneTimeCredits(userId: string): Promise<void> {
+    const existing = await this.getUserSubscription(userId);
+    if (existing && (existing.oneTimeCredits || 0) > 0) {
+      await db.update(userSubscriptions)
+        .set({ 
+          oneTimeCredits: Math.max((existing.oneTimeCredits || 0) - 1, 0),
+          updatedAt: new Date()
+        })
+        .where(eq(userSubscriptions.userId, userId));
+    }
   }
 
   async getStripeProduct(productId: string): Promise<any> {

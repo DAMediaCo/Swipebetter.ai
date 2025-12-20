@@ -1,0 +1,121 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Implement a high-volume pricing model with a heavily DISCOUNTED annual plan.
+Do NOT add a free tier.
+Do NOT change existing URLs.
+
+====================================================
+FINAL PRICING TIERS
+====================================================
+
+Tier 1: Starter Fix (One-Time)
+Price:
+- $9 one-time
+
+Includes:
+- One full Fix Profile OR Fix Reply
+- Full results unlocked
+- Copy buttons enabled
+- No expiration
+- No subscription
+
+----------------------------------------------------
+
+Tier 2: Unlimited Monthly
+Price:
+- $19 per month
+
+Includes:
+- Unlimited Fix Profile
+- Unlimited Fix Reply
+- Cancel anytime
+
+----------------------------------------------------
+
+Tier 3: Unlimited Annual (HEAVILY DISCOUNTED)
+Price:
+- $99 per year
+
+Includes:
+- Same features as Unlimited Monthly
+
+Savings math (must be displayed):
+- Monthly annual cost: $228
+- Annual price: $99
+- Savings: ~57%
+- Effective monthly: ~$8.25/mo
+
+====================================================
+PRICING UI RULES
+====================================================
+
+Wherever pricing is shown (upgrade modals, /pricing page, upgrade pages):
+
+- Show all three options:
+  1) One-Time Fix – $9
+  2) Unlimited Monthly – $19/mo
+  3) Unlimited Annual – $99/yr
+
+- Annual MUST clearly display:
+  - Badge: “Best Value”
+  - Badge or text: “Save 57%”
+  - Subtext: “$8.25/mo billed annually”
+
+- Monthly should be labeled:
+  “Most Flexible”
+
+Do NOT hide discount details.
+
+====================================================
+UPGRADE FLOW
+====================================================
+
+When locked content is reached:
+
+Headline:
+“Unlock Your Full Results”
+
+Buttons (order matters):
+1) One-Time Fix – $9
+2) Unlimited Monthly – $19/mo
+3) Unlimited Annual – $99/yr (Save 57%)
+
+Monthly remains visually neutral.
+Annual is visually emphasized.
+
+====================================================
+ENTITLEMENTS
+====================================================
+
+- Starter Fix unlocks ONLY the current analysis.
+- Monthly and Annual unlock:
+  - Unlimited Fix Profile
+  - Unlimited Fix Reply
+
+Backend must validate entitlement before returning full results.
+
+====================================================
+COPY RULES
+====================================================
+
+Do NOT use:
+- Free
+- Trial
+
+Use:
+- Preview
+- Unlock
+- Save 57%
+
+Tone:
+Direct, confident, no fluff.
+
+====================================================
+DELIVERABLES
+====================================================
+
+- Annual pricing set to $99
+- Discount math correct everywhere
+- Existing subscribers unaffected
+- Pricing consistent across all upgrade surfaces

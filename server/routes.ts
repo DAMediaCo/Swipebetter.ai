@@ -43,11 +43,13 @@ export async function registerRoutes(
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     const subscription = await storage.getUserSubscription(req.session.userId);
     const isActive = subscription?.status === "active";
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
     
     res.json({ 
       subscription: subscription || null,
-      canAnalyze: isActive,
-      isSubscribed: isActive
+      canAnalyze: isActive || hasOneTimeCredits,
+      isSubscribed: isActive,
+      oneTimeCredits: subscription?.oneTimeCredits || 0
     });
   });
 
@@ -65,12 +67,17 @@ export async function registerRoutes(
 
       const subscription = await storage.getUserSubscription(userId);
       const isSubscribed = subscription?.status === "active";
+      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
 
-      if (!isSubscribed) {
+      if (!isSubscribed && !hasOneTimeCredits) {
         return res.status(403).json({ 
           error: "Subscription required",
           requiresSubscription: true 
         });
+      }
+
+      if (!isSubscribed && hasOneTimeCredits) {
+        await storage.decrementOneTimeCredits(userId);
       }
 
       const systemPrompt = `You are an expert dating profile consultant specializing in ${platform}. 
@@ -150,12 +157,17 @@ export async function registerRoutes(
 
       const subscription = await storage.getUserSubscription(userId);
       const isSubscribed = subscription?.status === "active";
+      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
 
-      if (!isSubscribed) {
+      if (!isSubscribed && !hasOneTimeCredits) {
         return res.status(403).json({ 
           error: "Subscription required",
           requiresSubscription: true 
         });
+      }
+
+      if (!isSubscribed && hasOneTimeCredits) {
+        await storage.decrementOneTimeCredits(userId);
       }
 
       const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation screenshots and generate 3 reply suggestions with a ${tone} tone.
@@ -307,11 +319,15 @@ export async function registerRoutes(
         await storage.updateUserStripeInfo(userId, { stripeCustomerId: customerId });
       }
 
+      const price = await storage.getPrice(priceId);
+      const recurring = price?.recurring;
+      const isRecurring = recurring && (typeof recurring === 'object' ? !!recurring.interval : !!recurring);
+      
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
-        mode: 'subscription',
+        mode: isRecurring ? 'subscription' : 'payment',
         success_url: `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
       });
@@ -341,12 +357,9 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Payment not completed" });
       }
 
-      const subscription = session.subscription as any;
-      if (!subscription) {
-        return res.status(400).json({ error: "No subscription found" });
-      }
-
       const customerId = session.customer as string;
+      const subscription = session.subscription as any;
+      const isOneTime = session.mode === 'payment';
       
       let userSub = await storage.getUserSubscription(userId);
       if (userSub?.stripeCustomerId && userSub.stripeCustomerId !== customerId) {
@@ -357,17 +370,29 @@ export async function registerRoutes(
         userSub = await storage.createUserSubscription({ userId });
       }
       
-      await storage.updateUserSubscription(userId, {
-        stripeCustomerId: customerId,
-        stripeSubscriptionId: subscription.id,
-        status: 'active',
-        plan: 'pro',
-        currentPeriodEnd: subscription.current_period_end 
-          ? new Date(subscription.current_period_end * 1000) 
-          : null,
-      });
+      if (isOneTime) {
+        await storage.addOneTimeCredits(userId, 1);
+        await storage.updateUserSubscription(userId, {
+          stripeCustomerId: customerId,
+        });
+        res.json({ success: true, status: 'one_time', credits: 1 });
+      } else {
+        if (!subscription) {
+          return res.status(400).json({ error: "No subscription found" });
+        }
+        
+        await storage.updateUserSubscription(userId, {
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscription.id,
+          status: 'active',
+          plan: 'pro',
+          currentPeriodEnd: subscription.current_period_end 
+            ? new Date(subscription.current_period_end * 1000) 
+            : null,
+        });
 
-      res.json({ success: true, status: 'active' });
+        res.json({ success: true, status: 'active' });
+      }
     } catch (error) {
       console.error("Verify checkout error:", error);
       res.status(500).json({ error: "Failed to verify checkout" });
