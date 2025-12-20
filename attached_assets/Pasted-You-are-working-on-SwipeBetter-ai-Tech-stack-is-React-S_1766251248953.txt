@@ -1,0 +1,99 @@
+You are working on SwipeBetter.ai. Tech stack is React SPA + Express.
+
+Do NOT change these existing public routes:
+- /fix-profile
+- /fix-reply
+
+Goal:
+Add internal sub routes that keep the core URLs stable while enabling a multi step flow and future upgrades.
+
+Create these new client routes (React Router):
+1) /fix-profile/results
+2) /fix-profile/upgrade
+3) /fix-reply/results
+4) /fix-reply/upgrade
+
+Server requirement (Express):
+- Ensure Express serves the SPA index.html for ALL non API routes so deep links work:
+  GET /fix-profile/results
+  GET /fix-profile/upgrade
+  GET /fix-reply/results
+  GET /fix-reply/upgrade
+  and any other client route.
+- Keep existing API routes untouched (example: /api/* should still behave normally).
+
+Routing requirement (React Router v6):
+- Add nested routes and components:
+  - FixProfilePage (existing) at /fix-profile
+  - FixProfileResultsPage (new) at /fix-profile/results
+  - FixProfileUpgradePage (new) at /fix-profile/upgrade
+  - FixReplyPage (existing) at /fix-reply
+  - FixReplyResultsPage (new) at /fix-reply/results
+  - FixReplyUpgradePage (new) at /fix-reply/upgrade
+
+Flow requirements:
+- /fix-profile and /fix-reply remain the primary entry pages.
+- When an analysis completes successfully on the entry page:
+  - Navigate to /fix-profile/results for profile flow
+  - Navigate to /fix-reply/results for reply flow
+- Results pages show the latest analysis output using the same payload generated today.
+
+Guard rules:
+- If user hits /fix-profile/results without having analysis data:
+  redirect to /fix-profile
+- If user hits /fix-reply/results without having analysis data:
+  redirect to /fix-reply
+- Upgrade pages should always render even if no prior analysis exists, but include a “Back” link to the entry page.
+
+State persistence (important):
+- Persist the latest analysis payload so refresh does not lose results.
+- Use localStorage, with expiration after 24 hours.
+- Store as:
+  - swipebetter_profile_analysis_v1
+  - swipebetter_reply_analysis_v1
+Each value should be JSON:
+{
+  "savedAt": <unix_ms_timestamp>,
+  "data": <analysis_payload_object>
+}
+On load:
+- If no record exists, treat as missing.
+- If savedAt is older than 24 hours, delete it and treat as missing.
+
+Privacy:
+- Do not store screenshots or raw image files in localStorage.
+- Only store derived text results and structured scores.
+
+UI requirements:
+- Keep styling consistent with current pages.
+- Add a simple step indicator at top of each flow:
+  Profile flow: Entry -> Results -> Upgrade
+  Reply flow: Entry -> Results -> Upgrade
+- Add buttons:
+  - On /fix-profile/results: “Analyze Another Profile” (routes back to /fix-profile) and “Upgrade” (routes to /fix-profile/upgrade)
+  - On /fix-reply/results: “Try Another Reply” (routes back to /fix-reply) and “Upgrade” (routes to /fix-reply/upgrade)
+  - On both upgrade pages: “Continue Free” (routes back to entry) and “Upgrade Now” (starts checkout or routes to /pricing for now)
+
+SEO:
+- Add noindex to results and upgrade pages (react-helmet-async or similar). If helmet is not installed, add it.
+
+Implementation checklist:
+1) Update Express to serve index.html for client routes (history API fallback) while excluding /api routes.
+2) Add the 4 new React Router routes and page components.
+3) Add a small storage utility:
+   - saveAnalysis(type, data)
+   - loadAnalysis(type)
+   - clearAnalysis(type)
+   where type is "profile" or "reply".
+4) Wire navigation after analysis completion on entry pages to push to /results.
+5) Add the guard redirects on /results pages if loadAnalysis returns null.
+6) Smoke test deep linking by directly loading:
+   - /fix-profile/results
+   - /fix-profile/upgrade
+   - /fix-reply/results
+   - /fix-reply/upgrade
+and confirm no 404 and correct behavior.
+
+Deliverables:
+- PR ready code implementing all above.
+- Brief notes in README or a short comment block describing the new routes and localStorage keys.
