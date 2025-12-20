@@ -15,15 +15,15 @@ const scenarios: Scenario[] = [
     title: "After Matching",
     conversation: "Her: We matched! I love your dog in that photo.",
     replies: {
-      playful: [
-        "Thanks! He's my wingman. Fair warning though, he gets jealous easily.",
-        "That's actually how he gets all the dates, I just hold the leash.",
-        "He says thanks! He also wants to know if you're a belly rub person or a fetch person.",
-      ],
       flirty: [
         "He's pretty cute, but I'd argue I'm better company. Want to find out?",
         "He's a great conversation starter, but you seem way more interesting.",
         "Thanks! Maybe we can all grab a coffee sometime - he loves people watching.",
+      ],
+      witty: [
+        "Thanks! He's my wingman. Fair warning though, he gets jealous easily.",
+        "That's actually how he gets all the dates, I just hold the leash.",
+        "He says thanks! He also wants to know if you're a belly rub person or a fetch person.",
       ],
       confident: [
         "Thanks! He's the best. Let's grab coffee this week - I know a dog-friendly spot.",
@@ -36,15 +36,15 @@ const scenarios: Scenario[] = [
     title: "Restarting Dead Convo",
     conversation: "Last message (3 days ago): Her: Yeah that sounds fun!",
     replies: {
-      playful: [
-        "Plot twist: I'm back. Did you think you got rid of me that easily?",
-        "My phone was on airplane mode for 3 days. Just kidding, I'm terrible at texting. How was your week?",
-        "I just found this message hiding in my notifications. Quick, let's pretend it hasn't been 3 days.",
-      ],
       flirty: [
         "Hey stranger. Been thinking about that conversation we started. Want to pick up where we left off?",
         "I owe you a better reply than silence. Let me make it up to you - coffee this week?",
         "Missing our chats. Any chance you're free to grab a drink and catch up properly?",
+      ],
+      witty: [
+        "Plot twist: I'm back. Did you think you got rid of me that easily?",
+        "My phone was on airplane mode for 3 days. Just kidding, I'm terrible at texting. How was your week?",
+        "I just found this message hiding in my notifications. Quick, let's pretend it hasn't been 3 days.",
       ],
       confident: [
         "Hey. Life got busy but I didn't forget about you. Let's actually make plans this time.",
@@ -57,15 +57,15 @@ const scenarios: Scenario[] = [
     title: "Setting Up a Date",
     conversation: "Her: I'd be down to grab coffee sometime!",
     replies: {
-      playful: [
-        "Sometime? That's too vague for my coffee addiction. How about Saturday at 2?",
-        "Perfect! There's this place that makes lattes so good they should be illegal. Saturday work?",
-        "Coffee sounds like the perfect excuse to hear more of your terrible puns. Friday afternoon?",
-      ],
       flirty: [
         "Love that energy. There's a cute spot downtown - Saturday afternoon? I'll save you a seat.",
         "It's a date then. Saturday at 3? I know just the place with the best vibes.",
         "Finally! I've been waiting for you to say that. How's Friday evening sound?",
+      ],
+      witty: [
+        "Sometime? That's too vague for my coffee addiction. How about Saturday at 2?",
+        "Perfect! There's this place that makes lattes so good they should be illegal. Saturday work?",
+        "Coffee sounds like the perfect excuse to hear more of your terrible puns. Friday afternoon?",
       ],
       confident: [
         "Great. Saturday, 3pm, Blue Bottle on Main Street. I'll be the one who looks even better in person.",
@@ -77,7 +77,7 @@ const scenarios: Scenario[] = [
 ];
 
 export function ExampleReplies() {
-  const [tone, setTone] = useState("playful");
+  const [tone, setTone] = useState("flirty");
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const copyToClipboard = async (text: string, key: string) => {

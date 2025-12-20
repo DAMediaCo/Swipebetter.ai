@@ -307,7 +307,7 @@ export default function ProfileFix() {
                   analyzeMutation.mutate();
                 }
               }}
-              disabled={!canProceed() || analyzeMutation.isPending || !subscriptionData?.canAnalyze}
+              disabled={!canProceed() || analyzeMutation.isPending || (step === 3 && !subscriptionData?.canAnalyze)}
               className="flex-1 py-6"
               data-testid="button-next-step"
             >

@@ -12,15 +12,15 @@ Me: There's this great one in the mountains about an hour from the city. The vie
 Her: That sounds nice! I've been wanting to explore more trails lately.`;
 
 const replysByTone: Record<string, string[]> = {
-  playful: [
-    "Sounds like you need a hiking buddy who knows all the secret viewpoints! I happen to know a few...",
-    "Perfect timing! I was just planning my next adventure. Want to be my expedition partner?",
-    "We should totally go together! I'll bring the snacks, you bring the good vibes. Deal?",
-  ],
   flirty: [
     "Well, I know the perfect trail with an incredible sunset view... but it's way better with company.",
     "I'd love to show you my favorite spot. The view is almost as nice as this conversation.",
     "There's this hidden waterfall I've been wanting to share with someone special. Interested?",
+  ],
+  witty: [
+    "Sounds like you need a hiking buddy who knows all the secret viewpoints! I happen to know a few...",
+    "Perfect timing! I was just planning my next adventure. Want to be my expedition partner?",
+    "We should totally go together! I'll bring the snacks, you bring the good vibes. Deal?",
   ],
   confident: [
     "Let's make it happen. This Saturday, I'll take you to the best trail in the area. You in?",
@@ -30,7 +30,7 @@ const replysByTone: Record<string, string[]> = {
 };
 
 export function ConvoDemo() {
-  const [tone, setTone] = useState("playful");
+  const [tone, setTone] = useState("flirty");
   const [showReplies, setShowReplies] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
@@ -44,7 +44,7 @@ export function ConvoDemo() {
     setShowReplies(true);
   };
 
-  const replies = replysByTone[tone] || replysByTone.playful;
+  const replies = replysByTone[tone] || replysByTone.flirty;
 
   return (
     <div className="space-y-6" id="reply-demo">

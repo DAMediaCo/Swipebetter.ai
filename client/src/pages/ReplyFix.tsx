@@ -270,7 +270,7 @@ export default function ReplyFix() {
                   analyzeMutation.mutate();
                 }
               }}
-              disabled={!canProceed() || analyzeMutation.isPending || !subscriptionData?.canAnalyze}
+              disabled={!canProceed() || analyzeMutation.isPending || (step === 2 && !subscriptionData?.canAnalyze)}
               className="flex-1 py-6"
               data-testid="button-next-step"
             >

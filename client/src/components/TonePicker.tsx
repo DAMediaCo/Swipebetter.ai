@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Smile, Heart, Flame } from "lucide-react";
 
 const tones = [
-  { id: "playful", label: "Playful", icon: Smile, description: "Fun and lighthearted" },
   { id: "flirty", label: "Flirty", icon: Heart, description: "Warm and romantic" },
+  { id: "witty", label: "Witty", icon: Smile, description: "Fun and clever" },
   { id: "confident", label: "Confident", icon: Flame, description: "Bold and direct" },
 ];
 
