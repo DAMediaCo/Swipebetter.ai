@@ -6,13 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUpload } from "@/components/ImageUpload";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
-import { Link } from "wouter";
+import { saveAnalysis } from "@/lib/analysisStorage";
+import { Link, useLocation } from "wouter";
 import { 
   Sparkles, 
   ArrowLeft, 
-  Clipboard, 
-  Check, 
-  AlertCircle,
   MessageSquare,
   Heart,
   Flame,
@@ -28,22 +26,16 @@ const tones = [
   { id: "thoughtful", label: "Thoughtful", icon: Brain },
 ];
 
-interface AnalysisResult {
-  conversationContext: string;
-  suggestedReplies: string[];
-}
-
 export default function ReplyFix() {
   const { data: authData, isLoading: authLoading } = useAuth();
   const { data: subscriptionData } = useSubscription();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const user = authData?.user;
 
   const [step, setStep] = useState(1);
   const [images, setImages] = useState<string[]>([]);
   const [tone, setTone] = useState("");
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
@@ -55,8 +47,8 @@ export default function ReplyFix() {
     },
     onSuccess: (data) => {
       if (data.parsed) {
-        setResult(data.parsed);
-        setStep(3);
+        saveAnalysis('reply', data.parsed);
+        setLocation('/fix-reply/results');
       }
     },
     onError: (error: any) => {
@@ -75,12 +67,6 @@ export default function ReplyFix() {
       }
     },
   });
-
-  const copyToClipboard = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
-  };
 
   const canProceed = () => {
     if (step === 1) return images.length > 0;
@@ -154,107 +140,48 @@ export default function ReplyFix() {
           </Card>
         )}
 
-        {step < 3 && (
-          <Card className="shadow-lg">
-            <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl font-bold">
-                {step === 1 && "Upload Conversation"}
-                {step === 2 && "Choose Your Tone"}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {step === 1 && "Screenshot the conversation you need help with"}
-                {step === 2 && "How do you want your reply to sound?"}
-              </p>
-            </CardHeader>
-            
-            <CardContent className="space-y-6 pt-4">
-              {step === 1 && (
-                <ImageUpload images={images} onChange={setImages} maxImages={3} />
-              )}
-
-              {step === 2 && (
-                <div className="grid grid-cols-2 gap-3">
-                  {tones.map((t) => {
-                    const Icon = t.icon;
-                    const isSelected = tone === t.id;
-                    return (
-                      <Button
-                        key={t.id}
-                        variant={isSelected ? "default" : "outline"}
-                        onClick={() => setTone(t.id)}
-                        className="h-auto py-6 flex flex-col gap-2"
-                        data-testid={`button-tone-${t.id}`}
-                      >
-                        <Icon className={`w-6 h-6 ${isSelected ? "" : "text-muted-foreground"}`} />
-                        <span className="font-semibold">{t.label}</span>
-                      </Button>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {step === 3 && result && (
-          <div className="space-y-6">
-            {result.conversationContext && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-semibold">Conversation Context</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{result.conversationContext}</p>
-                </CardContent>
-              </Card>
+        <Card className="shadow-lg">
+          <CardHeader className="text-center pb-2">
+            <CardTitle className="text-2xl font-bold">
+              {step === 1 && "Upload Conversation"}
+              {step === 2 && "Choose Your Tone"}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {step === 1 && "Screenshot the conversation you need help with"}
+              {step === 2 && "How do you want your reply to sound?"}
+            </p>
+          </CardHeader>
+          
+          <CardContent className="space-y-6 pt-4">
+            {step === 1 && (
+              <ImageUpload images={images} onChange={setImages} maxImages={3} />
             )}
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Suggested Replies</h3>
-              {result.suggestedReplies?.map((reply, index) => (
-                <Card key={index} className="hover-elevate cursor-pointer" onClick={() => copyToClipboard(reply, index)}>
-                  <CardContent className="py-4 flex items-start gap-4">
-                    <div className="flex-1">
-                      <p className="leading-relaxed">{reply}</p>
-                    </div>
+            {step === 2 && (
+              <div className="grid grid-cols-2 gap-3">
+                {tones.map((t) => {
+                  const Icon = t.icon;
+                  const isSelected = tone === t.id;
+                  return (
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        copyToClipboard(reply, index);
-                      }}
-                      data-testid={`button-copy-reply-${index}`}
+                      key={t.id}
+                      variant={isSelected ? "default" : "outline"}
+                      onClick={() => setTone(t.id)}
+                      className="h-auto py-6 flex flex-col gap-2"
+                      data-testid={`button-tone-${t.id}`}
                     >
-                      {copiedIndex === index ? (
-                        <Check className="w-4 h-4 text-primary" />
-                      ) : (
-                        <Clipboard className="w-4 h-4" />
-                      )}
+                      <Icon className={`w-6 h-6 ${isSelected ? "" : "text-muted-foreground"}`} />
+                      <span className="font-semibold">{t.label}</span>
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <Button
-              onClick={() => {
-                setStep(1);
-                setImages([]);
-                setTone("");
-                setResult(null);
-              }}
-              variant="outline"
-              className="w-full"
-              data-testid="button-analyze-again"
-            >
-              Analyze Another Conversation
-            </Button>
-          </div>
-        )}
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
-      {step < 3 && (
+      {step <= 2 && (
         <div className="fixed bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background border-t border-border safe-bottom">
           <div className="max-w-2xl mx-auto flex gap-3">
             {step > 1 && (

@@ -2,20 +2,17 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUpload } from "@/components/ImageUpload";
+import { StepIndicator } from "@/components/StepIndicator";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
-import { Link } from "wouter";
+import { saveAnalysis } from "@/lib/analysisStorage";
+import { Link, useLocation } from "wouter";
 import { 
   Sparkles, 
   ArrowLeft, 
-  Clipboard, 
-  Check, 
-  AlertCircle,
-  Camera,
-  TrendingUp
+  Camera
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,6 +31,7 @@ export default function ProfileFix() {
   const { data: authData, isLoading: authLoading } = useAuth();
   const { data: subscriptionData } = useSubscription();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const user = authData?.user;
 
   const [step, setStep] = useState(1);
@@ -41,8 +39,6 @@ export default function ProfileFix() {
   const [platform, setPlatform] = useState("");
   const [gender, setGender] = useState("");
   const [intent, setIntent] = useState("");
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
@@ -56,8 +52,8 @@ export default function ProfileFix() {
     },
     onSuccess: (data) => {
       if (data.parsed) {
-        setResult(data.parsed);
-        setStep(4);
+        saveAnalysis('profile', data.parsed);
+        setLocation('/fix-profile/results');
       }
     },
     onError: (error: any) => {
@@ -76,12 +72,6 @@ export default function ProfileFix() {
       }
     },
   });
-
-  const copyToClipboard = async (text: string, field: string) => {
-    await navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    setTimeout(() => setCopiedField(null), 2000);
-  };
 
   const canProceed = () => {
     if (step === 1) return images.length > 0;
@@ -156,8 +146,7 @@ export default function ProfileFix() {
           </Card>
         )}
 
-        {step < 4 && (
-          <Card className="shadow-lg">
+        <Card className="shadow-lg">
             <CardHeader className="text-center pb-2">
               <CardTitle className="text-2xl font-bold">
                 {step === 1 && "Upload Your Profile"}
@@ -234,64 +223,9 @@ export default function ProfileFix() {
               )}
             </CardContent>
           </Card>
-        )}
-
-        {step === 4 && result && (
-          <div className="space-y-6">
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
-              <CardContent className="pt-6 text-center">
-                <div className="text-5xl font-bold text-primary mb-2">
-                  {result.overallScore}
-                </div>
-                <p className="text-muted-foreground">Overall Profile Score</p>
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  <TrendingUp className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Room for improvement!</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <ResultCard
-              title="Bio Suggestions"
-              content={result.bioSuggestions}
-              onCopy={() => copyToClipboard(result.bioSuggestions, "bio")}
-              copied={copiedField === "bio"}
-            />
-
-            <ResultCard
-              title="Photo Feedback"
-              content={result.photoFeedback}
-              onCopy={() => copyToClipboard(result.photoFeedback, "photo")}
-              copied={copiedField === "photo"}
-            />
-
-            <ResultCard
-              title="Top Improvements"
-              content={result.improvements}
-              onCopy={() => copyToClipboard(result.improvements, "improvements")}
-              copied={copiedField === "improvements"}
-            />
-
-            <Button
-              onClick={() => {
-                setStep(1);
-                setImages([]);
-                setPlatform("");
-                setGender("");
-                setIntent("");
-                setResult(null);
-              }}
-              variant="outline"
-              className="w-full"
-              data-testid="button-analyze-again"
-            >
-              Analyze Another Profile
-            </Button>
-          </div>
-        )}
       </div>
 
-      {step < 4 && (
+      {step <= 3 && (
         <div className="fixed bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background border-t border-border safe-bottom">
           <div className="max-w-2xl mx-auto flex gap-3">
             {step > 1 && (
@@ -334,42 +268,5 @@ export default function ProfileFix() {
         </div>
       )}
     </div>
-  );
-}
-
-function ResultCard({
-  title,
-  content,
-  onCopy,
-  copied,
-}: {
-  title: string;
-  content: string;
-  onCopy: () => void;
-  copied: boolean;
-}) {
-  return (
-    <Card>
-      <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2">
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onCopy}
-          data-testid={`button-copy-${title.toLowerCase().replace(/ /g, "-")}`}
-        >
-          {copied ? (
-            <Check className="w-4 h-4 text-primary" />
-          ) : (
-            <Clipboard className="w-4 h-4" />
-          )}
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-          {content}
-        </p>
-      </CardContent>
-    </Card>
   );
 }
