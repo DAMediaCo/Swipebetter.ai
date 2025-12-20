@@ -6,7 +6,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth, useSubscription, useCheckout, useCustomerPortal } from "@/lib/auth";
 import { useLocation } from "wouter";
 import { Link } from "wouter";
-import { storePendingPurchase } from "@/lib/analytics";
 import { 
   ArrowLeft, 
   Check, 
@@ -53,12 +52,11 @@ export default function Pricing() {
 
   const isSubscribed = subscriptionData?.subscription?.status === "active";
 
-  const handleCheckout = (priceId: string, planType: "starter" | "monthly" | "annual", priceAmount: number, productName: string) => {
+  const handleCheckout = (priceId: string) => {
     if (!user) {
       setLocation("/auth");
       return;
     }
-    storePendingPurchase({ planType, price: priceAmount, priceId, productName });
     checkoutMutation.mutate(priceId);
   };
 
@@ -162,7 +160,7 @@ export default function Pricing() {
                 <Button
                   className="w-full py-6 mt-6"
                   variant="outline"
-                  onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id, "starter", (oneTimePrice.unit_amount ?? 900) / 100, "Starter Fix")}
+                  onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id)}
                   disabled={checkoutMutation.isPending || !oneTimePrice}
                   data-testid="button-checkout-onetime"
                 >
@@ -194,7 +192,7 @@ export default function Pricing() {
                 <Button
                   className="w-full py-6 mt-6"
                   variant="outline"
-                  onClick={() => monthlyPrice && handleCheckout(monthlyPrice.id, "monthly", (monthlyPrice.unit_amount ?? 1900) / 100, "Unlimited Monthly")}
+                  onClick={() => monthlyPrice && handleCheckout(monthlyPrice.id)}
                   disabled={checkoutMutation.isPending || !monthlyPrice}
                   data-testid="button-checkout-monthly"
                 >
@@ -232,7 +230,7 @@ export default function Pricing() {
                 </ul>
                 <Button
                   className="w-full py-6 mt-6"
-                  onClick={() => annualPrice && handleCheckout(annualPrice.id, "annual", (annualPrice.unit_amount ?? 9900) / 100, "Unlimited Annual")}
+                  onClick={() => annualPrice && handleCheckout(annualPrice.id)}
                   disabled={checkoutMutation.isPending || !annualPrice}
                   data-testid="button-checkout-annual"
                 >

@@ -90,8 +90,8 @@ Preferred communication style: Simple, everyday language.
   - `preview_viewed` - When results page loads
   - `paywall_viewed` - When upgrade page loads
   - `purchase_completed` - Custom event with plan details
-  - `purchase` - GA4 ecommerce event with transaction_id, value, currency, items array
-- **Purchase Tracking Flow**: Pricing.tsx stores pending purchase data (planType, price from Stripe, priceId, productName) in sessionStorage, CheckoutSuccess.tsx retrieves and fires purchase events
+  - `purchase` - GA4 ecommerce event with transaction_id, value, currency, items array (includes item_id)
+- **Purchase Tracking Flow**: Backend verifies Stripe payment_status === 'paid' via /api/verify-checkout and returns purchase data (plan_type, price, currency, transaction_id, price_id). CheckoutSuccess.tsx fires GA4 events only after backend verification confirms payment success.
 
 ### Input Validation
 - Added Zod validation schemas for all API endpoints in `server/routes.ts`

@@ -74,25 +74,6 @@ export function trackPaywallViewed(toolType: "profile" | "reply") {
   });
 }
 
-interface PendingPurchase {
-  planType: "starter" | "monthly" | "annual";
-  price: number;
-  priceId: string;
-  productName: string;
-}
-
-export function storePendingPurchase(data: PendingPurchase) {
-  sessionStorage.setItem("pending_purchase", JSON.stringify(data));
-}
-
-export function retrievePendingPurchase(): PendingPurchase | null {
-  const data = sessionStorage.getItem("pending_purchase");
-  if (data) {
-    sessionStorage.removeItem("pending_purchase");
-    return JSON.parse(data);
-  }
-  return null;
-}
 
 interface PurchaseParams {
   planType: "starter" | "monthly" | "annual";

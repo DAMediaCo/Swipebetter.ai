@@ -350,7 +350,7 @@ export async function registerRoutes(
       const stripe = await getUncachableStripeClient();
       
       const session = await stripe.checkout.sessions.retrieve(sessionId, {
-        expand: ['subscription']
+        expand: ['subscription', 'line_items']
       });
 
       if (session.payment_status !== 'paid') {
@@ -370,12 +370,36 @@ export async function registerRoutes(
         userSub = await storage.createUserSubscription({ userId });
       }
       
+      const lineItem = session.line_items?.data?.[0];
+      const priceAmount = (session.amount_total ?? 0) / 100;
+      const priceId = lineItem?.price?.id ?? '';
+      const productName = typeof lineItem?.description === 'string' ? lineItem.description : '';
+      
+      let planType: 'starter' | 'monthly' | 'annual' = 'starter';
+      if (!isOneTime) {
+        const interval = lineItem?.price?.recurring?.interval;
+        planType = interval === 'year' ? 'annual' : 'monthly';
+      }
+      
       if (isOneTime) {
         await storage.addOneTimeCredits(userId, 1);
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
         });
-        res.json({ success: true, status: 'one_time', credits: 1 });
+        res.json({ 
+          success: true, 
+          status: 'one_time', 
+          credits: 1,
+          purchase: {
+            plan_type: planType,
+            price: priceAmount,
+            currency: 'USD',
+            tool_type: 'both',
+            transaction_id: sessionId,
+            price_id: priceId,
+            product_name: productName,
+          }
+        });
       } else {
         if (!subscription) {
           return res.status(400).json({ error: "No subscription found" });
@@ -391,7 +415,19 @@ export async function registerRoutes(
             : null,
         });
 
-        res.json({ success: true, status: 'active' });
+        res.json({ 
+          success: true, 
+          status: 'active',
+          purchase: {
+            plan_type: planType,
+            price: priceAmount,
+            currency: 'USD',
+            tool_type: 'both',
+            transaction_id: sessionId,
+            price_id: priceId,
+            product_name: productName,
+          }
+        });
       }
     } catch (error) {
       console.error("Verify checkout error:", error);

@@ -4,8 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { retrievePendingPurchase, trackPurchaseCompleted } from "@/lib/analytics";
+import { trackPurchaseCompleted } from "@/lib/analytics";
 import { CheckCircle, Sparkles, ArrowRight, AlertCircle } from "lucide-react";
+
+interface VerifyCheckoutResponse {
+  success: boolean;
+  status: string;
+  purchase?: {
+    plan_type: "starter" | "monthly" | "annual";
+    price: number;
+    currency: string;
+    tool_type: "profile" | "reply" | "both";
+    transaction_id: string;
+    price_id: string;
+    product_name: string;
+  };
+}
 
 export default function CheckoutSuccess() {
   const [verifying, setVerifying] = useState(true);
@@ -23,18 +37,19 @@ export default function CheckoutSuccess() {
       }
 
       try {
-        await apiRequest("POST", "/api/verify-checkout", { sessionId });
+        const response = await apiRequest("POST", "/api/verify-checkout", { sessionId });
+        const data: VerifyCheckoutResponse = await response.json();
+        
         queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
         queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
         
-        const pendingPurchase = retrievePendingPurchase();
-        if (pendingPurchase) {
+        if (data.purchase) {
           trackPurchaseCompleted({
-            planType: pendingPurchase.planType,
-            toolType: "both",
-            price: pendingPurchase.price,
-            transactionId: sessionId,
-            priceId: pendingPurchase.priceId,
+            planType: data.purchase.plan_type,
+            toolType: data.purchase.tool_type,
+            price: data.purchase.price,
+            transactionId: data.purchase.transaction_id,
+            priceId: data.purchase.price_id,
           });
         }
         
