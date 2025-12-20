@@ -8,7 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuth, login, logout } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
+import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
 export function DesktopNav() {
   const [location] = useLocation();
   const { data: authData, isLoading } = useAuth();
+  const logoutMutation = useLogout();
   const user = authData?.user;
 
   return (
@@ -76,16 +78,18 @@ export function DesktopNav() {
                   </div>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={logout} data-testid="button-logout">
+              <DropdownMenuItem onClick={() => logoutMutation.mutate()} data-testid="button-logout">
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Button onClick={login} data-testid="button-login">
-            Sign In
-          </Button>
+          <Link href="/auth">
+            <Button data-testid="button-login">
+              Sign In
+            </Button>
+          </Link>
         )}
       </div>
     </nav>

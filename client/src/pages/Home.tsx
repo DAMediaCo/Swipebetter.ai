@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Zap, Heart, Star, Check } from "lucide-react";
-import { useAuth, login } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 
 export default function Home() {
   const { data: authData } = useAuth();
@@ -41,10 +41,12 @@ export default function Home() {
                 </Button>
               </Link>
             ) : (
-              <Button size="lg" className="text-lg px-8 py-6 touch-target" onClick={login} data-testid="button-get-started">
-                <Sparkles className="w-5 h-5 mr-2" />
-                Get Started Free
-              </Button>
+              <Link href="/auth">
+                <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-get-started">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Get Started Free
+                </Button>
+              </Link>
             )}
             <Link href="/fix-reply">
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-reply-hero">
@@ -223,10 +225,12 @@ export default function Home() {
               </Button>
             </Link>
           ) : (
-            <Button size="lg" className="text-lg px-8 py-6" onClick={login} data-testid="button-start-free">
-              <Zap className="w-5 h-5 mr-2" />
-              Start Free
-            </Button>
+            <Link href="/auth">
+              <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-free">
+                <Zap className="w-5 h-5 mr-2" />
+                Start Free
+              </Button>
+            </Link>
           )}
         </div>
       </section>

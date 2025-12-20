@@ -5,7 +5,7 @@ import { createServer } from "http";
 import { runMigrations } from "stripe-replit-sync";
 import { getStripeSync } from "./stripeClient";
 import { WebhookHandlers } from "./webhookHandlers";
-import { setupAuth, registerAuthRoutes } from "./replit_integrations/auth";
+import { setupSession, registerAuthRoutes } from "./auth";
 
 const app = express();
 const httpServer = createServer(app);
@@ -113,7 +113,7 @@ async function initStripe() {
 
   app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
-  await setupAuth(app);
+  setupSession(app);
   registerAuthRoutes(app);
 
   app.use((req, res, next) => {

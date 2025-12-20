@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ImageUpload } from "@/components/ImageUpload";
-import { useAuth, useSubscription, login } from "@/lib/auth";
+import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { 
@@ -106,9 +106,11 @@ export default function ReplyFix() {
             <p className="text-muted-foreground">
               Get AI-generated reply suggestions for your dating conversations.
             </p>
-            <Button onClick={login} className="w-full" data-testid="button-login-reply">
-              Sign In to Continue
-            </Button>
+            <Link href="/auth">
+              <Button className="w-full" data-testid="button-login-reply">
+                Sign In to Continue
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

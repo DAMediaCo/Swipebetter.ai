@@ -2,7 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
-import { isAuthenticated, getSession } from "./replit_integrations/auth";
+import { requireAuth, getCurrentUserId } from "./auth";
+import { db } from "./db";
+import { users } from "@shared/models/auth";
+import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 
@@ -36,21 +39,10 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
-  app.get("/api/auth/user", async (req: any, res) => {
-    const session = await getSession(req);
-    if (!session?.user) {
-      return res.json({ user: null });
-    }
-    
-    const subscription = await storage.getUserSubscription(session.user.id);
-    res.json({ 
-      user: session.user,
-      subscription: subscription || { freeAnalysesUsed: 0, status: "inactive" }
-    });
-  });
+  // Note: /api/auth/user is now registered in server/auth.ts
 
-  app.get("/api/subscription", isAuthenticated, async (req: any, res) => {
-    const subscription = await storage.getUserSubscription(req.user.id);
+  app.get("/api/subscription", requireAuth, async (req: any, res) => {
+    const subscription = await storage.getUserSubscription(req.session.userId);
     if (!subscription) {
       return res.json({ subscription: null, canAnalyze: true, freeAnalysesRemaining: FREE_ANALYSES_LIMIT });
     }
@@ -65,7 +57,7 @@ export async function registerRoutes(
     });
   });
 
-  app.post("/api/analyze-profile", isAuthenticated, async (req: any, res) => {
+  app.post("/api/analyze-profile", requireAuth, async (req: any, res) => {
     try {
       const parseResult = profileAnalysisSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -75,7 +67,7 @@ export async function registerRoutes(
         });
       }
       const { platform, gender, intent, screenshots } = parseResult.data;
-      const userId = req.user.id;
+      const userId = req.session.userId;
 
       let subscription = await storage.getUserSubscription(userId);
       if (!subscription) {
@@ -160,7 +152,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/analyze-reply", isAuthenticated, async (req: any, res) => {
+  app.post("/api/analyze-reply", requireAuth, async (req: any, res) => {
     try {
       const parseResult = replyAnalysisSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -170,7 +162,7 @@ export async function registerRoutes(
         });
       }
       const { tone, screenshots } = parseResult.data;
-      const userId = req.user.id;
+      const userId = req.session.userId;
 
       let subscription = await storage.getUserSubscription(userId);
       if (!subscription) {
@@ -251,9 +243,9 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/my-analyses", isAuthenticated, async (req: any, res) => {
-    const profileAnalyses = await storage.getProfileAnalyses(req.user.id);
-    const replyAnalyses = await storage.getReplyAnalyses(req.user.id);
+  app.get("/api/my-analyses", requireAuth, async (req: any, res) => {
+    const profileAnalyses = await storage.getProfileAnalyses(req.session.userId);
+    const replyAnalyses = await storage.getReplyAnalyses(req.session.userId);
     res.json({ profileAnalyses, replyAnalyses });
   });
 
@@ -312,7 +304,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/checkout", isAuthenticated, async (req: any, res) => {
+  app.post("/api/checkout", requireAuth, async (req: any, res) => {
     try {
       const parseResult = checkoutSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -321,22 +313,27 @@ export async function registerRoutes(
         });
       }
       const { priceId } = parseResult.data;
-      const user = req.user;
+      const userId = req.session.userId;
       const stripe = await getUncachableStripeClient();
 
-      let subscription = await storage.getUserSubscription(user.id);
+      const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+      if (!user) {
+        return res.status(401).json({ error: "User not found" });
+      }
+
+      let subscription = await storage.getUserSubscription(userId);
       let customerId = subscription?.stripeCustomerId;
 
       if (!customerId) {
         const customer = await stripe.customers.create({
           email: user.email,
-          metadata: { userId: user.id },
+          metadata: { userId: userId },
         });
         customerId = customer.id;
-        await storage.updateUserStripeInfo(user.id, { stripeCustomerId: customerId });
+        await storage.updateUserStripeInfo(userId, { stripeCustomerId: customerId });
       }
 
-      const session = await stripe.checkout.sessions.create({
+      const checkoutSession = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
@@ -345,16 +342,16 @@ export async function registerRoutes(
         cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
       });
 
-      res.json({ url: session.url });
+      res.json({ url: checkoutSession.url });
     } catch (error) {
       console.error("Checkout error:", error);
       res.status(500).json({ error: "Failed to create checkout session" });
     }
   });
 
-  app.post("/api/customer-portal", isAuthenticated, async (req: any, res) => {
+  app.post("/api/customer-portal", requireAuth, async (req: any, res) => {
     try {
-      const subscription = await storage.getUserSubscription(req.user.id);
+      const subscription = await storage.getUserSubscription(req.session.userId);
       if (!subscription?.stripeCustomerId) {
         return res.status(400).json({ error: "No subscription found" });
       }

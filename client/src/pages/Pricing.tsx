@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth, useSubscription, useCheckout, useCustomerPortal, login } from "@/lib/auth";
+import { useAuth, useSubscription, useCheckout, useCustomerPortal } from "@/lib/auth";
+import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { 
   ArrowLeft, 
@@ -31,6 +32,7 @@ interface Product {
 }
 
 export default function Pricing() {
+  const [, setLocation] = useLocation();
   const { data: authData, isLoading: authLoading } = useAuth();
   const { data: subscriptionData, isLoading: subLoading } = useSubscription();
   const checkoutMutation = useCheckout();
@@ -50,7 +52,7 @@ export default function Pricing() {
 
   const handleCheckout = (priceId: string) => {
     if (!user) {
-      login();
+      setLocation("/auth");
       return;
     }
     checkoutMutation.mutate(priceId);

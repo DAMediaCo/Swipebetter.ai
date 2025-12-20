@@ -3,7 +3,7 @@ import { queryClient, apiRequest } from "./queryClient";
 
 export interface User {
   id: string;
-  email: string | null;
+  email: string;
   firstName: string | null;
   lastName: string | null;
   profileImageUrl: string | null;
@@ -22,7 +22,6 @@ export interface Subscription {
 
 export interface AuthData {
   user: User | null;
-  subscription: Subscription | null;
 }
 
 export function useAuth() {
@@ -40,6 +39,45 @@ export function useSubscription() {
   }>({
     queryKey: ["/api/subscription"],
     staleTime: 1000 * 60,
+  });
+}
+
+export function useLogin() {
+  return useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      const response = await apiRequest("POST", "/api/auth/login", data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/auth/user"], data);
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    },
+  });
+}
+
+export function useSignup() {
+  return useMutation({
+    mutationFn: async (data: { email: string; password: string; firstName?: string; lastName?: string }) => {
+      const response = await apiRequest("POST", "/api/auth/signup", data);
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(["/api/auth/user"], data);
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    },
+  });
+}
+
+export function useLogout() {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/auth/logout");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["/api/auth/user"], { user: null });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    },
   });
 }
 
@@ -69,12 +107,4 @@ export function useCustomerPortal() {
       }
     },
   });
-}
-
-export function logout() {
-  window.location.href = "/api/logout";
-}
-
-export function login() {
-  window.location.href = "/api/login";
 }

@@ -31,17 +31,25 @@ Preferred communication style: Simple, everyday language.
 - **Database**: PostgreSQL with Drizzle ORM
 - **Schema Location**: `shared/schema.ts` exports models from `shared/models/*`
 - **Key Tables**:
-  - `users` and `sessions` - Replit Auth integration (mandatory)
+  - `users` - User accounts with email/password authentication
+  - `sessions` - Express session storage
   - `profileAnalyses` - Stores profile improvement requests and results
   - `replyAnalyses` - Stores reply generation requests and results
   - `userSubscriptions` - Tracks free usage and Stripe subscription status
 
 ### Authentication
-- **Provider**: Replit Auth via OpenID Connect
+- **Provider**: Custom email/password authentication
+- **Password Hashing**: bcrypt with 12 salt rounds
 - **Session Storage**: PostgreSQL-backed sessions using connect-pg-simple
-- **Implementation**: Located in `server/replit_integrations/auth/`
+- **Implementation**: Located in `server/auth.ts`
+- **Routes**:
+  - `POST /api/auth/signup` - Create new account
+  - `POST /api/auth/login` - Sign in
+  - `POST /api/auth/logout` - Sign out
+  - `GET /api/auth/user` - Get current user
 
 ### Key Routes
+- `/auth` - Login/signup page
 - `/fix-profile` - Multi-step wizard for profile analysis
 - `/fix-reply` - Multi-step wizard for reply generation
 - `/pricing` - Subscription plans and checkout
