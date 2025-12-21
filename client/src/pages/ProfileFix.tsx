@@ -372,7 +372,7 @@ export default function ProfileFix() {
                   Analyze My Profile
                 </>
               ) : step === 1 ? (
-                "Continue to Details"
+                "Analyze My Profile"
               ) : (
                 "Continue"
               )}

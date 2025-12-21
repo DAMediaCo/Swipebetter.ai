@@ -1,0 +1,59 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Finish the remaining UX polish on /fix-profile by:
+1) Changing the primary CTA button text to “Analyze My Profile”
+2) Standardizing privacy wording so it is consistent everywhere on the page
+
+Do NOT change URLs, routing, pricing, or core logic.
+This is a UI copy polish only.
+
+====================================================
+1) CHANGE PRIMARY CTA COPY
+====================================================
+
+On /fix-profile:
+- Find the primary bottom CTA button that currently says:
+  “Continue to Details”
+- Change the label to:
+  “Analyze My Profile”
+
+Keep existing behavior the same.
+Keep the disabled state and helper text:
+“Upload at least 1 screenshot to continue.”
+
+When clicked, show a loading state (if not already implemented):
+- Button text becomes “Analyzing...”
+- Disable button to prevent double submits
+
+====================================================
+2) STANDARDIZE PRIVACY WORDING
+====================================================
+
+On /fix-profile there are multiple similar lines:
+- “Your screenshots are private and deleted after processing”
+- “Your screenshots are processed securely and automatically deleted after analysis.”
+
+Standardize all privacy lines on this page to a single consistent sentence:
+
+Use exactly:
+“Your screenshots are processed securely and deleted after analysis.”
+
+Apply this replacement wherever privacy/deletion is mentioned on the page, except the trust bar items, which should remain:
+
+Trust bar must remain:
+- Private & Secure
+- Screenshots deleted after processing
+- No account sharing required
+
+Every other privacy line on the page should use the standardized sentence above.
+
+====================================================
+3) DELIVERABLE
+====================================================
+
+- Primary CTA now reads “Analyze My Profile”
+- Disabled helper text remains correct
+- Loading state prevents double submits
+- Privacy messaging is consistent across the page (outside the trust bar)
+- No other UI regressions
