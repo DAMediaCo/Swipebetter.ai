@@ -1,0 +1,60 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Fix remaining copy inconsistencies on /fix-profile:
+1) Standardize privacy/deletion messaging so it is not duplicated or contradictory.
+2) Remove redundant FAQ items about Grindr/ENM.
+
+Do NOT change URLs, routing, pricing, or business logic.
+UI copy changes only.
+
+====================================================
+1) PRIVACY MESSAGE CONSISTENCY
+====================================================
+
+On /fix-profile, the page currently shows BOTH:
+- “Your screenshots are private and deleted after processing”
+- “Your screenshots are processed securely and deleted after analysis.”
+
+Keep the Trust Bar text unchanged:
+- Private & Secure
+- Screenshots deleted after processing
+- No account sharing required
+
+For ALL other privacy lines on this page, use ONE consistent sentence only:
+
+Use exactly:
+“Your screenshots are processed securely and deleted after analysis.”
+
+Action:
+- Replace “Your screenshots are private and deleted after processing” with the sentence above.
+- Ensure the privacy line appears only ONCE in the main body (outside the trust bar), placed near the upload area or ENM toggle.
+- Remove any other duplicate privacy sentence in the body so it is not repeated.
+
+====================================================
+2) FAQ DEDUPLICATION
+====================================================
+
+In “Common Questions” on /fix-profile, there are two overlapping questions:
+- “Will this work for Hinge, Tinder, Bumble, and Grindr?”
+- “Does this work for Grindr and ENM/poly relationships?”
+
+Keep BOTH topics, but avoid redundancy by changing the first question to exclude Grindr.
+
+Update the first question to:
+“Will this work for Hinge, Tinder, and Bumble?”
+
+Keep the second question as-is:
+“Does this work for Grindr and ENM/poly relationships?”
+
+Ensure answers still make sense and mention all supported apps across the two items.
+
+====================================================
+DELIVERABLES
+====================================================
+
+- Trust bar unchanged
+- Only one body privacy line, consistent wording
+- No duplicated privacy lines in the body
+- FAQ no longer has redundant Grindr mentions
+- No UI regressions

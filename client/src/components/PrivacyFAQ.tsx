@@ -7,8 +7,8 @@ import {
 
 const faqs = [
   {
-    question: "Will this work for Hinge, Tinder, Bumble, and Grindr?",
-    answer: "Yes. SwipeBetter works with all major dating apps including Hinge, Tinder, Bumble, Grindr, and others.",
+    question: "Will this work for Hinge, Tinder, and Bumble?",
+    answer: "Yes. SwipeBetter works with all major dating apps including Hinge, Tinder, Bumble, and others.",
   },
   {
     question: "Does this work for Grindr and ENM/poly relationships?",
