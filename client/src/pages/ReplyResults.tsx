@@ -65,7 +65,7 @@ export default function ReplyResults() {
         </div>
 
         <StepIndicator 
-          steps={["Analyze", "Results", "Upgrade"]} 
+          steps={["Paste", "Results", "Upgrade"]} 
           currentStep={2} 
         />
 
@@ -116,7 +116,7 @@ export default function ReplyResults() {
                 className="w-full"
                 data-testid="button-try-another"
               >
-                Try Another Reply
+                Try Another Conversation
               </Button>
             </Link>
             <Link href="/fix-reply/upgrade" className="flex-1">

@@ -41,7 +41,7 @@ export default function ReplyUpgrade() {
         </div>
 
         <StepIndicator 
-          steps={["Analyze", "Results", "Upgrade"]} 
+          steps={["Paste", "Results", "Upgrade"]} 
           currentStep={3} 
         />
 
@@ -80,13 +80,13 @@ export default function ReplyUpgrade() {
         </Card>
 
         <div className="flex gap-3">
-          <Link href="/fix-reply" className="flex-1">
+          <Link href="/fix-reply/results" className="flex-1">
             <Button
               variant="outline"
               className="w-full"
-              data-testid="button-view-preview"
+              data-testid="button-back-to-results"
             >
-              View Preview
+              Back to Results
             </Button>
           </Link>
           <Link href="/pricing" className="flex-1">

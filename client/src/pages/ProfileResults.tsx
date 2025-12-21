@@ -68,7 +68,7 @@ export default function ProfileResults() {
         </div>
 
         <StepIndicator 
-          steps={["Analyze", "Results", "Upgrade"]} 
+          steps={["Upload", "Results", "Upgrade"]} 
           currentStep={2} 
         />
 

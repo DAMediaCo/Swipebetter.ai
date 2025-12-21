@@ -21,8 +21,10 @@ import {
   Camera,
   Upload,
   ArrowDown,
-  HelpCircle
+  HelpCircle,
+  Loader2
 } from "lucide-react";
+import { StepIndicator } from "@/components/StepIndicator";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Tooltip,
@@ -202,18 +204,13 @@ export default function ProfileFix() {
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-2">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  i <= step ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            ))}
-          </div>
           <div className="w-9" />
         </div>
+
+        <StepIndicator 
+          steps={["Upload", "Results", "Upgrade"]} 
+          currentStep={1} 
+        />
 
         <div className="mb-6">
           <TrustBar />
@@ -346,7 +343,12 @@ export default function ProfileFix() {
 
       {step >= 1 && step <= 3 && (
         <div className="fixed bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background border-t border-border safe-bottom">
-          <div className="max-w-2xl mx-auto flex gap-3">
+          <div className="max-w-2xl mx-auto space-y-2">
+            {step === 1 && images.length === 0 && (
+              <p className="text-sm text-muted-foreground text-center">
+                Upload at least 1 screenshot to continue.
+              </p>
+            )}
             <Button
               onClick={() => {
                 if (step < 3) {
@@ -356,21 +358,23 @@ export default function ProfileFix() {
                 }
               }}
               disabled={!canProceed() || analyzeMutation.isPending || (step === 3 && !subscriptionData?.canAnalyze)}
-              className="flex-1 py-6"
+              className="w-full py-6"
               data-testid="button-next-step"
             >
               {analyzeMutation.isPending ? (
                 <>
-                  <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Analyzing...
                 </>
-              ) : step < 3 ? (
-                "Next"
-              ) : (
+              ) : step === 3 ? (
                 <>
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Analyze Profile
+                  Analyze My Profile
                 </>
+              ) : step === 1 ? (
+                "Continue to Details"
+              ) : (
+                "Continue"
               )}
             </Button>
           </div>
