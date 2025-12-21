@@ -42,6 +42,35 @@ export function useSubscription() {
   });
 }
 
+export interface EntitlementData {
+  user: User | null;
+  isPro: boolean;
+  proActive: boolean;
+  planType: "monthly" | "annual" | "starter" | null;
+  subscriptionStatus: string | null;
+  oneTimeCredits: number;
+}
+
+export function useEntitlement() {
+  const query = useQuery<EntitlementData>({
+    queryKey: ["/api/me"],
+    staleTime: 1000 * 30,
+  });
+  
+  const refreshEntitlement = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+    await queryClient.refetchQueries({ queryKey: ["/api/me"] });
+  };
+
+  return {
+    ...query,
+    isPro: query.data?.isPro ?? false,
+    proActive: query.data?.proActive ?? false,
+    planType: query.data?.planType ?? null,
+    refreshEntitlement,
+  };
+}
+
 export function useLogin() {
   return useMutation({
     mutationFn: async (data: { email: string; password: string }) => {

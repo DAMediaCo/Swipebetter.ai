@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
+import { useEntitlement, useCustomerPortal } from "@/lib/auth";
 import { 
   ArrowLeft, 
   Clipboard, 
   Check,
-  Sparkles
+  Sparkles,
+  Lock,
+  Settings
 } from "lucide-react";
 
 interface ReplyAnalysisData {
@@ -21,6 +25,8 @@ export default function ReplyResults() {
   const [, setLocation] = useLocation();
   const [result, setResult] = useState<ReplyAnalysisData | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const { isPro, proActive, isLoading: entitlementLoading, refreshEntitlement } = useEntitlement();
+  const customerPortal = useCustomerPortal();
 
   useEffect(() => {
     const data = loadAnalysis<ReplyAnalysisData>('reply');
@@ -33,6 +39,12 @@ export default function ReplyResults() {
   }, [setLocation]);
 
   useEffect(() => {
+    if (!entitlementLoading && !isPro) {
+      refreshEntitlement();
+    }
+  }, [entitlementLoading]);
+
+  useEffect(() => {
     const meta = document.createElement('meta');
     meta.name = 'robots';
     meta.content = 'noindex';
@@ -43,6 +55,7 @@ export default function ReplyResults() {
   }, []);
 
   const copyToClipboard = async (text: string, index: number) => {
+    if (!isPro) return;
     await navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
@@ -69,6 +82,30 @@ export default function ReplyResults() {
           currentStep={2} 
         />
 
+        <div className="flex justify-center mb-4">
+          {isPro ? (
+            <Badge variant="default" className="bg-primary/10 text-primary border-primary/20" data-testid="badge-full-access">
+              <Check className="w-3 h-3 mr-1" />
+              Full Results Unlocked
+            </Badge>
+          ) : (
+            <Badge variant="secondary" data-testid="badge-preview">
+              <Lock className="w-3 h-3 mr-1" />
+              Preview Mode
+            </Badge>
+          )}
+        </div>
+
+        {!isPro && (
+          <Card className="mb-6 border-primary/50 bg-primary/5">
+            <CardContent className="py-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                Upgrade to unlock all reply suggestions and copy buttons.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="space-y-6">
           {result.conversationContext && (
             <Card>
@@ -84,7 +121,11 @@ export default function ReplyResults() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Suggested Replies</h3>
             {result.suggestedReplies?.map((reply, index) => (
-              <Card key={index} className="hover-elevate cursor-pointer" onClick={() => copyToClipboard(reply, index)}>
+              <Card 
+                key={index} 
+                className={isPro ? "hover-elevate cursor-pointer" : ""} 
+                onClick={() => isPro && copyToClipboard(reply, index)}
+              >
                 <CardContent className="py-4 flex items-start gap-4">
                   <div className="flex-1">
                     <p className="leading-relaxed">{reply}</p>
@@ -96,12 +137,15 @@ export default function ReplyResults() {
                       e.stopPropagation();
                       copyToClipboard(reply, index);
                     }}
+                    disabled={!isPro}
                     data-testid={`button-copy-reply-${index}`}
                   >
                     {copiedIndex === index ? (
                       <Check className="w-4 h-4 text-primary" />
-                    ) : (
+                    ) : isPro ? (
                       <Clipboard className="w-4 h-4" />
+                    ) : (
+                      <Lock className="w-4 h-4 text-muted-foreground" />
                     )}
                   </Button>
                 </CardContent>
@@ -109,25 +153,45 @@ export default function ReplyResults() {
             ))}
           </div>
 
-          <div className="flex gap-3">
-            <Link href="/fix-reply" className="flex-1">
-              <Button
-                variant="outline"
-                className="w-full"
-                data-testid="button-try-another"
-              >
-                Try Another Conversation
-              </Button>
-            </Link>
-            <Link href="/fix-reply/upgrade" className="flex-1">
-              <Button
-                className="w-full"
-                data-testid="button-upgrade"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Upgrade
-              </Button>
-            </Link>
+          <div className="space-y-3">
+            {!isPro && (
+              <p className="text-sm text-muted-foreground text-center">
+                Unlock the full report in seconds.
+              </p>
+            )}
+            <div className="flex gap-3">
+              <Link href="/fix-reply" className="flex-1">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-try-another"
+                >
+                  Try Another Conversation
+                </Button>
+              </Link>
+              {isPro && proActive ? (
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => customerPortal.mutate()}
+                  disabled={customerPortal.isPending}
+                  data-testid="button-manage-subscription"
+                >
+                  <Settings className="w-4 h-4 mr-2" />
+                  Manage Subscription
+                </Button>
+              ) : (
+                <Link href="/fix-reply/upgrade" className="flex-1">
+                  <Button
+                    className="w-full"
+                    data-testid="button-upgrade"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Upgrade
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

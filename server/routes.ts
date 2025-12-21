@@ -42,6 +42,51 @@ export async function registerRoutes(
 
   // Note: /api/auth/user is now registered in server/auth.ts
 
+  app.get("/api/me", requireAuth, async (req: any, res) => {
+    const userId = req.session.userId;
+    const user = await storage.getUser(userId);
+    const subscription = await storage.getUserSubscription(userId);
+    
+    const isActive = subscription?.status === "active";
+    const isTrialing = subscription?.status === "trialing";
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+    
+    const proActive = isActive || isTrialing;
+    const isPro = proActive || hasOneTimeCredits;
+    
+    let planType: "monthly" | "annual" | "starter" | null = null;
+    const planLower = (subscription?.plan || "").toLowerCase();
+    if (planLower) {
+      if (planLower.includes("month")) {
+        planType = "monthly";
+      } else if (planLower.includes("annual") || planLower.includes("year")) {
+        planType = "annual";
+      } else if (planLower.includes("starter") || hasOneTimeCredits) {
+        planType = "starter";
+      } else if (proActive) {
+        planType = "monthly";
+      }
+    } else if (hasOneTimeCredits) {
+      planType = "starter";
+    } else if (proActive) {
+      planType = "monthly";
+    }
+
+    res.json({
+      user: user ? {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      } : null,
+      isPro,
+      proActive,
+      planType,
+      subscriptionStatus: subscription?.status || null,
+      oneTimeCredits: subscription?.oneTimeCredits || 0,
+    });
+  });
+
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     const subscription = await storage.getUserSubscription(req.session.userId);
     const isActive = subscription?.status === "active";

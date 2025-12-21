@@ -1,0 +1,108 @@
+You are working on SwipeBetter.ai (React SPA + Express) with Stripe subscriptions.
+
+Issue:
+The UI sometimes does not recognize that the account is upgraded (Pro),
+so results pages still show “Upgrade” and/or treat the user as not entitled.
+
+Goal:
+Make Pro entitlement detection reliable across the entire app, including:
+- /pricing
+- /fix-profile
+- /fix-profile/upload
+- /fix-profile/results
+- /fix-reply and its results pages
+
+Do NOT change pricing.
+Do NOT change routes.
+Do NOT change Stripe products.
+Focus on entitlement state, persistence, and refresh after purchase.
+
+====================================================
+1) CREATE A SINGLE SOURCE OF TRUTH: /api/me
+====================================================
+
+Add (or update) a backend endpoint:
+
+GET /api/me
+
+It must return the current user’s entitlement status based on server truth:
+{
+  isPro: boolean,
+  planType: "monthly" | "annual" | null,
+  proActive: boolean,
+  subscriptionStatus: "active" | "trialing" | "past_due" | "canceled" | null
+}
+
+Rules:
+- proActive should be true only when Stripe subscription is active or trialing.
+- Use your existing user auth/session identification.
+- Never rely on client-side flags alone.
+
+====================================================
+2) CLIENT: LOAD ENTITLEMENT GLOBALLY
+====================================================
+
+In React, create a global Auth/Entitlement context (or store) that:
+- Fetches /api/me on app boot
+- Stores isPro + planType in memory
+- Exposes:
+  - isPro
+  - refreshEntitlement() that re-fetches /api/me
+
+Behavior:
+- Do not block the UI, but do prevent entitlement-dependent UI from assuming false before the first fetch completes.
+- Use a loading state: entitlementLoading.
+
+====================================================
+3) ALWAYS RECHECK AFTER CHECKOUT SUCCESS
+====================================================
+
+On the Stripe success return page/handler:
+- After verifying Stripe session success on the backend,
+  call refreshEntitlement() immediately.
+- Then route the user back to results with full access.
+
+If the user lands on /fix-profile/results after checkout:
+- Also call refreshEntitlement() on that page mount if entitlementLoading is false and isPro is false,
+  to avoid stale status.
+
+====================================================
+4) RESULTS PAGES: USE ENTITLEMENT CORRECTLY
+====================================================
+
+On /fix-profile/results and /fix-reply results views:
+
+If isPro is true:
+- Do NOT show the “Upgrade” button
+- Instead show:
+  “Manage Subscription” (link to Stripe customer portal if available)
+  OR hide all upgrade CTAs.
+
+If isPro is false:
+- Show upgrade CTA as normal.
+
+Also ensure:
+- Copy buttons and full results are unlocked only when isPro is true OR the user paid for a one-time starter unlock.
+
+====================================================
+5) OPTIONAL: HARD REFRESH FALLBACK
+====================================================
+
+If Stripe webhook timing causes a short delay:
+- After checkout success, poll /api/me up to 3 times:
+  - wait 1 second
+  - wait 2 seconds
+  - wait 3 seconds
+Stop early if isPro becomes true.
+
+This prevents “I paid but it still says upgrade” moments.
+
+====================================================
+6) DELIVERABLES
+====================================================
+
+- Entitlement comes from /api/me server truth
+- isPro is available globally in the client
+- After purchase, the UI refreshes entitlement automatically
+- Results pages correctly hide upgrade UI for Pro users
+- No more stale “Upgrade” state after payment
