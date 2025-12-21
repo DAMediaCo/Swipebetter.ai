@@ -263,19 +263,21 @@ export async function registerRoutes(
   app.get("/api/stripe/debug-prices", async (req, res) => {
     try {
       const stripe = await getUncachableStripeClient();
-      const prices = await stripe.prices.list({ active: true, limit: 20 });
-      const products = await stripe.products.list({ active: true, limit: 10 });
+      const prices = await stripe.prices.list({ limit: 100 });
+      const products = await stripe.products.list({ limit: 50 });
       res.json({ 
         prices: prices.data.map(p => ({
           id: p.id,
           product: p.product,
           unit_amount: p.unit_amount,
           recurring: p.recurring,
-          type: p.type
+          type: p.type,
+          active: p.active
         })),
         products: products.data.map(p => ({
           id: p.id,
-          name: p.name
+          name: p.name,
+          active: p.active
         }))
       });
     } catch (error) {
