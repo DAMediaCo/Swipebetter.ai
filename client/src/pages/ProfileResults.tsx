@@ -68,8 +68,8 @@ export default function ProfileResults() {
         </div>
 
         <StepIndicator 
-          steps={["Upload", "Results", "Upgrade"]} 
-          currentStep={2} 
+          steps={["Details", "Upload", "Results"]} 
+          currentStep={3} 
         />
 
         <div className="space-y-6">

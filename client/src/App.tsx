@@ -10,6 +10,7 @@ import { initGA, trackPageView } from "@/lib/analytics";
 import Home from "@/pages/Home";
 import Auth from "@/pages/Auth";
 import ProfileFix from "@/pages/ProfileFix";
+import ProfileUpload from "@/pages/ProfileUpload";
 import ProfileResults from "@/pages/ProfileResults";
 import ProfileUpgrade from "@/pages/ProfileUpgrade";
 import ReplyFix from "@/pages/ReplyFix";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/auth" component={Auth} />
       <Route path="/fix-profile" component={ProfileFix} />
+      <Route path="/fix-profile/upload" component={ProfileUpload} />
       <Route path="/fix-profile/results" component={ProfileResults} />
       <Route path="/fix-profile/upgrade" component={ProfileUpgrade} />
       <Route path="/fix-reply" component={ReplyFix} />

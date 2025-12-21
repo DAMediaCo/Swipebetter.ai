@@ -41,7 +41,7 @@ export default function ProfileUpgrade() {
         </div>
 
         <StepIndicator 
-          steps={["Upload", "Results", "Upgrade"]} 
+          steps={["Details", "Upload", "Results"]} 
           currentStep={3} 
         />
 

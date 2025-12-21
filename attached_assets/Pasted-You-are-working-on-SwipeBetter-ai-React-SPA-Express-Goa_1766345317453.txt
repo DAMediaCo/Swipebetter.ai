@@ -1,0 +1,121 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Split the Fix Profile flow into two clear steps by moving the upload + analysis action to a dedicated second page.
+
+Do NOT change pricing, business logic, or analysis behavior.
+This is a routing + UI flow change only.
+
+====================================================
+NEW FLOW OVERVIEW
+====================================================
+
+/fix-profile
+→ context & personalization
+→ continues to
+/fix-profile/upload
+→ upload + analyze
+
+====================================================
+STEP 1: UPDATE /fix-profile (PAGE 1)
+====================================================
+
+On /fix-profile:
+
+A) Keep:
+- Step indicator: Step 1 highlighted
+- Dating Platform selection
+- Gender / identity selection
+- ENM toggle (if present)
+- FAQ section
+
+B) REMOVE from this page:
+- Screenshot upload UI
+- Screenshot counters
+- Any analyze or upload logic
+
+C) Primary CTA on this page:
+Button text:
+“Continue to Upload”
+
+Button behavior:
+- Disabled until:
+  - Dating platform is selected
+  - Identity is selected
+- Helper text if disabled:
+  “Select a platform and identity to continue.”
+
+On click:
+- Save selections to state (or session/local storage)
+- Navigate to:
+  /fix-profile/upload
+
+====================================================
+STEP 2: CREATE /fix-profile/upload (PAGE 2)
+====================================================
+
+Create a new route:
+- /fix-profile/upload
+
+This page handles upload + analysis only.
+
+A) Step indicator:
+- Step 2 (Upload) highlighted
+
+B) Show summary at top:
+Example:
+“Profile for: Hinge • Man”
+(Use values from previous page)
+
+C) Upload UI:
+- Drag & drop screenshot upload
+- Counter (0/5)
+- Same upload component currently used
+
+D) Trust messaging (visible near upload):
+Use exactly:
+“Your screenshots are processed securely and deleted after analysis.”
+
+E) Primary CTA:
+Button text:
+“Analyze My Profile”
+
+Behavior:
+- Disabled until at least 1 screenshot uploaded
+- Helper text:
+  “Upload at least 1 screenshot to continue.”
+- Loading state:
+  “Analyzing...”
+- Prevent double submit
+
+On click:
+- Trigger existing analysis logic
+- Navigate to results state or route (unchanged)
+
+====================================================
+STEP 3: STEP INDICATOR BEHAVIOR
+====================================================
+
+- /fix-profile → Step 1 highlighted
+- /fix-profile/upload → Step 2 highlighted
+- Results / upgrade → Step 3 highlighted
+
+====================================================
+STEP 4: BACK NAVIGATION
+====================================================
+
+On /fix-profile/upload:
+- Add a small “Back” link
+- Returns to /fix-profile
+- Preserves selections
+
+====================================================
+DELIVERABLES
+====================================================
+
+- /fix-profile = context + personalization only
+- /fix-profile/upload = upload + analyze
+- Clear linear flow
+- No broken logic
+- No duplicated upload UI
+- No UX regressions
