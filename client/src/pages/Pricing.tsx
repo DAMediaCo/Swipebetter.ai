@@ -50,10 +50,12 @@ export default function Pricing() {
   });
 
   const products = productsData?.data || [];
-  const mainProduct = products[0];
-  const monthlyPrice = mainProduct?.prices.find(p => p.recurring?.interval === "month");
-  const annualPrice = mainProduct?.prices.find(p => p.recurring?.interval === "year");
-  const oneTimePrice = mainProduct?.prices.find(p => !p.recurring);
+  
+  // Find prices across all products
+  const allPrices: Price[] = products.flatMap(p => p.prices || []);
+  const monthlyPrice = allPrices.find(p => p.recurring?.interval === "month");
+  const annualPrice = allPrices.find(p => p.recurring?.interval === "year");
+  const oneTimePrice = allPrices.find(p => !p.recurring);
 
   const isSubscribed = subscriptionData?.subscription?.status === "active";
 
