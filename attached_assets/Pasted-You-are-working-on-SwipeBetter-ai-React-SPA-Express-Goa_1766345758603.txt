@@ -1,0 +1,93 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Polish the Fix Profile Results page UI for clarity and conversion.
+Do NOT change existing analysis logic or pricing.
+Do NOT change existing URLs.
+
+Target page:
+- /fix-profile/results (or wherever the results view is rendered)
+
+====================================================
+1) FIX THE STEP INDICATOR
+====================================================
+
+Replace the current step header text (currently shows something like “Details / Upload / 3 Results”) with a consistent 3-step indicator used across the flow:
+
+Step labels:
+1 Upload
+2 Results
+3 Upgrade
+
+Behavior:
+- On the results page, highlight Step 2 (Results).
+- Remove the word “Details” entirely from the step indicator.
+
+====================================================
+2) ADD CLEAR RESULTS STATE (UNLOCKED VS PREVIEW)
+====================================================
+
+Add a small status badge near the top of results:
+
+If user has access to full results:
+- Badge text: “Full Results Unlocked”
+
+If user is in preview mode:
+- Badge text: “Preview Mode”
+- Show a short callout under badge:
+  “Upgrade to unlock full bio rewrites, photo order, and copy buttons.”
+
+Do not show both states at once.
+Detect state using existing entitlement logic.
+
+====================================================
+3) ADD COPY BUTTONS FOR BIO SUGGESTIONS
+====================================================
+
+For each bio suggestion item:
+- Add a visible “Copy” button
+- Clicking copies the bio text to clipboard
+- Show a brief confirmation toast or inline text: “Copied”
+
+If preview mode:
+- Either disable Copy and show “Upgrade to copy”
+  OR only enable Copy for the first suggestion and lock the rest
+Choose the approach that best matches current business logic.
+
+====================================================
+4) IMPROVE SECTION READABILITY
+====================================================
+
+Make each major section collapsible (optional but recommended) using accordions:
+- Bio Suggestions
+- Photo Feedback
+- Top Improvements
+
+Default:
+- Expanded on first load
+
+====================================================
+5) RESULTS PAGE CTA IMPROVEMENTS
+====================================================
+
+Keep existing buttons:
+- Analyze Another Profile (routes to /fix-profile)
+- Upgrade (routes to /fix-profile/upgrade)
+
+If in preview mode:
+- Upgrade button should be visually emphasized
+- Add small helper text above buttons:
+  “Unlock the full report in seconds.”
+
+If full results unlocked:
+- Keep buttons neutral and clean
+
+====================================================
+DELIVERABLES
+====================================================
+
+- Step indicator is correct and consistent
+- Results state is clearly communicated
+- Copy buttons added for bio suggestions
+- Sections are easier to scan
+- Preview users are guided to upgrade without confusion

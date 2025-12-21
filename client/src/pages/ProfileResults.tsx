@@ -2,15 +2,18 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
+import { useSubscription } from "@/lib/auth";
 import { 
   ArrowLeft, 
   Clipboard, 
   Check,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Lock
 } from "lucide-react";
 
 interface ProfileAnalysisData {
@@ -24,6 +27,9 @@ export default function ProfileResults() {
   const [, setLocation] = useLocation();
   const [result, setResult] = useState<ProfileAnalysisData | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const { data: subscriptionData } = useSubscription();
+  
+  const hasFullAccess = subscriptionData?.canAnalyze ?? false;
 
   useEffect(() => {
     const data = loadAnalysis<ProfileAnalysisData>('profile');
@@ -46,6 +52,7 @@ export default function ProfileResults() {
   }, []);
 
   const copyToClipboard = async (text: string, field: string) => {
+    if (!hasFullAccess) return;
     await navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
@@ -68,9 +75,33 @@ export default function ProfileResults() {
         </div>
 
         <StepIndicator 
-          steps={["Details", "Upload", "Results"]} 
-          currentStep={3} 
+          steps={["Upload", "Results", "Upgrade"]} 
+          currentStep={2} 
         />
+
+        <div className="flex justify-center mb-4">
+          {hasFullAccess ? (
+            <Badge variant="default" className="bg-primary/10 text-primary border-primary/20" data-testid="badge-full-access">
+              <Check className="w-3 h-3 mr-1" />
+              Full Results Unlocked
+            </Badge>
+          ) : (
+            <Badge variant="secondary" data-testid="badge-preview">
+              <Lock className="w-3 h-3 mr-1" />
+              Preview Mode
+            </Badge>
+          )}
+        </div>
+
+        {!hasFullAccess && (
+          <Card className="mb-6 border-primary/50 bg-primary/5">
+            <CardContent className="py-4 text-center">
+              <p className="text-sm text-muted-foreground">
+                Upgrade to unlock full bio rewrites, photo order, and copy buttons.
+              </p>
+            </CardContent>
+          </Card>
+        )}
 
         <div className="space-y-6">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
@@ -91,6 +122,7 @@ export default function ProfileResults() {
             content={result.bioSuggestions}
             onCopy={() => copyToClipboard(result.bioSuggestions, "bio")}
             copied={copiedField === "bio"}
+            canCopy={hasFullAccess}
           />
 
           <ResultCard
@@ -98,6 +130,7 @@ export default function ProfileResults() {
             content={result.photoFeedback}
             onCopy={() => copyToClipboard(result.photoFeedback, "photo")}
             copied={copiedField === "photo"}
+            canCopy={hasFullAccess}
           />
 
           <ResultCard
@@ -105,27 +138,36 @@ export default function ProfileResults() {
             content={result.improvements}
             onCopy={() => copyToClipboard(result.improvements, "improvements")}
             copied={copiedField === "improvements"}
+            canCopy={hasFullAccess}
           />
 
-          <div className="flex gap-3">
-            <Link href="/fix-profile" className="flex-1">
-              <Button
-                variant="outline"
-                className="w-full"
-                data-testid="button-analyze-another"
-              >
-                Analyze Another Profile
-              </Button>
-            </Link>
-            <Link href="/fix-profile/upgrade" className="flex-1">
-              <Button
-                className="w-full"
-                data-testid="button-upgrade"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Upgrade
-              </Button>
-            </Link>
+          <div className="space-y-3">
+            {!hasFullAccess && (
+              <p className="text-sm text-muted-foreground text-center">
+                Unlock the full report in seconds.
+              </p>
+            )}
+            <div className="flex gap-3">
+              <Link href="/fix-profile" className="flex-1">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  data-testid="button-analyze-another"
+                >
+                  Analyze Another Profile
+                </Button>
+              </Link>
+              <Link href="/fix-profile/upgrade" className="flex-1">
+                <Button
+                  className="w-full"
+                  variant={hasFullAccess ? "outline" : "default"}
+                  data-testid="button-upgrade"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {hasFullAccess ? "View Plans" : "Upgrade"}
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -138,11 +180,13 @@ function ResultCard({
   content,
   onCopy,
   copied,
+  canCopy,
 }: {
   title: string;
   content: string;
   onCopy: () => void;
   copied: boolean;
+  canCopy: boolean;
 }) {
   return (
     <Card>
@@ -152,12 +196,15 @@ function ResultCard({
           variant="ghost"
           size="icon"
           onClick={onCopy}
+          disabled={!canCopy}
           data-testid={`button-copy-${title.toLowerCase().replace(/ /g, "-")}`}
         >
           {copied ? (
             <Check className="w-4 h-4 text-primary" />
-          ) : (
+          ) : canCopy ? (
             <Clipboard className="w-4 h-4" />
+          ) : (
+            <Lock className="w-4 h-4 text-muted-foreground" />
           )}
         </Button>
       </CardHeader>
