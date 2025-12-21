@@ -1,0 +1,105 @@
+You are working on SwipeBetter.ai (React SPA + Express).
+
+Goal:
+Improve the user flow clarity on Fix Profile and Fix Reply by replacing vague buttons like “Next” with action-based CTAs, adding a clear step indicator, and reducing drop-off.
+
+Do NOT change existing URLs or routing.
+Do NOT change pricing or business logic.
+This is UI/UX polish only.
+
+====================================================
+1) FIX PROFILE: BUTTON COPY + FLOW CLARITY
+====================================================
+
+On /fix-profile:
+
+A) Replace the primary button label “Next” with:
+- “Analyze My Profile”
+
+B) Disable the button until minimum input exists:
+- At least 1 screenshot selected
+- If no screenshot, button disabled and shows helper text:
+  “Upload at least 1 screenshot to continue.”
+
+C) After user clicks “Analyze My Profile”:
+- Show a loading state on the button:
+  “Analyzing...” with spinner
+- Prevent double submits
+
+D) Add a step indicator near the top of the page:
+Step 1: Upload
+Step 2: Results
+Step 3: Upgrade
+
+Highlight current step (Upload).
+
+====================================================
+2) FIX REPLY: MATCHING ACTION CTA
+====================================================
+
+On /fix-reply:
+
+A) Ensure the primary CTA is action-based and consistent:
+- Use “Generate Replies” or “Analyze Conversation”
+Pick the one that best matches existing copy.
+
+B) Disable the button until minimum input exists:
+- Conversation text is not empty
+- Optional: require at least 20 characters
+
+C) After user clicks:
+- Show loading state: “Generating...” with spinner
+- Prevent double submits
+
+D) Add the same step indicator:
+Step 1: Paste
+Step 2: Results
+Step 3: Upgrade
+
+Highlight current step.
+
+====================================================
+3) RESULTS PAGE OR RESULTS STATE (IF PRESENT)
+====================================================
+
+Wherever results are shown (either a dedicated route like /fix-profile/results or a results state within the same page):
+
+A) Step indicator should highlight Results.
+
+B) Add two clear buttons:
+Profile results:
+- “Analyze Another Profile” (routes to /fix-profile and clears local session results)
+- “Upgrade” (opens upgrade modal or routes to upgrade page)
+
+Reply results:
+- “Try Another Conversation” (routes to /fix-reply and clears local session results)
+- “Upgrade” (opens upgrade modal or routes to upgrade page)
+
+====================================================
+4) UPGRADE STATE (IF PRESENT)
+====================================================
+
+Wherever upgrade is shown:
+
+A) Step indicator should highlight Upgrade.
+
+B) Add a “Back to Results” link (if results exist).
+
+====================================================
+5) CONSISTENCY RULES
+====================================================
+
+- Button labels must describe the action.
+- Use the same phrasing everywhere:
+  - “Analyze My Profile” for profile
+  - “Generate Replies” (or chosen equivalent) for reply
+- Loading states must be consistent.
+- No layout breaking changes.
+
+====================================================
+DELIVERABLES
+====================================================
+
+- “Next” replaced with “Analyze My Profile” on /fix-profile
+- Clear disabled state + helper text until required input exists
+- Loading states and double-submit preven
