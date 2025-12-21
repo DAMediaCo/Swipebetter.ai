@@ -247,6 +247,43 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/stripe/sync", async (req, res) => {
+    try {
+      const { getStripeSync } = await import('./stripeClient');
+      const stripeSync = await getStripeSync();
+      await stripeSync.syncBackfill();
+      res.json({ success: true, message: "Stripe data synced" });
+    } catch (error) {
+      console.error("Error syncing Stripe:", error);
+      res.status(500).json({ error: "Failed to sync Stripe data" });
+    }
+  });
+
+  // Debug endpoint to check actual Stripe prices
+  app.get("/api/stripe/debug-prices", async (req, res) => {
+    try {
+      const stripe = await getUncachableStripeClient();
+      const prices = await stripe.prices.list({ active: true, limit: 20 });
+      const products = await stripe.products.list({ active: true, limit: 10 });
+      res.json({ 
+        prices: prices.data.map(p => ({
+          id: p.id,
+          product: p.product,
+          unit_amount: p.unit_amount,
+          recurring: p.recurring,
+          type: p.type
+        })),
+        products: products.data.map(p => ({
+          id: p.id,
+          name: p.name
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching Stripe debug:", error);
+      res.status(500).json({ error: "Failed to fetch Stripe data" });
+    }
+  });
+
   app.get("/api/products", async (req, res) => {
     try {
       const products = await storage.listProducts();
