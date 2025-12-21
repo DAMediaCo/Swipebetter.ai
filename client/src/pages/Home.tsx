@@ -3,10 +3,16 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Zap, Check } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, UserX } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { TestimonialsRotator } from "@/components/TestimonialsRotator";
 import { trackToolEntry } from "@/lib/analytics";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function Home() {
   const { data: authData } = useAuth();
@@ -14,12 +20,35 @@ export default function Home() {
   const [location] = useLocation();
 
   useEffect(() => {
-    document.title = "SwipeBetter.ai - AI Dating Profile Coach";
+    document.title = "AI Dating Profile Review | Fix Tinder, Hinge & Bumble Profiles";
   }, []);
 
   const handleToolClick = (toolType: "profile" | "reply") => {
     trackToolEntry(toolType, location);
   };
+
+  const faqItems = [
+    {
+      question: "Is SwipeBetter private?",
+      answer: "Yes. Your screenshots are processed to generate feedback and are deleted after processing."
+    },
+    {
+      question: "Do you store my screenshots?",
+      answer: "No. Screenshots are deleted after processing. We do not build public profiles from your uploads."
+    },
+    {
+      question: "Which apps does this work with?",
+      answer: "Any app where you can screenshot your profile or chat, including Tinder, Hinge, Bumble, Grindr, and more."
+    },
+    {
+      question: "Do I need an account?",
+      answer: "No account is required to use SwipeBetter."
+    },
+    {
+      question: "Does this guarantee more matches?",
+      answer: "No. Results vary, but we aim to improve your odds with clear, actionable suggestions."
+    }
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -59,14 +88,61 @@ export default function Home() {
             </Link>
           </div>
           
-          <p className="text-sm text-muted-foreground pt-4 flex items-center justify-center gap-2">
-            <Shield className="w-4 h-4" />
-            Your screenshots are private and secure
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
+            <span className="flex items-center gap-1.5">
+              <Trash2 className="w-4 h-4" />
+              Screenshots deleted after processing
+            </span>
+            <span className="hidden sm:inline text-muted-foreground/50">|</span>
+            <span className="flex items-center gap-1.5">
+              <UserX className="w-4 h-4" />
+              No account required
+            </span>
+            <span className="hidden sm:inline text-muted-foreground/50">|</span>
+            <span className="flex items-center gap-1.5">
+              <Check className="w-4 h-4" />
+              Works with Tinder, Hinge, Bumble, and more
+            </span>
+          </div>
         </div>
       </section>
 
       <section className="py-16 md:py-24 px-4 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10 space-y-3">
+            <h2 className="text-2xl md:text-3xl font-bold">Example AI Feedback</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              See what kind of actionable insights you will get
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="pt-6 pb-5 px-5">
+                <div className="text-3xl font-bold text-primary mb-2">41/100</div>
+                <p className="text-sm font-medium">Profile Score</p>
+                <p className="text-xs text-muted-foreground mt-1">Room for improvement</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6 pb-5 px-5">
+                <div className="text-lg font-semibold mb-2">Top Issue</div>
+                <p className="text-sm text-muted-foreground">Your first photo reads as low trust</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6 pb-5 px-5">
+                <div className="text-lg font-semibold mb-2">Suggested Fix</div>
+                <p className="text-sm text-muted-foreground">Move your clearest solo photo to #1 and shorten your bio to 2 punchy lines</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12 space-y-3">
             <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
@@ -105,9 +181,9 @@ export default function Home() {
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                   <TrendingUp className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">3. Get More Matches</h3>
+                <h3 className="text-lg font-semibold">3. Improve Your Profile</h3>
                 <p className="text-sm text-muted-foreground">
-                  Apply the suggestions and watch your match rate improve significantly.
+                  Apply the suggestions to strengthen your profile and messaging.
                 </p>
               </CardContent>
             </Card>
@@ -115,7 +191,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4">
+      <section className="py-16 md:py-24 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12 space-y-3">
             <h2 className="text-2xl md:text-3xl font-bold">Two Powerful Tools</h2>
@@ -190,7 +266,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4 bg-muted/30">
+      <section className="py-16 md:py-24 px-4">
         <TestimonialsRotator />
         <p className="text-sm text-muted-foreground text-center mt-8 flex items-center justify-center gap-2">
           <Shield className="w-4 h-4" />
@@ -198,13 +274,13 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="py-16 md:py-24 px-4">
+      <section className="py-16 md:py-24 px-4 bg-muted/30">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           <h2 className="text-2xl md:text-3xl font-bold">
-            Ready to Get More Matches?
+            Ready to improve your matches?
           </h2>
           <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-            Join thousands of users who have improved their dating profiles with AI-powered feedback.
+            Get actionable feedback in under a minute. No account required.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
@@ -220,6 +296,24 @@ export default function Home() {
               </Button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="py-16 md:py-24 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">FAQ</h2>
+          <Accordion type="single" collapsible className="w-full">
+            {faqItems.map((item, index) => (
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="text-left" data-testid={`faq-trigger-${index}`}>
+                  {item.question}
+                </AccordionTrigger>
+                <AccordionContent data-testid={`faq-content-${index}`}>
+                  {item.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </section>
 

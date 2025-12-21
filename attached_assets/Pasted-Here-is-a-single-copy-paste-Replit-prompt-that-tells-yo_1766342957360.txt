@@ -1,0 +1,90 @@
+Here is a single copy paste Replit prompt that tells your dev build exactly what we discussed for SwipeBetter.ai. Paste this into Replit AI and run it.
+
+```text
+You are an expert senior full stack engineer. Update the existing SwipeBetter.ai website (already built) to improve conversion flow, SEO, and Google Search rich results. Do NOT redesign the entire UI. Keep the current clean, minimal style. Do not add heavy dependencies.
+
+PRIMARY GOALS
+1) Improve above the fold trust and reduce bounce.
+2) Improve Google Search CTR with better meta tags.
+3) Add structured data (JSON-LD) for SoftwareApplication and FAQPage.
+4) Add a micro output preview section to set expectations.
+5) Strengthen internal linking and on page SEO, without keyword stuffing.
+6) Ensure no policy risky claims (no “guaranteed matches”, etc).
+
+SCOPE
+- Home page only (https://swipebetter.ai/).
+- If this is a Next.js app, implement changes in the appropriate page component and metadata config.
+- If React SPA, update index.html head tags and the home route component.
+- If server rendered, update the server template head and homepage view.
+
+REQUIRED COPY AND UI CHANGES (HOME PAGE)
+
+A) Meta title and description (update <title> and meta description)
+Title:
+AI Dating Profile Review | Fix Tinder, Hinge & Bumble Profiles
+Meta description:
+Get instant AI feedback on your dating profile and replies. Improve photos, bios, and messages. Private, fast, no account required.
+
+Also add:
+- Canonical tag for https://swipebetter.ai/
+- OpenGraph tags (og:title, og:description, og:url, og:type=website)
+- Twitter card tags (summary_large_image)
+Use a reasonable default social image if one exists; otherwise omit image tags rather than using a broken link.
+
+B) Trust strip directly under the hero buttons (Fix My Profile / Fix My Reply)
+Add a compact single line trust strip with small icons and separators:
+“Screenshots deleted after processing • No account required • Works with Tinder, Hinge, Bumble, and more”
+Place it immediately under the two main hero CTA buttons.
+
+C) Add a “Example AI Feedback” micro preview section (on homepage, above “How It Works”)
+This is NOT interactive. It is a static preview to show what users will get.
+Add a section titled: “Example AI Feedback”
+Include 3 small cards (or bordered boxes) with short sample content:
+Card 1: “Profile Score: 41/100”
+Card 2: “Top Issue: Your first photo reads as low trust”
+Card 3: “Suggested Fix: Move your clearest solo photo to #1 and shorten your bio to 2 punchy lines”
+Keep the tone helpful, not insulting. Do not claim guaranteed results.
+
+D) Improve CTA language at the bottom of page (final section)
+Keep the buttons but add a stronger sub headline above them:
+Headline: “Ready to improve your matches?”
+Subtext: “Get actionable feedback in under a minute. No account required.”
+Keep existing buttons linking to /fix-profile and /fix-reply.
+
+E) Add an FAQ section near the bottom (above footer), then add FAQ schema
+Add an FAQ section titled: “FAQ”
+Include these questions and concise answers:
+
+1. “Is SwipeBetter private?”
+Answer: “Yes. Your screenshots are processed to generate feedback and are deleted after processing.”
+
+2. “Do you store my screenshots?”
+Answer: “No. Screenshots are deleted after processing. We do not build public profiles from your uploads.”
+
+3. “Which apps does this work with?”
+Answer: “Any app where you can screenshot your profile or chat, including Tinder, Hinge, Bumble, Grindr, and more.”
+
+4. “Do I need an account?”
+Answer: “No account is required to use SwipeBetter.”
+
+5. “Does this guarantee more matches?”
+Answer: “No. Results vary, but we aim to improve your odds with clear, actionable suggestions.”
+
+F) Structured data (JSON-LD)
+Add JSON-LD in the homepage head for:
+1) SoftwareApplication (or Product) describing SwipeBetter.ai as a web based app.
+Include: name, applicationCategory, operatingSystem (Web), offers (if pricing is known, otherwise omit), url, description.
+2) FAQPage schema matching the FAQ content exactly.
+
+IMPORTANT IMPLEMENTATION NOTES
+- Do not add em dashes or double hyphens anywhere in the output copy.
+- Keep page performance fast. Avoid large images, new fonts, or heavy animation libraries.
+- Ensure accessibility: semantic headings, proper aria labels where needed, and sufficient color contrast.
+- Make sure the existing nav and CTAs still work.
+- Run formatting and lint checks.
+
+DELIVERABLE
+- Provide a short summary of what changed.
+- Provide a list of files modified.
+- Include the JSON-LD objects in the code in the proper place (head or metadata API).
+```
