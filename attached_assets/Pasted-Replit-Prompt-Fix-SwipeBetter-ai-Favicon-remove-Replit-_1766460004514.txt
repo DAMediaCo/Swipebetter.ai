@@ -1,0 +1,85 @@
+Replit Prompt: Fix SwipeBetter.ai Favicon (remove Replit frame icon)
+
+Goal
+SwipeBetter.ai is showing the Replit frame icon as the favicon. Replace it with our own SwipeBetter favicon everywhere: browser tab, iOS Safari, bookmarks, and PWA/manifest.
+
+What to do
+1) Find the app framework and entry HTML
+- Search repo for: index.html, public/, static/, assets/, manifest.json, next.config.js, app/layout, pages/_document, vite.config, webpack config.
+- Identify which file controls <head> tags.
+
+2) Create proper favicon assets
+- Add these files (use our SwipeBetter logo, orange “S” mark, transparent background):
+  - /public/favicon.ico (multi size, includes 16x16 and 32x32)
+  - /public/favicon-16x16.png
+  - /public/favicon-32x32.png
+  - /public/apple-touch-icon.png (180x180)
+  - /public/android-chrome-192x192.png
+  - /public/android-chrome-512x512.png
+  - /public/site.webmanifest
+
+If the project is not using a /public folder, place them in the correct static folder for the framework:
+- Next.js: /public
+- Vite: /public
+- CRA: /public
+- Express static: whatever folder is served by express.static
+
+3) Update the HTML head tags
+Add or replace ALL favicon related tags in the main head file:
+
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#ff6a00">
+
+Framework locations:
+- Next.js App Router: app/layout.tsx in <head> or metadata.icons
+- Next.js Pages Router: pages/_document.tsx inside <Head>
+- Vite: index.html <head>
+- React CRA: public/index.html <head>
+
+4) Ensure PWA manifest points to the right icons
+Create or update /public/site.webmanifest to:
+
+{
+  "name": "SwipeBetter",
+  "short_name": "SwipeBetter",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0f",
+  "theme_color": "#ff6a00",
+  "icons": [
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+
+5) Stop any Replit default injection from being used as the favicon
+- Search for any existing favicon references that include replit, replit.com, frame, or a default icon path.
+- Remove them or override them with the new tags above.
+- If there is a base href or asset prefix, make sure favicon paths still resolve from site root.
+
+6) Verify locally
+- Run the app.
+- Open in browser and confirm the favicon is SwipeBetter.
+- Hard refresh.
+- In devtools Network tab, confirm favicon requests return 200 from our files:
+  /favicon.ico
+  /favicon-32x32.png
+  /favicon-16x16.png
+  /apple-touch-icon.png
+  /site.webmanifest
+
+7) Deploy and verify production caching
+- After deploy, test in an incognito window.
+- If old icon persists, bump cache:
+  - Rename files with version suffix (favicon-32x32-v2.png etc) and update head links.
+  - Or set cache headers to allow updates if you control them.
+
+Deliverables
+- Commit new favicon files in the static/public directory
+- Updated head tags
+- Updated site.webmanifest
+- Confirmation steps and the exact file paths edited
