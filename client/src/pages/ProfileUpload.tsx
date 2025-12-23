@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ImageUpload } from "@/components/ImageUpload";
 import { TrustBar } from "@/components/TrustBar";
-import { PrivacyNote } from "@/components/PrivacyNote";
 import { useAuth, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
@@ -157,7 +156,6 @@ export default function ProfileUpload() {
           
           <CardContent className="space-y-6 pt-4">
             <ImageUpload images={images} onChange={setImages} maxImages={5} />
-            <PrivacyNote />
           </CardContent>
         </Card>
       </div>
