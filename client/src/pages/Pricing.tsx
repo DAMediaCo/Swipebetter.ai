@@ -97,8 +97,8 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center">
+      <div className="max-w-4xl mx-auto px-4 pt-4 pb-8">
+        <div className="mb-4 flex items-center">
           <Link href="/">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />

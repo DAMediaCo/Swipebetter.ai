@@ -79,8 +79,8 @@ export default function ProfileFix() {
   if (step === 0) {
     return (
       <div className="min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 py-8 space-y-16">
-          <div className="mb-6">
+        <div className="max-w-4xl mx-auto px-4 pt-4 pb-8 space-y-12">
+          <div className="mb-2">
             <Link href="/">
               <Button variant="ghost" size="icon" data-testid="button-back">
                 <ArrowLeft className="w-5 h-5" />
