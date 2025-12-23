@@ -8,6 +8,7 @@ import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   Clipboard, 
@@ -29,8 +30,10 @@ export default function ProfileResults() {
   const [, setLocation] = useLocation();
   const [result, setResult] = useState<ProfileAnalysisData | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [copiedBioIndex, setCopiedBioIndex] = useState<number | null>(null);
   const { isPro, proActive, planType, isLoading: entitlementLoading, refreshEntitlement } = useEntitlement();
   const customerPortal = useCustomerPortal();
+  const { toast } = useToast();
 
   useEffect(() => {
     const data = loadAnalysis<ProfileAnalysisData>('profile');
@@ -63,6 +66,44 @@ export default function ProfileResults() {
     await navigator.clipboard.writeText(text);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const copyBio = async (bioText: string, index: number) => {
+    if (!isPro) return;
+    await navigator.clipboard.writeText(bioText);
+    setCopiedBioIndex(index);
+    toast({
+      description: "Bio copied. Paste into your dating app.",
+    });
+    setTimeout(() => setCopiedBioIndex(null), 2000);
+  };
+
+  const parseBioSuggestions = (content: string): string[] => {
+    const lines = content.split('\n').filter(line => line.trim());
+    const bios: string[] = [];
+    let currentBio = '';
+    
+    for (const line of lines) {
+      const numberedMatch = line.match(/^\d+\.\s*(.+)/);
+      if (numberedMatch) {
+        if (currentBio) {
+          bios.push(currentBio.trim());
+        }
+        currentBio = numberedMatch[1];
+      } else if (currentBio) {
+        currentBio += ' ' + line.trim();
+      }
+    }
+    
+    if (currentBio) {
+      bios.push(currentBio.trim());
+    }
+    
+    if (bios.length === 0 && content.trim()) {
+      bios.push(content.trim());
+    }
+    
+    return bios;
   };
 
   if (!result) {
@@ -124,13 +165,42 @@ export default function ProfileResults() {
             </CardContent>
           </Card>
 
-          <ResultCard
-            title="Bio Suggestions"
-            content={result.bioSuggestions}
-            onCopy={() => copyToClipboard(result.bioSuggestions, "bio")}
-            copied={copiedField === "bio"}
-            canCopy={isPro}
-          />
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg font-semibold">Bio Suggestions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {parseBioSuggestions(result.bioSuggestions).map((bio, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-start gap-3 p-3 rounded-md bg-muted/50"
+                >
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">
+                    {index + 1}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm leading-relaxed text-muted-foreground">{bio}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyBio(bio, index)}
+                    disabled={!isPro}
+                    className="flex-shrink-0"
+                    data-testid={`button-copy-bio-${index}`}
+                  >
+                    {copiedBioIndex === index ? (
+                      <Check className="w-4 h-4 text-primary" />
+                    ) : isPro ? (
+                      <Clipboard className="w-4 h-4" />
+                    ) : (
+                      <Lock className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
 
           <ResultCard
             title="Photo Feedback"
