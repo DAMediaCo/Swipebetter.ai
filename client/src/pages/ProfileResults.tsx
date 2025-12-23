@@ -28,7 +28,7 @@ export default function ProfileResults() {
   const [, setLocation] = useLocation();
   const [result, setResult] = useState<ProfileAnalysisData | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const { isPro, proActive, isLoading: entitlementLoading, refreshEntitlement } = useEntitlement();
+  const { isPro, proActive, planType, isLoading: entitlementLoading, refreshEntitlement } = useEntitlement();
   const customerPortal = useCustomerPortal();
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function ProfileResults() {
           {isPro ? (
             <Badge variant="default" className="bg-primary/10 text-primary border-primary/20" data-testid="badge-full-access">
               <Check className="w-3 h-3 mr-1" />
-              Full Results Unlocked
+              {planType === 'starter' ? 'Starter Fix' : planType === 'annual' ? 'Annual Member' : planType === 'monthly' ? 'Monthly Member' : 'Full Results Unlocked'}
             </Badge>
           ) : (
             <Badge variant="secondary" data-testid="badge-preview">
