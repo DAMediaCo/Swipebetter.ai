@@ -30,11 +30,11 @@ export default function Contact() {
                     For all inquiries, feedback, and support requests
                   </p>
                   <a 
-                    href="mailto:support@swipebetter.ai" 
+                    href="mailto:hello@swipebetter.ai" 
                     className="text-primary hover:underline font-medium"
                     data-testid="link-email"
                   >
-                    support@swipebetter.ai
+                    hello@swipebetter.ai
                   </a>
                 </div>
               </div>

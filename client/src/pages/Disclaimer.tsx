@@ -107,7 +107,7 @@ export default function Disclaimer() {
               If you have any questions about this Disclaimer, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> support@swipebetter.ai
+              <strong>Email:</strong> hello@swipebetter.ai
             </p>
           </section>
         </div>

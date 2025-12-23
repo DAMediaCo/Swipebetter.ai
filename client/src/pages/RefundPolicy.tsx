@@ -94,7 +94,7 @@ export default function RefundPolicy() {
               To request a refund (for eligible cases):
             </p>
             <ol className="list-decimal pl-6 space-y-2 mt-2">
-              <li>Email us at support@swipebetter.ai</li>
+              <li>Email us at hello@swipebetter.ai</li>
               <li>Include your account email address</li>
               <li>Describe the issue you experienced</li>
               <li>Include any relevant screenshots or details</li>
@@ -107,7 +107,7 @@ export default function RefundPolicy() {
           <section>
             <h2 className="text-xl font-semibold mt-8 mb-4">7. Chargebacks</h2>
             <p>
-              If you believe there has been an error with your payment, please contact us at support@swipebetter.ai before initiating a chargeback with your bank or credit card company. We are committed to resolving any billing issues promptly and fairly.
+              If you believe there has been an error with your payment, please contact us at hello@swipebetter.ai before initiating a chargeback with your bank or credit card company. We are committed to resolving any billing issues promptly and fairly.
             </p>
           </section>
 
@@ -117,7 +117,7 @@ export default function RefundPolicy() {
               If you have any questions about this Refund and Cancellation Policy, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> support@swipebetter.ai
+              <strong>Email:</strong> hello@swipebetter.ai
             </p>
           </section>
         </div>

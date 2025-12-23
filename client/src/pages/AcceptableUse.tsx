@@ -97,7 +97,7 @@ export default function AcceptableUse() {
           <section>
             <h2 className="text-xl font-semibold mt-8 mb-4">4. Reporting Violations</h2>
             <p>
-              If you become aware of any violations of this Acceptable Use Policy, please report them to us at support@swipebetter.ai. We take all reports seriously and will investigate appropriately.
+              If you become aware of any violations of this Acceptable Use Policy, please report them to us at hello@swipebetter.ai. We take all reports seriously and will investigate appropriately.
             </p>
           </section>
 
@@ -131,7 +131,7 @@ export default function AcceptableUse() {
               If you have any questions about this Acceptable Use Policy, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> support@swipebetter.ai
+              <strong>Email:</strong> hello@swipebetter.ai
             </p>
           </section>
         </div>

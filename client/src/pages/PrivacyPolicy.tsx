@@ -111,7 +111,7 @@ export default function PrivacyPolicy() {
               <li><strong>Data Portability:</strong> Request your data in a portable format</li>
             </ul>
             <p className="mt-2">
-              To exercise any of these rights, please contact us at support@swipebetter.ai.
+              To exercise any of these rights, please contact us at hello@swipebetter.ai.
             </p>
           </section>
 
@@ -142,7 +142,7 @@ export default function PrivacyPolicy() {
               If you have any questions about this Privacy Policy, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> support@swipebetter.ai
+              <strong>Email:</strong> hello@swipebetter.ai
             </p>
           </section>
         </div>
