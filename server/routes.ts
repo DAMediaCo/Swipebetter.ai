@@ -55,21 +55,18 @@ export async function registerRoutes(
     const isPro = proActive || hasOneTimeCredits;
     
     let planType: "monthly" | "annual" | "starter" | null = null;
-    const planLower = (subscription?.plan || "").toLowerCase();
-    if (planLower) {
-      if (planLower.includes("month")) {
-        planType = "monthly";
-      } else if (planLower.includes("annual") || planLower.includes("year")) {
-        planType = "annual";
-      } else if (planLower.includes("starter") || hasOneTimeCredits) {
-        planType = "starter";
-      } else if (proActive) {
-        planType = "monthly";
-      }
-    } else if (hasOneTimeCredits) {
+    
+    if (subscription?.planType) {
+      planType = subscription.planType as "monthly" | "annual" | "starter";
+    } else if (hasOneTimeCredits && !proActive) {
       planType = "starter";
     } else if (proActive) {
-      planType = "monthly";
+      const planLower = (subscription?.plan || "").toLowerCase();
+      if (planLower.includes("annual") || planLower.includes("year")) {
+        planType = "annual";
+      } else {
+        planType = "monthly";
+      }
     }
 
     res.json({
@@ -471,6 +468,8 @@ export async function registerRoutes(
         await storage.addOneTimeCredits(userId, 1);
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
+          stripePriceId: priceId,
+          planType: planType,
         });
         res.json({ 
           success: true, 
@@ -494,8 +493,10 @@ export async function registerRoutes(
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
           stripeSubscriptionId: subscription.id,
+          stripePriceId: priceId,
           status: 'active',
           plan: 'pro',
+          planType: planType,
           currentPeriodEnd: subscription.current_period_end 
             ? new Date(subscription.current_period_end * 1000) 
             : null,
