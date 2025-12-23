@@ -1,0 +1,73 @@
+Replit Prompt: Fix X (Twitter) link preview image for SwipeBetter.ai
+
+Problem
+When posting https://swipebetter.ai on X, the link preview shows no image. We need a proper Twitter Card with a large preview image.
+
+Success Criteria
+- Posting https://swipebetter.ai on X shows a “summary_large_image” card with our branded image.
+- The preview image is fetched successfully by bots (200 OK, correct content type, no auth, no blocks).
+
+Step 1: Add a real OG image file that is publicly accessible
+1) Create a new folder: /public/og
+2) Add a branded OG image at:
+   /public/og/swipebetter-og.png
+3) Requirements for the image:
+   - Exact size: 1200 x 630
+   - File type: PNG
+   - File name: swipebetter-og.png
+   - Design: dark background, SwipeBetter logo, headline “AI Dating Profile Review”, subtext “Fix Tinder, Hinge & Bumble”
+4) After deploy, this must load directly in a browser:
+   https://swipebetter.ai/og/swipebetter-og.png
+   It must return 200 OK and Content-Type image/png.
+
+Step 2: Add Open Graph + Twitter Card meta tags to the homepage head
+Add or update these tags in the <head> for the homepage (and any marketing landing page you share on X):
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://swipebetter.ai/" />
+<meta property="og:title" content="SwipeBetter.ai | AI Dating Profile Review" />
+<meta property="og:description" content="Fix your dating profile and replies for Tinder, Hinge, Bumble and more." />
+<meta property="og:image" content="https://swipebetter.ai/og/swipebetter-og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="SwipeBetter.ai | AI Dating Profile Review" />
+<meta name="twitter:description" content="Fix your dating profile and replies for Tinder, Hinge, Bumble and more." />
+<meta name="twitter:image" content="https://swipebetter.ai/og/swipebetter-og.png" />
+
+Also ensure a canonical tag exists:
+<link rel="canonical" href="https://swipebetter.ai/" />
+
+Where to place them (pick the correct location for this project):
+- Next.js App Router: app/layout.tsx (preferred via metadata, or add tags in <head>)
+- Next.js Pages Router: pages/_document.tsx inside <Head>, or on the page with next/head
+- Vite / SPA: index.html <head>
+- Server-rendered template: main layout template head
+
+Step 3: Make sure bots are not blocked
+1) Check /public/robots.txt (or equivalent) and confirm it does NOT block:
+   - User-agent: Twitterbot
+   - User-agent: *
+   from accessing /
+2) Remove any meta tags like:
+   <meta name="robots" content="noindex">
+   <meta name="robots" content="nosnippet">
+   on public marketing pages.
+
+Step 4: Ensure the OG image is not redirected or protected
+- The og image URL must be absolute HTTPS.
+- It must not require cookies, login, or headers.
+- It must not redirect to another domain.
+- It must not be served behind a CDN rule that blocks bots.
+
+Step 5: Deploy and verify
+After deploy:
+1) Open https://swipebetter.ai and View Page Source to confirm the meta tags exist in the server returned HTML.
+2) Open https://swipebetter.ai/og/swipebetter-og.png and confirm it loads.
+3) Force X to re-scrape the URL using an X Card validator tool and confirm the preview now shows the image.
+
+Deliverables
+- Commit: /public/og/swipebetter-og.png
+- Commit: updated head tags in the correct layout/page file
+- Confirm: X shows a large image card for https://swipebetter.ai
