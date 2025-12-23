@@ -31,7 +31,15 @@ import ReviveDeadConversation from "@/pages/ReviveDeadConversation";
 import AdminLogin from "@/pages/AdminLogin";
 import AdminPromoCodes from "@/pages/AdminPromoCodes";
 import RedeemPromo from "@/pages/RedeemPromo";
+import TermsOfService from "@/pages/TermsOfService";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import CookiePolicy from "@/pages/CookiePolicy";
+import RefundPolicy from "@/pages/RefundPolicy";
+import Disclaimer from "@/pages/Disclaimer";
+import Contact from "@/pages/Contact";
+import AcceptableUse from "@/pages/AcceptableUse";
 import NotFound from "@/pages/not-found";
+import { LegalFooter } from "@/components/LegalFooter";
 
 function Router() {
   return (
@@ -60,6 +68,13 @@ function Router() {
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/promo-codes" component={AdminPromoCodes} />
       <Route path="/redeem" component={RedeemPromo} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy" component={PrivacyPolicy} />
+      <Route path="/cookie-policy" component={CookiePolicy} />
+      <Route path="/refund-policy" component={RefundPolicy} />
+      <Route path="/disclaimer" component={Disclaimer} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/acceptable-use" component={AcceptableUse} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -100,6 +115,7 @@ function App() {
         <main className="pb-16 md:pb-0">
           <Router />
         </main>
+        <LegalFooter />
         <MobileNav />
         <Toaster />
       </TooltipProvider>

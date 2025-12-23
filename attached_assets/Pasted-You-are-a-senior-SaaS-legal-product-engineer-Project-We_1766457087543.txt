@@ -1,0 +1,91 @@
+You are a senior SaaS legal + product engineer.
+
+Project:
+Website name: SwipeBetter.ai
+Business type: AI-powered dating profile and message analysis SaaS
+Jurisdiction: United States
+Monetization: One-time purchases and monthly subscriptions via Stripe
+Audience: Adults 18+
+
+TASK:
+Generate a complete, production-ready legal compliance stack for SwipeBetter.ai.
+
+Create the following pages as separate, cleanly formatted HTML or Markdown files (one file per page):
+
+1. Terms of Service
+2. Privacy Policy
+3. Cookie Policy
+4. Refund & Cancellation Policy
+5. Disclaimer
+6. Contact Page
+7. Acceptable Use Policy (can be standalone OR clearly embedded inside the Terms of Service)
+
+GLOBAL REQUIREMENTS:
+- Professional, plain-English legal language (not overly verbose, not casual)
+- No emojis
+- No em dashes or double hyphens
+- Explicitly state this is an AI advice tool with no guaranteed outcomes
+- Explicitly state SwipeBetter.ai does NOT guarantee matches, replies, dates, or relationship success
+- All pages must reference SwipeBetter.ai by name
+- Include a clear effective date placeholder (e.g., “Effective Date: October 1, 2025”)
+- All policies must be Stripe-compliant and Google-compliant
+- Assume users may upload screenshots, profile text, and messages
+
+PAGE-SPECIFIC REQUIREMENTS:
+
+TERMS OF SERVICE MUST INCLUDE:
+- Service description
+- Eligibility (18+ only)
+- User responsibilities
+- Prohibited activities
+- Intellectual property ownership
+- AI limitation disclaimer
+- No guarantees clause
+- Account suspension/termination rights
+- Limitation of liability
+- Indemnification
+- Governing law (United States, state unspecified placeholder)
+- Contact email
+
+PRIVACY POLICY MUST INCLUDE:
+- Data collected (text, screenshots, email, IP, usage data)
+- Purpose of data use
+- Third-party services (Stripe, analytics, AI providers)
+- Cookies and tracking disclosure
+- Data retention policy
+- User rights (access, deletion, opt-out)
+- Contact email
+
+COOKIE POLICY MUST INCLUDE:
+- What cookies are
+- Types used (functional, analytics)
+- How users manage cookies
+
+REFUND & CANCELLATION POLICY MUST INCLUDE:
+- Digital product policy
+- One-time purchase refund rules
+- Subscription cancellation rules
+- No refunds after service delivery
+- How to request cancellation or refunds
+
+DISCLAIMER MUST INCLUDE:
+- Educational/informational use only
+- Not professional dating, legal, or psychological advice
+- User assumes all risk from using advice
+
+CONTACT PAGE MUST INCLUDE:
+- Support email placeholder
+- Business name
+- General response time disclaimer
+
+ACCEPTABLE USE POLICY MUST INCLUDE:
+- No harassment
+- No illegal use
+- No scraping, abuse, or system manipulation
+- No impersonation or misuse of advice
+
+FINAL STEP:
+At the end, output a single reusable HTML footer snippet containing links to all policies in this order:
+Terms of Service | Privacy Policy | Cookie Policy | Refund Policy | Disclaimer | Contact
+
+Label each file clearly with its filename.
