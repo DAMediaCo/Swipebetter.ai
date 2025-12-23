@@ -28,6 +28,9 @@ import BumbleBioExamples from "@/pages/BumbleBioExamples";
 import TinderPhotoOrder from "@/pages/TinderPhotoOrder";
 import WhatToTextAfterMatching from "@/pages/WhatToTextAfterMatching";
 import ReviveDeadConversation from "@/pages/ReviveDeadConversation";
+import AdminLogin from "@/pages/AdminLogin";
+import AdminPromoCodes from "@/pages/AdminPromoCodes";
+import RedeemPromo from "@/pages/RedeemPromo";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -54,6 +57,9 @@ function Router() {
       <Route path="/tinder-photo-order" component={TinderPhotoOrder} />
       <Route path="/what-to-text-after-matching" component={WhatToTextAfterMatching} />
       <Route path="/revive-dead-conversation" component={ReviveDeadConversation} />
+      <Route path="/admin" component={AdminLogin} />
+      <Route path="/admin/promo-codes" component={AdminPromoCodes} />
+      <Route path="/redeem" component={RedeemPromo} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -5,6 +5,8 @@ import {
   profileAnalyses,
   replyAnalyses,
   userSubscriptions,
+  promoCodes,
+  promoRedemptions,
   type User,
   type ProfileAnalysis,
   type InsertProfileAnalysis,
@@ -12,6 +14,9 @@ import {
   type InsertReplyAnalysis,
   type UserSubscription,
   type InsertUserSubscription,
+  type PromoCode,
+  type InsertPromoCode,
+  type PromoRedemption,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -41,6 +46,16 @@ export interface IStorage {
   getPricesForProduct(productId: string): Promise<any[]>;
   getSubscription(subscriptionId: string): Promise<any>;
   updateUserStripeInfo(userId: string, stripeInfo: { stripeCustomerId?: string; stripeSubscriptionId?: string }): Promise<UserSubscription | undefined>;
+
+  getPromoCode(code: string): Promise<PromoCode | undefined>;
+  getPromoCodeById(id: number): Promise<PromoCode | undefined>;
+  listPromoCodes(): Promise<PromoCode[]>;
+  createPromoCode(data: InsertPromoCode): Promise<PromoCode>;
+  updatePromoCode(id: number, data: Partial<InsertPromoCode>): Promise<PromoCode | undefined>;
+  deletePromoCode(id: number): Promise<void>;
+  incrementPromoRedemptions(id: number): Promise<void>;
+  hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean>;
+  createPromoRedemption(userId: string, promoCodeId: number): Promise<PromoRedemption>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -219,6 +234,62 @@ export class DatabaseStorage implements IStorage {
         stripeSubscriptionId: stripeInfo.stripeSubscriptionId,
       });
     }
+  }
+
+  async getPromoCode(code: string): Promise<PromoCode | undefined> {
+    const [promo] = await db.select().from(promoCodes).where(eq(promoCodes.code, code.toUpperCase()));
+    return promo;
+  }
+
+  async getPromoCodeById(id: number): Promise<PromoCode | undefined> {
+    const [promo] = await db.select().from(promoCodes).where(eq(promoCodes.id, id));
+    return promo;
+  }
+
+  async listPromoCodes(): Promise<PromoCode[]> {
+    return db.select().from(promoCodes).orderBy(desc(promoCodes.createdAt));
+  }
+
+  async createPromoCode(data: InsertPromoCode): Promise<PromoCode> {
+    const [promo] = await db.insert(promoCodes).values({
+      ...data,
+      code: data.code.toUpperCase(),
+    }).returning();
+    return promo;
+  }
+
+  async updatePromoCode(id: number, data: Partial<InsertPromoCode>): Promise<PromoCode | undefined> {
+    const updateData = data.code ? { ...data, code: data.code.toUpperCase() } : data;
+    const [promo] = await db.update(promoCodes)
+      .set(updateData)
+      .where(eq(promoCodes.id, id))
+      .returning();
+    return promo;
+  }
+
+  async deletePromoCode(id: number): Promise<void> {
+    await db.delete(promoCodes).where(eq(promoCodes.id, id));
+  }
+
+  async incrementPromoRedemptions(id: number): Promise<void> {
+    await db.update(promoCodes)
+      .set({ currentRedemptions: sql`${promoCodes.currentRedemptions} + 1` })
+      .where(eq(promoCodes.id, id));
+  }
+
+  async hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean> {
+    const [redemption] = await db.select()
+      .from(promoRedemptions)
+      .where(sql`${promoRedemptions.userId} = ${userId} AND ${promoRedemptions.promoCodeId} = ${promoCodeId}`);
+    return !!redemption;
+  }
+
+  async createPromoRedemption(userId: string, promoCodeId: number): Promise<PromoRedemption> {
+    const [redemption] = await db.insert(promoRedemptions).values({
+      userId,
+      promoCodeId,
+    }).returning();
+    return redemption;
   }
 }
 

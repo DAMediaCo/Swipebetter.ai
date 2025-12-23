@@ -522,6 +522,168 @@ export async function registerRoutes(
     }
   });
 
+  const requireAdmin = (req: any, res: any, next: any) => {
+    if (!req.session.isAdmin) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    next();
+  };
+
+  const adminLoginSchema = z.object({
+    email: z.string().email(),
+    password: z.string().min(1),
+  });
+
+  app.post("/api/admin/login", async (req: any, res) => {
+    try {
+      const parseResult = adminLoginSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ error: "Invalid input" });
+      }
+      
+      const { email, password } = parseResult.data;
+      const adminEmail = process.env.ADMIN_EMAIL;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      
+      if (!adminEmail || !adminPassword) {
+        return res.status(500).json({ error: "Admin credentials not configured" });
+      }
+      
+      if (email !== adminEmail || password !== adminPassword) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      req.session.regenerate((err: any) => {
+        if (err) {
+          console.error("Session regeneration error:", err);
+          return res.status(500).json({ error: "Authentication failed" });
+        }
+        req.session.isAdmin = true;
+        res.json({ success: true });
+      });
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ error: "Authentication failed" });
+    }
+  });
+
+  app.post("/api/admin/logout", (req: any, res) => {
+    req.session.isAdmin = false;
+    res.json({ success: true });
+  });
+
+  app.get("/api/admin/check", (req: any, res) => {
+    res.json({ isAdmin: !!req.session.isAdmin });
+  });
+
+  app.get("/api/admin/promo-codes", requireAdmin, async (req, res) => {
+    const codes = await storage.listPromoCodes();
+    res.json(codes);
+  });
+
+  app.post("/api/admin/promo-codes", requireAdmin, async (req, res) => {
+    try {
+      const { code, credits, maxRedemptions, expiresAt, isActive } = req.body;
+      
+      if (!code || typeof code !== 'string' || code.length < 3) {
+        return res.status(400).json({ error: "Code must be at least 3 characters" });
+      }
+      
+      const existing = await storage.getPromoCode(code);
+      if (existing) {
+        return res.status(400).json({ error: "Code already exists" });
+      }
+      
+      const promo = await storage.createPromoCode({
+        code,
+        credits: credits || 3,
+        maxRedemptions: maxRedemptions || null,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        isActive: isActive !== false,
+      });
+      
+      res.json(promo);
+    } catch (error) {
+      console.error("Create promo code error:", error);
+      res.status(500).json({ error: "Failed to create promo code" });
+    }
+  });
+
+  app.patch("/api/admin/promo-codes/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { isActive } = req.body;
+      
+      const promo = await storage.updatePromoCode(id, { isActive });
+      if (!promo) {
+        return res.status(404).json({ error: "Promo code not found" });
+      }
+      
+      res.json(promo);
+    } catch (error) {
+      console.error("Update promo code error:", error);
+      res.status(500).json({ error: "Failed to update promo code" });
+    }
+  });
+
+  app.delete("/api/admin/promo-codes/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deletePromoCode(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Delete promo code error:", error);
+      res.status(500).json({ error: "Failed to delete promo code" });
+    }
+  });
+
+  app.post("/api/redeem-promo", requireAuth, async (req: any, res) => {
+    try {
+      const { code } = req.body;
+      const userId = req.session.userId;
+      
+      if (!code || typeof code !== 'string') {
+        return res.status(400).json({ error: "Promo code required" });
+      }
+      
+      const promo = await storage.getPromoCode(code.trim());
+      
+      if (!promo) {
+        return res.status(404).json({ error: "Invalid promo code" });
+      }
+      
+      if (!promo.isActive) {
+        return res.status(400).json({ error: "This promo code is no longer active" });
+      }
+      
+      if (promo.expiresAt && new Date() > promo.expiresAt) {
+        return res.status(400).json({ error: "This promo code has expired" });
+      }
+      
+      if (promo.maxRedemptions && promo.currentRedemptions >= promo.maxRedemptions) {
+        return res.status(400).json({ error: "This promo code has reached its usage limit" });
+      }
+      
+      const alreadyRedeemed = await storage.hasUserRedeemedCode(userId, promo.id);
+      if (alreadyRedeemed) {
+        return res.status(400).json({ error: "You have already used this promo code" });
+      }
+      
+      await storage.addOneTimeCredits(userId, promo.credits);
+      await storage.incrementPromoRedemptions(promo.id);
+      await storage.createPromoRedemption(userId, promo.id);
+      
+      res.json({ 
+        success: true, 
+        credits: promo.credits,
+        message: `You received ${promo.credits} free analyses!`
+      });
+    } catch (error) {
+      console.error("Redeem promo error:", error);
+      res.status(500).json({ error: "Failed to redeem promo code" });
+    }
+  });
+
   app.post("/api/customer-portal", requireAuth, async (req: any, res) => {
     try {
       const subscription = await storage.getUserSubscription(req.session.userId);
