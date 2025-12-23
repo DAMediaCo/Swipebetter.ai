@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -227,9 +228,9 @@ function ResultCard({
         </Button>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
-          {content}
-        </p>
+        <div className="text-muted-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-0">
+          <ReactMarkdown>{content}</ReactMarkdown>
+        </div>
       </CardContent>
     </Card>
   );

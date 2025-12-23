@@ -52,13 +52,13 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative min-h-[90vh] md:min-h-screen flex items-center justify-center px-4 py-20 bg-gradient-to-br from-primary/5 via-background to-accent/10">
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center px-4 py-12 md:py-16 bg-gradient-to-br from-primary/5 via-background to-accent/10">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
         </div>
         
-        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-8">
+        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-6">
           <Badge variant="secondary" className="px-4 py-1.5">
             <Sparkles className="w-3.5 h-3.5 mr-1.5" />
             AI-Powered Dating Profile Coach
@@ -73,7 +73,7 @@ export default function Home() {
             AI-powered feedback for your dating profile and replies. Private, fast, and built to actually help.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
               <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-profile-hero">
                 <Camera className="w-5 h-5 mr-2" />
@@ -107,9 +107,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4 bg-muted/30">
+      <section className="py-10 md:py-14 px-4 bg-muted/30">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10 space-y-3">
+          <div className="text-center mb-6 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Example AI Feedback</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               See what kind of actionable insights you will get
@@ -142,16 +142,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4">
+      <section className="py-10 md:py-14 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 space-y-3">
+          <div className="text-center mb-8 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               Three simple steps to transform your dating profile
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4">
             <Card className="text-center">
               <CardContent className="pt-8 pb-6 px-6 space-y-4">
                 <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
@@ -191,16 +191,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4 bg-muted/30">
+      <section className="py-10 md:py-14 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 space-y-3">
+          <div className="text-center mb-8 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Two Powerful Tools</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               Everything you need to improve your dating app success
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-8">
@@ -266,16 +266,16 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4">
+      <section className="py-10 md:py-14 px-4">
         <TestimonialsRotator />
-        <p className="text-sm text-muted-foreground text-center mt-8 flex items-center justify-center gap-2">
+        <p className="text-sm text-muted-foreground text-center mt-6 flex items-center justify-center gap-2">
           <Shield className="w-4 h-4" />
           Your screenshots are private and deleted after processing.
         </p>
       </section>
 
-      <section className="py-16 md:py-24 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
+      <section className="py-10 md:py-14 px-4 bg-muted/30">
+        <div className="max-w-3xl mx-auto text-center space-y-5">
           <h2 className="text-2xl md:text-3xl font-bold">
             Ready to improve your matches?
           </h2>
@@ -299,9 +299,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4">
+      <section className="py-10 md:py-14 px-4">
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">FAQ</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">FAQ</h2>
           <Accordion type="single" collapsible className="w-full">
             {faqItems.map((item, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
@@ -317,7 +317,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-12 px-4 border-t border-border">
+      <footer className="py-8 px-4 border-t border-border">
         <div className="max-w-5xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>

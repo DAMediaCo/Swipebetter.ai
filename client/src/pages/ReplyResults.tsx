@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -127,8 +128,8 @@ export default function ReplyResults() {
                 onClick={() => isPro && copyToClipboard(reply, index)}
               >
                 <CardContent className="py-4 flex items-start gap-4">
-                  <div className="flex-1">
-                    <p className="leading-relaxed">{reply}</p>
+                  <div className="flex-1 prose prose-sm dark:prose-invert max-w-none prose-p:my-1">
+                    <ReactMarkdown>{reply}</ReactMarkdown>
                   </div>
                   <Button
                     variant="ghost"
