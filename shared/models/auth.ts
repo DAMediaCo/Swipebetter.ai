@@ -35,6 +35,7 @@ export const signupSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
   firstName: z.string().min(1, "First name is required").optional(),
   lastName: z.string().optional(),
+  promoCode: z.string().optional(),
 });
 
 export const loginSchema = z.object({

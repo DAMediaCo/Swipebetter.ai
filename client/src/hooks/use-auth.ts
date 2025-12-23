@@ -32,7 +32,7 @@ export function useAuth() {
   });
 
   const signupMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; firstName?: string }) => {
+    mutationFn: async (data: { email: string; password: string; firstName?: string; promoCode?: string }) => {
       const response = await apiRequest("POST", "/api/auth/signup", data);
       return response.json();
     },

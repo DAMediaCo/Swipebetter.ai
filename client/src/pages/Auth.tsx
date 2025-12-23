@@ -16,16 +16,25 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [promoCode, setPromoCode] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       if (isSignUp) {
-        await signup({ email, password, firstName: firstName || undefined });
+        const result = await signup({ email, password, firstName: firstName || undefined, promoCode: promoCode.trim() || undefined });
+        let description = "Welcome to SwipeBetter!";
+        if (promoCode.trim()) {
+          if (result.promoApplied) {
+            description = `Welcome! You got ${result.promoCredits} free credits from your promo code.`;
+          } else {
+            description = "Welcome! (Note: The promo code was invalid or expired)";
+          }
+        }
         toast({
           title: "Account created",
-          description: "Welcome to SwipeBetter!",
+          description,
         });
       } else {
         await login({ email, password });
@@ -105,6 +114,21 @@ export default function Auth() {
                 data-testid="input-password"
               />
             </div>
+
+            {isSignUp && (
+              <div className="space-y-2">
+                <Label htmlFor="promoCode">Promo Code (optional)</Label>
+                <Input
+                  id="promoCode"
+                  type="text"
+                  placeholder="FRIEND2024"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  className="uppercase"
+                  data-testid="input-promo-code"
+                />
+              </div>
+            )}
             
             <Button 
               type="submit" 

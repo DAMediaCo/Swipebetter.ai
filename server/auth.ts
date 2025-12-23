@@ -3,8 +3,8 @@ import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { db } from "./db";
 import { users, signupSchema, loginSchema, type SafeUser } from "@shared/models/auth";
-import { userSubscriptions } from "@shared/models/swipebetter";
-import { eq } from "drizzle-orm";
+import { userSubscriptions, promoCodes, promoRedemptions } from "@shared/models/swipebetter";
+import { eq, and, sql } from "drizzle-orm";
 import type { Express, RequestHandler } from "express";
 
 declare module "express-session" {
@@ -90,7 +90,7 @@ export function registerAuthRoutes(app: Express) {
         });
       }
 
-      const { email, password, firstName, lastName } = parsed.data;
+      const { email, password, firstName, lastName, promoCode } = parsed.data;
 
       // Check if user exists
       const [existing] = await db
@@ -101,6 +101,29 @@ export function registerAuthRoutes(app: Express) {
 
       if (existing) {
         return res.status(400).json({ message: "Email already registered" });
+      }
+
+      // Validate promo code if provided
+      let validPromoCode = null;
+      if (promoCode && promoCode.trim()) {
+        const [code] = await db
+          .select()
+          .from(promoCodes)
+          .where(and(
+            eq(promoCodes.code, promoCode.trim().toUpperCase()),
+            eq(promoCodes.isActive, true)
+          ))
+          .limit(1);
+
+        if (code) {
+          const now = new Date();
+          const notExpired = !code.expiresAt || new Date(code.expiresAt) > now;
+          const hasCapacity = !code.maxRedemptions || code.currentRedemptions < code.maxRedemptions;
+          
+          if (notExpired && hasCapacity) {
+            validPromoCode = code;
+          }
+        }
       }
 
       // Create user
@@ -115,12 +138,26 @@ export function registerAuthRoutes(app: Express) {
         })
         .returning();
 
-      // Create subscription record with free tier
+      // Create subscription record with credits from promo code
+      const oneTimeCredits = validPromoCode ? validPromoCode.credits : 0;
       await db.insert(userSubscriptions).values({
         userId: newUser.id,
         freeAnalysesUsed: 0,
         status: "inactive",
+        oneTimeCredits,
       });
+
+      // Record promo code redemption if used
+      if (validPromoCode) {
+        await db.insert(promoRedemptions).values({
+          promoCodeId: validPromoCode.id,
+          userId: newUser.id,
+        });
+        await db
+          .update(promoCodes)
+          .set({ currentRedemptions: sql`${promoCodes.currentRedemptions} + 1` })
+          .where(eq(promoCodes.id, validPromoCode.id));
+      }
 
       // Set session
       req.session.userId = newUser.id;
@@ -128,7 +165,11 @@ export function registerAuthRoutes(app: Express) {
         if (err) {
           console.error("Session save error:", err);
         }
-        res.json({ user: sanitizeUser(newUser) });
+        res.json({ 
+          user: sanitizeUser(newUser),
+          promoApplied: !!validPromoCode,
+          promoCredits: validPromoCode ? validPromoCode.credits : 0,
+        });
       });
     } catch (error) {
       console.error("Signup error:", error);
