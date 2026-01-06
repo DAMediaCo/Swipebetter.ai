@@ -134,7 +134,7 @@ export default function ReplyFix() {
             
             <div 
               onClick={startAnalysis}
-              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-slate-50 dark:bg-slate-900/50 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-slate-100 dark:hover:bg-slate-800/50 group"
+              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-white dark:bg-slate-900/50 shadow-sm cursor-pointer transition-all duration-200 hover:border-primary hover:shadow-md group"
               data-testid="button-start-paste"
             >
               <div className="flex flex-col items-center gap-3">
@@ -174,7 +174,7 @@ export default function ReplyFix() {
             </Button>
             
             <div className="pt-2">
-              <div className="inline-block bg-slate-50 dark:bg-slate-900/50 rounded-lg px-6 py-4">
+              <div className="inline-block bg-white dark:bg-slate-900/50 rounded-lg px-6 py-4 shadow-sm">
                 <TrustBar />
               </div>
             </div>
@@ -196,11 +196,11 @@ export default function ReplyFix() {
             <PrivacyFAQ />
           </section>
 
-          <section className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-8 text-center">
+          <section className="bg-white dark:bg-slate-900/50 rounded-2xl p-8 text-center shadow-sm">
             <p className="text-muted-foreground mb-4">Need help with your profile instead?</p>
             <Link href="/fix-profile">
               <Button 
-                className="bg-white dark:bg-slate-800 text-foreground shadow-md hover:shadow-lg transition-shadow border border-border"
+                variant="outline"
                 data-testid="link-fix-profile-cross"
               >
                 Try Fix My Profile
