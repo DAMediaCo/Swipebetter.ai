@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +37,15 @@ export function ProfileOptimizer() {
   const [intent, setIntent] = useState("");
   const [isEnm, setIsEnm] = useState(false);
   const [images, setImages] = useState<string[]>([]);
+  const analyzeButtonRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (images.length > 0 && analyzeButtonRef.current) {
+      setTimeout(() => {
+        analyzeButtonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }, [images.length]);
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
@@ -201,7 +210,7 @@ export function ProfileOptimizer() {
         </div>
       </div>
 
-      <div className="pt-4">
+      <div className="pt-4" ref={analyzeButtonRef}>
         <Button
           onClick={() => analyzeMutation.mutate()}
           disabled={!canAnalyze || analyzeMutation.isPending}
