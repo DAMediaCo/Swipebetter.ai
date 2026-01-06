@@ -27,8 +27,11 @@ const profileAnalysisSchema = z.object({
 
 const replyAnalysisSchema = z.object({
   tone: z.enum(["flirty", "witty", "confident", "thoughtful"]),
-  screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).min(1).max(3),
+  screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).max(3).optional(),
+  conversationText: z.string().max(5000).optional(),
   enm: z.boolean().optional(),
+}).refine(data => (data.screenshots && data.screenshots.length > 0) || (data.conversationText && data.conversationText.trim().length > 0), {
+  message: "Either screenshots or conversation text is required"
 });
 
 const checkoutSchema = z.object({
@@ -196,7 +199,7 @@ export async function registerRoutes(
           details: parseResult.error.flatten() 
         });
       }
-      const { tone, screenshots } = parseResult.data;
+      const { tone, screenshots, conversationText } = parseResult.data;
       const userId = req.session.userId;
 
       const subscription = await storage.getUserSubscription(userId);
@@ -214,7 +217,10 @@ export async function registerRoutes(
         await storage.decrementOneTimeCredits(userId);
       }
 
-      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation screenshots and generate 3 reply suggestions with a ${tone} tone.
+      const hasScreenshots = screenshots && screenshots.length > 0;
+      const hasText = conversationText && conversationText.trim().length > 0;
+
+      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation and generate 3 reply suggestions with a ${tone} tone.
       
       Consider:
       - The conversation flow and context
@@ -226,19 +232,32 @@ export async function registerRoutes(
       conversationContext (brief summary of the conversation),
       suggestedReplies (array of 3 string replies, each different in approach but matching the ${tone} tone)`;
 
-      const userContent = screenshots.map((img: string) => ({
-        type: "image_url" as const,
-        image_url: { url: img }
-      }));
+      let userContent: any[] = [];
+      
+      if (hasText) {
+        userContent.push({
+          type: "text" as const,
+          text: `Generate ${tone} reply suggestions for this dating app conversation:\n\n"${conversationText}"`
+        });
+      } else {
+        userContent.push({
+          type: "text" as const,
+          text: `Generate ${tone} reply suggestions for this dating app conversation.`
+        });
+      }
+      
+      if (hasScreenshots) {
+        userContent.push(...screenshots.map((img: string) => ({
+          type: "image_url" as const,
+          image_url: { url: img }
+        })));
+      }
 
       const response = await grok.chat.completions.create({
-        model: "grok-2-vision-1212",
+        model: hasScreenshots ? "grok-2-vision-1212" : "grok-3-mini-beta",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: [
-            { type: "text", text: `Generate ${tone} reply suggestions for this dating app conversation.` },
-            ...userContent
-          ]}
+          { role: "user", content: userContent }
         ],
         response_format: { type: "json_object" },
         max_completion_tokens: 1024,
@@ -258,7 +277,7 @@ export async function registerRoutes(
       const savedAnalysis = await storage.createReplyAnalysis({
         userId,
         tone,
-        screenshots,
+        screenshots: screenshots || [],
         suggestedReplies: analysis.suggestedReplies || [],
         conversationContext: analysis.conversationContext,
       });

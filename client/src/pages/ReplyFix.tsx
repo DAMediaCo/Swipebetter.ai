@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/ImageUpload";
 import { TrustBar } from "@/components/TrustBar";
 import { PrivacyNote } from "@/components/PrivacyNote";
@@ -17,15 +18,15 @@ import { trackAnalysisStarted } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
 import { 
   Sparkles, 
-  ArrowLeft, 
-  MessageSquare,
   Heart,
   Flame,
   Smile,
   Brain,
   ArrowDown,
   HelpCircle,
-  Loader2
+  Loader2,
+  Shield,
+  Trash2
 } from "lucide-react";
 import { StepIndicator } from "@/components/StepIndicator";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -43,6 +44,12 @@ const tones = [
   { id: "thoughtful", label: "Thoughtful", icon: Brain },
 ];
 
+const heroTones = [
+  { id: "witty", label: "Witty", icon: Sparkles },
+  { id: "flirty", label: "Flirty", icon: Heart },
+  { id: "direct", label: "Direct", icon: Flame },
+];
+
 export default function ReplyFix() {
   const { data: authData, isLoading: authLoading } = useAuth();
   const { data: subscriptionData } = useSubscription();
@@ -58,6 +65,8 @@ export default function ReplyFix() {
   const [images, setImages] = useState<string[]>([]);
   const [tone, setTone] = useState("");
   const [isEnm, setIsEnm] = useState(false);
+  const [conversationText, setConversationText] = useState("");
+  const [heroTone, setHeroTone] = useState("witty");
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
@@ -110,6 +119,57 @@ export default function ReplyFix() {
     setStep(1);
   };
 
+  const heroAnalyzeMutation = useMutation({
+    mutationFn: async () => {
+      trackAnalysisStarted("reply");
+      const selectedTone = heroTone === "direct" ? "confident" : heroTone;
+      const response = await apiRequest("POST", "/api/analyze-reply", {
+        tone: selectedTone,
+        conversationText: conversationText.trim(),
+        enm: false,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.parsed) {
+        saveAnalysis('reply', data.parsed);
+        setLocation('/fix-reply/results');
+      }
+    },
+    onError: (error: any) => {
+      if (error.message?.includes("403")) {
+        toast({
+          title: "Subscription required",
+          description: "Upgrade to Pro to use this feature.",
+          variant: "destructive",
+        });
+        setLocation('/pricing');
+      } else {
+        toast({
+          title: "Analysis failed",
+          description: "Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  const handleHeroSubmit = () => {
+    if (!user) {
+      setLocation('/auth');
+      return;
+    }
+    if (!conversationText.trim()) {
+      toast({
+        title: "Please paste a message",
+        description: "Enter the conversation text to generate replies.",
+        variant: "destructive",
+      });
+      return;
+    }
+    heroAnalyzeMutation.mutate();
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -121,15 +181,7 @@ export default function ReplyFix() {
   if (step === 0) {
     return (
       <div className="min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 pt-4 pb-8 space-y-12">
-          <div className="mb-2">
-            <Link href="/">
-              <Button variant="ghost" size="icon" data-testid="button-back">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-          </div>
-
+        <div className="max-w-4xl mx-auto px-4 pt-8 pb-8 space-y-12">
           <section className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               Fix Your Reply.<br />
@@ -138,30 +190,81 @@ export default function ReplyFix() {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Paste the chat. Pick a tone. Get 3 replies that sound like you.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            
+            <div className="max-w-2xl mx-auto space-y-4">
+              <Textarea
+                value={conversationText}
+                onChange={(e) => setConversationText(e.target.value)}
+                placeholder="Paste your match's message here... (e.g. 'What's your favorite travel spot?')"
+                className="h-48 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-border/50 p-6 text-base resize-none"
+                data-testid="textarea-conversation"
+              />
+              
+              <div className="flex flex-wrap justify-center gap-3">
+                {heroTones.map((t) => {
+                  const Icon = t.icon;
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setHeroTone(t.id)}
+                      className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all flex items-center gap-1.5 ${
+                        heroTone === t.id
+                          ? "bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-md"
+                          : "bg-slate-100 dark:bg-slate-800 text-foreground hover:bg-slate-200 dark:hover:bg-slate-700"
+                      }`}
+                      data-testid={`button-hero-tone-${t.id}`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+              
               <Button 
                 size="lg" 
-                onClick={startAnalysis}
-                className="py-6 px-8"
-                data-testid="button-start-paste"
+                onClick={handleHeroSubmit}
+                disabled={heroAnalyzeMutation.isPending || !conversationText.trim()}
+                className="w-full py-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-lg hover:shadow-xl transition-shadow border-0 disabled:opacity-50"
+                data-testid="button-generate-replies"
               >
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Paste Conversation
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                onClick={scrollToDemo}
-                className="py-6 px-8"
-                data-testid="button-see-reply-examples"
-              >
-                See Reply Examples
-                <ArrowDown className="w-4 h-4 ml-2" />
+                {heroAnalyzeMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Generate Replies
+                  </>
+                )}
               </Button>
             </div>
-            <div className="pt-4">
-              <TrustBar />
+            
+            <div className="pt-4 flex justify-center">
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 backdrop-blur-sm inline-flex flex-wrap items-center justify-center gap-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Shield className="w-4 h-4 text-green-500" />
+                  <span>Private & Secure</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Trash2 className="w-4 h-4 text-green-500" />
+                  <span>Data deleted after analysis</span>
+                </div>
+              </div>
             </div>
+
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={scrollToDemo}
+              className="text-muted-foreground"
+              data-testid="button-see-reply-examples"
+            >
+              See Reply Examples
+              <ArrowDown className="w-4 h-4 ml-2" />
+            </Button>
           </section>
 
           <section>
@@ -199,18 +302,6 @@ export default function ReplyFix() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setStep(step > 1 ? step - 1 : 0)}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="w-9" />
-        </div>
-
         <StepIndicator 
           steps={["Paste", "Results", "Upgrade"]} 
           currentStep={1} 
