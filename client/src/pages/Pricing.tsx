@@ -100,7 +100,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen pb-24 md:pb-8">
-      <div className="max-w-4xl mx-auto px-4 pt-4 pb-8">
+      <div className="max-w-4xl mx-auto px-4 pt-2 pb-8">
         <div className="mb-4 flex items-center">
           <Link href="/">
             <Button variant="ghost" size="icon" data-testid="button-back">
@@ -109,7 +109,7 @@ export default function Pricing() {
           </Link>
         </div>
 
-        <div className="text-center mb-12 space-y-4">
+        <div className="text-center mb-6 space-y-2">
           <Badge variant="secondary" className="px-4 py-1.5">
             <Crown className="w-3.5 h-3.5 mr-1.5" />
             SwipeBetter Pro
@@ -146,19 +146,19 @@ export default function Pricing() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6 mb-8 items-stretch">
+          <div className="grid md:grid-cols-3 gap-4 mb-6 items-stretch">
             <Card className="flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
               <CardHeader className="text-center pb-2">
                 <div className="h-6" />
                 <CardTitle className="text-xl">Starter Fix</CardTitle>
                 <p className="text-sm text-muted-foreground">One-time purchase</p>
               </CardHeader>
-              <CardContent className="flex flex-col flex-1 text-center">
-                <div className="mb-6">
+              <CardContent className="flex flex-col flex-1 text-center pt-4">
+                <div className="mb-3">
                   <span className="text-4xl font-bold">$9</span>
                   <span className="text-muted-foreground"> one-time</span>
                 </div>
-                <ul className="text-sm space-y-2 text-left flex-1">
+                <ul className="text-sm space-y-1 text-left flex-1">
                   {oneTimeFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -167,7 +167,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6 mt-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+                  className="w-full py-5 mt-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: starter");
                     if (oneTimePrice) handleCheckout(oneTimePrice.id);
@@ -186,12 +186,12 @@ export default function Pricing() {
                 <CardTitle className="text-xl">Unlimited Monthly</CardTitle>
                 <p className="text-sm text-muted-foreground">Cancel anytime</p>
               </CardHeader>
-              <CardContent className="flex flex-col flex-1 text-center">
-                <div className="mb-6">
+              <CardContent className="flex flex-col flex-1 text-center pt-4">
+                <div className="mb-3">
                   <span className="text-4xl font-bold">$19</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
-                <ul className="text-sm space-y-2 text-left flex-1">
+                <ul className="text-sm space-y-1 text-left flex-1">
                   {unlimitedFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -200,7 +200,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6 mt-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+                  className="w-full py-5 mt-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: monthly");
                     if (monthlyPrice) handleCheckout(monthlyPrice.id);
@@ -224,15 +224,15 @@ export default function Pricing() {
                 <CardTitle className="text-xl">Unlimited Annual</CardTitle>
                 <p className="text-sm text-muted-foreground">Best savings</p>
               </CardHeader>
-              <CardContent className="flex flex-col flex-1 text-center">
-                <div className="mb-6">
+              <CardContent className="flex flex-col flex-1 text-center pt-4">
+                <div className="mb-3">
                   <span className="text-4xl font-bold">$99</span>
                   <span className="text-muted-foreground">/year</span>
                   <p className="text-sm text-primary font-medium mt-1">
                     Save 57% – $8.25/mo billed annually
                   </p>
                 </div>
-                <ul className="text-sm space-y-2 text-left flex-1">
+                <ul className="text-sm space-y-1 text-left flex-1">
                   {unlimitedFeatures.map((feature, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
@@ -241,7 +241,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6 mt-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+                  className="w-full py-5 mt-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: annual");
                     if (annualPrice) handleCheckout(annualPrice.id);
