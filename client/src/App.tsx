@@ -89,6 +89,9 @@ function PageViewTracker() {
   }, []);
 
   useEffect(() => {
+    // Scroll to top on every route change
+    window.scrollTo(0, 0);
+    
     // Skip tracking on first load since gtag config sends automatic page_view
     if (isFirstLoad.current) {
       isFirstLoad.current = false;
