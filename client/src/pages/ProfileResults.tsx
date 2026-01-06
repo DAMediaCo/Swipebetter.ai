@@ -19,9 +19,9 @@ import {
 
 interface ProfileAnalysisData {
   overallScore: number;
-  bioSuggestions: string;
-  photoFeedback: string;
-  improvements: string;
+  bioSuggestions: string | string[];
+  photoFeedback: string | string[];
+  improvements: string | string[];
 }
 
 export default function ProfileResults() {
@@ -59,9 +59,10 @@ export default function ProfileResults() {
     };
   }, []);
 
-  const copyToClipboard = async (text: string, field: string) => {
+  const copyToClipboard = async (text: string | string[], field: string) => {
     if (!isPro) return;
-    await navigator.clipboard.writeText(text);
+    const textString = Array.isArray(text) ? text.join('\n\n') : String(text || '');
+    await navigator.clipboard.writeText(textString);
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
   };
@@ -253,11 +254,15 @@ function ResultCard({
   canCopy,
 }: {
   title: string;
-  content: string;
+  content: string | string[];
   onCopy: () => void;
   copied: boolean;
   canCopy: boolean;
 }) {
+  const contentString = Array.isArray(content) 
+    ? content.join('\n\n') 
+    : (typeof content === 'string' ? content : String(content || ''));
+  
   return (
     <Card>
       <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2">
@@ -280,7 +285,7 @@ function ResultCard({
       </CardHeader>
       <CardContent>
         <div className="text-muted-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-0">
-          <ReactMarkdown>{content}</ReactMarkdown>
+          <ReactMarkdown>{contentString}</ReactMarkdown>
         </div>
       </CardContent>
     </Card>
