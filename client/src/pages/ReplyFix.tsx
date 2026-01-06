@@ -134,7 +134,7 @@ export default function ReplyFix() {
             
             <div 
               onClick={startAnalysis}
-              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-slate-50 dark:bg-slate-900/50 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-slate-100 dark:hover:bg-slate-800/50 group"
+              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-white dark:bg-slate-900 cursor-pointer transition-all duration-200 hover:border-primary hover:shadow-lg group"
               data-testid="button-start-paste"
             >
               <div className="flex flex-col items-center gap-3">
