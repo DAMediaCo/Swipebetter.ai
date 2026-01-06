@@ -15,6 +15,7 @@ import ProfileUpgrade from "@/pages/ProfileUpgrade";
 import ReplyFix from "@/pages/ReplyFix";
 import ReplyResults from "@/pages/ReplyResults";
 import ReplyUpgrade from "@/pages/ReplyUpgrade";
+import DashboardPage from "@/pages/DashboardPage";
 import Pricing from "@/pages/Pricing";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
 import TinderBioGuide from "@/pages/TinderBioGuide";
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/fix-reply" component={ReplyFix} />
       <Route path="/fix-reply/results" component={ReplyResults} />
       <Route path="/fix-reply/upgrade" component={ReplyUpgrade} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route path="/pricing" component={Pricing} />
       <Route path="/checkout/success" component={CheckoutSuccess} />
       <Route path="/tinder-bio-guide" component={TinderBioGuide} />
