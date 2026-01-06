@@ -52,7 +52,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative flex items-center px-4 pt-6 pb-10 md:pt-8 md:pb-12">
+      <section className="relative flex items-center px-4 pt-6 pb-10 md:pt-8 md:pb-12 bg-gradient-to-br from-primary/5 via-background to-accent/10">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
