@@ -43,7 +43,7 @@ export default function Auth() {
           description: "You're now logged in.",
         });
       }
-      setLocation("/");
+      setLocation("/dashboard");
     } catch (error: any) {
       const message = error?.message || "Something went wrong";
       toast({
