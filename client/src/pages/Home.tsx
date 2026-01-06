@@ -20,7 +20,7 @@ export default function Home() {
   const [location] = useLocation();
 
   useEffect(() => {
-    document.title = "AI Dating Profile Review | Fix Tinder, Hinge & Bumble Profiles";
+    document.title = "Swipe Better | AI Dating Profile Review & Bio Generator";
   }, []);
 
   const handleToolClick = (toolType: "profile" | "reply") => {
@@ -77,7 +77,7 @@ export default function Home() {
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-                AI-powered feedback for your dating profile and replies. Private, fast, and built to actually help.
+                Stop guessing. Let our AI optimize your photos and bio for Tinder, Hinge, and Bumble.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
@@ -109,7 +109,7 @@ export default function Home() {
             </div>
             
             <div className="hidden md:flex items-center justify-center">
-              <div className="relative">
+              <div className="relative" role="img" aria-label="Phone mockup showing AI analysis of a dating profile">
                 <div className="w-64 h-[520px] bg-card rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-3 flex flex-col">
                   <div className="w-20 h-5 bg-border rounded-full mx-auto mb-3" />
                   <div className="flex-1 bg-muted/50 rounded-[1.5rem] flex flex-col items-center justify-center gap-4 p-4">
@@ -188,7 +188,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-8">
-                  <Camera className="w-12 h-12 text-primary mb-4" />
+                  <Camera className="w-12 h-12 text-primary mb-4" aria-label="Icon for dating bio writer" />
                   <h3 className="text-xl font-bold mb-2">Profile Fix</h3>
                   <p className="text-muted-foreground mb-6">
                     Get AI-powered feedback on your bio, photos, and overall profile appeal.
@@ -219,7 +219,7 @@ export default function Home() {
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="bg-gradient-to-br from-accent/40 to-accent/10 p-8">
-                  <MessageSquare className="w-12 h-12 text-primary mb-4" />
+                  <MessageSquare className="w-12 h-12 text-primary mb-4" aria-label="Icon for reply generator" />
                   <h3 className="text-xl font-bold mb-2">Reply Fix</h3>
                   <p className="text-muted-foreground mb-6">
                     Get perfect reply suggestions based on your conversation context.
