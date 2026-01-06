@@ -184,7 +184,7 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
               <CardContent className="p-0">
                 <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-8">
                   <Camera className="w-12 h-12 text-primary mb-4" aria-label="Icon for dating bio writer" />
@@ -215,7 +215,7 @@ export default function Home() {
               </CardContent>
             </Card>
             
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
               <CardContent className="p-0">
                 <div className="bg-gradient-to-br from-accent/40 to-accent/10 p-8">
                   <MessageSquare className="w-12 h-12 text-primary mb-4" aria-label="Icon for reply generator" />
@@ -349,76 +349,29 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-8 px-4 border-t border-border">
+      <footer className="py-8 px-4 bg-slate-50 dark:bg-slate-900/50 border-t border-border">
         <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <span className="font-semibold">SwipeBetter.ai</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                AI-powered feedback for your dating profile and replies.
-              </p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <span className="font-bold text-lg">SwipeBetter</span>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Features</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/fix-profile" className="hover-elevate">Fix My Profile</Link>
-                </li>
-                <li>
-                  <Link href="/fix-reply" className="hover-elevate">Fix My Reply</Link>
-                </li>
-                <li>
-                  <Link href="/pricing" className="hover-elevate">Pricing</Link>
-                </li>
-              </ul>
+            
+            <p className="text-sm text-muted-foreground">
+              © 2026 SwipeBetter.ai. All rights reserved.
+            </p>
+            
+            <div className="flex items-center gap-6 text-sm">
+              <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                Terms of Service
+              </Link>
+              <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                Contact
+              </Link>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Profile Tips</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/tinder-bio-guide" className="hover-elevate">Tinder Bio Guide</Link>
-                </li>
-                <li>
-                  <Link href="/hinge-prompts-men" className="hover-elevate">Hinge Prompts for Men</Link>
-                </li>
-                <li>
-                  <Link href="/hinge-prompts-women" className="hover-elevate">Hinge Prompts for Women</Link>
-                </li>
-                <li>
-                  <Link href="/bumble-bio-examples" className="hover-elevate">Bumble Bio Examples</Link>
-                </li>
-                <li>
-                  <Link href="/dating-app-photos" className="hover-elevate">Dating App Photos</Link>
-                </li>
-                <li>
-                  <Link href="/hinge-profile-tips" className="hover-elevate">Hinge Profile Tips</Link>
-                </li>
-                <li>
-                  <Link href="/tinder-photo-order" className="hover-elevate">Tinder Photo Order</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Messaging Tips</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <Link href="/bumble-opener-lines" className="hover-elevate">Bumble Opener Lines</Link>
-                </li>
-                <li>
-                  <Link href="/what-to-text-after-matching" className="hover-elevate">What to Text After Matching</Link>
-                </li>
-                <li>
-                  <Link href="/revive-dead-conversation" className="hover-elevate">Revive Dead Conversations</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>Your screenshots are private and deleted after processing.</p>
-            <p>© {new Date().getFullYear()} SwipeBetter.ai</p>
           </div>
         </div>
       </footer>
