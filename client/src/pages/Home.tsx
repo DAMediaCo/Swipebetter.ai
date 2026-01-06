@@ -183,55 +183,6 @@ export default function Home() {
       <section className="py-10 md:py-14 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">
-              Three simple steps to transform your dating profile
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card className="text-center">
-              <CardContent className="pt-8 pb-6 px-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Camera className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">1. Upload Screenshots</h3>
-                <p className="text-sm text-muted-foreground">
-                  Take screenshots of your dating profile from any app - Tinder, Hinge, Bumble, Grindr, or others.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="text-center">
-              <CardContent className="pt-8 pb-6 px-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <Sparkles className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">2. Get AI Analysis</h3>
-                <p className="text-sm text-muted-foreground">
-                  Our AI analyzes your profile and provides specific, actionable feedback instantly.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="text-center">
-              <CardContent className="pt-8 pb-6 px-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                  <TrendingUp className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold">3. Improve Your Profile</h3>
-                <p className="text-sm text-muted-foreground">
-                  Apply the suggestions to strengthen your profile and messaging.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-10 md:py-14 px-4 bg-muted/30">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-8 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Two Powerful Tools</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               Everything you need to improve your dating app success
@@ -298,6 +249,55 @@ export default function Home() {
                     </Button>
                   </Link>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-10 md:py-14 px-4 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-8 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Three simple steps to transform your dating profile
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-4">
+            <Card className="text-center">
+              <CardContent className="pt-8 pb-6 px-6 space-y-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Camera className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">1. Upload Screenshots</h3>
+                <p className="text-sm text-muted-foreground">
+                  Take screenshots of your dating profile from any app - Tinder, Hinge, Bumble, Grindr, or others.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardContent className="pt-8 pb-6 px-6 space-y-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Sparkles className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">2. Get AI Analysis</h3>
+                <p className="text-sm text-muted-foreground">
+                  Our AI analyzes your profile and provides specific, actionable feedback instantly.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="text-center">
+              <CardContent className="pt-8 pb-6 px-6 space-y-4">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <TrendingUp className="w-7 h-7 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">3. Improve Your Profile</h3>
+                <p className="text-sm text-muted-foreground">
+                  Apply the suggestions to strengthen your profile and messaging.
+                </p>
               </CardContent>
             </Card>
           </div>
