@@ -14,8 +14,12 @@ import {
   Crown,
   Zap,
   Shield,
-  Star
+  Star,
+  Lock,
+  Clock,
+  RefreshCcw
 } from "lucide-react";
+import { SiVisa, SiMastercard, SiAmericanexpress } from "react-icons/si";
 
 interface Price {
   id: string;
@@ -144,7 +148,7 @@ export default function Pricing() {
           </Card>
         ) : (
           <div className="grid md:grid-cols-3 gap-6 mb-8 items-stretch">
-            <Card className="flex flex-col">
+            <Card className="flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
               <CardHeader className="text-center pb-2">
                 <div className="h-6" />
                 <CardTitle className="text-xl">Starter Fix</CardTitle>
@@ -164,8 +168,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6 mt-6"
-                  variant="outline"
+                  className="w-full py-6 mt-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: starter");
                     if (oneTimePrice) handleCheckout(oneTimePrice.id);
@@ -178,7 +181,7 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="flex flex-col">
+            <Card className="flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
               <CardHeader className="text-center pb-2">
                 <Badge variant="secondary" className="mx-auto mb-2 h-6 flex items-center">Most Flexible</Badge>
                 <CardTitle className="text-xl">Unlimited Monthly</CardTitle>
@@ -198,8 +201,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6 mt-6"
-                  variant="outline"
+                  className="w-full py-6 mt-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: monthly");
                     if (monthlyPrice) handleCheckout(monthlyPrice.id);
@@ -212,7 +214,7 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg">
+            <Card className="border-primary border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <Badge className="bg-primary text-primary-foreground px-4 py-1.5">
                   <Star className="w-3.5 h-3.5 mr-1.5" />
@@ -240,7 +242,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-6 mt-6"
+                  className="w-full py-6 mt-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: annual");
                     if (annualPrice) handleCheckout(annualPrice.id);
@@ -257,14 +259,51 @@ export default function Pricing() {
         )}
 
         {!isSubscribed && (
-          <div className="mt-8 text-center space-y-3">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Shield className="w-4 h-4" />
-              <span>Secure payment via Stripe</span>
+          <div className="mt-8 text-center space-y-4">
+            <div className="flex items-center justify-center gap-3">
+              <Lock className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Guaranteed safe & secure checkout via Stripe. SSL Encrypted.</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Cancel subscriptions anytime. No questions asked.
-            </p>
+            <div className="flex items-center justify-center gap-4">
+              <SiVisa className="w-10 h-6 text-muted-foreground" />
+              <SiMastercard className="w-10 h-6 text-muted-foreground" />
+              <SiAmericanexpress className="w-10 h-6 text-muted-foreground" />
+            </div>
+          </div>
+        )}
+
+        {!isSubscribed && (
+          <div className="mt-12 pt-8 border-t border-border">
+            <h3 className="text-xl font-bold text-center mb-8">Frequently Asked Questions</h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <RefreshCcw className="w-5 h-5 text-primary" />
+                </div>
+                <h4 className="font-semibold">Is this a subscription?</h4>
+                <p className="text-sm text-muted-foreground">
+                  Starter is one-time. Monthly/Annual are subscriptions you can cancel anytime.
+                </p>
+              </div>
+              <div className="text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Shield className="w-5 h-5 text-primary" />
+                </div>
+                <h4 className="font-semibold">What if I'm not happy?</h4>
+                <p className="text-sm text-muted-foreground">
+                  We offer a 100% money-back guarantee if you don't see results.
+                </p>
+              </div>
+              <div className="text-center space-y-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Clock className="w-5 h-5 text-primary" />
+                </div>
+                <h4 className="font-semibold">How fast is it?</h4>
+                <p className="text-sm text-muted-foreground">
+                  You get your analysis instantly after uploading your screenshots.
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
