@@ -128,7 +128,7 @@ export default function ProfileResults() {
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <h1 className="text-xl font-semibold">Your Results</h1>
+          <h1 className="text-xl font-semibold">Your Profile Analysis</h1>
           <div className="w-9" />
         </div>
 
@@ -145,16 +145,6 @@ export default function ProfileResults() {
             </Badge>
           )}
         </div>
-
-        {!isPro && (
-          <Card className="mb-6 border-primary/50 bg-primary/5">
-            <CardContent className="py-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                Upgrade to unlock full bio rewrites, photo order, and copy buttons.
-              </p>
-            </CardContent>
-          </Card>
-        )}
 
         <div className="space-y-6">
           <Card className="bg-gradient-to-br from-primary/10 to-primary/5">
@@ -223,45 +213,38 @@ export default function ProfileResults() {
             canCopy={isPro}
           />
 
-          <div className="space-y-3">
-            {!isPro && (
-              <p className="text-sm text-muted-foreground text-center">
-                Unlock the full report in seconds.
-              </p>
-            )}
-            <div className="flex gap-3">
-              <Link href="/fix-profile" className="flex-1">
+          <div className="flex gap-3 pt-4">
+            <Link href="/fix-profile" className="flex-1">
+              <Button
+                variant="outline"
+                className="w-full"
+                data-testid="button-analyze-another"
+              >
+                Analyze Another Profile
+              </Button>
+            </Link>
+            {isPro && proActive ? (
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => customerPortal.mutate()}
+                disabled={customerPortal.isPending}
+                data-testid="button-manage-subscription"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Manage Subscription
+              </Button>
+            ) : (
+              <Link href="/fix-profile/upgrade" className="flex-1">
                 <Button
-                  variant="outline"
                   className="w-full"
-                  data-testid="button-analyze-another"
+                  data-testid="button-upgrade"
                 >
-                  Analyze Another Profile
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Upgrade
                 </Button>
               </Link>
-              {isPro && proActive ? (
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => customerPortal.mutate()}
-                  disabled={customerPortal.isPending}
-                  data-testid="button-manage-subscription"
-                >
-                  <Settings className="w-4 h-4 mr-2" />
-                  Manage Subscription
-                </Button>
-              ) : (
-                <Link href="/fix-profile/upgrade" className="flex-1">
-                  <Button
-                    className="w-full"
-                    data-testid="button-upgrade"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Upgrade
-                  </Button>
-                </Link>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
