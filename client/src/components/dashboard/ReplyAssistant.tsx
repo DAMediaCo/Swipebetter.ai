@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
@@ -11,13 +12,18 @@ import {
   Sparkles, 
   Heart,
   Flame,
-  Smile,
   Loader2,
   Shield,
-  Trash2
+  Trash2,
+  HelpCircle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const heroTones = [
   { id: "witty", label: "Witty", icon: Sparkles },
@@ -32,6 +38,7 @@ export function ReplyAssistant() {
 
   const [conversationText, setConversationText] = useState("");
   const [heroTone, setHeroTone] = useState("witty");
+  const [isEnm, setIsEnm] = useState(false);
 
   const heroAnalyzeMutation = useMutation({
     mutationFn: async () => {
@@ -40,7 +47,7 @@ export function ReplyAssistant() {
       const response = await apiRequest("POST", "/api/analyze-reply", {
         tone: selectedTone,
         conversationText: conversationText.trim(),
-        enm: false,
+        enm: isEnm,
       });
       return response.json();
     },
@@ -109,6 +116,29 @@ export function ReplyAssistant() {
           />
         </div>
         
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+          <Checkbox
+            id="enm-toggle-reply"
+            checked={isEnm}
+            onCheckedChange={(checked) => setIsEnm(checked === true)}
+            data-testid="checkbox-enm-reply"
+          />
+          <label 
+            htmlFor="enm-toggle-reply" 
+            className="text-sm font-medium cursor-pointer flex-1"
+          >
+            This is an ENM/Poly conversation
+          </label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p>Selecting this helps us tailor your replies for ethical non-monogamy contexts.</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+
         <div>
           <label className="text-sm font-medium mb-2 block">Choose your tone</label>
           <div className="flex flex-wrap gap-3">
