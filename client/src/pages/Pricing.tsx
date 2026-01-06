@@ -8,7 +8,6 @@ import { useAuth, useSubscription, useCheckout, useCustomerPortal } from "@/lib/
 import { useLocation } from "wouter";
 import { Link } from "wouter";
 import { 
-  ArrowLeft, 
   Check, 
   Sparkles, 
   Crown,
@@ -46,7 +45,7 @@ export default function Pricing() {
   const user = authData?.user;
 
   useEffect(() => {
-    document.title = "Pricing - SwipeBetter.ai";
+    document.title = "Pricing | SwipeBetter";
   }, []);
 
   const { data: productsData, isLoading: productsLoading } = useQuery<{ data: Product[] }>({
@@ -101,14 +100,6 @@ export default function Pricing() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-4xl mx-auto px-4 pt-2 pb-8">
-        <div className="mb-4 flex items-center">
-          <Link href="/">
-            <Button variant="ghost" size="icon" data-testid="button-back">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-        </div>
-
         <div className="text-center mb-6 space-y-2">
           <Badge variant="secondary" className="px-4 py-1.5">
             <Crown className="w-3.5 h-3.5 mr-1.5" />
@@ -180,9 +171,14 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-              <CardHeader className="text-center pb-2">
-                <Badge variant="secondary" className="mx-auto mb-2 h-6 flex items-center">Most Flexible</Badge>
+            <Card className="border-pink-500 border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-4 py-1.5">
+                  <Star className="w-3.5 h-3.5 mr-1.5" />
+                  Most Popular
+                </Badge>
+              </div>
+              <CardHeader className="text-center pb-2 pt-8">
                 <CardTitle className="text-xl">Unlimited Monthly</CardTitle>
                 <p className="text-sm text-muted-foreground">Cancel anytime</p>
               </CardHeader>
@@ -213,14 +209,9 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-4 py-1.5">
-                  <Star className="w-3.5 h-3.5 mr-1.5" />
-                  Best Value
-                </Badge>
-              </div>
-              <CardHeader className="text-center pb-2 pt-8">
+            <Card className="flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+              <CardHeader className="text-center pb-2">
+                <Badge variant="secondary" className="mx-auto mb-2 h-6 flex items-center">Best Value</Badge>
                 <CardTitle className="text-xl">Unlimited Annual</CardTitle>
                 <p className="text-sm text-muted-foreground">Best savings</p>
               </CardHeader>
@@ -258,12 +249,12 @@ export default function Pricing() {
         )}
 
         {!isSubscribed && (
-          <div className="mt-8 text-center space-y-4">
+          <div className="mt-8 max-w-2xl mx-auto bg-white/50 dark:bg-slate-900/50 rounded-xl p-4">
             <div className="flex items-center justify-center gap-3">
               <Lock className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">Guaranteed safe & secure checkout via Stripe. SSL Encrypted.</span>
+              <span className="text-sm text-muted-foreground">Guaranteed safe & secure checkout via Stripe</span>
             </div>
-            <div className="flex items-center justify-center gap-4">
+            <div className="flex items-center justify-center gap-4 mt-3">
               <SiVisa className="w-10 h-6 text-muted-foreground" />
               <SiMastercard className="w-10 h-6 text-muted-foreground" />
               <SiAmericanexpress className="w-10 h-6 text-muted-foreground" />
