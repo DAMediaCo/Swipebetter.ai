@@ -109,7 +109,7 @@ export async function registerRoutes(
           details: parseResult.error.flatten() 
         });
       }
-      const { platform, gender, intent, screenshots } = parseResult.data;
+      const { platform, gender, intent, screenshots, enm } = parseResult.data;
       const userId = req.session.userId;
 
       const subscription = await storage.getUserSubscription(userId);
@@ -127,8 +127,17 @@ export async function registerRoutes(
         await storage.decrementOneTimeCredits(userId);
       }
 
+      const enmContext = enm ? `
+      IMPORTANT: This is an ENM (Ethical Non-Monogamy) / Polyamorous profile. The user may be married, partnered, or in existing relationships while seeking additional connections. This is normal and healthy in the ENM community. Do NOT suggest:
+      - Removing mentions of being married or partnered
+      - Hiding relationship status
+      - Making the profile seem like they're single
+      Instead, help them communicate their ENM status clearly and attract compatible matches who understand and appreciate ethical non-monogamy.` : '';
+
       const systemPrompt = `You are an expert dating profile consultant specializing in ${platform}. 
-      The user is ${gender} looking for ${intent}. Analyze their profile screenshots and provide:
+      The user is ${gender} looking for ${intent}.${enmContext}
+      
+      Analyze their profile screenshots and provide:
       1. An overall score from 1-100
       2. Specific bio suggestions (3-5 alternatives)
       3. Photo feedback (what works, what to change)
@@ -147,7 +156,7 @@ export async function registerRoutes(
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: [
-            { type: "text", text: `Please analyze this ${platform} dating profile for a ${gender} looking for ${intent}.` },
+            { type: "text", text: `Please analyze this ${platform} dating profile for a ${gender} looking for ${intent}.${enm ? ' This is an ENM/Poly profile - keep that context in mind.' : ''}` },
             ...userContent
           ]}
         ],
@@ -199,7 +208,7 @@ export async function registerRoutes(
           details: parseResult.error.flatten() 
         });
       }
-      const { tone, screenshots, conversationText } = parseResult.data;
+      const { tone, screenshots, conversationText, enm } = parseResult.data;
       const userId = req.session.userId;
 
       const subscription = await storage.getUserSubscription(userId);
@@ -220,7 +229,14 @@ export async function registerRoutes(
       const hasScreenshots = screenshots && screenshots.length > 0;
       const hasText = conversationText && conversationText.trim().length > 0;
 
-      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation and generate 3 reply suggestions with a ${tone} tone.
+      const enmContext = enm ? `
+      IMPORTANT: This is an ENM (Ethical Non-Monogamy) / Polyamorous conversation. The user may mention being married, partnered, or in existing relationships. This is normal and acceptable. Generate replies that:
+      - Are comfortable and natural about ENM dynamics
+      - Don't try to hide or minimize existing relationships
+      - Appeal to people who understand ethical non-monogamy
+      ` : '';
+
+      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation and generate 3 reply suggestions with a ${tone} tone.${enmContext}
       
       Consider:
       - The conversation flow and context
