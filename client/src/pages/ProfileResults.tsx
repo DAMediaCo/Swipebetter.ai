@@ -9,7 +9,6 @@ import { trackPreviewViewed } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  ArrowLeft, 
   Clipboard, 
   Check,
   TrendingUp,
@@ -122,14 +121,8 @@ export default function ProfileResults() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between gap-2">
-          <Link href="/fix-profile">
-            <Button variant="ghost" size="icon" data-testid="button-back">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
+        <div className="mb-6 text-center">
           <h1 className="text-xl font-semibold">Your Profile Analysis</h1>
-          <div className="w-9" />
         </div>
 
         <div className="flex justify-center mb-6">
