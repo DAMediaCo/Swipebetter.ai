@@ -12,9 +12,9 @@ import { trackAnalysisStarted } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
 import { 
   Sparkles, 
-  ArrowLeft, 
   Loader2
 } from "lucide-react";
+import { SiTinder } from "react-icons/si";
 import { StepIndicator } from "@/components/StepIndicator";
 import { useToast } from "@/hooks/use-toast";
 
@@ -26,7 +26,7 @@ export default function ProfileUpload() {
   const user = authData?.user;
 
   useEffect(() => {
-    document.title = "Upload Profile - SwipeBetter.ai";
+    document.title = "Upload Profile | SwipeBetter";
   }, []);
 
   const [images, setImages] = useState<string[]>([]);
@@ -86,25 +86,12 @@ export default function ProfileUpload() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <Link href="/fix-profile">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              data-testid="button-back"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div className="w-9" />
-        </div>
-
         <StepIndicator 
           steps={["Details", "Upload", "Results"]} 
           currentStep={2} 
         />
 
-        <div className="mb-6">
+        <div className="bg-white/50 dark:bg-slate-900/50 rounded-xl p-4 mb-6">
           <TrustBar />
         </div>
 
@@ -144,7 +131,7 @@ export default function ProfileUpload() {
           </Card>
         )}
 
-        <Card className="shadow-lg">
+        <Card className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-2xl font-bold">
               Upload Your Profile
@@ -158,6 +145,20 @@ export default function ProfileUpload() {
             <ImageUpload images={images} onChange={setImages} maxImages={5} />
           </CardContent>
         </Card>
+
+        <div className="mt-6 text-center">
+          <p className="text-xs text-slate-400 mb-2">Compatible with all major apps</p>
+          <div className="flex items-center justify-center gap-4 text-slate-400">
+            <div className="flex items-center gap-1">
+              <SiTinder className="w-4 h-4" />
+              <span className="text-xs">Tinder</span>
+            </div>
+            <span className="text-slate-300">|</span>
+            <span className="text-xs">Hinge</span>
+            <span className="text-slate-300">|</span>
+            <span className="text-xs">Bumble</span>
+          </div>
+        </div>
       </div>
 
       <div className="fixed bottom-16 md:bottom-0 left-0 right-0 p-4 bg-background border-t border-border safe-bottom">
