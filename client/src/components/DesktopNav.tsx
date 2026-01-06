@@ -42,11 +42,12 @@ export function DesktopNav() {
         </Link>
         <div className="flex items-center gap-1">
           {navItems.map((item) => {
-            const isActive = location === item.href;
+            const isActive = location === item.href || location.startsWith(item.href + "/");
             return (
               <Link key={item.href} href={item.href} onClick={() => handleNavClick(item.toolType, item.href)}>
                 <Button
-                  variant={isActive ? "secondary" : "ghost"}
+                  variant="ghost"
+                  className={isActive ? "text-primary font-semibold" : ""}
                   data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
                 >
                   {item.label}
