@@ -123,7 +123,7 @@ export function ExampleReplies() {
                       data-testid={`button-copy-example-${sIndex}-${rIndex}`}
                     >
                       {copiedKey === key ? (
-                        <Check className="w-4 h-4 text-primary" />
+                        <Check className="w-4 h-4 text-green-500" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}

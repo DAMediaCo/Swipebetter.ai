@@ -51,7 +51,7 @@ export default function ReplyFix() {
   const user = authData?.user;
 
   useEffect(() => {
-    document.title = "Fix My Reply - SwipeBetter.ai";
+    document.title = "Fix Your Reply | SwipeBetter";
   }, []);
 
   const [step, setStep] = useState(0);
@@ -180,10 +180,13 @@ export default function ReplyFix() {
             <PrivacyFAQ />
           </section>
 
-          <section className="text-center py-8 border-t border-border">
+          <section className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-8 text-center">
             <p className="text-muted-foreground mb-4">Need help with your profile instead?</p>
             <Link href="/fix-profile">
-              <Button variant="outline" data-testid="link-fix-profile-cross">
+              <Button 
+                className="bg-white dark:bg-slate-800 text-foreground shadow-md hover:shadow-lg transition-shadow border border-border"
+                data-testid="link-fix-profile-cross"
+              >
                 Try Fix My Profile
               </Button>
             </Link>
