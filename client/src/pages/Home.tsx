@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, UserX } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, UserX, Star } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { TestimonialsRotator } from "@/components/TestimonialsRotator";
 import { trackToolEntry } from "@/lib/analytics";
@@ -59,14 +59,19 @@ export default function Home() {
         </div>
         
         <div className="relative z-10 max-w-3xl mx-auto text-center space-y-6">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center gap-1.5">
+            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+            Trusted by 10,000+ Daters
+          </p>
+          
           <Badge variant="secondary" className="px-4 py-1.5">
             <Sparkles className="w-3.5 h-3.5 mr-1.5" />
             AI-Powered Dating Profile Coach
           </Badge>
           
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-            Get More Matches. Say the Right Thing.{" "}
-            <span className="text-primary">Look Better Doing It.</span>
+            <span className="text-primary">Get More Matches.</span> Say the Right Thing.{" "}
+            Look Better Doing It.
           </h1>
           
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
@@ -75,7 +80,7 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
-              <Button size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-profile-hero">
+              <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
                 <Camera className="w-5 h-5 mr-2" />
                 Fix My Profile
               </Button>
@@ -96,7 +101,7 @@ export default function Home() {
             <span className="hidden sm:inline text-muted-foreground/50">|</span>
             <span className="flex items-center gap-1.5">
               <UserX className="w-4 h-4" />
-              No account required
+              <strong className="font-semibold">No account required</strong>
             </span>
             <span className="hidden sm:inline text-muted-foreground/50">|</span>
             <span className="flex items-center gap-1.5">
@@ -116,28 +121,32 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="pt-6 pb-5 px-5">
-                <div className="text-3xl font-bold text-primary mb-2">41/100</div>
-                <p className="text-sm font-medium">Profile Score</p>
-                <p className="text-xs text-muted-foreground mt-1">Room for improvement</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6 pb-5 px-5">
-                <div className="text-lg font-semibold mb-2">Top Issue</div>
-                <p className="text-sm text-muted-foreground">Your first photo reads as low trust</p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6 pb-5 px-5">
-                <div className="text-lg font-semibold mb-2">Suggested Fix</div>
-                <p className="text-sm text-muted-foreground">Move your clearest solo photo to #1 and shorten your bio to 2 punchy lines</p>
-              </CardContent>
-            </Card>
+          <div className="bg-card rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 p-6 md:p-8">
+            <div className="grid md:grid-cols-3 gap-6 items-start">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-4 border-primary flex items-center justify-center mb-3">
+                  <span className="text-2xl font-bold text-primary">41</span>
+                </div>
+                <p className="text-sm font-semibold">Profile Score</p>
+                <p className="text-xs text-muted-foreground">out of 100</p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-destructive" />
+                  <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Top Issue</span>
+                </div>
+                <p className="text-base">Your first photo reads as low trust. Facial expression unclear and lighting is dim.</p>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-green-500" />
+                  <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Suggested Fix</span>
+                </div>
+                <p className="text-base">Move your clearest solo photo to #1 and shorten your bio to 2 punchy lines.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
