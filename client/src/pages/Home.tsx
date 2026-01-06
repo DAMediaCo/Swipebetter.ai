@@ -100,7 +100,6 @@ export default function Home() {
                   <Trash2 className="w-4 h-4" />
                   Screenshots deleted after processing
                 </span>
-                <span className="hidden sm:inline text-muted-foreground/50">|</span>
                 <span className="flex items-center gap-1.5">
                   <Check className="w-4 h-4" />
                   Works with Tinder, Hinge, Bumble, and more
