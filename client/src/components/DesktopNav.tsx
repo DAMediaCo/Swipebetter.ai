@@ -93,7 +93,7 @@ export function DesktopNav() {
           </DropdownMenu>
         ) : (
           <Link href="/auth">
-            <Button data-testid="button-login">
+            <Button variant="ghost" className="border border-primary text-primary" data-testid="button-login">
               Sign In
             </Button>
           </Link>

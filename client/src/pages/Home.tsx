@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, UserX, Star } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, UserX, Star, Smartphone } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { TestimonialsRotator } from "@/components/TestimonialsRotator";
 import { trackToolEntry } from "@/lib/analytics";
@@ -52,62 +52,91 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center justify-center px-4 py-12 md:py-16 bg-gradient-to-br from-primary/5 via-background to-accent/10">
+      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center px-4 py-12 md:py-16 bg-gradient-to-br from-primary/5 via-background to-accent/10">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
         </div>
         
-        <div className="relative z-10 max-w-3xl mx-auto text-center space-y-6">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center gap-1.5">
-            <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-            Trusted by 10,000+ Daters
-          </p>
-          
-          <Badge variant="secondary" className="px-4 py-1.5">
-            <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-            AI-Powered Dating Profile Coach
-          </Badge>
-          
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-            <span className="text-primary">Get More Matches.</span> Say the Right Thing.{" "}
-            Look Better Doing It.
-          </h1>
-          
-          <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            AI-powered feedback for your dating profile and replies. Private, fast, and built to actually help.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-            <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
-              <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
-                <Camera className="w-5 h-5 mr-2" />
-                Fix My Profile
-              </Button>
-            </Link>
-            <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-reply-hero">
-                <MessageSquare className="w-5 h-5 mr-2" />
-                Fix My Reply
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
-            <span className="flex items-center gap-1.5">
-              <Trash2 className="w-4 h-4" />
-              Screenshots deleted after processing
-            </span>
-            <span className="hidden sm:inline text-muted-foreground/50">|</span>
-            <span className="flex items-center gap-1.5">
-              <UserX className="w-4 h-4" />
-              <strong className="font-semibold">No account required</strong>
-            </span>
-            <span className="hidden sm:inline text-muted-foreground/50">|</span>
-            <span className="flex items-center gap-1.5">
-              <Check className="w-4 h-4" />
-              Works with Tinder, Hinge, Bumble, and more
-            </span>
+        <div className="relative z-10 max-w-6xl mx-auto w-full">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="space-y-6 text-center md:text-left">
+              <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center md:justify-start gap-1.5">
+                <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
+                Trusted by 10,000+ Daters
+              </p>
+              
+              <Badge variant="secondary" className="px-4 py-1.5">
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                AI-Powered Dating Profile Coach
+              </Badge>
+              
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+                <span className="text-primary">Get More Matches.</span> Say the Right Thing.{" "}
+                Look Better Doing It.
+              </h1>
+              
+              <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
+                AI-powered feedback for your dating profile and replies. Private, fast, and built to actually help.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
+                <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
+                  <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
+                    <Camera className="w-5 h-5 mr-2" />
+                    Fix My Profile
+                  </Button>
+                </Link>
+                <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
+                  <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-reply-hero">
+                    <MessageSquare className="w-5 h-5 mr-2" />
+                    Fix My Reply
+                  </Button>
+                </Link>
+              </div>
+              
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
+                <span className="flex items-center gap-1.5">
+                  <Trash2 className="w-4 h-4" />
+                  Screenshots deleted after processing
+                </span>
+                <span className="hidden sm:inline text-muted-foreground/50">|</span>
+                <span className="flex items-center gap-1.5">
+                  <UserX className="w-4 h-4" />
+                  <strong className="font-semibold">No account required</strong>
+                </span>
+                <span className="hidden sm:inline text-muted-foreground/50">|</span>
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4" />
+                  Works with Tinder, Hinge, Bumble, and more
+                </span>
+              </div>
+            </div>
+            
+            <div className="hidden md:flex items-center justify-center">
+              <div className="relative">
+                <div className="w-64 h-[520px] bg-card rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-3 flex flex-col">
+                  <div className="w-20 h-5 bg-border rounded-full mx-auto mb-3" />
+                  <div className="flex-1 bg-muted/50 rounded-[1.5rem] flex flex-col items-center justify-center gap-4 p-4">
+                    <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Smartphone className="w-10 h-10 text-primary" />
+                    </div>
+                    <p className="text-sm font-medium text-center">Your Profile Analysis</p>
+                    <div className="w-full space-y-2">
+                      <div className="h-2 bg-primary/30 rounded-full w-full" />
+                      <div className="h-2 bg-primary/20 rounded-full w-4/5" />
+                      <div className="h-2 bg-primary/10 rounded-full w-3/5" />
+                    </div>
+                    <div className="mt-4 text-center">
+                      <div className="text-3xl font-bold text-primary">87/100</div>
+                      <p className="text-xs text-muted-foreground">Profile Score</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/20 rounded-full blur-xl" />
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-accent/30 rounded-full blur-xl" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
