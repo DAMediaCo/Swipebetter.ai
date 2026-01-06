@@ -52,7 +52,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <section className="relative min-h-[70vh] md:min-h-[80vh] flex items-center px-4 py-12 md:py-16 bg-gradient-to-br from-primary/5 via-background to-accent/10">
+      <section className="relative flex items-center px-4 pt-6 pb-10 md:pt-8 md:pb-12 bg-gradient-to-br from-primary/5 via-background to-accent/10">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
@@ -60,7 +60,7 @@ export default function Home() {
         
         <div className="relative z-10 max-w-6xl mx-auto w-full">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="space-y-6 text-center md:text-left">
+            <div className="space-y-4 text-center md:text-left">
               <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center md:justify-start gap-1.5">
                 <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
                 Trusted by 10,000+ Daters
@@ -141,9 +141,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-10 md:py-14 px-4 bg-muted/30">
+      <section className="py-7 md:py-10 px-4 bg-muted/30">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-6 space-y-2">
+          <div className="text-center mb-5 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Example AI Feedback</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               See what kind of actionable insights you will get
@@ -180,9 +180,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-10 md:py-14 px-4">
+      <section className="py-7 md:py-10 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-8 space-y-2">
+          <div className="text-center mb-6 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Two Powerful Tools</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               Everything you need to improve your dating app success
@@ -255,9 +255,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-10 md:py-14 px-4 bg-muted/30">
+      <section className="py-7 md:py-10 px-4 bg-muted/30">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-8 space-y-2">
+          <div className="text-center mb-6 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               Three simple steps to transform your dating profile
@@ -304,7 +304,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-10 md:py-14 px-4">
+      <section className="py-7 md:py-10 px-4">
         <TestimonialsRotator />
         <p className="text-sm text-muted-foreground text-center mt-6 flex items-center justify-center gap-2">
           <Shield className="w-4 h-4" />
@@ -312,7 +312,7 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="py-10 md:py-14 px-4 bg-muted/30">
+      <section className="py-7 md:py-10 px-4 bg-muted/30">
         <div className="max-w-3xl mx-auto text-center space-y-5">
           <h2 className="text-2xl md:text-3xl font-bold">
             Ready to improve your matches?
@@ -337,7 +337,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-10 md:py-14 px-4">
+      <section className="py-7 md:py-10 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">FAQ</h2>
           <Accordion type="single" collapsible className="w-full">
