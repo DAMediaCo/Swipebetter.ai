@@ -23,8 +23,17 @@ export function useAuth() {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: { email: string; password: string }) => {
-      const response = await apiRequest("POST", "/api/auth/login", credentials);
-      return response.json();
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
+        credentials: "include",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+      return data;
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/auth/user"], data);
@@ -33,8 +42,17 @@ export function useAuth() {
 
   const signupMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; firstName?: string; promoCode?: string }) => {
-      const response = await apiRequest("POST", "/api/auth/signup", data);
-      return response.json();
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        credentials: "include",
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.message || "Signup failed");
+      }
+      return result;
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["/api/auth/user"], data);
