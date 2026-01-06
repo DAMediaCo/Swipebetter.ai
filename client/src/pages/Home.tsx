@@ -102,11 +102,6 @@ export default function Home() {
                 </span>
                 <span className="hidden sm:inline text-muted-foreground/50">|</span>
                 <span className="flex items-center gap-1.5">
-                  <UserX className="w-4 h-4" />
-                  <strong className="font-semibold">No account required</strong>
-                </span>
-                <span className="hidden sm:inline text-muted-foreground/50">|</span>
-                <span className="flex items-center gap-1.5">
                   <Check className="w-4 h-4" />
                   Works with Tinder, Hinge, Bumble, and more
                 </span>
