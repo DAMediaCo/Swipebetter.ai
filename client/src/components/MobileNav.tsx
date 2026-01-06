@@ -3,8 +3,8 @@ import { Home, Wrench, CreditCard } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
-  { href: "/dashboard", icon: Wrench, label: "Tools" },
   { href: "/pricing", icon: CreditCard, label: "Pricing" },
+  { href: "/dashboard", icon: Wrench, label: "Dashboard" },
 ];
 
 export function MobileNav() {
