@@ -25,8 +25,7 @@ import {
   Brain,
   ArrowDown,
   HelpCircle,
-  Loader2,
-  CloudUpload
+  Loader2
 } from "lucide-react";
 import { StepIndicator } from "@/components/StepIndicator";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,7 +51,7 @@ export default function ReplyFix() {
   const user = authData?.user;
 
   useEffect(() => {
-    document.title = "Fix Your Reply | SwipeBetter";
+    document.title = "Fix My Reply - SwipeBetter.ai";
   }, []);
 
   const [step, setStep] = useState(0);
@@ -123,60 +122,45 @@ export default function ReplyFix() {
     return (
       <div className="min-h-screen">
         <div className="max-w-4xl mx-auto px-4 pt-4 pb-8 space-y-12">
+          <div className="mb-2">
+            <Link href="/">
+              <Button variant="ghost" size="icon" data-testid="button-back">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+          </div>
+
           <section className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               Fix Your Reply.<br />
               <span className="text-primary">Keep the Conversation Going.</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Upload your conversation screenshot. Pick a tone. Get 3 replies that sound like you.
+              Paste the chat. Pick a tone. Get 3 replies that sound like you.
             </p>
-            
-            <div 
-              onClick={startAnalysis}
-              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-white dark:bg-slate-900/50 shadow-sm cursor-pointer transition-all duration-200 hover:border-primary hover:shadow-md group"
-              data-testid="button-start-paste"
-            >
-              <div className="flex flex-col items-center gap-3">
-                <CloudUpload className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
-                <p className="text-lg font-medium">Drag & drop conversation screenshots here</p>
-                <p className="text-sm text-muted-foreground">or click to browse</p>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                size="lg" 
+                onClick={startAnalysis}
+                className="py-6 px-8"
+                data-testid="button-start-paste"
+              >
+                <MessageSquare className="w-5 h-5 mr-2" />
+                Paste Conversation
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                onClick={scrollToDemo}
+                className="py-6 px-8"
+                data-testid="button-see-reply-examples"
+              >
+                See Reply Examples
+                <ArrowDown className="w-4 h-4 ml-2" />
+              </Button>
             </div>
-
-            <div className="max-w-xl mx-auto">
-              <p className="text-sm text-muted-foreground mb-4">Pick a tone for your replies:</p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {tones.map((t) => {
-                  const Icon = t.icon;
-                  return (
-                    <div
-                      key={t.id}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-background text-sm text-muted-foreground"
-                    >
-                      <Icon className="w-4 h-4" />
-                      <span>{t.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={scrollToDemo}
-              className="text-muted-foreground"
-              data-testid="button-see-reply-examples"
-            >
-              See Reply Examples
-              <ArrowDown className="w-4 h-4 ml-2" />
-            </Button>
-            
-            <div className="pt-2">
-              <div className="inline-block bg-white dark:bg-slate-900/50 rounded-lg px-6 py-4 shadow-sm">
-                <TrustBar />
-              </div>
+            <div className="pt-4">
+              <TrustBar />
             </div>
           </section>
 
@@ -196,13 +180,10 @@ export default function ReplyFix() {
             <PrivacyFAQ />
           </section>
 
-          <section className="bg-white dark:bg-slate-900/50 rounded-2xl p-8 text-center shadow-sm">
+          <section className="text-center py-8 border-t border-border">
             <p className="text-muted-foreground mb-4">Need help with your profile instead?</p>
             <Link href="/fix-profile">
-              <Button 
-                variant="outline"
-                data-testid="link-fix-profile-cross"
-              >
+              <Button variant="outline" data-testid="link-fix-profile-cross">
                 Try Fix My Profile
               </Button>
             </Link>

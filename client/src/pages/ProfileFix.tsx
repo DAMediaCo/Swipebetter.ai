@@ -93,7 +93,7 @@ export default function ProfileFix() {
             
             <div 
               onClick={startAnalysis}
-              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-white dark:bg-slate-900/50 shadow-sm cursor-pointer transition-all duration-200 hover:border-primary hover:shadow-md group"
+              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-slate-50 dark:bg-slate-900/50 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-slate-100 dark:hover:bg-slate-800/50 group"
               data-testid="button-start-upload"
             >
               <div className="flex flex-col items-center gap-3">
@@ -133,7 +133,7 @@ export default function ProfileFix() {
             </Button>
             
             <div className="pt-2">
-              <div className="inline-block bg-white dark:bg-slate-900/50 rounded-lg px-6 py-4 shadow-sm">
+              <div className="inline-block bg-slate-50 dark:bg-slate-900/50 rounded-lg px-6 py-4">
                 <TrustBar />
               </div>
             </div>
@@ -155,11 +155,11 @@ export default function ProfileFix() {
             <PrivacyFAQ />
           </section>
 
-          <section className="bg-white dark:bg-slate-900/50 rounded-2xl p-8 text-center shadow-sm">
+          <section className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-8 text-center">
             <p className="text-muted-foreground mb-4">Need help with replies instead?</p>
             <Link href="/fix-reply">
               <Button 
-                variant="outline"
+                className="bg-white dark:bg-slate-800 text-foreground shadow-md hover:shadow-lg transition-shadow border border-border"
                 data-testid="link-fix-reply-cross"
               >
                 Try Fix My Reply
