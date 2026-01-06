@@ -4,7 +4,6 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal } from "@/lib/auth";
@@ -123,21 +122,17 @@ export default function ProfileResults() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between gap-2">
           <Link href="/fix-profile">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
+          <h1 className="text-xl font-semibold">Your Results</h1>
           <div className="w-9" />
         </div>
 
-        <StepIndicator 
-          steps={["Upload", "Results", "Upgrade"]} 
-          currentStep={2} 
-        />
-
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-6">
           {isPro ? (
             <Badge variant="default" className="bg-primary/10 text-primary border-primary/20" data-testid="badge-full-access">
               <Check className="w-3 h-3 mr-1" />
