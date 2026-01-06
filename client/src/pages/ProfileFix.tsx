@@ -13,8 +13,10 @@ import {
   ArrowLeft, 
   Upload,
   ArrowDown,
-  HelpCircle
+  HelpCircle,
+  CloudUpload
 } from "lucide-react";
+import { SiTinder } from "react-icons/si";
 import { StepIndicator } from "@/components/StepIndicator";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -80,14 +82,6 @@ export default function ProfileFix() {
     return (
       <div className="min-h-screen">
         <div className="max-w-4xl mx-auto px-4 pt-4 pb-8 space-y-12">
-          <div className="mb-2">
-            <Link href="/">
-              <Button variant="ghost" size="icon" data-testid="button-back">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-          </div>
-
           <section className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               Fix Your Dating Profile.<br />
@@ -96,29 +90,52 @@ export default function ProfileFix() {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Upload screenshots. Get a score, photo feedback, and a better bio in minutes.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button 
-                size="lg" 
-                onClick={startAnalysis}
-                className="py-6 px-8"
-                data-testid="button-start-upload"
-              >
-                <Upload className="w-5 h-5 mr-2" />
-                Upload Profile Screenshots
-              </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                onClick={scrollToExamples}
-                className="py-6 px-8"
-                data-testid="button-see-examples"
-              >
-                See Example Results
-                <ArrowDown className="w-4 h-4 ml-2" />
-              </Button>
+            
+            <div 
+              onClick={startAnalysis}
+              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-slate-50 dark:bg-slate-900/50 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-slate-100 dark:hover:bg-slate-800/50 group"
+              data-testid="button-start-upload"
+            >
+              <div className="flex flex-col items-center gap-3">
+                <CloudUpload className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
+                <p className="text-lg font-medium">Drag & drop screenshots here</p>
+                <p className="text-sm text-muted-foreground">or click to browse</p>
+              </div>
             </div>
-            <div className="pt-4">
-              <TrustBar />
+
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Upload 3-6 screenshots of your photos, bio, and prompts.
+              </p>
+              <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <SiTinder className="w-4 h-4" />
+                  <span>Tinder</span>
+                </div>
+                <span className="text-muted-foreground/40">|</span>
+                <span>Hinge</span>
+                <span className="text-muted-foreground/40">|</span>
+                <span>Bumble</span>
+                <span className="text-muted-foreground/40">|</span>
+                <span className="text-muted-foreground/60">+ more</span>
+              </div>
+            </div>
+
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={scrollToExamples}
+              className="text-muted-foreground"
+              data-testid="button-see-examples"
+            >
+              See Example Results
+              <ArrowDown className="w-4 h-4 ml-2" />
+            </Button>
+            
+            <div className="pt-2">
+              <div className="inline-block bg-slate-50 dark:bg-slate-900/50 rounded-lg px-6 py-4">
+                <TrustBar />
+              </div>
             </div>
           </section>
 
