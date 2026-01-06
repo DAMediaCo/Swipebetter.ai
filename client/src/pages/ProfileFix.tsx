@@ -10,7 +10,6 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { useAuth } from "@/lib/auth";
 import { Link, useLocation } from "wouter";
 import { 
-  ArrowLeft, 
   Upload,
   ArrowDown,
   HelpCircle,
@@ -174,28 +173,16 @@ export default function ProfileFix() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setStep(step > 1 ? step - 1 : 0)}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="w-9" />
-        </div>
-
         <StepIndicator 
           steps={["Details", "Upload", "Results"]} 
           currentStep={1} 
         />
 
-        <div className="mb-6">
+        <div className="bg-white/50 dark:bg-slate-900/50 rounded-xl p-4 mb-6">
           <TrustBar />
         </div>
 
-        <Card className="shadow-lg">
+        <Card className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
           <CardHeader className="text-center pb-2">
             <CardTitle className="text-2xl font-bold">
               {step === 1 && "About You"}
