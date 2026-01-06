@@ -76,7 +76,6 @@ export default function Pricing() {
     "Unlimited reply suggestions",
     "All dating platforms supported",
     "Advanced AI feedback",
-    "Priority support",
   ];
 
   const oneTimeFeatures = [
