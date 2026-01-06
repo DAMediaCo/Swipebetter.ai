@@ -154,7 +154,6 @@ export default function Pricing() {
                 <div className="mb-6">
                   <span className="text-4xl font-bold">$9</span>
                   <span className="text-muted-foreground"> one-time</span>
-                  <p className="text-sm text-transparent mt-1">placeholder</p>
                 </div>
                 <ul className="text-sm space-y-2 text-left flex-1">
                   {oneTimeFeatures.map((feature, i) => (
@@ -167,7 +166,10 @@ export default function Pricing() {
                 <Button
                   className="w-full py-6 mt-6"
                   variant="outline"
-                  onClick={() => oneTimePrice && handleCheckout(oneTimePrice.id)}
+                  onClick={() => {
+                    console.log("Selected plan: starter");
+                    if (oneTimePrice) handleCheckout(oneTimePrice.id);
+                  }}
                   disabled={checkoutMutation.isPending || !oneTimePrice}
                   data-testid="button-checkout-onetime"
                 >
@@ -186,7 +188,6 @@ export default function Pricing() {
                 <div className="mb-6">
                   <span className="text-4xl font-bold">$19</span>
                   <span className="text-muted-foreground">/month</span>
-                  <p className="text-sm text-transparent mt-1">placeholder</p>
                 </div>
                 <ul className="text-sm space-y-2 text-left flex-1">
                   {unlimitedFeatures.map((feature, i) => (
@@ -199,7 +200,10 @@ export default function Pricing() {
                 <Button
                   className="w-full py-6 mt-6"
                   variant="outline"
-                  onClick={() => monthlyPrice && handleCheckout(monthlyPrice.id)}
+                  onClick={() => {
+                    console.log("Selected plan: monthly");
+                    if (monthlyPrice) handleCheckout(monthlyPrice.id);
+                  }}
                   disabled={checkoutMutation.isPending || !monthlyPrice}
                   data-testid="button-checkout-monthly"
                 >
@@ -237,7 +241,10 @@ export default function Pricing() {
                 </ul>
                 <Button
                   className="w-full py-6 mt-6"
-                  onClick={() => annualPrice && handleCheckout(annualPrice.id)}
+                  onClick={() => {
+                    console.log("Selected plan: annual");
+                    if (annualPrice) handleCheckout(annualPrice.id);
+                  }}
                   disabled={checkoutMutation.isPending || !annualPrice}
                   data-testid="button-checkout-annual"
                 >
