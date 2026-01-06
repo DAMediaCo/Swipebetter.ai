@@ -78,7 +78,17 @@ export default function ProfileResults() {
     setTimeout(() => setCopiedBioIndex(null), 2000);
   };
 
-  const parseBioSuggestions = (content: string): string[] => {
+  const parseBioSuggestions = (content: string | string[] | undefined): string[] => {
+    if (!content) return [];
+    
+    if (Array.isArray(content)) {
+      return content.filter(item => typeof item === 'string' && item.trim());
+    }
+    
+    if (typeof content !== 'string') {
+      return [];
+    }
+    
     const lines = content.split('\n').filter(line => line.trim());
     const bios: string[] = [];
     let currentBio = '';
