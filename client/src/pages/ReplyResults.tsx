@@ -4,12 +4,10 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { StepIndicator } from "@/components/StepIndicator";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal } from "@/lib/auth";
 import { 
-  ArrowLeft, 
   Clipboard, 
   Check,
   Sparkles,
@@ -69,19 +67,7 @@ export default function ReplyResults() {
   return (
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="mb-6 flex items-center justify-between">
-          <Link href="/fix-reply">
-            <Button variant="ghost" size="icon" data-testid="button-back">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div className="w-9" />
-        </div>
-
-        <StepIndicator 
-          steps={["Paste", "Results", "Upgrade"]} 
-          currentStep={2} 
-        />
+        <h1 className="text-2xl font-bold text-center mb-6">Your Reply Suggestions</h1>
 
         <div className="flex justify-center mb-4">
           {isPro ? (
