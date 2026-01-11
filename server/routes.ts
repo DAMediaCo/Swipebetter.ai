@@ -14,6 +14,11 @@ const grok = new OpenAI({
   baseURL: "https://api.x.ai/v1",
 });
 
+const openai = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
+
 const MAX_SCREENSHOTS = 5;
 const MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024; // 10MB base64
 
@@ -27,11 +32,16 @@ const profileAnalysisSchema = z.object({
 
 const replyAnalysisSchema = z.object({
   tone: z.enum(["flirty", "witty", "confident", "thoughtful"]),
+  goal: z.enum(["first_impression", "keep_going", "ask_out", "revive"]).optional(),
   screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).max(3).optional(),
   conversationText: z.string().max(5000).optional(),
   enm: z.boolean().optional(),
 }).refine(data => (data.screenshots && data.screenshots.length > 0) || (data.conversationText && data.conversationText.trim().length > 0), {
   message: "Either screenshots or conversation text is required"
+});
+
+const ocrSchema = z.object({
+  screenshot: z.string().max(MAX_SCREENSHOT_SIZE),
 });
 
 const checkoutSchema = z.object({
@@ -199,6 +209,46 @@ export async function registerRoutes(
     }
   });
 
+  // OCR endpoint to extract text from chat screenshots
+  app.post("/api/ocr", requireAuth, async (req: any, res) => {
+    try {
+      const parseResult = ocrSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: parseResult.error.flatten() 
+        });
+      }
+      const { screenshot } = parseResult.data;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Extract all text from this dating app chat screenshot. Format the conversation clearly, showing who said what if distinguishable. Return ONLY the extracted text, no additional commentary.`
+              },
+              {
+                type: "image_url",
+                image_url: { url: screenshot }
+              }
+            ]
+          }
+        ],
+        max_tokens: 2000,
+      });
+
+      const extractedText = response.choices[0]?.message?.content || "";
+      res.json({ text: extractedText });
+    } catch (error) {
+      console.error("OCR error:", error);
+      res.status(500).json({ error: "Failed to extract text from image" });
+    }
+  });
+
   app.post("/api/analyze-reply", requireAuth, async (req: any, res) => {
     try {
       const parseResult = replyAnalysisSchema.safeParse(req.body);
@@ -208,7 +258,7 @@ export async function registerRoutes(
           details: parseResult.error.flatten() 
         });
       }
-      const { tone, screenshots, conversationText, enm } = parseResult.data;
+      const { tone, goal, screenshots, conversationText, enm } = parseResult.data;
       const userId = req.session.userId;
 
       const subscription = await storage.getUserSubscription(userId);
@@ -236,7 +286,15 @@ export async function registerRoutes(
       - Appeal to people who understand ethical non-monogamy
       ` : '';
 
-      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation and generate 3 reply suggestions with a ${tone} tone.${enmContext}
+      const goalContextMap: Record<string, string> = {
+        first_impression: "This is a first message/impression. Focus on making a memorable opener that stands out and invites a response.",
+        keep_going: "The conversation is going well. Keep the momentum with engaging follow-ups that deepen the connection.",
+        ask_out: "The goal is to smoothly transition to asking them out. Be confident but not pushy, and suggest a specific date idea.",
+        revive: "This is a dead/stale conversation. Create a creative re-opener that acknowledges the gap and rekindles interest.",
+      };
+      const goalContext = goal ? `\n\nCONVERSATION GOAL: ${goalContextMap[goal] || ''}` : '';
+
+      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation and generate 3 reply suggestions with a ${tone} tone.${enmContext}${goalContext}
       
       Consider:
       - The conversation flow and context
