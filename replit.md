@@ -114,3 +114,13 @@ Preferred communication style: Simple, everyday language.
 - Gender options: "Man", "Woman", "Non-binary"
 - Intent options: "Relationship", "Casual Dating", "Friendship", "Not Sure"
 - Tone options: "flirty", "witty", "confident", "thoughtful"
+- Goal options: "first_impression", "keep_going", "ask_out", "revive"
+
+### Reply Assistant Features (January 2025)
+- **Screenshot OCR**: Users can upload chat screenshots; GPT-4o vision extracts text automatically
+  - Endpoint: `POST /api/ocr` with `screenshot` (base64 image)
+  - Returns extracted conversation text for editing before analysis
+- **Goal Selector**: Dropdown to specify conversation intent
+  - Options: First Impression, Keep Conversation Going, Ask Them Out, Revive Dead Chat
+  - Goal context is passed to AI prompt for more relevant suggestions
+- **Updated UI**: Camera icon in textarea for screenshot upload, "Private & Secure" badge near upload area
