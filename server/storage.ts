@@ -56,6 +56,22 @@ export interface IStorage {
   incrementPromoRedemptions(id: number): Promise<void>;
   hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean>;
   createPromoRedemption(userId: string, promoCodeId: number): Promise<PromoRedemption>;
+
+  getAdminStats(): Promise<{
+    totalUsers: number;
+    freeUsers: number;
+    paidUsers: number;
+    paidUserDetails: Array<{
+      id: string;
+      email: string;
+      planType: string | null;
+      status: string | null;
+      priceId: string | null;
+      amount: number | null;
+      currency: string | null;
+      oneTimeCredits: number | null;
+    }>;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -290,6 +306,84 @@ export class DatabaseStorage implements IStorage {
       promoCodeId,
     }).returning();
     return redemption;
+  }
+
+  async getAdminStats(): Promise<{
+    totalUsers: number;
+    freeUsers: number;
+    paidUsers: number;
+    paidUserDetails: Array<{
+      id: string;
+      email: string;
+      planType: string | null;
+      status: string | null;
+      priceId: string | null;
+      amount: number | null;
+      currency: string | null;
+      oneTimeCredits: number | null;
+    }>;
+  }> {
+    // Get total users
+    const allUsers = await db.select({ id: users.id, email: users.email }).from(users);
+    const totalUsers = allUsers.length;
+
+    // Get all subscriptions with user info
+    const subsResult = await db.execute(
+      sql`
+        SELECT 
+          u.id,
+          u.email,
+          us.plan_type,
+          us.status,
+          us.stripe_price_id,
+          us.one_time_credits,
+          p.unit_amount,
+          p.currency
+        FROM users u
+        LEFT JOIN user_subscriptions us ON us.user_id = u.id
+        LEFT JOIN stripe.prices p ON p.id = us.stripe_price_id
+        ORDER BY u.created_at DESC
+      `
+    );
+
+    const paidUserDetails: Array<{
+      id: string;
+      email: string;
+      planType: string | null;
+      status: string | null;
+      priceId: string | null;
+      amount: number | null;
+      currency: string | null;
+      oneTimeCredits: number | null;
+    }> = [];
+
+    let paidUsers = 0;
+
+    for (const row of subsResult.rows as any[]) {
+      const hasActiveSubscription = row.status === 'active';
+      const hasCredits = (row.one_time_credits || 0) > 0;
+      
+      if (hasActiveSubscription || hasCredits) {
+        paidUsers++;
+        paidUserDetails.push({
+          id: row.id,
+          email: row.email,
+          planType: row.plan_type,
+          status: row.status,
+          priceId: row.stripe_price_id,
+          amount: row.unit_amount ? Number(row.unit_amount) : null,
+          currency: row.currency,
+          oneTimeCredits: row.one_time_credits,
+        });
+      }
+    }
+
+    return {
+      totalUsers,
+      freeUsers: totalUsers - paidUsers,
+      paidUsers,
+      paidUserDetails,
+    };
   }
 }
 

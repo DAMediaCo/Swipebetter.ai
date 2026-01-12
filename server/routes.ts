@@ -730,6 +730,16 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/admin/user-stats", requireAdmin, async (req, res) => {
+    try {
+      const stats = await storage.getAdminStats();
+      res.json(stats);
+    } catch (error) {
+      console.error("Get admin stats error:", error);
+      res.status(500).json({ error: "Failed to get user statistics" });
+    }
+  });
+
   app.post("/api/redeem-promo", requireAuth, async (req: any, res) => {
     try {
       const { code } = req.body;
