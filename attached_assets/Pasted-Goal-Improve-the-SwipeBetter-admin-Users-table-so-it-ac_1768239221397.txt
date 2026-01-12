@@ -1,0 +1,93 @@
+Goal: Improve the SwipeBetter admin “Users” table so it accurately represents billing vs free credits, adds Date Joined, and upgrades the admin UX for clearer operations. Right now users who were granted free credits are being shown as “Paid.” Fix this and improve the admin view.
+
+Requirements (do all):
+
+1) Data model and logic
+- Stop using “Type” to infer payment.
+- Introduce these explicit fields for each user (computed if needed):
+  - billingStatus: one of ["free","trial","subscription","one_time","comped","refunded","chargeback"]
+  - creditsSource: one of ["none","purchased","trial","promo","admin_grant","referral","migration"]
+  - creditsTotal (int)
+  - creditsUsed (int)
+  - creditsRemaining (int) = creditsTotal - creditsUsed
+  - lifetimeSpendCents (int)
+  - lastPaymentAt (datetime|null)
+  - lastActiveAt (datetime|null)
+  - createdAt (datetime)  // Date Joined
+
+- Define billingStatus rules (compute per user):
+  - subscription: has active subscription in Stripe (or our billing table)
+  - one_time: has at least one successful payment but no active subscription
+  - refunded: last transaction is a full refund OR user has refund flag true
+  - chargeback: any dispute/chargeback flag true
+  - trial: lifetimeSpendCents == 0 AND creditsSource == "trial"
+  - comped: lifetimeSpendCents == 0 AND creditsRemaining > 0 AND creditsSource in ["admin_grant","promo","referral","migration"]
+  - free: lifetimeSpendCents == 0 AND creditsRemaining == 0 AND creditsSource in ["none"]
+
+- Never label comped/promo/trial users as “Paid.” “Paid” is NOT a user type. Payment is derived from billingStatus.
+
+2) UI changes (admin table)
+- Replace current columns with:
+  Email | Date Joined | Billing | Credits (Remaining/Total) | Credits Source | User State | Lifetime Spend | Last Active | Actions
+
+- Remove “Plan: Unknown.” No “Unknown” labels. Use “None” where applicable.
+
+- Date Joined:
+  - Display createdAt as a readable date (example: Jan 8, 2026)
+  - Optional secondary text: relative time (example: 4 days ago)
+  - Make it sortable (newest first)
+
+- User State values derived from createdAt + lastActiveAt + creditsUsed:
+  - If createdAt <= 24 hours AND lastActiveAt is null AND creditsUsed == 0: "New User"
+  - Else if lastActiveAt is same calendar day: "Active Today"
+  - Else if lastActiveAt <= 7 days: "Active This Week"
+  - Else if lastActiveAt > 7 and <= 30 days: "Dormant 7+ Days"
+  - Else if lastActiveAt > 30 days: "Dormant 30+ Days"
+  - Else if lastActiveAt is null and creditsUsed == 0 and createdAt > 24 hours: "Never Used"
+
+  NOTE: Do not label someone “Dormant” if they joined less than 7 days ago. Use "New User" or "Never Used" appropriately.
+
+- Badges:
+  - Billing badge colors:
+    - subscription/one_time = green
+    - trial/comped = blue or muted
+    - refunded/chargeback = red
+    - free = gray
+  - Credits Source badge shown next to Credits.
+  - If creditsRemaining == 0, visually de-emphasize the credits text.
+
+- Add quick filters above table:
+  - Revenue Users (subscription + one_time)
+  - Comped/Promo Users (comped OR creditsSource in ["promo","admin_grant","referral","migration"])
+  - Never Converted (lifetimeSpendCents == 0)
+  - Active Last 7 Days
+  - Has Credits (creditsRemaining > 0)
+  - New Users (createdAt <= 24 hours)
+
+- Add search by email.
+
+3) Backend/API
+- Update the admin users endpoint to return the new fields above.
+- If we currently store only “type” and “plan”, keep them for backward compatibility but stop using them in the admin UI.
+- If Stripe is used:
+  - Add a small service function that maps Stripe customer/subscription/payment history into:
+    billingStatus, lifetimeSpendCents, lastPaymentAt
+  - Cache results in DB so the admin table loads fast (do NOT call Stripe on every page render).
+- Ensure sorting works for:
+  - createdAt desc (Date Joined)
+  - lastActiveAt desc
+  - lifetimeSpendCents desc
+  - creditsRemaining desc
+
+4) Deliverables
+- Implement schema changes (migration if using SQL) OR add computed fields safely if a migration is too risky right now.
+- Update admin table UI component to the new layout with badges, filters, search, and sorting.
+- Include brief notes in code comments explaining why billingStatus is separate from creditsSource, and why Date Joined is included.
+- Provide the exact files changed and what changed in each.
+
+Constraints
+- Keep the page clean and mobile-friendly.
+- Do not add new dependencies unless necessary.
+- Maintain good performance for admin list loads.
+
+Now make the changes in the codebase accordingly.

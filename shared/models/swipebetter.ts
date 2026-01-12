@@ -28,6 +28,14 @@ export const replyAnalyses = pgTable("reply_analyses", {
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
+// creditsSource tracks where credits came from:
+// - "none": No credits granted
+// - "purchased": Credits from a one-time purchase
+// - "trial": Trial credits (legacy)
+// - "promo": Credits from promo code redemption
+// - "admin_grant": Manually granted by admin
+// - "referral": Credits from referral program
+// - "migration": Credits migrated from old system
 export const userSubscriptions = pgTable("user_subscriptions", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -39,6 +47,9 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   status: text("status").default("inactive"),
   freeAnalysesUsed: integer("free_analyses_used").default(0),
   oneTimeCredits: integer("one_time_credits").default(0),
+  creditsSource: text("credits_source").default("none"),
+  lifetimeSpendCents: integer("lifetime_spend_cents").default(0),
+  lastPaymentAt: timestamp("last_payment_at"),
   currentPeriodEnd: timestamp("current_period_end"),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
