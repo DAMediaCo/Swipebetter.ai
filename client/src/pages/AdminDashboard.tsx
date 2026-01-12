@@ -13,13 +13,15 @@ import {
   LogOut, 
   Ticket,
   DollarSign,
-  CreditCard
+  CreditCard,
+  Gift
 } from "lucide-react";
 
 interface UserStats {
   totalUsers: number;
   freeUsers: number;
   paidUsers: number;
+  freeCreditsUsers: number;
   userDetails: Array<{
     id: string;
     email: string;
@@ -30,6 +32,7 @@ interface UserStats {
     currency: string | null;
     oneTimeCredits: number | null;
     isPaid: boolean;
+    hasFreeCredits: boolean;
   }>;
 }
 
@@ -112,7 +115,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -137,6 +140,20 @@ export default function AdminDashboard() {
             <CardContent>
               <div className="text-3xl font-bold text-green-600" data-testid="text-paid-users">
                 {stats?.paidUsers || 0}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2 pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Free Credits
+              </CardTitle>
+              <Gift className="w-5 h-5 text-amber-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-amber-600" data-testid="text-free-credits-users">
+                {stats?.freeCreditsUsers || 0}
               </div>
             </CardContent>
           </Card>
@@ -189,9 +206,9 @@ export default function AdminDashboard() {
                         <td className="py-3 px-2">
                           <Badge 
                             variant={user.isPaid ? 'default' : 'secondary'}
-                            className={user.isPaid ? 'bg-green-100 text-green-700 border-green-200' : ''}
+                            className={user.isPaid ? 'bg-green-100 text-green-700 border-green-200' : user.hasFreeCredits ? 'bg-amber-100 text-amber-700 border-amber-200' : ''}
                           >
-                            {user.isPaid ? 'Paid' : 'Free'}
+                            {user.isPaid ? 'Paid' : user.hasFreeCredits ? 'Free Credits' : 'Free'}
                           </Badge>
                         </td>
                         <td className="py-3 px-2">

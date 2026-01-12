@@ -61,6 +61,7 @@ export interface IStorage {
     totalUsers: number;
     freeUsers: number;
     paidUsers: number;
+    freeCreditsUsers: number;
     userDetails: Array<{
       id: string;
       email: string;
@@ -71,6 +72,7 @@ export interface IStorage {
       currency: string | null;
       oneTimeCredits: number | null;
       isPaid: boolean;
+      hasFreeCredits: boolean;
     }>;
   }>;
 }
@@ -313,6 +315,7 @@ export class DatabaseStorage implements IStorage {
     totalUsers: number;
     freeUsers: number;
     paidUsers: number;
+    freeCreditsUsers: number;
     userDetails: Array<{
       id: string;
       email: string;
@@ -323,6 +326,7 @@ export class DatabaseStorage implements IStorage {
       currency: string | null;
       oneTimeCredits: number | null;
       isPaid: boolean;
+      hasFreeCredits: boolean;
     }>;
   }> {
     // Get all subscriptions with user info
@@ -354,17 +358,22 @@ export class DatabaseStorage implements IStorage {
       currency: string | null;
       oneTimeCredits: number | null;
       isPaid: boolean;
+      hasFreeCredits: boolean;
     }> = [];
 
     let paidUsers = 0;
+    let freeCreditsUsers = 0;
 
     for (const row of subsResult.rows as any[]) {
       const hasActiveSubscription = row.status === 'active';
       const hasCredits = (row.one_time_credits || 0) > 0;
-      const isPaid = hasActiveSubscription || hasCredits;
+      const isPaid = hasActiveSubscription;
+      const hasFreeCredits = hasCredits && !hasActiveSubscription;
       
       if (isPaid) {
         paidUsers++;
+      } else if (hasFreeCredits) {
+        freeCreditsUsers++;
       }
       
       userDetails.push({
@@ -377,6 +386,7 @@ export class DatabaseStorage implements IStorage {
         currency: row.currency,
         oneTimeCredits: row.one_time_credits,
         isPaid,
+        hasFreeCredits,
       });
     }
 
@@ -384,8 +394,9 @@ export class DatabaseStorage implements IStorage {
 
     return {
       totalUsers,
-      freeUsers: totalUsers - paidUsers,
+      freeUsers: totalUsers - paidUsers - freeCreditsUsers,
       paidUsers,
+      freeCreditsUsers,
       userDetails,
     };
   }
