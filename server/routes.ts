@@ -199,6 +199,8 @@ export async function registerRoutes(
         improvements: analysis.improvements,
       });
 
+      await storage.updateLastActiveAt(userId);
+
       res.json({ 
         analysis: savedAnalysis,
         parsed: analysis
@@ -355,6 +357,8 @@ export async function registerRoutes(
         suggestedReplies: analysis.suggestedReplies || [],
         conversationContext: analysis.conversationContext,
       });
+
+      await storage.updateLastActiveAt(userId);
 
       res.json({ 
         analysis: savedAnalysis,

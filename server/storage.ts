@@ -35,8 +35,9 @@ export interface IStorage {
   createUserSubscription(data: InsertUserSubscription): Promise<UserSubscription>;
   updateUserSubscription(userId: string, data: Partial<InsertUserSubscription>): Promise<UserSubscription | undefined>;
   incrementFreeAnalysesUsed(userId: string): Promise<void>;
-  addOneTimeCredits(userId: string, credits: number): Promise<void>;
+  addOneTimeCredits(userId: string, credits: number, source?: string): Promise<void>;
   decrementOneTimeCredits(userId: string): Promise<void>;
+  updateLastActiveAt(userId: string): Promise<void>;
 
   getStripeProduct(productId: string): Promise<any>;
   listProducts(active?: boolean): Promise<any[]>;
@@ -57,22 +58,37 @@ export interface IStorage {
   hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean>;
   createPromoRedemption(userId: string, promoCodeId: number): Promise<PromoRedemption>;
 
+  // billingStatus: derived status for billing classification
+  // - subscription: has active subscription in Stripe
+  // - one_time: has at least one successful payment but no active subscription
+  // - refunded: last transaction is a full refund
+  // - chargeback: any dispute/chargeback flag
+  // - trial: lifetimeSpendCents == 0 AND creditsSource == "trial"
+  // - comped: lifetimeSpendCents == 0 AND creditsRemaining > 0 AND creditsSource in ["admin_grant","promo","referral","migration"]
+  // - free: lifetimeSpendCents == 0 AND creditsRemaining == 0
   getAdminStats(): Promise<{
     totalUsers: number;
-    freeUsers: number;
-    paidUsers: number;
-    freeCreditsUsers: number;
+    stats: {
+      revenueUsers: number;
+      compedUsers: number;
+      neverConverted: number;
+      activeLast7Days: number;
+      hasCredits: number;
+      newUsers: number;
+    };
     userDetails: Array<{
       id: string;
       email: string;
-      planType: string | null;
-      status: string | null;
-      priceId: string | null;
-      amount: number | null;
-      currency: string | null;
-      oneTimeCredits: number | null;
-      isPaid: boolean;
-      hasFreeCredits: boolean;
+      createdAt: string;
+      lastActiveAt: string | null;
+      billingStatus: 'subscription' | 'one_time' | 'refunded' | 'chargeback' | 'trial' | 'comped' | 'free';
+      creditsSource: string;
+      creditsTotal: number;
+      creditsUsed: number;
+      creditsRemaining: number;
+      lifetimeSpendCents: number;
+      lastPaymentAt: string | null;
+      userState: 'New User' | 'Active Today' | 'Active This Week' | 'Dormant 7+ Days' | 'Dormant 30+ Days' | 'Never Used';
     }>;
   }>;
 }
@@ -144,19 +160,26 @@ export class DatabaseStorage implements IStorage {
       .where(eq(userSubscriptions.userId, userId));
   }
 
-  async addOneTimeCredits(userId: string, credits: number): Promise<void> {
+  async addOneTimeCredits(userId: string, credits: number, source: string = 'promo'): Promise<void> {
     const existing = await this.getUserSubscription(userId);
     if (existing) {
       const currentCredits = existing.oneTimeCredits || 0;
       await db.update(userSubscriptions)
         .set({ 
           oneTimeCredits: currentCredits + credits,
+          creditsSource: source,
           updatedAt: new Date()
         })
         .where(eq(userSubscriptions.userId, userId));
     } else {
-      await this.createUserSubscription({ userId, oneTimeCredits: credits });
+      await this.createUserSubscription({ userId, oneTimeCredits: credits, creditsSource: source });
     }
+  }
+
+  async updateLastActiveAt(userId: string): Promise<void> {
+    await db.update(users)
+      .set({ lastActiveAt: new Date(), updatedAt: new Date() })
+      .where(eq(users.id, userId));
   }
 
   async decrementOneTimeCredits(userId: string): Promise<void> {
@@ -313,90 +336,178 @@ export class DatabaseStorage implements IStorage {
 
   async getAdminStats(): Promise<{
     totalUsers: number;
-    freeUsers: number;
-    paidUsers: number;
-    freeCreditsUsers: number;
+    stats: {
+      revenueUsers: number;
+      compedUsers: number;
+      neverConverted: number;
+      activeLast7Days: number;
+      hasCredits: number;
+      newUsers: number;
+    };
     userDetails: Array<{
       id: string;
       email: string;
-      planType: string | null;
-      status: string | null;
-      priceId: string | null;
-      amount: number | null;
-      currency: string | null;
-      oneTimeCredits: number | null;
-      isPaid: boolean;
-      hasFreeCredits: boolean;
+      createdAt: string;
+      lastActiveAt: string | null;
+      billingStatus: 'subscription' | 'one_time' | 'refunded' | 'chargeback' | 'trial' | 'comped' | 'free';
+      creditsSource: string;
+      creditsTotal: number;
+      creditsUsed: number;
+      creditsRemaining: number;
+      lifetimeSpendCents: number;
+      lastPaymentAt: string | null;
+      userState: 'New User' | 'Active Today' | 'Active This Week' | 'Dormant 7+ Days' | 'Dormant 30+ Days' | 'Never Used';
     }>;
   }> {
-    // Get all subscriptions with user info
-    const subsResult = await db.execute(
+    // Get all users with subscription info and analysis counts
+    const result = await db.execute(
       sql`
         SELECT 
           u.id,
           u.email,
-          us.plan_type,
+          u.created_at,
+          u.last_active_at,
           us.status,
-          us.stripe_price_id,
           us.one_time_credits,
-          p.unit_amount,
-          p.currency
+          us.credits_source,
+          us.lifetime_spend_cents,
+          us.last_payment_at,
+          us.free_analyses_used,
+          COALESCE((SELECT COUNT(*) FROM profile_analyses pa WHERE pa.user_id = u.id), 0) as profile_count,
+          COALESCE((SELECT COUNT(*) FROM reply_analyses ra WHERE ra.user_id = u.id), 0) as reply_count
         FROM users u
         LEFT JOIN user_subscriptions us ON us.user_id = u.id
-        LEFT JOIN stripe.prices p ON p.id = us.stripe_price_id
         ORDER BY u.created_at DESC
       `
     );
 
-    const userDetails: Array<{
+    const now = new Date();
+    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    type UserDetail = {
       id: string;
       email: string;
-      planType: string | null;
-      status: string | null;
-      priceId: string | null;
-      amount: number | null;
-      currency: string | null;
-      oneTimeCredits: number | null;
-      isPaid: boolean;
-      hasFreeCredits: boolean;
-    }> = [];
+      createdAt: string;
+      lastActiveAt: string | null;
+      billingStatus: 'subscription' | 'one_time' | 'refunded' | 'chargeback' | 'trial' | 'comped' | 'free';
+      creditsSource: string;
+      creditsTotal: number;
+      creditsUsed: number;
+      creditsRemaining: number;
+      lifetimeSpendCents: number;
+      lastPaymentAt: string | null;
+      userState: 'New User' | 'Active Today' | 'Active This Week' | 'Dormant 7+ Days' | 'Dormant 30+ Days' | 'Never Used';
+    };
 
-    let paidUsers = 0;
-    let freeCreditsUsers = 0;
+    const userDetails: UserDetail[] = [];
+    let revenueUsers = 0;
+    let compedUsers = 0;
+    let neverConverted = 0;
+    let activeLast7Days = 0;
+    let hasCreditsCount = 0;
+    let newUsers = 0;
 
-    for (const row of subsResult.rows as any[]) {
+    for (const row of result.rows as any[]) {
+      const createdAt = new Date(row.created_at);
+      const lastActiveAt = row.last_active_at ? new Date(row.last_active_at) : null;
+      const creditsUsed = Number(row.profile_count || 0) + Number(row.reply_count || 0);
+      const creditsTotal = (row.one_time_credits || 0) + creditsUsed;
+      const creditsRemaining = row.one_time_credits || 0;
+      const lifetimeSpendCents = row.lifetime_spend_cents || 0;
+      const creditsSource = row.credits_source || 'none';
       const hasActiveSubscription = row.status === 'active';
-      const hasCredits = (row.one_time_credits || 0) > 0;
-      const isPaid = hasActiveSubscription;
-      const hasFreeCredits = hasCredits && !hasActiveSubscription;
       
-      if (isPaid) {
-        paidUsers++;
-      } else if (hasFreeCredits) {
-        freeCreditsUsers++;
+      // Compute billingStatus
+      let billingStatus: UserDetail['billingStatus'];
+      if (hasActiveSubscription) {
+        billingStatus = 'subscription';
+      } else if (lifetimeSpendCents > 0) {
+        billingStatus = 'one_time';
+      } else if (creditsSource === 'trial') {
+        billingStatus = 'trial';
+      } else if (creditsRemaining > 0 && ['admin_grant', 'promo', 'referral', 'migration'].includes(creditsSource)) {
+        billingStatus = 'comped';
+      } else {
+        billingStatus = 'free';
+      }
+      
+      // Compute userState based on createdAt, lastActiveAt, creditsUsed
+      let userState: UserDetail['userState'];
+      const isNewUser = createdAt > oneDayAgo;
+      
+      if (isNewUser && !lastActiveAt && creditsUsed === 0) {
+        userState = 'New User';
+      } else if (lastActiveAt) {
+        const today = new Date();
+        const isSameDay = lastActiveAt.toDateString() === today.toDateString();
+        if (isSameDay) {
+          userState = 'Active Today';
+        } else if (lastActiveAt > sevenDaysAgo) {
+          userState = 'Active This Week';
+        } else if (lastActiveAt > thirtyDaysAgo) {
+          userState = 'Dormant 7+ Days';
+        } else {
+          userState = 'Dormant 30+ Days';
+        }
+      } else if (creditsUsed === 0 && !isNewUser) {
+        userState = 'Never Used';
+      } else {
+        userState = 'Never Used';
+      }
+      
+      // Count stats
+      // Revenue users are those with active subscriptions or one-time payments
+      const isRevenueUser = billingStatus === 'subscription' || billingStatus === 'one_time';
+      if (isRevenueUser) {
+        revenueUsers++;
+      }
+      // Comped users have free credits from promo/admin/referral sources
+      if (billingStatus === 'comped' || ['promo', 'admin_grant', 'referral', 'migration'].includes(creditsSource)) {
+        compedUsers++;
+      }
+      // Never converted: users who haven't paid AND don't have active subscriptions
+      // This excludes revenue users since they have "converted" even if lifetimeSpendCents isn't populated yet
+      if (!isRevenueUser && lifetimeSpendCents === 0) {
+        neverConverted++;
+      }
+      if (lastActiveAt && lastActiveAt > sevenDaysAgo) {
+        activeLast7Days++;
+      }
+      if (creditsRemaining > 0) {
+        hasCreditsCount++;
+      }
+      if (isNewUser) {
+        newUsers++;
       }
       
       userDetails.push({
         id: row.id,
         email: row.email,
-        planType: row.plan_type,
-        status: row.status,
-        priceId: row.stripe_price_id,
-        amount: row.unit_amount ? Number(row.unit_amount) : null,
-        currency: row.currency,
-        oneTimeCredits: row.one_time_credits,
-        isPaid,
-        hasFreeCredits,
+        createdAt: createdAt.toISOString(),
+        lastActiveAt: lastActiveAt ? lastActiveAt.toISOString() : null,
+        billingStatus,
+        creditsSource,
+        creditsTotal,
+        creditsUsed,
+        creditsRemaining,
+        lifetimeSpendCents,
+        lastPaymentAt: row.last_payment_at ? new Date(row.last_payment_at).toISOString() : null,
+        userState,
       });
     }
 
-    const totalUsers = userDetails.length;
-
     return {
-      totalUsers,
-      freeUsers: totalUsers - paidUsers - freeCreditsUsers,
-      paidUsers,
-      freeCreditsUsers,
+      totalUsers: userDetails.length,
+      stats: {
+        revenueUsers,
+        compedUsers,
+        neverConverted,
+        activeLast7Days,
+        hasCredits: hasCreditsCount,
+        newUsers,
+      },
       userDetails,
     };
   }

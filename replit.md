@@ -124,3 +124,32 @@ Preferred communication style: Simple, everyday language.
   - Options: First Impression, Keep Conversation Going, Ask Them Out, Revive Dead Chat
   - Goal context is passed to AI prompt for more relevant suggestions
 - **Updated UI**: Camera icon in textarea for screenshot upload, "Private & Secure" badge near upload area
+
+### Admin Dashboard Overhaul (January 2025)
+- **Route**: `/admin/dashboard` (protected by admin auth)
+- **Schema Updates**:
+  - `users.lastActiveAt` - Tracks when user last performed an analysis
+  - `userSubscriptions.creditsSource` - Tracks origin of credits (none, purchased, trial, promo, admin_grant, referral, migration)
+  - `userSubscriptions.lifetimeSpendCents` - Tracks total spend (for future Stripe sync)
+  - `userSubscriptions.lastPaymentAt` - Tracks last payment timestamp
+
+- **Billing Status Classification** (computed, not stored):
+  - `subscription` - Has active Stripe subscription
+  - `one_time` - Has payment but no active subscription
+  - `trial` - No spend, credits from trial
+  - `comped` - No spend, has credits from promo/admin/referral/migration
+  - `free` - No spend, no credits
+
+- **User State Classification** (computed from lastActiveAt and createdAt):
+  - `New User` - Created in last 24 hours, no activity
+  - `Active Today` - Last active today
+  - `Active This Week` - Last active in 7 days
+  - `Dormant 7+ Days` - Inactive 7-30 days
+  - `Dormant 30+ Days` - Inactive 30+ days
+  - `Never Used` - Never performed an analysis
+
+- **Admin Table Columns**: Email, Date Joined, Billing, Credits (Remaining/Total), Credits Source, User State, Lifetime Spend, Last Active
+
+- **Quick Filters**: All Users, Revenue, Comped/Promo, Never Converted, Active 7 Days, Has Credits, New Users
+
+- **Features**: Email search, sortable columns (Date Joined, Credits, Lifetime Spend, Last Active)
