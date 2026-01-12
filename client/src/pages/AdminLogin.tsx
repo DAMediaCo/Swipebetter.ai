@@ -23,7 +23,7 @@ export default function AdminLogin() {
       const response = await apiRequest("POST", "/api/admin/login", { email, password });
       
       if (response.ok) {
-        setLocation("/admin/promo-codes");
+        setLocation("/admin/dashboard");
       } else {
         const data = await response.json();
         toast({

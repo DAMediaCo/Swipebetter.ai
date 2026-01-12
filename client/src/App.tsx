@@ -29,6 +29,7 @@ import TinderPhotoOrder from "@/pages/TinderPhotoOrder";
 import WhatToTextAfterMatching from "@/pages/WhatToTextAfterMatching";
 import ReviveDeadConversation from "@/pages/ReviveDeadConversation";
 import AdminLogin from "@/pages/AdminLogin";
+import AdminDashboard from "@/pages/AdminDashboard";
 import AdminPromoCodes from "@/pages/AdminPromoCodes";
 import RedeemPromo from "@/pages/RedeemPromo";
 import TermsOfService from "@/pages/TermsOfService";
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/what-to-text-after-matching" component={WhatToTextAfterMatching} />
       <Route path="/revive-dead-conversation" component={ReviveDeadConversation} />
       <Route path="/admin" component={AdminLogin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/promo-codes" component={AdminPromoCodes} />
       <Route path="/redeem" component={RedeemPromo} />
       <Route path="/terms" component={TermsOfService} />

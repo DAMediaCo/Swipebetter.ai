@@ -148,6 +148,11 @@ export default function AdminPromoCodes() {
             <Ticket className="w-8 h-8 text-primary" />
             <h1 className="text-2xl font-bold">Promo Codes</h1>
           </div>
+          <Link href="/admin/dashboard">
+            <Button variant="outline" data-testid="button-back-dashboard">
+              Back to Dashboard
+            </Button>
+          </Link>
           <Button variant="outline" onClick={handleLogout} data-testid="button-admin-logout">
             <LogOut className="w-4 h-4 mr-2" />
             Logout
