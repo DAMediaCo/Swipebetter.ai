@@ -61,7 +61,7 @@ export interface IStorage {
     totalUsers: number;
     freeUsers: number;
     paidUsers: number;
-    paidUserDetails: Array<{
+    userDetails: Array<{
       id: string;
       email: string;
       planType: string | null;
@@ -70,6 +70,7 @@ export interface IStorage {
       amount: number | null;
       currency: string | null;
       oneTimeCredits: number | null;
+      isPaid: boolean;
     }>;
   }>;
 }
@@ -312,7 +313,7 @@ export class DatabaseStorage implements IStorage {
     totalUsers: number;
     freeUsers: number;
     paidUsers: number;
-    paidUserDetails: Array<{
+    userDetails: Array<{
       id: string;
       email: string;
       planType: string | null;
@@ -321,12 +322,9 @@ export class DatabaseStorage implements IStorage {
       amount: number | null;
       currency: string | null;
       oneTimeCredits: number | null;
+      isPaid: boolean;
     }>;
   }> {
-    // Get total users
-    const allUsers = await db.select({ id: users.id, email: users.email }).from(users);
-    const totalUsers = allUsers.length;
-
     // Get all subscriptions with user info
     const subsResult = await db.execute(
       sql`
@@ -346,7 +344,7 @@ export class DatabaseStorage implements IStorage {
       `
     );
 
-    const paidUserDetails: Array<{
+    const userDetails: Array<{
       id: string;
       email: string;
       planType: string | null;
@@ -355,6 +353,7 @@ export class DatabaseStorage implements IStorage {
       amount: number | null;
       currency: string | null;
       oneTimeCredits: number | null;
+      isPaid: boolean;
     }> = [];
 
     let paidUsers = 0;
@@ -362,27 +361,32 @@ export class DatabaseStorage implements IStorage {
     for (const row of subsResult.rows as any[]) {
       const hasActiveSubscription = row.status === 'active';
       const hasCredits = (row.one_time_credits || 0) > 0;
+      const isPaid = hasActiveSubscription || hasCredits;
       
-      if (hasActiveSubscription || hasCredits) {
+      if (isPaid) {
         paidUsers++;
-        paidUserDetails.push({
-          id: row.id,
-          email: row.email,
-          planType: row.plan_type,
-          status: row.status,
-          priceId: row.stripe_price_id,
-          amount: row.unit_amount ? Number(row.unit_amount) : null,
-          currency: row.currency,
-          oneTimeCredits: row.one_time_credits,
-        });
       }
+      
+      userDetails.push({
+        id: row.id,
+        email: row.email,
+        planType: row.plan_type,
+        status: row.status,
+        priceId: row.stripe_price_id,
+        amount: row.unit_amount ? Number(row.unit_amount) : null,
+        currency: row.currency,
+        oneTimeCredits: row.one_time_credits,
+        isPaid,
+      });
     }
+
+    const totalUsers = userDetails.length;
 
     return {
       totalUsers,
       freeUsers: totalUsers - paidUsers,
       paidUsers,
-      paidUserDetails,
+      userDetails,
     };
   }
 }

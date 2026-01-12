@@ -20,7 +20,7 @@ interface UserStats {
   totalUsers: number;
   freeUsers: number;
   paidUsers: number;
-  paidUserDetails: Array<{
+  userDetails: Array<{
     id: string;
     email: string;
     planType: string | null;
@@ -29,6 +29,7 @@ interface UserStats {
     amount: number | null;
     currency: string | null;
     oneTimeCredits: number | null;
+    isPaid: boolean;
   }>;
 }
 
@@ -159,13 +160,13 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <CreditCard className="w-5 h-5" />
-              Paid Users Details
+              Users Details
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {!stats?.paidUserDetails || stats.paidUserDetails.length === 0 ? (
+            {!stats?.userDetails || stats.userDetails.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
-                No paid users yet.
+                No users yet.
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -173,16 +174,25 @@ export default function AdminDashboard() {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-3 px-2 font-medium text-muted-foreground">Email</th>
+                      <th className="text-left py-3 px-2 font-medium text-muted-foreground">Type</th>
                       <th className="text-left py-3 px-2 font-medium text-muted-foreground">Plan</th>
                       <th className="text-left py-3 px-2 font-medium text-muted-foreground">Status</th>
                       <th className="text-right py-3 px-2 font-medium text-muted-foreground">Amount</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {stats.paidUserDetails.map((user) => (
+                    {stats.userDetails.map((user) => (
                       <tr key={user.id} className="border-b last:border-0" data-testid={`row-user-${user.id}`}>
                         <td className="py-3 px-2">
                           <span className="text-sm">{user.email}</span>
+                        </td>
+                        <td className="py-3 px-2">
+                          <Badge 
+                            variant={user.isPaid ? 'default' : 'secondary'}
+                            className={user.isPaid ? 'bg-green-100 text-green-700 border-green-200' : ''}
+                          >
+                            {user.isPaid ? 'Paid' : 'Free'}
+                          </Badge>
                         </td>
                         <td className="py-3 px-2">
                           <Badge variant="outline">
@@ -194,13 +204,19 @@ export default function AdminDashboard() {
                             variant={user.status === 'active' ? 'default' : 'secondary'}
                             className={user.status === 'active' ? 'bg-green-100 text-green-700 border-green-200' : ''}
                           >
-                            {user.status || (user.oneTimeCredits ? 'Credits' : 'Inactive')}
+                            {user.status || (user.oneTimeCredits ? 'Credits' : 'None')}
                           </Badge>
                         </td>
                         <td className="py-3 px-2 text-right">
                           <span className="flex items-center justify-end gap-1">
-                            <DollarSign className="w-3 h-3 text-muted-foreground" />
-                            {formatAmount(user.amount, user.currency)}
+                            {user.amount ? (
+                              <>
+                                <DollarSign className="w-3 h-3 text-muted-foreground" />
+                                {formatAmount(user.amount, user.currency)}
+                              </>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
                           </span>
                         </td>
                       </tr>
