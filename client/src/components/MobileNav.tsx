@@ -1,9 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { Home, Wrench, CreditCard } from "lucide-react";
+import { Home, Wrench } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
-  { href: "/pricing", icon: CreditCard, label: "Pricing" },
   { href: "/dashboard", icon: Wrench, label: "Dashboard" },
 ];
 

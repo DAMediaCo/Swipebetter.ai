@@ -8,7 +8,7 @@ Use this prompt to create a React Native mobile app that connects to an existing
 
 SwipeBetter is a dating profile improvement app that uses AI to help users optimize their dating profiles and craft better conversation replies. The mobile app should connect to an existing backend API.
 
-**Backend API Base URL**: `https://swipebetter-ai.replit.app` (update with your actual deployed URL)
+**Backend API Base URL**: `https://swipebetter.replit.app` (update with your actual deployed URL)
 
 ---
 

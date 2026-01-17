@@ -59,8 +59,8 @@ export default function Home() {
         </div>
         
         <div className="relative z-10 max-w-6xl mx-auto w-full">
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="space-y-4 text-center md:text-left">
+          <div className="flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="space-y-4 text-center md:text-left order-1">
               <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center md:justify-start gap-1.5">
                 <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
                 Trusted by 10,000+ Daters
@@ -72,27 +72,27 @@ export default function Home() {
               </Badge>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-                <span className="text-primary">Get More Matches.</span> Say the Right Thing.{" "}
-                Look Better Doing It.
+                Why Aren't You Getting Matches?{" "}
+                <span className="text-primary">Let AI Roast Your Profile.</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-                Stop guessing. Let our AI optimize your photos and bio for Tinder, Hinge, and Bumble.
+                Get brutally honest, data-driven feedback on your bio and photos. Stop guessing and start converting.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
                 <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                   <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
                     <Camera className="w-5 h-5 mr-2" />
-                    Fix My Profile
+                    Analyze My Profile (Free)
                   </Button>
                 </Link>
-                <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
-                  <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-fix-reply-hero">
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    Fix My Reply
+                <a href="#example-feedback">
+                  <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-see-example-hero">
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    See an Example
                   </Button>
-                </Link>
+                </a>
               </div>
               
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
@@ -107,7 +107,7 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="hidden md:flex items-center justify-center">
+            <div className="flex items-center justify-center order-2 md:order-2">
               <div className="relative" role="img" aria-label="Phone mockup showing AI analysis of a dating profile">
                 <div className="w-64 h-[520px] bg-card rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-3 flex flex-col">
                   <div className="w-20 h-5 bg-border rounded-full mx-auto mb-3" />
@@ -135,7 +135,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-7 md:py-10 px-4 bg-muted/30">
+      <section id="example-feedback" className="py-7 md:py-10 px-4 bg-muted/30 scroll-mt-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-5 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Example AI Feedback</h2>
@@ -309,16 +309,16 @@ export default function Home() {
       <section className="py-7 md:py-10 px-4 bg-muted/30">
         <div className="max-w-3xl mx-auto text-center space-y-5">
           <h2 className="text-2xl md:text-3xl font-bold">
-            Ready to improve your matches?
+            Ready to find out why you're not getting matches?
           </h2>
           <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-            Get actionable feedback in under a minute. No account required.
+            Get brutally honest feedback in under a minute. No account required.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
               <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-profile">
                 <Camera className="w-5 h-5 mr-2" />
-                Fix My Profile
+                Analyze My Profile (Free)
               </Button>
             </Link>
             <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
