@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, Smartphone } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, AlertTriangle, XCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
@@ -109,26 +109,42 @@ export default function Home() {
             
             <div className="flex items-center justify-center order-2 md:order-2">
               <div className="relative" role="img" aria-label="Phone mockup showing AI analysis of a dating profile">
-                <div className="w-64 h-[520px] bg-card rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-3 flex flex-col">
+                <div className="w-72 h-[520px] bg-card rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-3 flex flex-col">
                   <div className="w-20 h-5 bg-border rounded-full mx-auto mb-3" />
-                  <div className="flex-1 bg-muted/50 rounded-[1.5rem] flex flex-col items-center justify-center gap-4 p-4">
-                    <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Smartphone className="w-10 h-10 text-primary" />
-                    </div>
-                    <p className="text-sm font-medium text-center">Your Profile Analysis</p>
-                    <div className="w-full space-y-2">
-                      <div className="h-2 bg-primary/30 rounded-full w-full" />
-                      <div className="h-2 bg-primary/20 rounded-full w-4/5" />
-                      <div className="h-2 bg-primary/10 rounded-full w-3/5" />
-                    </div>
-                    <div className="mt-4 text-center">
-                      <div className="text-3xl font-bold text-primary">87/100</div>
+                  <div className="flex-1 bg-muted/50 rounded-[1.5rem] flex flex-col gap-3 p-4 overflow-hidden">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-orange-500">42/100</div>
                       <p className="text-xs text-muted-foreground">Profile Score</p>
+                    </div>
+                    
+                    <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <XCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
+                        <p className="text-sm font-semibold text-orange-600 dark:text-orange-400">Trust Issue Detected</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Your main photo has poor lighting and sunglasses, which lowers trust by 40%. Swap this for a clear headshot.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2 mt-auto">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-3 h-3 text-orange-500" />
+                        <div className="h-2 bg-orange-500/40 rounded-full flex-1" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-3 h-3 text-amber-500" />
+                        <div className="h-2 bg-amber-500/30 rounded-full flex-1" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-green-500" />
+                        <div className="h-2 bg-green-500/30 rounded-full flex-1" />
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-primary/20 rounded-full blur-xl" />
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-accent/30 rounded-full blur-xl" />
+                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-orange-500/20 rounded-full blur-xl" />
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-amber-500/30 rounded-full blur-xl" />
               </div>
             </div>
           </div>
