@@ -166,3 +166,18 @@ Preferred communication style: Simple, everyday language.
   - Locked cards with blur effect for detailed sections
   - "Unlock Full Report & Suggestions" CTA prompts upgrade
 - **Conversion Flow**: Users get hooked by seeing their score, then upgrade to access specific improvements
+
+### Mobile App Support (January 2025)
+- **Architecture**: Separate React Native/Expo app consuming the same backend API
+- **Authentication**: JWT-based auth for mobile, session-based for web (both work in parallel)
+- **Social Login Endpoints**:
+  - `POST /api/auth/apple` - Sign in with Apple (verifies identity token, creates/links accounts)
+  - `POST /api/auth/google` - Sign in with Google (verifies ID token, creates/links accounts)
+  - `POST /api/auth/refresh` - Token refresh for mobile sessions
+- **User Schema Updates**: Added `appleId` and `googleId` columns for social login
+- **Payment Support**: Stripe React Native SDK handles Apple Pay / Google Pay
+- **Environment Variables Required**:
+  - `APPLE_CLIENT_ID` - Apple Services ID for token verification
+  - `GOOGLE_CLIENT_ID` - Google OAuth client ID
+  - `JWT_SECRET` - (optional, defaults to SESSION_SECRET)
+- **API Spec**: See `MOBILE_APP_API_SPEC.md` for complete mobile integration documentation

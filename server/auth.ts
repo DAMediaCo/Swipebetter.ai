@@ -4,8 +4,11 @@ import connectPg from "connect-pg-simple";
 import { db } from "./db";
 import { users, signupSchema, loginSchema, type SafeUser } from "@shared/models/auth";
 import { userSubscriptions, promoCodes, promoRedemptions } from "@shared/models/swipebetter";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, or } from "drizzle-orm";
 import type { Express, RequestHandler } from "express";
+import { signToken } from "./jwt";
+import { OAuth2Client } from "google-auth-library";
+import appleSignin from "apple-signin-auth";
 
 declare module "express-session" {
   interface SessionData {
@@ -230,6 +233,218 @@ export function registerAuthRoutes(app: Express) {
       res.clearCookie("connect.sid");
       res.json({ success: true });
     });
+  });
+
+  // Sign in with Apple (for mobile app)
+  app.post("/api/auth/apple", async (req, res) => {
+    try {
+      const { identityToken, user: appleUser } = req.body;
+      
+      if (!identityToken) {
+        return res.status(400).json({ message: "Missing identity token" });
+      }
+
+      let payload;
+      try {
+        payload = await appleSignin.verifyIdToken(identityToken, {
+          audience: process.env.APPLE_CLIENT_ID,
+          ignoreExpiration: false,
+        });
+      } catch (verifyError) {
+        console.error("Apple token verification failed:", verifyError);
+        return res.status(401).json({ message: "Invalid Apple identity token" });
+      }
+
+      const appleId = payload.sub;
+      const email = payload.email || appleUser?.email;
+      const firstName = appleUser?.name?.firstName || null;
+      const lastName = appleUser?.name?.lastName || null;
+
+      // First, try to find user by appleId (Apple only provides email on first sign-in)
+      let [existingUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.appleId, appleId))
+        .limit(1);
+
+      // If not found by appleId, try by email (if provided)
+      if (!existingUser && email) {
+        [existingUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, email))
+          .limit(1);
+      }
+
+      // If still no user and no email, we can't create a new account
+      if (!existingUser && !email) {
+        return res.status(400).json({ message: "Email is required for new accounts" });
+      }
+
+      if (existingUser) {
+        if (!existingUser.appleId) {
+          await db
+            .update(users)
+            .set({ appleId })
+            .where(eq(users.id, existingUser.id));
+          existingUser.appleId = appleId;
+        }
+      } else {
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            email,
+            appleId,
+            firstName,
+            lastName,
+          })
+          .returning();
+        
+        await db.insert(userSubscriptions).values({
+          userId: newUser.id,
+          freeAnalysesUsed: 0,
+          status: "inactive",
+          oneTimeCredits: 0,
+        });
+        
+        existingUser = newUser;
+      }
+
+      const token = signToken({ userId: existingUser.id, email: existingUser.email });
+      
+      res.json({
+        token,
+        user: sanitizeUser(existingUser),
+      });
+    } catch (error) {
+      console.error("Apple sign in error:", error);
+      res.status(500).json({ message: "Failed to sign in with Apple" });
+    }
+  });
+
+  // Sign in with Google (for mobile app)
+  app.post("/api/auth/google", async (req, res) => {
+    try {
+      const { idToken } = req.body;
+      
+      if (!idToken) {
+        return res.status(400).json({ message: "Missing ID token" });
+      }
+
+      const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      
+      let payload;
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken,
+          audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        payload = ticket.getPayload();
+      } catch (verifyError) {
+        console.error("Google token verification failed:", verifyError);
+        return res.status(401).json({ message: "Invalid Google ID token" });
+      }
+
+      if (!payload) {
+        return res.status(401).json({ message: "Invalid Google ID token" });
+      }
+
+      const googleId = payload.sub;
+      const email = payload.email;
+      const firstName = payload.given_name || null;
+      const lastName = payload.family_name || null;
+      const profileImageUrl = payload.picture || null;
+
+      if (!email) {
+        return res.status(400).json({ message: "Email is required" });
+      }
+
+      let [existingUser] = await db
+        .select()
+        .from(users)
+        .where(or(eq(users.googleId, googleId), eq(users.email, email)))
+        .limit(1);
+
+      if (existingUser) {
+        if (!existingUser.googleId) {
+          await db
+            .update(users)
+            .set({ googleId, profileImageUrl: profileImageUrl || existingUser.profileImageUrl })
+            .where(eq(users.id, existingUser.id));
+          existingUser.googleId = googleId;
+        }
+      } else {
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            email,
+            googleId,
+            firstName,
+            lastName,
+            profileImageUrl,
+          })
+          .returning();
+        
+        await db.insert(userSubscriptions).values({
+          userId: newUser.id,
+          freeAnalysesUsed: 0,
+          status: "inactive",
+          oneTimeCredits: 0,
+        });
+        
+        existingUser = newUser;
+      }
+
+      const token = signToken({ userId: existingUser.id, email: existingUser.email });
+      
+      res.json({
+        token,
+        user: sanitizeUser(existingUser),
+      });
+    } catch (error) {
+      console.error("Google sign in error:", error);
+      res.status(500).json({ message: "Failed to sign in with Google" });
+    }
+  });
+
+  // Token refresh endpoint for mobile
+  app.post("/api/auth/refresh", async (req, res) => {
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Missing authorization header" });
+    }
+    
+    const token = authHeader.substring(7);
+    
+    try {
+      const { verifyToken } = await import("./jwt");
+      const payload = verifyToken(token);
+      
+      if (!payload || !payload.userId) {
+        return res.status(401).json({ message: "Invalid or expired token" });
+      }
+      
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, payload.userId))
+        .limit(1);
+      
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      const newToken = signToken({ userId: user.id, email: user.email });
+      
+      res.json({
+        token: newToken,
+        user: sanitizeUser(user),
+      });
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      res.status(500).json({ message: "Failed to refresh token" });
+    }
   });
 }
 
