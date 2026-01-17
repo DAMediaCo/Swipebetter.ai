@@ -3,9 +3,9 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, UserX, Star, Smartphone } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, Smartphone } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { TestimonialsRotator } from "@/components/TestimonialsRotator";
+import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
 import {
   Accordion,
@@ -62,8 +62,8 @@ export default function Home() {
           <div className="flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-12 items-center">
             <div className="space-y-4 text-center md:text-left order-1">
               <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center md:justify-start gap-1.5">
-                <Star className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" />
-                Trusted by 10,000+ Daters
+                <Shield className="w-3.5 h-3.5 text-green-500" />
+                100% Private. Photos deleted immediately after analysis.
               </p>
               
               <Badge variant="secondary" className="px-4 py-1.5">
@@ -299,11 +299,10 @@ export default function Home() {
       </section>
 
       <section className="py-7 md:py-10 px-4">
-        <TestimonialsRotator />
-        <p className="text-sm text-muted-foreground text-center mt-6 flex items-center justify-center gap-2">
-          <Shield className="w-4 h-4" />
-          Your screenshots are private and deleted after processing.
-        </p>
+        <div className="text-center mb-6 space-y-2">
+          <h2 className="text-2xl md:text-3xl font-bold">What People Are Saying</h2>
+        </div>
+        <RedditSocialProof />
       </section>
 
       <section className="py-7 md:py-10 px-4 bg-muted/30">
