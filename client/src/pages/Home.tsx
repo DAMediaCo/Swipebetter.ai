@@ -71,8 +71,8 @@ export default function Home() {
                 <span className="text-primary">Let AI Roast Your Profile.</span>
               </h1>
               
-              <p className="text-sm md:text-base font-bold text-destructive flex items-center justify-center md:justify-start gap-1.5">
-                <Shield className="w-4 h-4" />
+              <p className="text-sm md:text-base font-bold text-destructive text-center md:text-left">
+                <Shield className="w-4 h-4 inline-block align-middle mr-1.5 -mt-0.5" />
                 100% PRIVATE. PHOTOS DELETED IMMEDIATELY AFTER ANALYSIS.
               </p>
               
