@@ -66,14 +66,14 @@ export default function Home() {
                 AI-Powered Dating Profile Coach
               </Badge>
               
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+              <h1 className="text-4xl font-bold tracking-tight leading-[1.2] text-center md:text-left">
                 Why Aren't You Getting Matches?{" "}
                 <span className="text-primary">Let AI Roast Your Profile.</span>
               </h1>
               
-              <p className="text-sm md:text-base font-bold text-destructive text-center md:text-left">
+              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 text-center md:text-left">
                 <Shield className="w-4 h-4 inline-block align-middle mr-1.5 -mt-0.5" />
-                100% PRIVATE. PHOTOS DELETED IMMEDIATELY AFTER ANALYSIS.
+                100% Private. Photos deleted immediately after analysis.
               </p>
               
               <p className="text-base md:text-xl text-muted-foreground max-w-xl leading-relaxed">
