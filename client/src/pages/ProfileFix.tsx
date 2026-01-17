@@ -57,10 +57,6 @@ export default function ProfileFix() {
   };
 
   const startAnalysis = () => {
-    if (!user) {
-      setLocation('/auth');
-      return;
-    }
     setShowDashboard(true);
   };
 

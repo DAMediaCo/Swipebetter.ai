@@ -111,7 +111,7 @@ export async function registerRoutes(
     });
   });
 
-  app.post("/api/analyze-profile", requireAuth, async (req: any, res) => {
+  app.post("/api/analyze-profile", async (req: any, res) => {
     try {
       const parseResult = profileAnalysisSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -121,16 +121,20 @@ export async function registerRoutes(
         });
       }
       const { platform, gender, intent, screenshots, enm } = parseResult.data;
-      const userId = req.session.userId;
+      const userId = req.session?.userId || null;
 
-      const subscription = await storage.getUserSubscription(userId);
-      const isSubscribed = subscription?.status === "active";
-      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
-      const isPaidUser = isSubscribed || hasOneTimeCredits;
+      // Check if user is paid (only if logged in)
+      let isPaidUser = false;
+      if (userId) {
+        const subscription = await storage.getUserSubscription(userId);
+        const isSubscribed = subscription?.status === "active";
+        const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+        isPaidUser = isSubscribed || hasOneTimeCredits;
 
-      // Decrement credits only for paying users with one-time credits
-      if (!isSubscribed && hasOneTimeCredits) {
-        await storage.decrementOneTimeCredits(userId);
+        // Decrement credits only for paying users with one-time credits
+        if (!isSubscribed && hasOneTimeCredits) {
+          await storage.decrementOneTimeCredits(userId);
+        }
       }
 
       const enmContext = enm ? `
@@ -183,21 +187,24 @@ export async function registerRoutes(
         };
       }
 
-      const savedAnalysis = await storage.createProfileAnalysis({
-        userId,
-        platform,
-        gender,
-        intent,
-        screenshots,
-        bioSuggestions: analysis.bioSuggestions,
-        photoFeedback: analysis.photoFeedback,
-        overallScore: analysis.overallScore,
-        improvements: analysis.improvements,
-      });
+      // Only save analysis to database if user is logged in
+      let savedAnalysis = null;
+      if (userId) {
+        savedAnalysis = await storage.createProfileAnalysis({
+          userId,
+          platform,
+          gender,
+          intent,
+          screenshots,
+          bioSuggestions: analysis.bioSuggestions,
+          photoFeedback: analysis.photoFeedback,
+          overallScore: analysis.overallScore,
+          improvements: analysis.improvements,
+        });
+        await storage.updateLastActiveAt(userId);
+      }
 
-      await storage.updateLastActiveAt(userId);
-
-      // For free users, only return the score - redact ALL detailed feedback
+      // For free/anonymous users, only return the score - redact ALL detailed feedback
       const redactedParsed = {
         overallScore: analysis.overallScore,
         bioSuggestions: "[Upgrade to unlock bio suggestions]",
@@ -208,11 +215,9 @@ export async function registerRoutes(
       if (!isPaidUser) {
         res.json({ 
           analysis: {
-            id: savedAnalysis.id,
-            userId: savedAnalysis.userId,
-            platform: savedAnalysis.platform,
-            overallScore: savedAnalysis.overallScore,
-            // Redact detailed content from the analysis object too
+            id: savedAnalysis?.id || null,
+            platform,
+            overallScore: analysis.overallScore,
             bioSuggestions: "[Upgrade to unlock]",
             photoFeedback: "[Upgrade to unlock]",
             improvements: "[Upgrade to unlock]",
