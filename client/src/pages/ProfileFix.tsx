@@ -100,7 +100,7 @@ export default function ProfileFix() {
   });
 
   const preferencesComplete = platform && gender && intent;
-  const canAnalyze = preferencesComplete && images.length > 0 && subscriptionData?.canAnalyze;
+  const canAnalyze = preferencesComplete && images.length > 0; // Allow all logged-in users (freemium)
 
   if (authLoading) {
     return (

@@ -153,3 +153,16 @@ Preferred communication style: Simple, everyday language.
 - **Quick Filters**: All Users, Revenue, Comped/Promo, Never Converted, Active 7 Days, Has Credits, New Users
 
 - **Features**: Email search, sortable columns (Date Joined, Credits, Lifetime Spend, Last Active)
+
+### Freemium Model (January 2025)
+- **Free Profile Analysis**: All logged-in users can run profile analysis for free
+- **Gated Content**: Free users only see their Profile Score; detailed feedback (bio suggestions, photo feedback, improvements) is redacted server-side
+- **Backend Security**: 
+  - `/api/analyze-profile` returns redacted content for non-paid users
+  - `/api/my-analyses` returns redacted historical data for non-paid users
+  - Full content only returned when `isPaidUser` is true (active subscription OR one-time credits)
+- **Frontend UX**: 
+  - Score shown prominently with alert styling
+  - Locked cards with blur effect for detailed sections
+  - "Unlock Full Report & Suggestions" CTA prompts upgrade
+- **Conversion Flow**: Users get hooked by seeing their score, then upgrade to access specific improvements

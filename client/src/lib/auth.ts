@@ -36,6 +36,7 @@ export function useSubscription() {
     subscription: Subscription | null;
     canAnalyze: boolean;
     freeAnalysesRemaining: number;
+    isPaidUser: boolean;
   }>({
     queryKey: ["/api/subscription"],
     staleTime: 1000 * 60,

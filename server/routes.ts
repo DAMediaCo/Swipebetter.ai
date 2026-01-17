@@ -104,9 +104,10 @@ export async function registerRoutes(
     
     res.json({ 
       subscription: subscription || null,
-      canAnalyze: isActive || hasOneTimeCredits,
+      canAnalyze: true, // Allow all users to analyze (freemium model)
       isSubscribed: isActive,
-      oneTimeCredits: subscription?.oneTimeCredits || 0
+      oneTimeCredits: subscription?.oneTimeCredits || 0,
+      isPaidUser: isActive || hasOneTimeCredits, // For determining if user sees full results
     });
   });
 
@@ -125,14 +126,9 @@ export async function registerRoutes(
       const subscription = await storage.getUserSubscription(userId);
       const isSubscribed = subscription?.status === "active";
       const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+      const isPaidUser = isSubscribed || hasOneTimeCredits;
 
-      if (!isSubscribed && !hasOneTimeCredits) {
-        return res.status(403).json({ 
-          error: "Subscription required",
-          requiresSubscription: true 
-        });
-      }
-
+      // Decrement credits only for paying users with one-time credits
       if (!isSubscribed && hasOneTimeCredits) {
         await storage.decrementOneTimeCredits(userId);
       }
@@ -201,9 +197,36 @@ export async function registerRoutes(
 
       await storage.updateLastActiveAt(userId);
 
+      // For free users, only return the score - redact ALL detailed feedback
+      const redactedParsed = {
+        overallScore: analysis.overallScore,
+        bioSuggestions: "[Upgrade to unlock bio suggestions]",
+        photoFeedback: "[Upgrade to unlock photo feedback]",
+        improvements: "[Upgrade to unlock improvement recommendations]",
+      };
+
+      if (!isPaidUser) {
+        res.json({ 
+          analysis: {
+            id: savedAnalysis.id,
+            userId: savedAnalysis.userId,
+            platform: savedAnalysis.platform,
+            overallScore: savedAnalysis.overallScore,
+            // Redact detailed content from the analysis object too
+            bioSuggestions: "[Upgrade to unlock]",
+            photoFeedback: "[Upgrade to unlock]",
+            improvements: "[Upgrade to unlock]",
+          },
+          parsed: redactedParsed,
+          isPaidUser: false,
+        });
+        return;
+      }
+
       res.json({ 
         analysis: savedAnalysis,
-        parsed: analysis
+        parsed: analysis,
+        isPaidUser: true,
       });
     } catch (error) {
       console.error("Profile analysis error:", error);
@@ -371,8 +394,39 @@ export async function registerRoutes(
   });
 
   app.get("/api/my-analyses", requireAuth, async (req: any, res) => {
-    const profileAnalyses = await storage.getProfileAnalyses(req.session.userId);
-    const replyAnalyses = await storage.getReplyAnalyses(req.session.userId);
+    const userId = req.session.userId;
+    const subscription = await storage.getUserSubscription(userId);
+    const isSubscribed = subscription?.status === "active";
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+    const isPaidUser = isSubscribed || hasOneTimeCredits;
+
+    const profileAnalyses = await storage.getProfileAnalyses(userId);
+    const replyAnalyses = await storage.getReplyAnalyses(userId);
+    
+    // Redact detailed content for free users
+    if (!isPaidUser) {
+      const redactedProfiles = profileAnalyses.map((a: any) => ({
+        id: a.id,
+        userId: a.userId,
+        platform: a.platform,
+        overallScore: a.overallScore,
+        createdAt: a.createdAt,
+        bioSuggestions: "[Upgrade to unlock]",
+        photoFeedback: "[Upgrade to unlock]",
+        improvements: "[Upgrade to unlock]",
+      }));
+      const redactedReplies = replyAnalyses.map((a: any) => ({
+        id: a.id,
+        userId: a.userId,
+        tone: a.tone,
+        createdAt: a.createdAt,
+        suggestedReplies: ["[Upgrade to unlock reply suggestions]"],
+        conversationContext: "[Upgrade to unlock]",
+      }));
+      res.json({ profileAnalyses: redactedProfiles, replyAnalyses: redactedReplies });
+      return;
+    }
+
     res.json({ profileAnalyses, replyAnalyses });
   });
 
