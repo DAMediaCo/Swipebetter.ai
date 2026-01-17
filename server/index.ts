@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -8,6 +9,24 @@ import { WebhookHandlers } from "./webhookHandlers";
 import { setupSession, registerAuthRoutes } from "./auth";
 
 const app = express();
+
+// CORS configuration for dev domains (mobile app, etc.)
+const allowedOrigins = [
+  "https://d3927c46-4ca2-4bc4-a717-3a83b7527b76-00-2zgdzqdobgm8a.janeway.replit.dev",
+  "https://swipebetter.replit.app",
+];
+
+app.use(cors({
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || origin.endsWith('.replit.dev') || origin.endsWith('.replit.app')) {
+      return callback(null, true);
+    }
+    callback(null, false);
+  },
+  credentials: true,
+}));
 const httpServer = createServer(app);
 
 declare module "http" {
