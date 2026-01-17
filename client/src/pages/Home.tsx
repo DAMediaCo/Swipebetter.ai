@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, Trash2, AlertTriangle, XCircle } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
@@ -60,23 +60,23 @@ export default function Home() {
         
         <div className="relative z-10 max-w-6xl mx-auto w-full">
           <div className="flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="space-y-4 text-center md:text-left order-1">
-              <p className="text-xs uppercase tracking-widest text-muted-foreground flex items-center justify-center md:justify-start gap-1.5">
-                <Shield className="w-3.5 h-3.5 text-green-500" />
-                100% Private. Photos deleted immediately after analysis.
-              </p>
-              
+            <div className="space-y-3 md:space-y-4 text-center md:text-left order-1">
               <Badge variant="secondary" className="px-4 py-1.5">
                 <Sparkles className="w-3.5 h-3.5 mr-1.5" />
                 AI-Powered Dating Profile Coach
               </Badge>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
                 Why Aren't You Getting Matches?{" "}
                 <span className="text-primary">Let AI Roast Your Profile.</span>
               </h1>
               
-              <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
+              <p className="text-sm md:text-base font-bold text-destructive flex items-center justify-center md:justify-start gap-1.5">
+                <Shield className="w-4 h-4" />
+                100% PRIVATE. PHOTOS DELETED IMMEDIATELY AFTER ANALYSIS.
+              </p>
+              
+              <p className="text-base md:text-xl text-muted-foreground max-w-xl leading-relaxed">
                 Get brutally honest, data-driven feedback on your bio and photos. Stop guessing and start converting.
               </p>
               
@@ -95,50 +95,44 @@ export default function Home() {
                 </a>
               </div>
               
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 text-sm text-muted-foreground pt-2">
-                <span className="flex items-center gap-1.5">
-                  <Trash2 className="w-4 h-4" />
-                  Screenshots deleted after processing
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="w-4 h-4" />
-                  Works with Tinder, Hinge, Bumble, and more
-                </span>
-              </div>
+              <p className="text-sm text-muted-foreground flex items-center justify-center md:justify-start gap-1.5 pt-1">
+                <Check className="w-4 h-4" />
+                Works with Tinder, Hinge, Bumble, and more
+              </p>
             </div>
             
             <div className="flex items-center justify-center order-2 md:order-2">
               <div className="relative" role="img" aria-label="Phone mockup showing AI analysis of a dating profile">
-                <div className="w-72 h-[520px] bg-card rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-3 flex flex-col">
-                  <div className="w-20 h-5 bg-border rounded-full mx-auto mb-3" />
-                  <div className="flex-1 bg-muted/50 rounded-[1.5rem] flex flex-col gap-3 p-4 overflow-hidden">
+                <div className="w-48 h-[320px] md:w-72 md:h-[520px] bg-card rounded-[1.5rem] md:rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-2 md:p-3 flex flex-col">
+                  <div className="w-14 md:w-20 h-4 md:h-5 bg-border rounded-full mx-auto mb-2 md:mb-3" />
+                  <div className="flex-1 bg-muted/50 rounded-lg md:rounded-[1.5rem] flex flex-col gap-2 md:gap-3 p-2 md:p-4 overflow-hidden">
                     <div className="text-center">
-                      <div className="text-4xl font-bold text-orange-500">42/100</div>
-                      <p className="text-xs text-muted-foreground">Profile Score</p>
+                      <div className="text-2xl md:text-4xl font-bold text-orange-500">42/100</div>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">Profile Score</p>
                     </div>
                     
-                    <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <XCircle className="w-4 h-4 text-orange-500 flex-shrink-0" />
-                        <p className="text-sm font-semibold text-orange-600 dark:text-orange-400">Trust Issue Detected</p>
+                    <div className="bg-orange-500/10 border border-orange-500/30 rounded p-2 md:p-3">
+                      <div className="flex items-center gap-1 md:gap-2 mb-1">
+                        <XCircle className="w-3 h-3 md:w-4 md:h-4 text-orange-500 flex-shrink-0" />
+                        <p className="text-[10px] md:text-sm font-semibold text-orange-600 dark:text-orange-400">Trust Issue</p>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Your main photo has poor lighting and sunglasses, which lowers trust by 40%. Swap this for a clear headshot.
+                      <p className="text-[9px] md:text-xs text-muted-foreground leading-tight md:leading-relaxed hidden md:block">
+                        Your main photo has poor lighting and sunglasses, which lowers trust by 40%.
                       </p>
                     </div>
                     
-                    <div className="space-y-2 mt-auto">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="w-3 h-3 text-orange-500" />
-                        <div className="h-2 bg-orange-500/40 rounded-full flex-1" />
+                    <div className="space-y-1 md:space-y-2 mt-auto">
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-orange-500" />
+                        <div className="h-1.5 md:h-2 bg-orange-500/40 rounded-full flex-1" />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="w-3 h-3 text-amber-500" />
-                        <div className="h-2 bg-amber-500/30 rounded-full flex-1" />
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-amber-500" />
+                        <div className="h-1.5 md:h-2 bg-amber-500/30 rounded-full flex-1" />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Check className="w-3 h-3 text-green-500" />
-                        <div className="h-2 bg-green-500/30 rounded-full flex-1" />
+                      <div className="flex items-center gap-1 md:gap-2">
+                        <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-500" />
+                        <div className="h-1.5 md:h-2 bg-green-500/30 rounded-full flex-1" />
                       </div>
                     </div>
                   </div>
