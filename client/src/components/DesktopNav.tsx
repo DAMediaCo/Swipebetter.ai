@@ -30,22 +30,24 @@ export function DesktopNav() {
             <span className="font-bold text-xl">SwipeBetter</span>
           </div>
         </Link>
-        <div className="flex items-center gap-1">
-          {navItems.map((item) => {
-            const isActive = location === item.href || location.startsWith(item.href + "/");
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant="ghost"
-                  className={isActive ? "text-primary font-semibold" : ""}
-                  data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
-                >
-                  {item.label}
-                </Button>
-              </Link>
-            );
-          })}
-        </div>
+        {user && (
+          <div className="flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = location === item.href || location.startsWith(item.href + "/");
+              return (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant="ghost"
+                    className={isActive ? "text-primary font-semibold" : ""}
+                    data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
+                  >
+                    {item.label}
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
@@ -82,13 +84,7 @@ export function DesktopNav() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : (
-          <Link href="/auth">
-            <Button variant="ghost" className="border border-primary text-primary" data-testid="button-login">
-              Sign In
-            </Button>
-          </Link>
-        )}
+        ) : null}
       </div>
     </nav>
   );

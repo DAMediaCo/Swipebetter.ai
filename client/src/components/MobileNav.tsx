@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Home, Wrench } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
@@ -8,6 +9,12 @@ const navItems = [
 
 export function MobileNav() {
   const [location] = useLocation();
+  const { data: authData } = useAuth();
+  const user = authData?.user;
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-bottom md:hidden">
