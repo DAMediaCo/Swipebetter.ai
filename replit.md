@@ -181,6 +181,10 @@ Preferred communication style: Simple, everyday language.
   - `GOOGLE_CLIENT_ID` - Google OAuth client ID
   - `JWT_SECRET` - (optional, defaults to SESSION_SECRET)
 - **API Spec**: See `MOBILE_APP_API_SPEC.md` for complete mobile integration documentation
+- **Apple Sign In Audiences**: The `/api/auth/apple` endpoint accepts tokens from multiple audiences:
+  - `APPLE_CLIENT_ID` (web Services ID)
+  - `host.exp.Exponent` (Expo Go development)
+  - `com.swipebetter.app` (production mobile bundle ID)
 
 ### Password Reset Feature (January 2025)
 - **Email Provider**: Resend (using user's own API key via RESEND_API_KEY secret)

@@ -247,10 +247,20 @@ export function registerAuthRoutes(app: Express) {
         return res.status(400).json({ message: "Missing identity token" });
       }
 
+      // Accept multiple valid audiences for Apple Sign In:
+      // - Web client ID (APPLE_CLIENT_ID)
+      // - Expo Go development (host.exp.Exponent)
+      // - Production mobile app bundle ID
+      const validAudiences = [
+        process.env.APPLE_CLIENT_ID,
+        "host.exp.Exponent",
+        "com.swipebetter.app",
+      ].filter(Boolean) as string[];
+
       let payload;
       try {
         payload = await appleSignin.verifyIdToken(identityToken, {
-          audience: process.env.APPLE_CLIENT_ID,
+          audience: validAudiences,
           ignoreExpiration: false,
         });
       } catch (verifyError) {
