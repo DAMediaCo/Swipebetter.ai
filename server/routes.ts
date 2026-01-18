@@ -445,6 +445,15 @@ export async function registerRoutes(
     }
   });
 
+  // Get Apple Client ID for Sign in with Apple
+  app.get("/api/auth/apple-client-id", (req, res) => {
+    const clientId = process.env.APPLE_CLIENT_ID;
+    if (!clientId) {
+      return res.status(500).json({ error: "Apple Sign In not configured" });
+    }
+    res.json({ clientId });
+  });
+
   app.post("/api/stripe/sync", async (req, res) => {
     try {
       const { getStripeSync } = await import('./stripeClient');

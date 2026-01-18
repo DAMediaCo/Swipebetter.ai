@@ -15,6 +15,7 @@ import { sendPasswordResetEmail } from "./email";
 declare module "express-session" {
   interface SessionData {
     userId: string;
+    appleOAuthState?: string;
   }
 }
 
@@ -321,6 +322,130 @@ export function registerAuthRoutes(app: Express) {
     } catch (error) {
       console.error("Apple sign in error:", error);
       res.status(500).json({ message: "Failed to sign in with Apple" });
+    }
+  });
+
+  // Store state for Apple Sign In (to prevent CSRF)
+  app.post("/api/auth/apple/init", (req, res) => {
+    const state = crypto.randomBytes(16).toString("hex");
+    req.session.appleOAuthState = state;
+    req.session.save((err) => {
+      if (err) {
+        console.error("Failed to save Apple OAuth state:", err);
+        return res.status(500).json({ error: "Failed to initialize sign in" });
+      }
+      res.json({ state });
+    });
+  });
+
+  // Sign in with Apple (web callback - handles redirect from Apple)
+  app.post("/api/auth/apple/callback", async (req, res) => {
+    try {
+      // Apple sends form-urlencoded data with id_token and optionally user info
+      const { id_token, user: userJson, state } = req.body;
+      
+      // Validate state to prevent CSRF
+      if (!state || state !== req.session.appleOAuthState) {
+        console.error("Apple callback: state mismatch", { received: state, expected: req.session.appleOAuthState });
+        return res.redirect("/auth?error=invalid_state");
+      }
+      // Clear the state after use
+      delete req.session.appleOAuthState;
+      
+      if (!id_token) {
+        console.error("Apple callback: missing id_token");
+        return res.redirect("/auth?error=missing_token");
+      }
+
+      let payload;
+      try {
+        payload = await appleSignin.verifyIdToken(id_token, {
+          audience: process.env.APPLE_CLIENT_ID,
+          ignoreExpiration: false,
+        });
+      } catch (verifyError) {
+        console.error("Apple web token verification failed:", verifyError);
+        return res.redirect("/auth?error=invalid_token");
+      }
+
+      const appleId = payload.sub;
+      const email = payload.email;
+      
+      // Parse user info if provided (only on first sign-in)
+      let firstName = null;
+      let lastName = null;
+      if (userJson) {
+        try {
+          const userInfo = typeof userJson === 'string' ? JSON.parse(userJson) : userJson;
+          firstName = userInfo?.name?.firstName || null;
+          lastName = userInfo?.name?.lastName || null;
+        } catch (e) {
+          console.error("Failed to parse Apple user info:", e);
+        }
+      }
+
+      // First, try to find user by appleId
+      let [existingUser] = await db
+        .select()
+        .from(users)
+        .where(eq(users.appleId, appleId))
+        .limit(1);
+
+      // If not found by appleId, try by email (if provided)
+      if (!existingUser && email) {
+        [existingUser] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, email))
+          .limit(1);
+      }
+
+      // If still no user and no email, we can't create a new account
+      if (!existingUser && !email) {
+        return res.redirect("/auth?error=email_required");
+      }
+
+      if (existingUser) {
+        if (!existingUser.appleId) {
+          await db
+            .update(users)
+            .set({ appleId })
+            .where(eq(users.id, existingUser.id));
+          existingUser.appleId = appleId;
+        }
+      } else {
+        const [newUser] = await db
+          .insert(users)
+          .values({
+            email: email!,
+            appleId,
+            firstName,
+            lastName,
+          })
+          .returning();
+        
+        await db.insert(userSubscriptions).values({
+          userId: newUser.id,
+          freeAnalysesUsed: 0,
+          status: "inactive",
+          oneTimeCredits: 0,
+        });
+        
+        existingUser = newUser;
+      }
+
+      // Set session for web
+      req.session.userId = existingUser.id;
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error after Apple sign in:", err);
+          return res.redirect("/auth?error=session_error");
+        }
+        res.redirect("/dashboard");
+      });
+    } catch (error) {
+      console.error("Apple web sign in error:", error);
+      res.redirect("/auth?error=unknown");
     }
   });
 

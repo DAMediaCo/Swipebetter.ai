@@ -183,7 +183,7 @@ Preferred communication style: Simple, everyday language.
 - **API Spec**: See `MOBILE_APP_API_SPEC.md` for complete mobile integration documentation
 
 ### Password Reset Feature (January 2025)
-- **Email Provider**: Resend via Replit connector integration
+- **Email Provider**: Resend (using user's own API key via RESEND_API_KEY secret)
 - **Endpoints**:
   - `POST /api/auth/forgot-password` - Accepts email, generates secure token, sends reset email
   - `POST /api/auth/reset-password` - Accepts token + new password, validates and updates
@@ -196,3 +196,24 @@ Preferred communication style: Simple, everyday language.
   - `/forgot-password` - Email input form
   - `/reset-password?token=xxx` - New password form
 - **Database**: `password_reset_tokens` table with userId, token, expiresAt, usedAt
+- **Environment**: Uses APP_URL for production reset links, REPLIT_DEV_DOMAIN for development
+
+### Sign in with Apple (Web) - January 2025
+- **Implementation**: OAuth 2.0 flow with Apple's authorization endpoint
+- **Endpoints**:
+  - `POST /api/auth/apple/init` - Generates and stores CSRF state in session
+  - `POST /api/auth/apple/callback` - Handles Apple's form_post redirect with id_token
+  - `GET /api/auth/apple-client-id` - Returns Apple Client ID for frontend
+- **Security**:
+  - CSRF protection via state parameter (stored in session, validated on callback)
+  - Apple identity token verification using apple-signin-auth library
+  - Account linking: existing users matched by appleId or email
+- **Frontend**: "Sign in with Apple" button on Auth page (only shown when configured)
+- **Apple Developer Portal Setup**:
+  - Configure Services ID (APPLE_CLIENT_ID)
+  - Add Return URLs: `https://swipebetter.ai/api/auth/apple/callback`
+  - Add Domains: `swipebetter.ai`
+
+### Navigation Improvements (January 2025)
+- **Desktop**: Login button shown in header when not authenticated; user menu dropdown when authenticated
+- **Mobile**: Bottom navigation includes Login/Logout option alongside Home and Dashboard
