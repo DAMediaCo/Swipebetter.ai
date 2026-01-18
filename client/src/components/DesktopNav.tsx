@@ -84,7 +84,13 @@ export function DesktopNav() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : null}
+        ) : (
+          <Link href="/auth">
+            <Button data-testid="button-login">
+              Log In
+            </Button>
+          </Link>
+        )}
       </div>
     </nav>
   );
