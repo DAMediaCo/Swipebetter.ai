@@ -39,6 +39,8 @@ import RefundPolicy from "@/pages/RefundPolicy";
 import Disclaimer from "@/pages/Disclaimer";
 import Contact from "@/pages/Contact";
 import AcceptableUse from "@/pages/AcceptableUse";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 import NotFound from "@/pages/not-found";
 import { LegalFooter } from "@/components/LegalFooter";
 
@@ -77,6 +79,8 @@ function Router() {
       <Route path="/disclaimer" component={Disclaimer} />
       <Route path="/contact" component={Contact} />
       <Route path="/acceptable-use" component={AcceptableUse} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route component={NotFound} />
     </Switch>
   );

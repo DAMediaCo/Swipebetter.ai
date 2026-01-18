@@ -1,14 +1,16 @@
 import bcrypt from "bcrypt";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
+import crypto from "crypto";
 import { db } from "./db";
-import { users, signupSchema, loginSchema, type SafeUser } from "@shared/models/auth";
+import { users, signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, passwordResetTokens, type SafeUser } from "@shared/models/auth";
 import { userSubscriptions, promoCodes, promoRedemptions } from "@shared/models/swipebetter";
-import { eq, and, sql, or } from "drizzle-orm";
+import { eq, and, sql, or, gt } from "drizzle-orm";
 import type { Express, RequestHandler } from "express";
 import { signToken } from "./jwt";
 import { OAuth2Client } from "google-auth-library";
 import appleSignin from "apple-signin-auth";
+import { sendPasswordResetEmail } from "./email";
 
 declare module "express-session" {
   interface SessionData {
@@ -444,6 +446,101 @@ export function registerAuthRoutes(app: Express) {
     } catch (error) {
       console.error("Token refresh error:", error);
       res.status(500).json({ message: "Failed to refresh token" });
+    }
+  });
+
+  // Forgot password - send reset email
+  app.post("/api/auth/forgot-password", async (req, res) => {
+    try {
+      const parsed = forgotPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          message: parsed.error.errors[0]?.message || "Invalid email" 
+        });
+      }
+
+      const { email } = parsed.data;
+
+      // Find user by email
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email.toLowerCase()))
+        .limit(1);
+
+      // Always return success to prevent email enumeration
+      if (!user) {
+        return res.json({ message: "If an account exists with that email, we've sent a password reset link." });
+      }
+
+      // Generate secure token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      // Store token in database
+      await db.insert(passwordResetTokens).values({
+        userId: user.id,
+        token: resetToken,
+        expiresAt,
+      });
+
+      // Send email
+      await sendPasswordResetEmail(user.email, resetToken, user.firstName);
+
+      res.json({ message: "If an account exists with that email, we've sent a password reset link." });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Failed to process request" });
+    }
+  });
+
+  // Reset password with token
+  app.post("/api/auth/reset-password", async (req, res) => {
+    try {
+      const parsed = resetPasswordSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ 
+          message: parsed.error.errors[0]?.message || "Invalid input" 
+        });
+      }
+
+      const { token, password } = parsed.data;
+
+      // Find valid token
+      const [resetRecord] = await db
+        .select()
+        .from(passwordResetTokens)
+        .where(
+          and(
+            eq(passwordResetTokens.token, token),
+            gt(passwordResetTokens.expiresAt, new Date())
+          )
+        )
+        .limit(1);
+
+      if (!resetRecord || resetRecord.usedAt) {
+        return res.status(400).json({ message: "Invalid or expired reset link" });
+      }
+
+      // Hash new password
+      const passwordHash = await hashPassword(password);
+
+      // Update user password
+      await db
+        .update(users)
+        .set({ passwordHash, updatedAt: new Date() })
+        .where(eq(users.id, resetRecord.userId));
+
+      // Mark token as used
+      await db
+        .update(passwordResetTokens)
+        .set({ usedAt: new Date() })
+        .where(eq(passwordResetTokens.id, resetRecord.id));
+
+      res.json({ message: "Password updated successfully" });
+    } catch (error) {
+      console.error("Reset password error:", error);
+      res.status(500).json({ message: "Failed to reset password" });
     }
   });
 }
