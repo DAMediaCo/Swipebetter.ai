@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -131,6 +132,7 @@ async function initStripe() {
   );
 
   app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+  app.use(cookieParser());
 
   setupSession(app);
   registerAuthRoutes(app);

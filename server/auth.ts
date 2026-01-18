@@ -326,37 +326,42 @@ export function registerAuthRoutes(app: Express) {
   });
 
   // Store state for Apple Sign In (to prevent CSRF)
+  // We use a separate cookie with sameSite: "none" because Apple's form_post
+  // is a cross-site request and lax cookies won't be sent
   app.post("/api/auth/apple/init", (req, res) => {
     const state = crypto.randomBytes(16).toString("hex");
-    req.session.appleOAuthState = state;
-    req.session.save((err) => {
-      if (err) {
-        console.error("Failed to save Apple OAuth state:", err);
-        return res.status(500).json({ error: "Failed to initialize sign in" });
-      }
-      res.json({ state });
+    
+    // Set state in a cookie that will survive Apple's cross-site POST
+    res.cookie("apple_oauth_state", state, {
+      httpOnly: true,
+      secure: true, // Required for sameSite: "none"
+      sameSite: "none", // Allow cross-site requests from Apple
+      maxAge: 10 * 60 * 1000, // 10 minutes
+      path: "/",
     });
+    
+    res.json({ state });
   });
 
   // Sign in with Apple (web callback - handles redirect from Apple)
   app.post("/api/auth/apple/callback", async (req, res) => {
+    const storedState = req.cookies?.apple_oauth_state;
     console.log("Apple callback received", { 
       hasIdToken: !!req.body.id_token, 
       hasState: !!req.body.state,
-      sessionState: req.session.appleOAuthState,
-      sessionId: req.sessionID
+      storedState,
     });
     try {
       // Apple sends form-urlencoded data with id_token and optionally user info
       const { id_token, user: userJson, state } = req.body;
       
-      // Validate state to prevent CSRF
-      if (!state || state !== req.session.appleOAuthState) {
-        console.error("Apple callback: state mismatch", { received: state, expected: req.session.appleOAuthState });
+      // Validate state to prevent CSRF (using cookie instead of session)
+      if (!state || state !== storedState) {
+        console.error("Apple callback: state mismatch", { received: state, expected: storedState });
         return res.redirect("/auth?error=invalid_state");
       }
-      // Clear the state after use
-      delete req.session.appleOAuthState;
+      // Clear the state cookie after use
+      res.clearCookie("apple_oauth_state", { path: "/" });
       
       if (!id_token) {
         console.error("Apple callback: missing id_token");
