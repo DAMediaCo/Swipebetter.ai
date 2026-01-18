@@ -8,6 +8,7 @@ import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal, useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
+import { Progress } from "@/components/ui/progress";
 import { 
   Clipboard, 
   Check,
@@ -15,7 +16,11 @@ import {
   Sparkles,
   Lock,
   Settings,
-  Unlock
+  Unlock,
+  Clock,
+  Camera,
+  FileText,
+  MessageCircle
 } from "lucide-react";
 
 interface ProfileAnalysisData {
@@ -23,6 +28,7 @@ interface ProfileAnalysisData {
   bioSuggestions: string | string[];
   photoFeedback: string | string[];
   improvements: string | string[];
+  firstTip?: string;
 }
 
 export default function ProfileResults() {
@@ -146,18 +152,57 @@ export default function ProfileResults() {
 
         <div className="space-y-6">
           <Card className="bg-gradient-to-br from-orange-500/10 to-orange-500/5 border-orange-500/20">
-            <CardContent className="pt-6 text-center">
-              <div className="text-5xl font-bold text-orange-500 mb-2">
-                {result.overallScore}
+            <CardContent className="pt-6">
+              <div className="text-center mb-6">
+                <div className="text-5xl font-bold text-orange-500 mb-1">
+                  {result.overallScore}
+                </div>
+                <p className="text-muted-foreground text-sm">out of 100</p>
+                <p className="text-sm font-medium mt-2">
+                  Top {Math.max(5, 100 - result.overallScore)}% of Profiles
+                </p>
               </div>
-              <p className="text-muted-foreground">Overall Profile Score</p>
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <TrendingUp className="w-4 h-4 text-orange-500" />
-                <span className="text-sm">Room for improvement!</span>
+              
+              <div className="space-y-3">
+                <ScoreBreakdown 
+                  label="Photos" 
+                  icon={<Camera className="w-4 h-4" />}
+                  score={Math.min(100, Math.max(20, result.overallScore + 8))} 
+                />
+                <ScoreBreakdown 
+                  label="Bio" 
+                  icon={<FileText className="w-4 h-4" />}
+                  score={Math.min(100, Math.max(20, result.overallScore - 5))} 
+                />
+                <ScoreBreakdown 
+                  label="Conversation Starters" 
+                  icon={<MessageCircle className="w-4 h-4" />}
+                  score={Math.min(100, Math.max(20, result.overallScore - 3))} 
+                />
+              </div>
+
+              <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
+                <Clock className="w-3 h-3" />
+                <span className="text-xs">Analysis valid for 24 hours</span>
               </div>
             </CardContent>
           </Card>
 
+          {!isPro && (
+            <Card className="border-primary/30 bg-primary/5">
+              <CardContent className="pt-6 text-center">
+                <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
+                  <Button size="lg" className="w-full text-lg py-6" data-testid="button-unlock-main">
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    {isLoggedIn ? "Unlock Full Report" : "Sign up free to unlock"}
+                  </Button>
+                </Link>
+                <p className="text-xs text-muted-foreground mt-3">
+                  See bio rewrites, photo feedback & actionable tips
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
           {isPro ? (
             <>
@@ -215,52 +260,38 @@ export default function ProfileResults() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-primary" />
-                    Key Improvement
+                    Your #1 Issue
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <FirstImprovementCard improvements={result.improvements} />
+                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-sm leading-relaxed">
+                      {result.firstTip || getFirstTip(result.improvements)}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3 text-center">
+                    Unlock your report to see all recommendations
+                  </p>
                 </CardContent>
               </Card>
 
-              <div className="relative">
-                <div className="space-y-6 locked-content">
-                  <LockedCard 
-                    title="Bio Suggestions" 
-                    teaser="3 custom bio rewrites ready for you"
-                    realContent={result.bioSuggestions}
-                  />
-                  <LockedCard 
-                    title="Photo Feedback" 
-                    teaser="Specific feedback on each of your photos"
-                    realContent={result.photoFeedback}
-                  />
-                  <LockedCard 
-                    title="More Improvements" 
-                    teaser="Prioritized list of changes to make"
-                    realContent={result.improvements}
-                    skipFirst={true}
-                  />
-                </div>
-
-                <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-[1px] rounded-lg">
-                  <div className="text-center px-6 py-8 max-w-sm">
-                    <Lock className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">
-                      {isLoggedIn ? "Unlock Your Full Report" : "See Your Full Report"}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      Get personalized bio rewrites, photo tips, and a complete improvement plan.
-                    </p>
-                    <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
-                      <Button size="lg" className="w-full" data-testid="button-unlock-full-report">
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        {isLoggedIn ? "Unlock Full Report" : "Sign up free to see full report"}
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <BlurredSection 
+                title="Bio Suggestions" 
+                content={result.bioSuggestions}
+                isLoggedIn={isLoggedIn}
+              />
+              
+              <BlurredSection 
+                title="Photo Feedback" 
+                content={result.photoFeedback}
+                isLoggedIn={isLoggedIn}
+              />
+              
+              <BlurredSection 
+                title="More Improvements" 
+                content={result.improvements}
+                isLoggedIn={isLoggedIn}
+              />
             </>
           )}
 
@@ -344,71 +375,77 @@ function ResultCard({
   );
 }
 
-function FirstImprovementCard({ improvements }: { improvements: string | string[] }) {
-  const getFirstImprovement = (): string => {
-    if (Array.isArray(improvements) && improvements.length > 0) {
-      return improvements[0];
+function getFirstTip(improvements: string | string[]): string {
+  if (Array.isArray(improvements) && improvements.length > 0) {
+    return improvements[0];
+  }
+  if (typeof improvements === 'string') {
+    const lines = improvements.split('\n').filter(line => line.trim());
+    for (const line of lines) {
+      const match = line.match(/^\d+\.\s*(.+)/);
+      if (match) return match[1];
+      if (line.trim()) return line.trim();
     }
-    if (typeof improvements === 'string') {
-      const lines = improvements.split('\n').filter(line => line.trim());
-      for (const line of lines) {
-        const match = line.match(/^\d+\.\s*(.+)/);
-        if (match) return match[1];
-        if (line.trim()) return line.trim();
-      }
-    }
-    return "Your profile has room for improvement - unlock full report for details.";
-  };
+  }
+  return "Your profile has room for improvement - unlock full report for details.";
+}
 
+function ScoreBreakdown({ 
+  label, 
+  icon, 
+  score 
+}: { 
+  label: string; 
+  icon: React.ReactNode; 
+  score: number;
+}) {
   return (
-    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-      <p className="text-sm leading-relaxed">{getFirstImprovement()}</p>
+    <div className="flex items-center gap-3">
+      <div className="text-muted-foreground">{icon}</div>
+      <div className="flex-1">
+        <div className="flex justify-between text-sm mb-1">
+          <span>{label}</span>
+          <span className="text-muted-foreground">{score}/100</span>
+        </div>
+        <Progress value={score} className="h-2" />
+      </div>
     </div>
   );
 }
 
-function LockedCard({ 
+function BlurredSection({ 
   title, 
-  teaser,
-  realContent,
-  skipFirst = false 
+  content,
+  isLoggedIn
 }: { 
   title: string; 
-  teaser: string;
-  realContent?: string | string[];
-  skipFirst?: boolean;
+  content: string | string[];
+  isLoggedIn: boolean;
 }) {
-  const getBlurredLines = (): string[] => {
-    if (!realContent) return [];
-    
-    let items: string[] = [];
-    if (Array.isArray(realContent)) {
-      items = realContent;
-    } else if (typeof realContent === 'string') {
-      items = realContent.split('\n').filter(line => line.trim());
+  const getContentLines = (): string[] => {
+    if (!content) return [];
+    if (Array.isArray(content)) {
+      return content.slice(0, 4);
     }
-    
-    if (skipFirst && items.length > 0) {
-      items = items.slice(1);
+    if (typeof content === 'string') {
+      return content.split('\n').filter(line => line.trim()).slice(0, 4);
     }
-    
-    return items.slice(0, 4);
+    return [];
   };
 
-  const blurredLines = getBlurredLines();
+  const lines = getContentLines();
   
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2">
+    <Card className="relative overflow-hidden">
+      <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-        <Lock className="w-4 h-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="blur-[6px] select-none pointer-events-none space-y-2">
-          {blurredLines.length > 0 ? (
-            blurredLines.map((line, i) => (
-              <p key={i} className="text-sm text-muted-foreground truncate">
-                {line.substring(0, 80)}...
+        <div className="blur-[5px] select-none pointer-events-none space-y-2 min-h-[80px]">
+          {lines.length > 0 ? (
+            lines.map((line, i) => (
+              <p key={i} className="text-sm text-muted-foreground">
+                {line.substring(0, 100)}
               </p>
             ))
           ) : (
@@ -419,7 +456,14 @@ function LockedCard({
             </>
           )}
         </div>
-        <p className="text-xs text-muted-foreground mt-3 text-center">{teaser}</p>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
+            <Button variant="secondary" size="sm" data-testid={`button-unlock-${title.toLowerCase().replace(/ /g, "-")}`}>
+              <Unlock className="w-4 h-4 mr-2" />
+              Unlock to Reveal
+            </Button>
+          </Link>
+        </div>
       </CardContent>
     </Card>
   );

@@ -204,12 +204,26 @@ export async function registerRoutes(
         await storage.updateLastActiveAt(userId);
       }
 
-      // For free/anonymous users, only return the score - redact ALL detailed feedback
-      const redactedParsed = {
-        overallScore: analysis.overallScore,
-        bioSuggestions: "[Upgrade to unlock bio suggestions]",
-        photoFeedback: "[Upgrade to unlock photo feedback]",
-        improvements: "[Upgrade to unlock improvement recommendations]",
+      // For free/anonymous users, return score + first tip + blurred teasers
+      // Extract first improvement for the "Key Improvement" teaser
+      const getFirstTip = (improvements: string): string => {
+        if (!improvements) return "";
+        const lines = improvements.split('\n').filter((l: string) => l.trim());
+        for (const line of lines) {
+          const match = line.match(/^\d+\.\s*(.+)/);
+          if (match) return match[1].trim();
+          if (line.trim()) return line.trim();
+        }
+        return improvements.substring(0, 200);
+      };
+
+      const firstTip = getFirstTip(analysis.improvements || "");
+      
+      // Create teaser content (truncated for blur effect)
+      const createTeaser = (content: string, maxLines: number = 3): string => {
+        if (!content) return "";
+        const lines = content.split('\n').filter((l: string) => l.trim()).slice(0, maxLines);
+        return lines.join('\n');
       };
 
       if (!isPaidUser) {
@@ -218,11 +232,18 @@ export async function registerRoutes(
             id: savedAnalysis?.id || null,
             platform,
             overallScore: analysis.overallScore,
-            bioSuggestions: "[Upgrade to unlock]",
-            photoFeedback: "[Upgrade to unlock]",
-            improvements: "[Upgrade to unlock]",
+            firstTip,
+            bioTeaser: createTeaser(analysis.bioSuggestions, 3),
+            photoTeaser: createTeaser(analysis.photoFeedback, 3),
+            improvementsTeaser: createTeaser(analysis.improvements, 4),
           },
-          parsed: redactedParsed,
+          parsed: {
+            overallScore: analysis.overallScore,
+            firstTip,
+            bioSuggestions: createTeaser(analysis.bioSuggestions, 3),
+            photoFeedback: createTeaser(analysis.photoFeedback, 3),
+            improvements: createTeaser(analysis.improvements, 4),
+          },
           isPaidUser: false,
         });
         return;
