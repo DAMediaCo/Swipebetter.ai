@@ -112,3 +112,8 @@ export function trackPurchaseCompleted(params: PurchaseParams) {
 export function shouldTrackToolEntry(targetPath: string, currentPath: string): boolean {
   return targetPath !== currentPath;
 }
+
+export function trackEvent(actionName: string) {
+  console.log("[Event]", actionName, { timestamp: new Date().toISOString() });
+  track(actionName);
+}

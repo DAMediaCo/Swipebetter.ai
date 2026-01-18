@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { loadAnalysis } from "@/lib/analysisStorage";
-import { trackPreviewViewed } from "@/lib/analytics";
+import { trackPreviewViewed, trackEvent } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal, useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -374,7 +374,12 @@ export default function ProfileResults() {
               <Card className="border-primary/30 bg-primary/5">
                 <CardContent className="pt-6 text-center">
                   <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
-                    <Button size="lg" className="w-full text-lg py-6" data-testid="button-unlock-main">
+                    <Button 
+                      size="lg" 
+                      className="w-full text-lg py-6" 
+                      data-testid="button-unlock-main"
+                      onClick={() => trackEvent('click_unlock_main')}
+                    >
                       <Sparkles className="w-5 h-5 mr-2" />
                       {isLoggedIn ? "Unlock Full Report" : "Sign up free to unlock"}
                     </Button>
@@ -463,6 +468,7 @@ export default function ProfileResults() {
                 variant="outline"
                 className="w-full"
                 data-testid="button-analyze-another"
+                onClick={() => trackEvent('click_analyze_new')}
               >
                 Analyze Another Profile
               </Button>

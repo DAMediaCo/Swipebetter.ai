@@ -250,7 +250,12 @@ export default function Pricing() {
 
         {!isSubscribed && !user && (
           <div className="text-center mt-4">
-            <Link href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-free-signup">
+            <Link 
+              href="/auth" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors" 
+              data-testid="link-free-signup"
+              onClick={() => console.log("[Event]", "click_downgrade_signup", { timestamp: new Date().toISOString() })}
+            >
               Not ready to upgrade? <span className="underline">Create a free account</span> to save your results.
             </Link>
           </div>
