@@ -217,3 +217,15 @@ Preferred communication style: Simple, everyday language.
 ### Navigation Improvements (January 2025)
 - **Desktop**: Login button shown in header when not authenticated; user menu dropdown when authenticated
 - **Mobile**: Bottom navigation includes Login/Logout option alongside Home and Dashboard
+
+### Account Page (January 2025)
+- **Route**: `/account` - Mobile-friendly account management page
+- **Features**:
+  - View profile info (email, name)
+  - View subscription status (Pro Member, credits remaining, or free plan)
+  - Upgrade to Pro button for free users
+  - Manage Subscription button opens Stripe customer portal (for active subscribers)
+  - Log out button
+- **Data Sources**: Uses useAuth, useSubscription, and useEntitlement hooks
+- **Access Control**: Redirects to /auth if user is not logged in
+- **Navigation**: Account tab shown in mobile bottom nav only for authenticated users
