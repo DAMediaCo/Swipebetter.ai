@@ -20,7 +20,8 @@ import {
   Clock,
   Camera,
   FileText,
-  MessageCircle
+  MessageCircle,
+  Share2
 } from "lucide-react";
 
 interface ProfileAnalysisData {
@@ -212,6 +213,18 @@ export default function ProfileResults() {
     setTimeout(() => setCopiedBioIndex(null), 2000);
   };
 
+  const [shareClicked, setShareClicked] = useState(false);
+  const shareResult = async () => {
+    const score = result?.overallScore || 0;
+    const shareText = `My dating profile just got roasted by AI! I scored a ${score}/100. Find out why you aren't getting matches: https://swipebetter.ai`;
+    await navigator.clipboard.writeText(shareText);
+    setShareClicked(true);
+    toast({
+      description: "Copied! Share it with your friends.",
+    });
+    setTimeout(() => setShareClicked(false), 2000);
+  };
+
   const parseBioSuggestions = (content: string | string[] | undefined): string[] => {
     if (!content) return [];
     
@@ -286,6 +299,25 @@ export default function ProfileResults() {
                 <p className="text-sm font-medium mt-2">
                   Top {Math.max(5, 100 - result.overallScore)}% of Profiles
                 </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={shareResult}
+                  className="mt-3"
+                  data-testid="button-share-result"
+                >
+                  {shareClicked ? (
+                    <>
+                      <Check className="w-4 h-4 mr-1.5" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4 mr-1.5" />
+                      Share Result
+                    </>
+                  )}
+                </Button>
               </div>
               
               <div className="space-y-3">
