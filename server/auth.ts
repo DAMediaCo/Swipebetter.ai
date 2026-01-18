@@ -340,6 +340,12 @@ export function registerAuthRoutes(app: Express) {
 
   // Sign in with Apple (web callback - handles redirect from Apple)
   app.post("/api/auth/apple/callback", async (req, res) => {
+    console.log("Apple callback received", { 
+      hasIdToken: !!req.body.id_token, 
+      hasState: !!req.body.state,
+      sessionState: req.session.appleOAuthState,
+      sessionId: req.sessionID
+    });
     try {
       // Apple sends form-urlencoded data with id_token and optionally user info
       const { id_token, user: userJson, state } = req.body;
