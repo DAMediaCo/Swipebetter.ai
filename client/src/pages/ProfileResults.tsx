@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
-import { useEntitlement, useCustomerPortal } from "@/lib/auth";
+import { useEntitlement, useCustomerPortal, useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Clipboard, 
@@ -30,9 +30,12 @@ export default function ProfileResults() {
   const [result, setResult] = useState<ProfileAnalysisData | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [copiedBioIndex, setCopiedBioIndex] = useState<number | null>(null);
+  const { data: authData } = useAuth();
   const { isPro, proActive, planType, isLoading: entitlementLoading, refreshEntitlement } = useEntitlement();
   const customerPortal = useCustomerPortal();
   const { toast } = useToast();
+  
+  const isLoggedIn = !!authData?.user;
 
   useEffect(() => {
     const data = loadAnalysis<ProfileAnalysisData>('profile');
@@ -124,7 +127,7 @@ export default function ProfileResults() {
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="mb-6 text-center">
-          <h1 className="text-xl font-semibold">Your Profile Analysis</h1>
+          <h1 className="text-xl font-semibold">Your Profile Score is Ready</h1>
         </div>
 
         <div className="flex justify-center mb-6">
@@ -155,30 +158,6 @@ export default function ProfileResults() {
             </CardContent>
           </Card>
 
-          {!isPro && (
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30">
-              <CardContent className="pt-6 text-center space-y-4">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
-                  <Unlock className="w-8 h-8 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">Your Score: {result.overallScore}/100</h3>
-                  <p className="text-muted-foreground text-sm">
-                    We found specific issues holding back your profile. Unlock the full report to see exactly what to fix.
-                  </p>
-                </div>
-                <Link href="/fix-profile/upgrade">
-                  <Button size="lg" className="w-full" data-testid="button-unlock-report">
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Unlock Full Report & Suggestions
-                  </Button>
-                </Link>
-                <p className="text-xs text-muted-foreground">
-                  Get bio rewrites, photo feedback, and actionable improvements
-                </p>
-              </CardContent>
-            </Card>
-          )}
 
           {isPro ? (
             <>
@@ -232,9 +211,56 @@ export default function ProfileResults() {
             </>
           ) : (
             <>
-              <LockedCard title="Bio Suggestions" teaser="3 custom bio rewrites ready for you" />
-              <LockedCard title="Photo Feedback" teaser="Specific feedback on each of your photos" />
-              <LockedCard title="Top Improvements" teaser="Prioritized list of changes to make" />
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Key Improvement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <FirstImprovementCard improvements={result.improvements} />
+                </CardContent>
+              </Card>
+
+              <div className="relative">
+                <div className="space-y-6 locked-content">
+                  <LockedCard 
+                    title="Bio Suggestions" 
+                    teaser="3 custom bio rewrites ready for you"
+                    realContent={result.bioSuggestions}
+                  />
+                  <LockedCard 
+                    title="Photo Feedback" 
+                    teaser="Specific feedback on each of your photos"
+                    realContent={result.photoFeedback}
+                  />
+                  <LockedCard 
+                    title="More Improvements" 
+                    teaser="Prioritized list of changes to make"
+                    realContent={result.improvements}
+                    skipFirst={true}
+                  />
+                </div>
+
+                <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-[1px] rounded-lg">
+                  <div className="text-center px-6 py-8 max-w-sm">
+                    <Lock className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      {isLoggedIn ? "Unlock Your Full Report" : "See Your Full Report"}
+                    </h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Get personalized bio rewrites, photo tips, and a complete improvement plan.
+                    </p>
+                    <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
+                      <Button size="lg" className="w-full" data-testid="button-unlock-full-report">
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        {isLoggedIn ? "Unlock Full Report" : "Sign up free to see full report"}
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </>
           )}
 
@@ -318,28 +344,82 @@ function ResultCard({
   );
 }
 
-function LockedCard({ title, teaser }: { title: string; teaser: string }) {
+function FirstImprovementCard({ improvements }: { improvements: string | string[] }) {
+  const getFirstImprovement = (): string => {
+    if (Array.isArray(improvements) && improvements.length > 0) {
+      return improvements[0];
+    }
+    if (typeof improvements === 'string') {
+      const lines = improvements.split('\n').filter(line => line.trim());
+      for (const line of lines) {
+        const match = line.match(/^\d+\.\s*(.+)/);
+        if (match) return match[1];
+        if (line.trim()) return line.trim();
+      }
+    }
+    return "Your profile has room for improvement - unlock full report for details.";
+  };
+
   return (
-    <Card className="relative overflow-hidden">
+    <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+      <p className="text-sm leading-relaxed">{getFirstImprovement()}</p>
+    </div>
+  );
+}
+
+function LockedCard({ 
+  title, 
+  teaser,
+  realContent,
+  skipFirst = false 
+}: { 
+  title: string; 
+  teaser: string;
+  realContent?: string | string[];
+  skipFirst?: boolean;
+}) {
+  const getBlurredLines = (): string[] => {
+    if (!realContent) return [];
+    
+    let items: string[] = [];
+    if (Array.isArray(realContent)) {
+      items = realContent;
+    } else if (typeof realContent === 'string') {
+      items = realContent.split('\n').filter(line => line.trim());
+    }
+    
+    if (skipFirst && items.length > 0) {
+      items = items.slice(1);
+    }
+    
+    return items.slice(0, 4);
+  };
+
+  const blurredLines = getBlurredLines();
+  
+  return (
+    <Card className="overflow-hidden">
       <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2">
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         <Lock className="w-4 h-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="relative">
-          <div className="blur-sm select-none pointer-events-none">
-            <div className="h-3 bg-muted rounded w-full mb-2" />
-            <div className="h-3 bg-muted rounded w-4/5 mb-2" />
-            <div className="h-3 bg-muted rounded w-3/5 mb-2" />
-            <div className="h-3 bg-muted rounded w-4/5" />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center bg-background/60 backdrop-blur-[2px]">
-            <div className="text-center px-4">
-              <Lock className="w-6 h-6 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">{teaser}</p>
-            </div>
-          </div>
+        <div className="blur-[6px] select-none pointer-events-none space-y-2">
+          {blurredLines.length > 0 ? (
+            blurredLines.map((line, i) => (
+              <p key={i} className="text-sm text-muted-foreground truncate">
+                {line.substring(0, 80)}...
+              </p>
+            ))
+          ) : (
+            <>
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-4/5" />
+              <div className="h-4 bg-muted rounded w-3/5" />
+            </>
+          )}
         </div>
+        <p className="text-xs text-muted-foreground mt-3 text-center">{teaser}</p>
       </CardContent>
     </Card>
   );
