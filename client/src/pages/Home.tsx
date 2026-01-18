@@ -121,18 +121,27 @@ export default function Home() {
                       </p>
                     </div>
                     
-                    <div className="space-y-1 md:space-y-2 mt-auto">
-                      <div className="flex items-center gap-1 md:gap-2">
-                        <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-orange-500" />
-                        <div className="h-1.5 md:h-2 bg-orange-500/40 rounded-full flex-1" />
+                    <div className="space-y-1.5 md:space-y-2 mt-auto">
+                      <div>
+                        <p className="text-[8px] md:text-[10px] text-muted-foreground mb-0.5">Photos</p>
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-orange-500" />
+                          <div className="h-1.5 md:h-2 bg-orange-500/40 rounded-full flex-1" />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 md:gap-2">
-                        <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-amber-500" />
-                        <div className="h-1.5 md:h-2 bg-amber-500/30 rounded-full flex-1" />
+                      <div>
+                        <p className="text-[8px] md:text-[10px] text-muted-foreground mb-0.5">Bio</p>
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-amber-500" />
+                          <div className="h-1.5 md:h-2 bg-amber-500/30 rounded-full flex-1" />
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 md:gap-2">
-                        <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-500" />
-                        <div className="h-1.5 md:h-2 bg-green-500/30 rounded-full flex-1" />
+                      <div>
+                        <p className="text-[8px] md:text-[10px] text-muted-foreground mb-0.5">Conversation</p>
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-500" />
+                          <div className="h-1.5 md:h-2 bg-green-500/30 rounded-full flex-1" />
+                        </div>
                       </div>
                     </div>
                   </div>
