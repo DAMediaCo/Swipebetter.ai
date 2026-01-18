@@ -426,7 +426,14 @@ export default function ProfileResults() {
                         {index + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm leading-relaxed text-muted-foreground">{bio}</p>
+                        <ReactMarkdown
+                          components={{
+                            p: ({ children }) => <p className="text-sm leading-relaxed text-muted-foreground">{children}</p>,
+                            strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                          }}
+                        >
+                          {bio}
+                        </ReactMarkdown>
                       </div>
                       <Button
                         variant="ghost"
