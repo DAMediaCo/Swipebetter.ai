@@ -248,6 +248,14 @@ export default function Pricing() {
           </div>
         )}
 
+        {!isSubscribed && !user && (
+          <div className="text-center mt-4">
+            <Link href="/auth" className="text-sm text-muted-foreground hover:text-foreground transition-colors" data-testid="link-free-signup">
+              Not ready to upgrade? <span className="underline">Create a free account</span> to save your results.
+            </Link>
+          </div>
+        )}
+
         {!isSubscribed && (
           <div className="mt-8 max-w-2xl mx-auto bg-white/50 dark:bg-slate-900/50 rounded-xl p-4">
             <div className="flex items-center justify-center gap-3">
