@@ -17,10 +17,19 @@ export function getResendClient() {
 export async function sendPasswordResetEmail(to: string, resetToken: string, firstName?: string | null) {
   const { client, fromEmail } = getResendClient();
   
-  // Use dev domain in development, otherwise use APP_URL or production URL
-  const baseUrl = process.env.APP_URL || 
-    (process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : 'https://swipebetter.ai');
+  // Determine base URL: prioritize APP_URL, then dev domain, then fallback
+  let baseUrl: string;
+  if (process.env.APP_URL) {
+    baseUrl = process.env.APP_URL;
+  } else if (process.env.REPLIT_DEV_DOMAIN) {
+    baseUrl = `https://${process.env.REPLIT_DEV_DOMAIN}`;
+  } else {
+    baseUrl = 'https://swipebetter.ai';
+  }
+  // Ensure no trailing slash
+  baseUrl = baseUrl.replace(/\/$/, '');
   const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
+  console.log(`[Email] Sending password reset to ${to} with URL: ${resetUrl}`);
   const name = firstName || 'there';
   
   await client.emails.send({
