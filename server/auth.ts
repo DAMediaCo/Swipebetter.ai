@@ -499,12 +499,14 @@ export function registerAuthRoutes(app: Express) {
     try {
       const parsed = resetPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
+        console.error("Reset password validation error:", parsed.error.errors);
         return res.status(400).json({ 
           message: parsed.error.errors[0]?.message || "Invalid input" 
         });
       }
 
       const { token, password } = parsed.data;
+      console.log("Reset password attempt with token length:", token?.length, "token preview:", token?.substring(0, 10));
 
       // Find valid token
       const [resetRecord] = await db
@@ -517,6 +519,8 @@ export function registerAuthRoutes(app: Express) {
           )
         )
         .limit(1);
+
+      console.log("Reset record found:", resetRecord ? "yes" : "no", resetRecord ? `usedAt: ${resetRecord.usedAt}` : "");
 
       if (!resetRecord || resetRecord.usedAt) {
         return res.status(400).json({ message: "Invalid or expired reset link" });

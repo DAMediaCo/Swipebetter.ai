@@ -17,7 +17,10 @@ export function getResendClient() {
 export async function sendPasswordResetEmail(to: string, resetToken: string, firstName?: string | null) {
   const { client, fromEmail } = getResendClient();
   
-  const resetUrl = `${process.env.APP_URL || 'https://swipebetter.ai'}/reset-password?token=${resetToken}`;
+  // Use dev domain in development, otherwise use APP_URL or production URL
+  const baseUrl = process.env.APP_URL || 
+    (process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : 'https://swipebetter.ai');
+  const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
   const name = firstName || 'there';
   
   await client.emails.send({
