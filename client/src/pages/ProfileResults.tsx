@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,131 @@ interface ProfileAnalysisData {
   photoFeedback: string | string[];
   improvements: string | string[];
   firstTip?: string;
+}
+
+// Helper function to extract the first improvement tip
+function getFirstTip(improvements: string | string[]): string {
+  // Check if improvements is empty or is the old placeholder text
+  if (!improvements) return "";
+  
+  const isPlaceholder = (text: string): boolean => {
+    return text.includes("[Upgrade to unlock") || 
+           text.includes("upgrade to unlock") ||
+           text.includes("Upgrade to see");
+  };
+  
+  if (Array.isArray(improvements) && improvements.length > 0) {
+    const first = improvements[0];
+    if (!isPlaceholder(first)) return first;
+    return "";
+  }
+  
+  if (typeof improvements === 'string') {
+    if (isPlaceholder(improvements)) return "";
+    
+    const lines = improvements.split('\n').filter(line => line.trim());
+    for (const line of lines) {
+      if (isPlaceholder(line)) continue;
+      const match = line.match(/^\d+\.\s*(.+)/);
+      if (match) return match[1];
+      if (line.trim()) return line.trim();
+    }
+  }
+  return "";
+}
+
+// Color-coded score breakdown with progress bar
+function ScoreBreakdown({ 
+  label, 
+  icon, 
+  score 
+}: { 
+  label: string; 
+  icon: React.ReactNode; 
+  score: number;
+}) {
+  // Color coding: red <50, orange 50-75, green 75+
+  const getScoreColor = (s: number): string => {
+    if (s < 50) return "text-red-500";
+    if (s < 75) return "text-orange-500";
+    return "text-green-500";
+  };
+  
+  const getProgressColor = (s: number): string => {
+    if (s < 50) return "[&>div]:bg-red-500";
+    if (s < 75) return "[&>div]:bg-orange-500";
+    return "[&>div]:bg-green-500";
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="text-muted-foreground">{icon}</div>
+      <div className="flex-1">
+        <div className="flex justify-between text-sm mb-1">
+          <span>{label}</span>
+          <span className={getScoreColor(score)}>{score}/100</span>
+        </div>
+        <Progress value={score} className={`h-2 ${getProgressColor(score)}`} />
+      </div>
+    </div>
+  );
+}
+
+// Blurred section with overlay unlock button
+function BlurredSection({ 
+  title, 
+  content,
+  isLoggedIn
+}: { 
+  title: string; 
+  content: string | string[];
+  isLoggedIn: boolean;
+}) {
+  const getContentLines = (): string[] => {
+    if (!content) return [];
+    if (Array.isArray(content)) {
+      return content.slice(0, 4);
+    }
+    if (typeof content === 'string') {
+      return content.split('\n').filter(line => line.trim()).slice(0, 4);
+    }
+    return [];
+  };
+
+  const lines = getContentLines();
+  
+  return (
+    <Card className="relative overflow-hidden">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="blur-[5px] select-none pointer-events-none space-y-2 min-h-[80px]">
+          {lines.length > 0 ? (
+            lines.map((line, i) => (
+              <p key={i} className="text-sm text-muted-foreground">
+                {line.substring(0, 100)}
+              </p>
+            ))
+          ) : (
+            <>
+              <div className="h-4 bg-muted rounded w-full" />
+              <div className="h-4 bg-muted rounded w-4/5" />
+              <div className="h-4 bg-muted rounded w-3/5" />
+            </>
+          )}
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center bg-background/30">
+          <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
+            <Button variant="secondary" size="sm" data-testid={`button-unlock-${title.toLowerCase().replace(/ /g, "-")}`}>
+              <Unlock className="w-4 h-4 mr-2" />
+              Unlock to Reveal
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function ProfileResults() {
@@ -265,8 +390,8 @@ export default function ProfileResults() {
                 </CardHeader>
                 <CardContent>
                   <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                    <p className="text-sm leading-relaxed">
-                      {result.firstTip || getFirstTip(result.improvements)}
+                    <p className="text-sm leading-relaxed" data-testid="text-first-tip">
+                      {result.firstTip || getFirstTip(result.improvements) || "Run a new analysis to see your personalized improvement tip"}
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground mt-3 text-center">
@@ -375,96 +500,3 @@ function ResultCard({
   );
 }
 
-function getFirstTip(improvements: string | string[]): string {
-  if (Array.isArray(improvements) && improvements.length > 0) {
-    return improvements[0];
-  }
-  if (typeof improvements === 'string') {
-    const lines = improvements.split('\n').filter(line => line.trim());
-    for (const line of lines) {
-      const match = line.match(/^\d+\.\s*(.+)/);
-      if (match) return match[1];
-      if (line.trim()) return line.trim();
-    }
-  }
-  return "Your profile has room for improvement - unlock full report for details.";
-}
-
-function ScoreBreakdown({ 
-  label, 
-  icon, 
-  score 
-}: { 
-  label: string; 
-  icon: React.ReactNode; 
-  score: number;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="text-muted-foreground">{icon}</div>
-      <div className="flex-1">
-        <div className="flex justify-between text-sm mb-1">
-          <span>{label}</span>
-          <span className="text-muted-foreground">{score}/100</span>
-        </div>
-        <Progress value={score} className="h-2" />
-      </div>
-    </div>
-  );
-}
-
-function BlurredSection({ 
-  title, 
-  content,
-  isLoggedIn
-}: { 
-  title: string; 
-  content: string | string[];
-  isLoggedIn: boolean;
-}) {
-  const getContentLines = (): string[] => {
-    if (!content) return [];
-    if (Array.isArray(content)) {
-      return content.slice(0, 4);
-    }
-    if (typeof content === 'string') {
-      return content.split('\n').filter(line => line.trim()).slice(0, 4);
-    }
-    return [];
-  };
-
-  const lines = getContentLines();
-  
-  return (
-    <Card className="relative overflow-hidden">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="blur-[5px] select-none pointer-events-none space-y-2 min-h-[80px]">
-          {lines.length > 0 ? (
-            lines.map((line, i) => (
-              <p key={i} className="text-sm text-muted-foreground">
-                {line.substring(0, 100)}
-              </p>
-            ))
-          ) : (
-            <>
-              <div className="h-4 bg-muted rounded w-full" />
-              <div className="h-4 bg-muted rounded w-4/5" />
-              <div className="h-4 bg-muted rounded w-3/5" />
-            </>
-          )}
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
-            <Button variant="secondary" size="sm" data-testid={`button-unlock-${title.toLowerCase().replace(/ /g, "-")}`}>
-              <Unlock className="w-4 h-4 mr-2" />
-              Unlock to Reveal
-            </Button>
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}

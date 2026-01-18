@@ -251,7 +251,10 @@ export async function registerRoutes(
 
       res.json({ 
         analysis: savedAnalysis,
-        parsed: analysis,
+        parsed: {
+          ...analysis,
+          firstTip,
+        },
         isPaidUser: true,
       });
     } catch (error) {
