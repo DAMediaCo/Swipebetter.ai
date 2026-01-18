@@ -323,10 +323,15 @@ export default function ProfileResults() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                    <p className="text-sm leading-relaxed" data-testid="text-first-tip">
+                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20" data-testid="text-first-tip">
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => <p className="text-sm leading-relaxed">{children}</p>,
+                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                      }}
+                    >
                       {result.firstTip || getFirstTip(result.improvements) || "Run a new analysis to see your personalized improvement tip"}
-                    </p>
+                    </ReactMarkdown>
                   </div>
                   <p className="text-xs text-muted-foreground mt-3 text-center">
                     Unlock your report to see all recommendations
