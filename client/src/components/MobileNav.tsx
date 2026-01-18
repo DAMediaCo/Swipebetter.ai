@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Home, Wrench, LogIn, User } from "lucide-react";
+import { Home, Wrench, LogIn, User, CreditCard } from "lucide-react";
 import { useAuth, useLogout } from "@/lib/auth";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/dashboard", icon: Wrench, label: "Dashboard" },
+  { href: "/account", icon: CreditCard, label: "Account", requiresAuth: true },
 ];
 
 export function MobileNav() {
@@ -16,7 +17,9 @@ export function MobileNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-bottom md:hidden">
       <div className="flex items-center justify-around h-16">
-        {navItems.map((item) => {
+        {navItems
+          .filter((item) => !item.requiresAuth || user)
+          .map((item) => {
           const isActive = location === item.href || 
             (item.href !== "/" && location.startsWith(item.href));
           return (

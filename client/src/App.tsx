@@ -41,6 +41,7 @@ import Contact from "@/pages/Contact";
 import AcceptableUse from "@/pages/AcceptableUse";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
+import Account from "@/pages/Account";
 import NotFound from "@/pages/not-found";
 import { LegalFooter } from "@/components/LegalFooter";
 
@@ -81,6 +82,7 @@ function Router() {
       <Route path="/acceptable-use" component={AcceptableUse} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/account" component={Account} />
       <Route component={NotFound} />
     </Switch>
   );
