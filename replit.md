@@ -181,3 +181,18 @@ Preferred communication style: Simple, everyday language.
   - `GOOGLE_CLIENT_ID` - Google OAuth client ID
   - `JWT_SECRET` - (optional, defaults to SESSION_SECRET)
 - **API Spec**: See `MOBILE_APP_API_SPEC.md` for complete mobile integration documentation
+
+### Password Reset Feature (January 2025)
+- **Email Provider**: Resend via Replit connector integration
+- **Endpoints**:
+  - `POST /api/auth/forgot-password` - Accepts email, generates secure token, sends reset email
+  - `POST /api/auth/reset-password` - Accepts token + new password, validates and updates
+- **Security**:
+  - Tokens are 32-byte cryptographically secure (crypto.randomBytes)
+  - Tokens expire after 1 hour
+  - Tokens can only be used once (usedAt tracking)
+  - Same response for valid/invalid emails (prevents email enumeration)
+- **Frontend Routes**:
+  - `/forgot-password` - Email input form
+  - `/reset-password?token=xxx` - New password form
+- **Database**: `password_reset_tokens` table with userId, token, expiresAt, usedAt
