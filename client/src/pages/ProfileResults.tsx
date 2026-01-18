@@ -314,22 +314,61 @@ export default function ProfileResults() {
           </Card>
 
           {!isPro && (
-            <Card className="border-primary/30 bg-primary/5">
-              <CardContent className="pt-6 text-center">
-                <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
-                  <Button size="lg" className="w-full text-lg py-6" data-testid="button-unlock-main">
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    {isLoggedIn ? "Unlock Full Report" : "Sign up free to unlock"}
-                  </Button>
-                </Link>
-                <p className="text-xs text-muted-foreground mt-3">
-                  See bio rewrites, photo feedback & actionable tips
-                </p>
-              </CardContent>
-            </Card>
+            <>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                    Your #1 Issue
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                    <p className="text-sm leading-relaxed" data-testid="text-first-tip">
+                      {result.firstTip || getFirstTip(result.improvements) || "Run a new analysis to see your personalized improvement tip"}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-3 text-center">
+                    Unlock your report to see all recommendations
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/30 bg-primary/5">
+                <CardContent className="pt-6 text-center">
+                  <Link href={isLoggedIn ? "/fix-profile/upgrade" : "/auth"}>
+                    <Button size="lg" className="w-full text-lg py-6" data-testid="button-unlock-main">
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      {isLoggedIn ? "Unlock Full Report" : "Sign up free to unlock"}
+                    </Button>
+                  </Link>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    See bio rewrites, photo feedback & actionable tips
+                  </p>
+                </CardContent>
+              </Card>
+
+              <BlurredSection 
+                title="Bio Suggestions" 
+                content={result.bioSuggestions}
+                isLoggedIn={isLoggedIn}
+              />
+              
+              <BlurredSection 
+                title="Photo Feedback" 
+                content={result.photoFeedback}
+                isLoggedIn={isLoggedIn}
+              />
+              
+              <BlurredSection 
+                title="More Improvements" 
+                content={result.improvements}
+                isLoggedIn={isLoggedIn}
+              />
+            </>
           )}
 
-          {isPro ? (
+          {isPro && (
             <>
               <Card>
                 <CardHeader className="pb-2">
@@ -377,45 +416,6 @@ export default function ProfileResults() {
                 content={result.improvements}
                 onCopy={() => copyToClipboard(result.improvements, "improvements")}
                 copied={copiedField === "improvements"}
-              />
-            </>
-          ) : (
-            <>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-primary" />
-                    Your #1 Issue
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                    <p className="text-sm leading-relaxed" data-testid="text-first-tip">
-                      {result.firstTip || getFirstTip(result.improvements) || "Run a new analysis to see your personalized improvement tip"}
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-3 text-center">
-                    Unlock your report to see all recommendations
-                  </p>
-                </CardContent>
-              </Card>
-
-              <BlurredSection 
-                title="Bio Suggestions" 
-                content={result.bioSuggestions}
-                isLoggedIn={isLoggedIn}
-              />
-              
-              <BlurredSection 
-                title="Photo Feedback" 
-                content={result.photoFeedback}
-                isLoggedIn={isLoggedIn}
-              />
-              
-              <BlurredSection 
-                title="More Improvements" 
-                content={result.improvements}
-                isLoggedIn={isLoggedIn}
               />
             </>
           )}
