@@ -277,6 +277,7 @@ export function registerAuthRoutes(app: Express) {
         process.env.APPLE_CLIENT_ID,
         "host.exp.Exponent",
         "com.swipebetter.app",
+        "app.replit.swipebetter",
       ].filter(Boolean) as string[];
       
       console.log("Valid audiences configured:", validAudiences);
