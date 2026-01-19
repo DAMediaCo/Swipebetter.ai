@@ -459,6 +459,167 @@ export async function registerRoutes(
     res.json({ profileAnalyses, replyAnalyses });
   });
 
+  // Profile analyses CRUD endpoints (for mobile app)
+  // Schema for storing completed profile analysis results
+  const storeProfileAnalysisSchema = z.object({
+    platform: z.enum(["Tinder", "Hinge", "Bumble", "Grindr", "Coffee Meets Bagel", "Other"]),
+    gender: z.enum(["Man", "Woman", "Non-binary"]),
+    intent: z.enum(["Relationship", "Casual Dating", "Friendship", "Not Sure"]),
+    screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).min(1).max(MAX_SCREENSHOTS),
+    bioSuggestions: z.string().nullable().optional(),
+    photoFeedback: z.string().nullable().optional(),
+    overallScore: z.number().int().min(0).max(100).nullable().optional(),
+    improvements: z.string().nullable().optional(),
+  });
+
+  app.post("/api/analyses/profile", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const parseResult = storeProfileAnalysisSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: parseResult.error.flatten() 
+        });
+      }
+
+      const { platform, gender, intent, screenshots, bioSuggestions, photoFeedback, overallScore, improvements } = parseResult.data;
+
+      const analysis = await storage.createProfileAnalysis({
+        userId,
+        platform,
+        gender,
+        intent,
+        screenshots,
+        bioSuggestions: bioSuggestions ?? null,
+        photoFeedback: photoFeedback ?? null,
+        overallScore: overallScore ?? null,
+        improvements: improvements ?? null,
+      });
+
+      res.status(201).json(analysis);
+    } catch (error) {
+      console.error("Create profile analysis error:", error);
+      res.status(500).json({ error: "Failed to save profile analysis" });
+    }
+  });
+
+  app.get("/api/analyses/profile", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const subscription = await storage.getUserSubscription(userId);
+      const isSubscribed = subscription?.status === "active";
+      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+      const isPaidUser = isSubscribed || hasOneTimeCredits;
+
+      const analyses = await storage.getProfileAnalyses(userId);
+
+      if (!isPaidUser) {
+        const redacted = analyses.map((a: any) => ({
+          id: a.id,
+          userId: a.userId,
+          platform: a.platform,
+          overallScore: a.overallScore,
+          createdAt: a.createdAt,
+          bioSuggestions: "[Upgrade to unlock]",
+          photoFeedback: "[Upgrade to unlock]",
+          improvements: "[Upgrade to unlock]",
+        }));
+        return res.json(redacted);
+      }
+
+      res.json(analyses);
+    } catch (error) {
+      console.error("Get profile analyses error:", error);
+      res.status(500).json({ error: "Failed to retrieve profile analyses" });
+    }
+  });
+
+  // Reply analyses CRUD endpoints (for mobile app)
+  // Schema for storing completed reply analysis results
+  const storeReplyAnalysisSchema = z.object({
+    tone: z.enum(["flirty", "witty", "confident", "thoughtful"]),
+    screenshots: z.array(z.string().max(MAX_SCREENSHOT_SIZE)).max(3).optional().default([]),
+    conversationText: z.string().max(5000).optional(),
+    suggestedReplies: z.array(z.string()).nullable().optional(),
+    conversationContext: z.string().nullable().optional(),
+  }).refine(data => (data.screenshots && data.screenshots.length > 0) || (data.conversationText && data.conversationText.trim().length > 0), {
+    message: "Either screenshots or conversation text is required"
+  });
+
+  app.post("/api/analyses/reply", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const parseResult = storeReplyAnalysisSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: parseResult.error.flatten() 
+        });
+      }
+
+      const { tone, screenshots, conversationText, suggestedReplies, conversationContext } = parseResult.data;
+
+      const analysis = await storage.createReplyAnalysis({
+        userId,
+        tone,
+        screenshots: screenshots ?? [],
+        suggestedReplies: suggestedReplies ?? [],
+        conversationContext: conversationContext ?? conversationText ?? null,
+      });
+
+      res.status(201).json(analysis);
+    } catch (error) {
+      console.error("Create reply analysis error:", error);
+      res.status(500).json({ error: "Failed to save reply analysis" });
+    }
+  });
+
+  app.get("/api/analyses/reply", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const subscription = await storage.getUserSubscription(userId);
+      const isSubscribed = subscription?.status === "active";
+      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+      const isPaidUser = isSubscribed || hasOneTimeCredits;
+
+      const analyses = await storage.getReplyAnalyses(userId);
+
+      if (!isPaidUser) {
+        const redacted = analyses.map((a: any) => ({
+          id: a.id,
+          userId: a.userId,
+          tone: a.tone,
+          createdAt: a.createdAt,
+          suggestedReplies: ["[Upgrade to unlock reply suggestions]"],
+          conversationContext: "[Upgrade to unlock]",
+        }));
+        return res.json(redacted);
+      }
+
+      res.json(analyses);
+    } catch (error) {
+      console.error("Get reply analyses error:", error);
+      res.status(500).json({ error: "Failed to retrieve reply analyses" });
+    }
+  });
+
   app.get("/api/stripe/publishable-key", async (req, res) => {
     try {
       const publishableKey = await getStripePublishableKey();
