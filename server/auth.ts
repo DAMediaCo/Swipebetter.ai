@@ -247,6 +247,28 @@ export function registerAuthRoutes(app: Express) {
         return res.status(400).json({ message: "Missing identity token" });
       }
 
+      // Decode token to inspect claims before verification (for debugging)
+      let decodedToken: { header?: unknown; payload?: { aud?: string; iss?: string; exp?: number; sub?: string } } = {};
+      try {
+        const parts = identityToken.split('.');
+        if (parts.length === 3) {
+          decodedToken = {
+            header: JSON.parse(Buffer.from(parts[0], 'base64').toString()),
+            payload: JSON.parse(Buffer.from(parts[1], 'base64').toString()),
+          };
+          console.log("Apple token claims:", {
+            aud: decodedToken.payload?.aud,
+            iss: decodedToken.payload?.iss,
+            exp: decodedToken.payload?.exp,
+            expDate: decodedToken.payload?.exp ? new Date(decodedToken.payload.exp * 1000).toISOString() : null,
+            now: new Date().toISOString(),
+            sub: decodedToken.payload?.sub?.substring(0, 10) + "...",
+          });
+        }
+      } catch (decodeErr) {
+        console.error("Failed to decode token for debugging:", decodeErr);
+      }
+
       // Accept multiple valid audiences for Apple Sign In:
       // - Web client ID (APPLE_CLIENT_ID)
       // - Expo Go development (host.exp.Exponent)
@@ -256,6 +278,8 @@ export function registerAuthRoutes(app: Express) {
         "host.exp.Exponent",
         "com.swipebetter.app",
       ].filter(Boolean) as string[];
+      
+      console.log("Valid audiences configured:", validAudiences);
 
       let payload;
       try {
@@ -263,9 +287,37 @@ export function registerAuthRoutes(app: Express) {
           audience: validAudiences,
           ignoreExpiration: false,
         });
-      } catch (verifyError) {
-        console.error("Apple token verification failed:", verifyError);
-        return res.status(401).json({ message: "Invalid Apple identity token" });
+        console.log("Apple token verified successfully for sub:", payload.sub?.substring(0, 10) + "...");
+      } catch (verifyError: unknown) {
+        const errorMessage = verifyError instanceof Error ? verifyError.message : String(verifyError);
+        const tokenAud = decodedToken.payload?.aud;
+        const tokenIss = decodedToken.payload?.iss;
+        const tokenExp = decodedToken.payload?.exp;
+        const isExpired = tokenExp ? Date.now() > tokenExp * 1000 : false;
+        
+        console.error("Apple token verification failed:", {
+          error: errorMessage,
+          tokenAudience: tokenAud,
+          expectedAudiences: validAudiences,
+          audienceMatch: tokenAud ? validAudiences.includes(tokenAud) : false,
+          tokenIssuer: tokenIss,
+          expectedIssuer: "https://appleid.apple.com",
+          issuerMatch: tokenIss === "https://appleid.apple.com",
+          isExpired,
+          tokenExpiry: tokenExp ? new Date(tokenExp * 1000).toISOString() : null,
+        });
+        
+        // Return more specific error message
+        let specificError = "Invalid Apple identity token";
+        if (isExpired) {
+          specificError = "Apple identity token has expired";
+        } else if (tokenAud && !validAudiences.includes(tokenAud)) {
+          specificError = `Invalid audience: ${tokenAud}`;
+        } else if (tokenIss !== "https://appleid.apple.com") {
+          specificError = "Invalid token issuer";
+        }
+        
+        return res.status(401).json({ message: specificError, debug: { tokenAud, isExpired } });
       }
 
       const appleId = payload.sub;
