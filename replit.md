@@ -185,6 +185,16 @@ Preferred communication style: Simple, everyday language.
   - `APPLE_CLIENT_ID` (web Services ID)
   - `host.exp.Exponent` (Expo Go development)
   - `com.swipebetter.app` (production mobile bundle ID)
+  - `app.replit.swipebetter` (TestFlight bundle ID)
+- **Analyses Storage Endpoints** (for mobile app):
+  - `POST /api/analyses/profile` - Save profile analysis results (requires auth)
+  - `GET /api/analyses/profile` - Retrieve user's profile analysis history
+  - `POST /api/analyses/reply` - Save reply analysis results (requires auth)
+  - `GET /api/analyses/reply` - Retrieve user's reply analysis history
+  - All endpoints support both session-based (web) and JWT-based (mobile) auth
+  - Zod validation enforces enum values, screenshot limits, and array types
+  - Reply POST accepts either screenshots OR conversationText
+  - GET endpoints redact detailed content for non-paid users (score visible, feedback hidden)
 
 ### Password Reset Feature (January 2025)
 - **Email Provider**: Resend (using user's own API key via RESEND_API_KEY secret)
