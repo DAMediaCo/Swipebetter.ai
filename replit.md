@@ -195,6 +195,10 @@ Preferred communication style: Simple, everyday language.
   - Zod validation enforces enum values, screenshot limits, and array types
   - Reply POST accepts either screenshots OR conversationText
   - GET endpoints redact detailed content for non-paid users (score visible, feedback hidden)
+- **Promo & Credits Endpoints** (for mobile app):
+  - `POST /api/promo/redeem` - Redeem promo code: `{ "code": "PROMO123" }` → `{ "success": true, "credits": 5, "message": "..." }`
+  - `GET /api/user/credits` - Get credit balance: → `{ "credits": 8 }`
+  - Both endpoints support session-based (web) and JWT-based (mobile) auth
 
 ### Password Reset Feature (January 2025)
 - **Email Provider**: Resend (using user's own API key via RESEND_API_KEY secret)
