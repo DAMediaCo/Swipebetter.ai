@@ -997,6 +997,75 @@ export async function registerRoutes(
     }
   });
 
+  // Mobile app endpoint: GET /api/user/credits
+  app.get("/api/user/credits", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      const subscription = await storage.getUserSubscription(userId);
+      const credits = subscription?.oneTimeCredits || 0;
+      res.json({ credits });
+    } catch (error) {
+      console.error("Get credits error:", error);
+      res.status(500).json({ error: "Failed to get credits" });
+    }
+  });
+
+  // Mobile app endpoint: POST /api/promo/redeem
+  app.post("/api/promo/redeem", requireAuth, async (req: any, res) => {
+    try {
+      const { code } = req.body;
+      const userId = req.session?.userId || req.user?.id;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      if (!code || typeof code !== 'string') {
+        return res.status(400).json({ error: "Promo code required" });
+      }
+      
+      const promo = await storage.getPromoCode(code.trim());
+      
+      if (!promo) {
+        return res.status(404).json({ error: "Invalid promo code" });
+      }
+      
+      if (!promo.isActive) {
+        return res.status(400).json({ error: "This promo code is no longer active" });
+      }
+      
+      if (promo.expiresAt && new Date() > promo.expiresAt) {
+        return res.status(400).json({ error: "This promo code has expired" });
+      }
+      
+      if (promo.maxRedemptions && promo.currentRedemptions >= promo.maxRedemptions) {
+        return res.status(400).json({ error: "This promo code has reached its usage limit" });
+      }
+      
+      const alreadyRedeemed = await storage.hasUserRedeemedCode(userId, promo.id);
+      if (alreadyRedeemed) {
+        return res.status(400).json({ error: "You have already used this promo code" });
+      }
+      
+      await storage.addOneTimeCredits(userId, promo.credits, "promo");
+      await storage.incrementPromoRedemptions(promo.id);
+      await storage.createPromoRedemption(userId, promo.id);
+      
+      res.json({ 
+        success: true, 
+        credits: promo.credits,
+        message: `You received ${promo.credits} free analyses!`
+      });
+    } catch (error) {
+      console.error("Redeem promo error:", error);
+      res.status(500).json({ error: "Failed to redeem promo code" });
+    }
+  });
+
+  // Web app endpoint (kept for backwards compatibility)
   app.post("/api/redeem-promo", requireAuth, async (req: any, res) => {
     try {
       const { code } = req.body;
