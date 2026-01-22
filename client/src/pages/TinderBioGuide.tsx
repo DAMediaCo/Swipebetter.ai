@@ -39,7 +39,7 @@ export default function TinderBioGuide() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -55,7 +55,7 @@ export default function TinderBioGuide() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               Most Tinder bios don't work. Not because people aren't interesting, but because they don't know how to translate who they are into a few lines of text. The result? Generic phrases, awkward jokes, or bios so vague they could describe anyone.
@@ -66,7 +66,7 @@ export default function TinderBioGuide() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What a Good Tinder Bio Actually Does</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What a Good Tinder Bio Actually Does</h2>
             <p className="leading-relaxed">
               A good bio serves three purposes. First, it shows your personality. Not a list of traits, but a genuine sense of who you are. Second, it provides easy conversation hooks. Something specific that makes it easy for someone to message you. Third, it sets expectations. Whether you're looking for something serious or casual, the right bio attracts the right people.
             </p>
@@ -76,7 +76,7 @@ export default function TinderBioGuide() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Tinder Bio Length: What Actually Works</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Tinder Bio Length: What Actually Works</h2>
             <p className="leading-relaxed">
               Short bios (1-2 lines) work well when your photos are strong and do most of the talking. A quick, punchy line can be effective if it's genuinely clever or intriguing.
             </p>
@@ -89,7 +89,7 @@ export default function TinderBioGuide() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Good Tinder Bio Examples: Before and After</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Good Tinder Bio Examples: Before and After</h2>
             <p className="leading-relaxed mb-6">
               Here's what the difference looks like in practice. These aren't templates to copy. They're examples of how small changes make a big difference.
             </p>
@@ -159,30 +159,30 @@ export default function TinderBioGuide() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common Tinder Bio Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common Tinder Bio Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>Trying too hard to be funny.</strong> Humor is great, but forced jokes fall flat. If a line doesn't come naturally, leave it out. Genuine beats clever every time.
+              <strong className="text-foreground">Trying too hard to be funny.</strong> Humor is great, but forced jokes fall flat. If a line doesn't come naturally, leave it out. Genuine beats clever every time.
             </p>
             <p className="leading-relaxed">
-              <strong>Listing traits instead of showing them.</strong> Saying you're "funny and adventurous" tells someone nothing. Showing it through a specific detail or story is much more effective.
+              <strong className="text-foreground">Listing traits instead of showing them.</strong> Saying you're "funny and adventurous" tells someone nothing. Showing it through a specific detail or story is much more effective.
             </p>
             <p className="leading-relaxed">
-              <strong>Inside jokes no one understands.</strong> References that only make sense to you (or a small group) don't translate. Keep it accessible.
+              <strong className="text-foreground">Inside jokes no one understands.</strong> References that only make sense to you (or a small group) don't translate. Keep it accessible.
             </p>
             <p className="leading-relaxed">
-              <strong>Being negative.</strong> Bios that focus on what you don't want ("no drama," "swipe left if...") come across as bitter. Focus on what you're looking for instead.
+              <strong className="text-foreground">Being negative.</strong> Bios that focus on what you don't want ("no drama," "swipe left if...") come across as bitter. Focus on what you're looking for instead.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">A Simple Tinder Bio Framework</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">A Simple Tinder Bio Framework</h2>
             <p className="leading-relaxed mb-4">
               If you're stuck, try this simple structure:
             </p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li><strong>One sentence about what you do or who you are.</strong> Keep it simple and real.</li>
-              <li><strong>One sentence about your interests or lifestyle.</strong> Something specific that shows personality.</li>
-              <li><strong>One light hook or invitation.</strong> Give someone an easy way to message you.</li>
+              <li><strong className="text-foreground">One sentence about what you do or who you are.</strong> Keep it simple and real.</li>
+              <li><strong className="text-foreground">One sentence about your interests or lifestyle.</strong> Something specific that shows personality.</li>
+              <li><strong className="text-foreground">One light hook or invitation.</strong> Give someone an easy way to message you.</li>
             </ol>
             <p className="leading-relaxed mt-4">
               That's it. You don't need more than this. The goal isn't to tell your life story. It's to start a conversation.
@@ -190,7 +190,7 @@ export default function TinderBioGuide() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">When to Rewrite Your Bio</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">When to Rewrite Your Bio</h2>
             <p className="leading-relaxed">
               If you're getting fewer matches than expected, your bio might be the problem. This is especially true if your photos are solid but conversations aren't starting.
             </p>
@@ -221,26 +221,26 @@ export default function TinderBioGuide() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">Does this advice work for other dating apps?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Does this advice work for other dating apps?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Yes. The principles here apply to Hinge, Bumble, and most other dating apps. The format might differ slightly (Hinge uses prompts instead of a bio), but the core ideas about clarity, specificity, and conversation hooks remain the same.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I mention my hobbies?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I mention my hobbies?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Only if they're specific and interesting. "I like music" says nothing. "I've seen the same band live four times" says a lot. Pick one or two things that actually reveal something about you.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">How often should I update my bio?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How often should I update my bio?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Every few months, or whenever your life changes significantly. If you're not getting results, try testing different versions. Small tweaks can make a big difference.
                 </p>
               </div>
@@ -248,7 +248,7 @@ export default function TinderBioGuide() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Writing a good Tinder bio takes a bit of thought, but it's not complicated. Be specific, be genuine, and give people something to talk about. If you want more help, our <Link href="/fix-profile" className="text-primary underline">profile analysis tool</Link> can give you personalized suggestions. And if you're matching but struggling with conversations, check out our <Link href="/fix-reply" className="text-primary underline">reply helper</Link> for message ideas.
             </p>
           </section>

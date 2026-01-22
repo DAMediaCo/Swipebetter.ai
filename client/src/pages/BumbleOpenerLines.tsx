@@ -23,7 +23,7 @@ export default function BumbleOpenerLines() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function BumbleOpenerLines() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               On Bumble, women make the first move. But with a 24-hour window and plenty of matches to choose from, most openers get ignored. The problem isn't that people are picky. It's that most first messages don't give anyone a reason to respond.
@@ -50,7 +50,7 @@ export default function BumbleOpenerLines() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why Most Bumble Openers Fail</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Why Most Bumble Openers Fail</h2>
             <p className="leading-relaxed">
               "Hey" and "Hi, how are you?" fail because they put all the effort on the other person. There's nothing to respond to. It feels like small talk, and small talk is boring.
             </p>
@@ -60,7 +60,7 @@ export default function BumbleOpenerLines() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Bumble Opener Examples: What Works</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Bumble Opener Examples: What Works</h2>
             <p className="leading-relaxed mb-6">
               The best openers reference something specific from their profile. Here's what that looks like:
             </p>
@@ -72,7 +72,7 @@ export default function BumbleOpenerLines() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Generic</p>
-                      <p className="text-muted-foreground italic">"Hey! How's your week going?"</p>
+                      <p className="text-foreground/80 italic">"Hey! How's your week going?"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -91,7 +91,7 @@ export default function BumbleOpenerLines() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Generic</p>
-                      <p className="text-muted-foreground italic">"You seem cool, what do you do for fun?"</p>
+                      <p className="text-foreground/80 italic">"You seem cool, what do you do for fun?"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -110,7 +110,7 @@ export default function BumbleOpenerLines() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Generic</p>
-                      <p className="text-muted-foreground italic">"Your profile is really interesting!"</p>
+                      <p className="text-foreground/80 italic">"Your profile is really interesting!"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -126,15 +126,15 @@ export default function BumbleOpenerLines() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Opener Formulas That Work</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Opener Formulas That Work</h2>
             <p className="leading-relaxed mb-4">
               If you're stuck, try one of these formats:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li><strong>The specific question:</strong> "I saw [detail from profile]. [Question about it]?"</li>
-              <li><strong>The playful challenge:</strong> "Okay, I have to ask... [light opinion/question]"</li>
-              <li><strong>The shared interest:</strong> "Another [hobby] person! [Follow-up question]"</li>
-              <li><strong>The compliment + question:</strong> "That [photo/detail] is great. [Question about it]?"</li>
+              <li><strong className="text-foreground">The specific question:</strong> "I saw [detail from profile]. [Question about it]?"</li>
+              <li><strong className="text-foreground">The playful challenge:</strong> "Okay, I have to ask... [light opinion/question]"</li>
+              <li><strong className="text-foreground">The shared interest:</strong> "Another [hobby] person! [Follow-up question]"</li>
+              <li><strong className="text-foreground">The compliment + question:</strong> "That [photo/detail] is great. [Question about it]?"</li>
             </ul>
             <p className="leading-relaxed mt-4">
               If their profile doesn't give you much to work with, that's okay. A simple observation or light question still beats "Hey."
@@ -142,23 +142,23 @@ export default function BumbleOpenerLines() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common Bumble Opener Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common Bumble Opener Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>Being too generic.</strong> If your opener could work for anyone, it probably won't work for anyone.
+              <strong className="text-foreground">Being too generic.</strong> If your opener could work for anyone, it probably won't work for anyone.
             </p>
             <p className="leading-relaxed">
-              <strong>Overthinking it.</strong> You don't need a perfect line. You just need something easy to respond to.
+              <strong className="text-foreground">Overthinking it.</strong> You don't need a perfect line. You just need something easy to respond to.
             </p>
             <p className="leading-relaxed">
-              <strong>Making it about yourself.</strong> Save your stories for the conversation. The opener should focus on them.
+              <strong className="text-foreground">Making it about yourself.</strong> Save your stories for the conversation. The opener should focus on them.
             </p>
             <p className="leading-relaxed">
-              <strong>Being too forward too fast.</strong> Keep it friendly. There's plenty of time to flirt once you're actually talking.
+              <strong className="text-foreground">Being too forward too fast.</strong> Keep it friendly. There's plenty of time to flirt once you're actually talking.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What to Do When Their Profile Is Empty</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What to Do When Their Profile Is Empty</h2>
             <p className="leading-relaxed">
               Sometimes profiles don't give you much. In that case, go with something light and playful:
             </p>
@@ -191,26 +191,26 @@ export default function BumbleOpenerLines() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">Does the opener really matter that much?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Does the opener really matter that much?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Yes and no. A great opener won't save a bad profile, but a bad opener can kill a good match. It's the difference between starting a conversation and getting ghosted.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I use the same opener for everyone?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I use the same opener for everyone?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Ideally, no. Personalized openers get better responses. But if you're short on time, have a few go-to options that work for most profiles.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">What if they don't respond?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">What if they don't respond?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Don't take it personally. People get busy, matches expire, or the timing wasn't right. Move on and try again with someone new.
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function BumbleOpenerLines() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Good openers are specific, easy to respond to, and feel like the start of a real conversation. If you want help improving your profile to get more matches in the first place, try our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>. For help with ongoing conversations, our <Link href="/fix-reply" className="text-primary underline">reply tool</Link> has you covered.
             </p>
           </section>

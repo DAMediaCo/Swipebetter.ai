@@ -23,7 +23,7 @@ export default function ReviveDeadConversation() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function ReviveDeadConversation() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               You were having a great conversation, then suddenly nothing. No response for days. It happens to everyone, and it doesn't always mean they're not interested. People get busy, forget to reply, or just didn't know what to say.
@@ -50,7 +50,7 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why Conversations Die</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Why Conversations Die</h2>
             <p className="leading-relaxed">
               Understanding why conversations stall helps you respond better. Common reasons include:
             </p>
@@ -67,9 +67,9 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">How to Revive a Dead Conversation</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">How to Revive a Dead Conversation</h2>
             
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Casual Check-In</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Casual Check-In</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="leading-relaxed">
@@ -83,7 +83,7 @@ export default function ReviveDeadConversation() {
               </CardContent>
             </Card>
 
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Callback</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Callback</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="leading-relaxed">
@@ -97,7 +97,7 @@ export default function ReviveDeadConversation() {
               </CardContent>
             </Card>
 
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Direct Approach</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Direct Approach</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="leading-relaxed">
@@ -113,7 +113,7 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Revival Examples: What Works</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Revival Examples: What Works</h2>
 
             <div className="space-y-6">
               <Card>
@@ -122,7 +122,7 @@ export default function ReviveDeadConversation() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Awkward</p>
-                      <p className="text-muted-foreground italic">"Hello?? Did you forget about me?"</p>
+                      <p className="text-foreground/80 italic">"Hello?? Did you forget about me?"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -141,7 +141,7 @@ export default function ReviveDeadConversation() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Passive aggressive</p>
-                      <p className="text-muted-foreground italic">"Guess you're not interested then..."</p>
+                      <p className="text-foreground/80 italic">"Guess you're not interested then..."</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -157,7 +157,7 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">When to Move On</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">When to Move On</h2>
             <p className="leading-relaxed">
               One follow-up message is reasonable. If they don't respond to that either, it's time to move on. Sending multiple messages without a response crosses into annoying territory.
             </p>
@@ -173,7 +173,7 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Preventing Conversations from Dying</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Preventing Conversations from Dying</h2>
             <p className="leading-relaxed">
               Prevention is better than revival. Here's how to keep conversations going:
             </p>
@@ -205,26 +205,26 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">How long should I wait before following up?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How long should I wait before following up?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   3-5 days is usually a good window. Long enough that you're not being pushy, short enough that they still remember the conversation.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I apologize for double texting?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I apologize for double texting?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   No. One follow-up is normal and nothing to apologize for. Just be casual about it.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">What if they respond but seem less interested?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">What if they respond but seem less interested?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Suggest meeting up. If they're interested, they'll make it happen. If not, you have your answer.
                 </p>
               </div>
@@ -232,7 +232,7 @@ export default function ReviveDeadConversation() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Dead conversations happen to everyone. The key is being casual, giving them an easy out, and knowing when to move on. For more help with messaging, try our <Link href="/fix-reply" className="text-primary underline">reply helper</Link>. And if you want more quality matches to start with, check out our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>.
             </p>
           </section>

@@ -23,7 +23,7 @@ export default function HingePromptsMen() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function HingePromptsMen() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               Hinge prompts are your chance to show personality beyond your photos. But most men either pick the wrong prompts or give answers so generic they blend into every other profile. The result? Fewer likes and even fewer messages.
@@ -50,7 +50,7 @@ export default function HingePromptsMen() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why Hinge Prompts Matter More Than You Think</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Why Hinge Prompts Matter More Than You Think</h2>
             <p className="leading-relaxed">
               Unlike Tinder's single bio, Hinge gives you three prompts. That's three opportunities to show who you are and give someone a reason to reach out. Women on Hinge can like specific prompts, making it easier for them to start conversations.
             </p>
@@ -60,21 +60,21 @@ export default function HingePromptsMen() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">The Best Hinge Prompts for Men</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">The Best Hinge Prompts for Men</h2>
             <p className="leading-relaxed mb-4">
               Not all prompts are created equal. Here are the ones that consistently perform well:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li><strong>"I'm looking for..."</strong> - Sets clear expectations and filters for compatibility.</li>
-              <li><strong>"A life goal of mine..."</strong> - Shows ambition without bragging.</li>
-              <li><strong>"The way to win me over is..."</strong> - Invites engagement and gives an easy opener.</li>
-              <li><strong>"I geek out on..."</strong> - Reveals genuine interests in a relatable way.</li>
-              <li><strong>"My simple pleasures..."</strong> - Shows you appreciate the little things.</li>
+              <li><strong className="text-foreground">"I'm looking for..."</strong> - Sets clear expectations and filters for compatibility.</li>
+              <li><strong className="text-foreground">"A life goal of mine..."</strong> - Shows ambition without bragging.</li>
+              <li><strong className="text-foreground">"The way to win me over is..."</strong> - Invites engagement and gives an easy opener.</li>
+              <li><strong className="text-foreground">"I geek out on..."</strong> - Reveals genuine interests in a relatable way.</li>
+              <li><strong className="text-foreground">"My simple pleasures..."</strong> - Shows you appreciate the little things.</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Hinge Prompt Examples: Before and After</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Hinge Prompt Examples: Before and After</h2>
             <p className="leading-relaxed mb-6">
               Here's what transforming a weak answer into a strong one looks like:
             </p>
@@ -82,12 +82,12 @@ export default function HingePromptsMen() {
             <div className="space-y-6">
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Prompt: "I'm looking for..."</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Prompt: "I'm looking for..."</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Before</p>
-                      <p className="text-muted-foreground italic">"Someone who doesn't take themselves too seriously"</p>
+                      <p className="text-foreground/80 italic">"Someone who doesn't take themselves too seriously"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -102,12 +102,12 @@ export default function HingePromptsMen() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Prompt: "The way to win me over is..."</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Prompt: "The way to win me over is..."</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Before</p>
-                      <p className="text-muted-foreground italic">"Good conversation and a sense of humor"</p>
+                      <p className="text-foreground/80 italic">"Good conversation and a sense of humor"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -122,12 +122,12 @@ export default function HingePromptsMen() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Prompt: "I geek out on..."</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Prompt: "I geek out on..."</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Before</p>
-                      <p className="text-muted-foreground italic">"Sports and music"</p>
+                      <p className="text-foreground/80 italic">"Sports and music"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -147,30 +147,30 @@ export default function HingePromptsMen() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common Hinge Prompt Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common Hinge Prompt Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>Being too vague.</strong> "I love music" tells someone nothing. "I've been to 15 concerts this year" tells a story.
+              <strong className="text-foreground">Being too vague.</strong> "I love music" tells someone nothing. "I've been to 15 concerts this year" tells a story.
             </p>
             <p className="leading-relaxed">
-              <strong>Using all three prompts the same way.</strong> Variety matters. Mix serious with playful, interests with goals.
+              <strong className="text-foreground">Using all three prompts the same way.</strong> Variety matters. Mix serious with playful, interests with goals.
             </p>
             <p className="leading-relaxed">
-              <strong>Self-deprecating humor overdone.</strong> One joke about being bad at something is fine. Three makes you seem insecure.
+              <strong className="text-foreground">Self-deprecating humor overdone.</strong> One joke about being bad at something is fine. Three makes you seem insecure.
             </p>
             <p className="leading-relaxed">
-              <strong>Leaving no conversation hook.</strong> Great answers make it easy to respond. Give people something to ask about.
+              <strong className="text-foreground">Leaving no conversation hook.</strong> Great answers make it easy to respond. Give people something to ask about.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Simple Framework for Hinge Prompts</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Simple Framework for Hinge Prompts</h2>
             <p className="leading-relaxed mb-4">
               Use this structure for each prompt answer:
             </p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li><strong>One prompt about what you're looking for.</strong> Be specific but not demanding.</li>
-              <li><strong>One prompt showing personality or interests.</strong> Make it specific and memorable.</li>
-              <li><strong>One prompt that invites engagement.</strong> Give them an easy way to message you.</li>
+              <li><strong className="text-foreground">One prompt about what you're looking for.</strong> Be specific but not demanding.</li>
+              <li><strong className="text-foreground">One prompt showing personality or interests.</strong> Make it specific and memorable.</li>
+              <li><strong className="text-foreground">One prompt that invites engagement.</strong> Give them an easy way to message you.</li>
             </ol>
           </section>
 
@@ -193,26 +193,26 @@ export default function HingePromptsMen() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">Should I use humor in all my prompts?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I use humor in all my prompts?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   No. Mix it up. One funny answer is great, but showing depth matters too. Balance humor with genuine interests or goals.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">How often should I change my prompts?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How often should I change my prompts?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   If you're not getting the results you want after 1-2 weeks, try new answers. Testing different approaches is key.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Do prompts matter more than photos?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Do prompts matter more than photos?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Photos get you noticed, but prompts get you messages. Both matter, but strong prompts are what turn a like into a conversation.
                 </p>
               </div>
@@ -220,7 +220,7 @@ export default function HingePromptsMen() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Great Hinge prompts aren't about being clever. They're about being specific and giving someone a reason to reach out. For more personalized help, try our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>. And if you're matching but struggling with what to say, check out our <Link href="/fix-reply" className="text-primary underline">reply suggestions</Link>.
             </p>
           </section>

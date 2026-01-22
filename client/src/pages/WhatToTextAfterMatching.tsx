@@ -23,7 +23,7 @@ export default function WhatToTextAfterMatching() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function WhatToTextAfterMatching() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               You matched with someone you're excited about. Now what? For most people, this is where things stall. They either send something so boring it gets ignored or overthink it so much they never message at all.
@@ -50,7 +50,7 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why Most First Messages Fail</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Why Most First Messages Fail</h2>
             <p className="leading-relaxed">
               "Hey" and "How are you?" fail because they put all the work on the other person. There's nothing to respond to. It's the texting equivalent of walking up to someone at a party and just staring at them.
             </p>
@@ -60,17 +60,17 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">First Message Examples That Work</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">First Message Examples That Work</h2>
 
             <div className="space-y-6">
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Reference something from their profile</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Reference something from their profile</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Generic</p>
-                      <p className="text-muted-foreground italic">"Hey! How's your weekend going?"</p>
+                      <p className="text-foreground/80 italic">"Hey! How's your weekend going?"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -85,12 +85,12 @@ export default function WhatToTextAfterMatching() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Ask about an interest</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Ask about an interest</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Generic</p>
-                      <p className="text-muted-foreground italic">"So you like music?"</p>
+                      <p className="text-foreground/80 italic">"So you like music?"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -105,12 +105,12 @@ export default function WhatToTextAfterMatching() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Be playful about a shared interest</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Be playful about a shared interest</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Generic</p>
-                      <p className="text-muted-foreground italic">"Cool, we both like coffee"</p>
+                      <p className="text-foreground/80 italic">"Cool, we both like coffee"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -126,14 +126,14 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">First Message Framework</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">First Message Framework</h2>
             <p className="leading-relaxed mb-4">
               If you're stuck, use this simple formula:
             </p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li><strong>Notice something specific</strong> from their profile (photo, prompt, bio detail)</li>
-              <li><strong>Make a brief comment or observation</strong> about it</li>
-              <li><strong>Ask an easy question</strong> related to that thing</li>
+              <li><strong className="text-foreground">Notice something specific</strong> from their profile (photo, prompt, bio detail)</li>
+              <li><strong className="text-foreground">Make a brief comment or observation</strong> about it</li>
+              <li><strong className="text-foreground">Ask an easy question</strong> related to that thing</li>
             </ol>
             <p className="leading-relaxed mt-4">
               That's it. You don't need a perfect opener. You just need something that shows you paid attention and gives them an easy way to respond.
@@ -141,7 +141,7 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What to Do When Their Profile Is Minimal</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What to Do When Their Profile Is Minimal</h2>
             <p className="leading-relaxed">
               Sometimes profiles don't give you much to work with. In that case, go for something light and low-pressure:
             </p>
@@ -153,18 +153,18 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common First Message Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common First Message Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>Opening with compliments about looks.</strong> "You're beautiful" is boring and can feel shallow. Comment on something they chose, not their genetics.
+              <strong className="text-foreground">Opening with compliments about looks.</strong> "You're beautiful" is boring and can feel shallow. Comment on something they chose, not their genetics.
             </p>
             <p className="leading-relaxed">
-              <strong>Asking interview questions.</strong> "What do you do for work?" is fine eventually, but it's not a great opener.
+              <strong className="text-foreground">Asking interview questions.</strong> "What do you do for work?" is fine eventually, but it's not a great opener.
             </p>
             <p className="leading-relaxed">
-              <strong>Being too casual too soon.</strong> Save the extreme casualness for after you've established rapport.
+              <strong className="text-foreground">Being too casual too soon.</strong> Save the extreme casualness for after you've established rapport.
             </p>
             <p className="leading-relaxed">
-              <strong>Waiting too long to message.</strong> Match momentum fades fast. Message within 24 hours if you're interested.
+              <strong className="text-foreground">Waiting too long to message.</strong> Match momentum fades fast. Message within 24 hours if you're interested.
             </p>
           </section>
 
@@ -187,26 +187,26 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">How long should I wait to message after matching?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How long should I wait to message after matching?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Within 24 hours is ideal. Waiting too long can make it awkward or make them forget why they matched with you.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I use the same opener for everyone?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I use the same opener for everyone?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Personalized messages get better responses. But having a few go-to templates that you customize is perfectly fine.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">What if they don't respond?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">What if they don't respond?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Don't take it personally. People get busy, matches expire, timing isn't always right. Move on and try again with someone new.
                 </p>
               </div>
@@ -214,7 +214,7 @@ export default function WhatToTextAfterMatching() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Good first messages are specific, easy to respond to, and show you actually looked at their profile. For more help with messages, try our <Link href="/fix-reply" className="text-primary underline">reply helper</Link>. And if you want to improve your profile to get more matches in the first place, check out our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>.
             </p>
           </section>

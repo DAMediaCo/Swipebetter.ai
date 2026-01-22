@@ -23,7 +23,7 @@ export default function BumbleBioExamples() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function BumbleBioExamples() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               Your Bumble bio has one job: give someone a reason to swipe right and then a reason to message you. Most bios fail at both. They're either too generic to stand out or so vague there's nothing to talk about.
@@ -50,7 +50,7 @@ export default function BumbleBioExamples() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What Makes a Bumble Bio Work</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What Makes a Bumble Bio Work</h2>
             <p className="leading-relaxed">
               Good Bumble bios share three traits. They show personality rather than listing traits. They include specific details that feel real. And they give someone an easy conversation starter.
             </p>
@@ -60,9 +60,9 @@ export default function BumbleBioExamples() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Bumble Bio Examples by Style</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Bumble Bio Examples by Style</h2>
             
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Casual and Confident</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Casual and Confident</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="italic leading-relaxed">
@@ -71,7 +71,7 @@ export default function BumbleBioExamples() {
               </CardContent>
             </Card>
 
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Playful</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Playful</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="italic leading-relaxed">
@@ -80,7 +80,7 @@ export default function BumbleBioExamples() {
               </CardContent>
             </Card>
 
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Direct</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Direct</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="italic leading-relaxed">
@@ -89,7 +89,7 @@ export default function BumbleBioExamples() {
               </CardContent>
             </Card>
 
-            <h3 className="text-xl font-semibold mt-8 mb-4">The Minimal but Memorable</h3>
+            <h3 className="text-xl font-semibold mt-8 mb-4 text-foreground">The Minimal but Memorable</h3>
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <p className="italic leading-relaxed">
@@ -100,7 +100,7 @@ export default function BumbleBioExamples() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Before and After Bio Transformations</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Before and After Bio Transformations</h2>
 
             <div className="space-y-6">
               <Card>
@@ -109,7 +109,7 @@ export default function BumbleBioExamples() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Before</p>
-                      <p className="text-muted-foreground italic">"Just looking to meet new people and see what happens. Love to travel and try new things."</p>
+                      <p className="text-foreground/80 italic">"Just looking to meet new people and see what happens. Love to travel and try new things."</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -128,7 +128,7 @@ export default function BumbleBioExamples() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Before</p>
-                      <p className="text-muted-foreground italic">"6'1 if that matters. Work in finance. Gym and sports."</p>
+                      <p className="text-foreground/80 italic">"6'1 if that matters. Work in finance. Gym and sports."</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -148,32 +148,32 @@ export default function BumbleBioExamples() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common Bumble Bio Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common Bumble Bio Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>Being too generic.</strong> "Love to laugh, travel, and try new things" describes everyone. Be specific.
+              <strong className="text-foreground">Being too generic.</strong> "Love to laugh, travel, and try new things" describes everyone. Be specific.
             </p>
             <p className="leading-relaxed">
-              <strong>Listing height and job only.</strong> These are facts, not personality. Add something with character.
+              <strong className="text-foreground">Listing height and job only.</strong> These are facts, not personality. Add something with character.
             </p>
             <p className="leading-relaxed">
-              <strong>Self-deprecating overload.</strong> One self-aware joke is charming. Three makes you seem insecure.
+              <strong className="text-foreground">Self-deprecating overload.</strong> One self-aware joke is charming. Three makes you seem insecure.
             </p>
             <p className="leading-relaxed">
-              <strong>No conversation hooks.</strong> If someone doesn't know what to message you about, they won't message at all.
+              <strong className="text-foreground">No conversation hooks.</strong> If someone doesn't know what to message you about, they won't message at all.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Bio Templates You Can Customize</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Bio Templates You Can Customize</h2>
             <div className="space-y-4 ml-4">
               <p className="leading-relaxed">
-                <strong>Template 1:</strong> "[Job/role]. [Hobby that shows personality]. Looking for [specific type of connection or activity]."
+                <strong className="text-foreground">Template 1:</strong> "[Job/role]. [Hobby that shows personality]. Looking for [specific type of connection or activity]."
               </p>
               <p className="leading-relaxed">
-                <strong>Template 2:</strong> "[Fun fact]. [Another fun fact]. [Invitation to connect over something specific]."
+                <strong className="text-foreground">Template 2:</strong> "[Fun fact]. [Another fun fact]. [Invitation to connect over something specific]."
               </p>
               <p className="leading-relaxed">
-                <strong>Template 3:</strong> "Will [positive trait in dating]. Looking for [what you want]. [Specific hook or question]."
+                <strong className="text-foreground">Template 3:</strong> "Will [positive trait in dating]. Looking for [what you want]. [Specific hook or question]."
               </p>
             </div>
           </section>
@@ -197,19 +197,19 @@ export default function BumbleBioExamples() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">How long should my Bumble bio be?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How long should my Bumble bio be?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   2-4 sentences is ideal. Long enough to show personality, short enough to read quickly.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I include my Instagram?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I include my Instagram?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Only if it adds value and you're active on it. An empty or private Instagram doesn't help.
                 </p>
               </div>
@@ -217,7 +217,7 @@ export default function BumbleBioExamples() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               A good Bumble bio is specific, shows personality, and makes it easy to start a conversation. For more help, try our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>. If you're matching but struggling with replies, our <Link href="/fix-reply" className="text-primary underline">reply helper</Link> can assist.
             </p>
           </section>

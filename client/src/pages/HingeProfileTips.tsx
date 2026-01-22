@@ -23,7 +23,7 @@ export default function HingeProfileTips() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function HingeProfileTips() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               Hinge is designed to be deleted, which means it rewards profiles that lead to real connections. Unlike swipe-heavy apps, Hinge gives you more space to show your personality through photos, prompts, and profile details. But most people don't use that space well.
@@ -50,7 +50,7 @@ export default function HingeProfileTips() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Hinge Photo Strategy</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Hinge Photo Strategy</h2>
             <p className="leading-relaxed">
               You get six photo slots on Hinge, and the order matters. Your first photo should be a clear, well-lit headshot with a genuine expression. This is what people see first in their feed.
             </p>
@@ -67,7 +67,7 @@ export default function HingeProfileTips() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Prompt Selection and Answers</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Prompt Selection and Answers</h2>
             <p className="leading-relaxed">
               Prompts are where Hinge profiles succeed or fail. You have three chances to show personality and give someone a reason to message you. The key is being specific and leaving conversation hooks.
             </p>
@@ -78,7 +78,7 @@ export default function HingeProfileTips() {
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Too vague</p>
-                      <p className="text-muted-foreground italic">"I'm looking for someone who can make me laugh"</p>
+                      <p className="text-foreground/80 italic">"I'm looking for someone who can make me laugh"</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -97,7 +97,7 @@ export default function HingeProfileTips() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Profile Details That Matter</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Profile Details That Matter</h2>
             <p className="leading-relaxed">
               Don't skip the basics. Height, job, education, and location all matter to people filtering matches. Leaving them blank means you might get filtered out before anyone sees your prompts.
             </p>
@@ -107,31 +107,31 @@ export default function HingeProfileTips() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common Hinge Profile Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common Hinge Profile Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>Generic prompts.</strong> Answers that could apply to anyone don't help you stand out.
+              <strong className="text-foreground">Generic prompts.</strong> Answers that could apply to anyone don't help you stand out.
             </p>
             <p className="leading-relaxed">
-              <strong>Bad photo order.</strong> Your best photo should be first. Period.
+              <strong className="text-foreground">Bad photo order.</strong> Your best photo should be first. Period.
             </p>
             <p className="leading-relaxed">
-              <strong>No conversation hooks.</strong> Every prompt should make it easy for someone to message you about something specific.
+              <strong className="text-foreground">No conversation hooks.</strong> Every prompt should make it easy for someone to message you about something specific.
             </p>
             <p className="leading-relaxed">
-              <strong>Negative energy.</strong> Profiles focused on what you don't want come across as jaded. Focus on what you're excited about instead.
+              <strong className="text-foreground">Negative energy.</strong> Profiles focused on what you don't want come across as jaded. Focus on what you're excited about instead.
             </p>
             <p className="leading-relaxed">
-              <strong>Incomplete profiles.</strong> Empty sections make you look like you're not taking it seriously.
+              <strong className="text-foreground">Incomplete profiles.</strong> Empty sections make you look like you're not taking it seriously.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Using Hinge Features Effectively</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Using Hinge Features Effectively</h2>
             <ul className="list-disc list-inside space-y-2 ml-4">
-              <li><strong>Voice prompts:</strong> A short audio clip can set you apart. Keep it natural and under 10 seconds.</li>
-              <li><strong>Video prompts:</strong> If comfortable on camera, these get more engagement than photos alone.</li>
-              <li><strong>Roses:</strong> Save these for profiles you really like. They signal extra interest.</li>
-              <li><strong>Standouts:</strong> Check these daily for compatible matches you might have missed.</li>
+              <li><strong className="text-foreground">Voice prompts:</strong> A short audio clip can set you apart. Keep it natural and under 10 seconds.</li>
+              <li><strong className="text-foreground">Video prompts:</strong> If comfortable on camera, these get more engagement than photos alone.</li>
+              <li><strong className="text-foreground">Roses:</strong> Save these for profiles you really like. They signal extra interest.</li>
+              <li><strong className="text-foreground">Standouts:</strong> Check these daily for compatible matches you might have missed.</li>
             </ul>
           </section>
 
@@ -154,19 +154,19 @@ export default function HingeProfileTips() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">How long does it take to see results from profile changes?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How long does it take to see results from profile changes?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Give it at least a week. Hinge's algorithm needs time to show your profile to new people after significant changes.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I pay for Hinge+?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I pay for Hinge+?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Not necessary for most people. Focus on your profile quality first. Premium features help more when your profile is already working.
                 </p>
               </div>
@@ -174,7 +174,7 @@ export default function HingeProfileTips() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               A great Hinge profile shows who you are clearly and makes it easy to start a conversation. For personalized feedback, try our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>. Once you're matching, our <Link href="/fix-reply" className="text-primary underline">reply helper</Link> can help you keep conversations going.
             </p>
           </section>

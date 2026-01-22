@@ -23,7 +23,7 @@ export default function DatingAppPhotos() {
     <div className="min-h-screen">
       <article className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <Link href="/">
+          <Link href="/blog">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -39,7 +39,7 @@ export default function DatingAppPhotos() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               Your photos are the most important part of your dating profile. Studies show that photos determine the majority of first impressions, and most people decide whether to swipe right within seconds. Yet most people choose their photos based on what they like, not what actually works.
@@ -50,7 +50,7 @@ export default function DatingAppPhotos() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What Makes a Good Dating App Photo</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What Makes a Good Dating App Photo</h2>
             <p className="leading-relaxed">
               The best dating photos have a few things in common. They're clear and well-lit. You're the obvious focus of the image. Your face is visible and you look approachable. And they give a sense of who you are and what your life looks like.
             </p>
@@ -60,16 +60,16 @@ export default function DatingAppPhotos() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">The Photo Order That Works</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">The Photo Order That Works</h2>
             <p className="leading-relaxed mb-4">
               Photo order matters more than most people think. Here's a structure that works:
             </p>
             <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li><strong>Lead photo:</strong> Clear headshot or upper body, good lighting, genuine smile. This is the first impression.</li>
-              <li><strong>Full body photo:</strong> Shows how you carry yourself in a natural setting.</li>
-              <li><strong>Activity or hobby photo:</strong> Shows you doing something you enjoy.</li>
-              <li><strong>Social photo:</strong> With friends or in a group (but you should be clearly identifiable).</li>
-              <li><strong>Interest photo:</strong> Travel, pet, or something that shows your personality.</li>
+              <li><strong className="text-foreground">Lead photo:</strong> Clear headshot or upper body, good lighting, genuine smile. This is the first impression.</li>
+              <li><strong className="text-foreground">Full body photo:</strong> Shows how you carry yourself in a natural setting.</li>
+              <li><strong className="text-foreground">Activity or hobby photo:</strong> Shows you doing something you enjoy.</li>
+              <li><strong className="text-foreground">Social photo:</strong> With friends or in a group (but you should be clearly identifiable).</li>
+              <li><strong className="text-foreground">Interest photo:</strong> Travel, pet, or something that shows your personality.</li>
             </ol>
             <p className="leading-relaxed mt-4">
               You don't need exactly five photos, but this order front-loads your best content and tells a story about who you are.
@@ -77,17 +77,17 @@ export default function DatingAppPhotos() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Good vs Bad Photos: Examples</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Good vs Bad Photos: Examples</h2>
 
             <div className="space-y-6">
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Lead Photo</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Lead Photo</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Bad</p>
-                      <p className="text-muted-foreground">Dark bar photo, multiple people, sunglasses, blurry, or heavily filtered</p>
+                      <p className="text-foreground/80">Dark bar photo, multiple people, sunglasses, blurry, or heavily filtered</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -102,12 +102,12 @@ export default function DatingAppPhotos() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Activity Photo</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Activity Photo</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Bad</p>
-                      <p className="text-muted-foreground">Distant hiking shot where you're a tiny figure, gym selfie, holding a fish</p>
+                      <p className="text-foreground/80">Distant hiking shot where you're a tiny figure, gym selfie, holding a fish</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -122,12 +122,12 @@ export default function DatingAppPhotos() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <p className="text-sm font-medium text-muted-foreground mb-3">Group Photo</p>
+                  <p className="text-sm font-medium text-foreground/80 mb-3">Group Photo</p>
                   <div className="flex items-start gap-3 mb-4">
                     <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-sm text-destructive mb-1">Bad</p>
-                      <p className="text-muted-foreground">Can't tell which person you are, everyone is more attractive than you, too many people</p>
+                      <p className="text-foreground/80">Can't tell which person you are, everyone is more attractive than you, too many people</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -143,26 +143,26 @@ export default function DatingAppPhotos() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Common Photo Mistakes</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Common Photo Mistakes</h2>
             <p className="leading-relaxed">
-              <strong>All selfies.</strong> One selfie is fine. Five selfies looks like you never do anything.
+              <strong className="text-foreground">All selfies.</strong> One selfie is fine. Five selfies looks like you never do anything.
             </p>
             <p className="leading-relaxed">
-              <strong>No variety.</strong> Multiple photos in the same location or outfit looks like they were all taken on the same day.
+              <strong className="text-foreground">No variety.</strong> Multiple photos in the same location or outfit looks like they were all taken on the same day.
             </p>
             <p className="leading-relaxed">
-              <strong>Sunglasses in every photo.</strong> People want to see your eyes. Limit sunglasses to one photo max.
+              <strong className="text-foreground">Sunglasses in every photo.</strong> People want to see your eyes. Limit sunglasses to one photo max.
             </p>
             <p className="leading-relaxed">
-              <strong>Photos with exes cropped out.</strong> We can always tell. Just don't use them.
+              <strong className="text-foreground">Photos with exes cropped out.</strong> We can always tell. Just don't use them.
             </p>
             <p className="leading-relaxed">
-              <strong>Old photos.</strong> Use recent photos that look like you right now. Surprises on the first date are not good.
+              <strong className="text-foreground">Old photos.</strong> Use recent photos that look like you right now. Surprises on the first date are not good.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Quick Photo Improvement Tips</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Quick Photo Improvement Tips</h2>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>Natural light makes everyone look better. Take photos near windows or outdoors.</li>
               <li>Ask a friend to take candid photos instead of posing for selfies.</li>
@@ -191,26 +191,26 @@ export default function DatingAppPhotos() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">How many photos should I have?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">How many photos should I have?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   4-6 is the sweet spot. Enough variety to show who you are, not so many that quality drops. Better to have 4 great photos than 6 mediocre ones.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I use professional photos?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Should I use professional photos?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   One professional headshot can work well as a lead photo, but too many looks staged. Mix professional with candid shots for the best results.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Do filters help or hurt?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="font-semibold mb-2 text-foreground">Do filters help or hurt?</h3>
+                <p className="text-foreground/80 leading-relaxed">
                   Light editing is fine, but heavy filters make you look fake and set unrealistic expectations. Keep edits minimal and natural-looking.
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function DatingAppPhotos() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Great photos are the foundation of a successful dating profile. For personalized feedback on your specific photos, try our <Link href="/fix-profile" className="text-primary underline">profile analyzer</Link>. And once you're getting matches, our <Link href="/fix-reply" className="text-primary underline">reply helper</Link> can help you keep conversations going.
             </p>
           </section>
