@@ -326,11 +326,18 @@ export default function Home() {
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold mb-1">Unlimited</h3>
                   <p className="text-sm text-muted-foreground mb-4">For serious daters who want results fast.</p>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-bold">$79</span>
-                    <span className="text-muted-foreground">/ year</span>
+                  <div className="space-y-2">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-bold">$13</span>
+                      <span className="text-muted-foreground">/ month</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">or</p>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-2xl font-bold text-primary">$79</span>
+                      <span className="text-muted-foreground">/ year</span>
+                      <Badge variant="outline" className="ml-2 text-xs border-green-500/50 text-green-500">Save 49%</Badge>
+                    </div>
                   </div>
-                  <p className="text-xs text-primary mt-1">Save 45% vs monthly</p>
                 </div>
                 
                 <ul className="space-y-3 mb-6">
