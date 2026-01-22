@@ -147,7 +147,7 @@ export default function HowToReplyToHeyOnBumble() {
             <p className="leading-relaxed">
               Before we get into responses, let's clear something up: "hey" doesn't mean she's not interested. It usually means she:
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
+            <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80">
               <li>Didn't know what to say but wanted to keep the match alive</li>
               <li>Is testing to see if you're interesting enough to invest more effort</li>
               <li>Is messaging multiple people and conserving energy</li>
@@ -184,7 +184,7 @@ export default function HowToReplyToHeyOnBumble() {
                 {category.icon === "bold" && <Zap className="w-6 h-6 text-primary" />}
                 {category.category}
               </h2>
-              <p className="text-muted-foreground mb-4">{category.description}</p>
+              <p className="text-foreground/80 mb-4">{category.description}</p>
               <div className="space-y-4">
                 {category.replies.map((reply, replyIndex) => (
                   <Card 
@@ -207,8 +207,8 @@ export default function HowToReplyToHeyOnBumble() {
                           <Copy className="w-4 h-4" />
                         </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        <strong>Why it works:</strong> {reply.why}
+                      <p className="text-sm text-foreground/80">
+                        <strong className="text-foreground">Why it works:</strong> {reply.why}
                       </p>
                     </CardContent>
                   </Card>
@@ -269,21 +269,21 @@ export default function HowToReplyToHeyOnBumble() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">What if she doesn't respond to my reply?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Give it 24-48 hours, then try one more message. If nothing after that, move on. Some matches just don't go anywhere, and that's normal.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Should I use a pickup line?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Generally no. Pickup lines work better as openers than responses. When replying to "hey," something conversational usually works better than something cheesy.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">How long should I wait to respond?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Don't play games. Respond when you see it and have time to write a real response. Playing hard to get over text just kills momentum.
                 </p>
               </div>
@@ -291,7 +291,7 @@ export default function HowToReplyToHeyOnBumble() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               A "hey" is just the start of a conversation, not a reflection of how interested she is. Pick a response that fits your style, don't overthink it, and move things forward. If you're consistently struggling with conversations, our <Link href="/fix-reply" className="text-primary underline">Rizz Assistant</Link> can help you figure out what to say next.
             </p>
           </section>

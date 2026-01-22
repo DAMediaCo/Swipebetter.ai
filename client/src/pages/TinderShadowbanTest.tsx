@@ -70,7 +70,7 @@ export default function TinderShadowbanTest() {
             <p className="leading-relaxed">
               A shadowban is when Tinder restricts your account without officially banning you. Your profile still exists, and you can use the app, but:
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground">
+            <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80">
               <li>Your profile is rarely (or never) shown to other users</li>
               <li>Even if someone swipes right on you, you might not match</li>
               <li>Your messages might not be delivered</li>
@@ -94,7 +94,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Test 1: The Match Drought</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     If you were getting regular matches and suddenly dropped to zero (not fewer - zero) for 1-2 weeks straight, that's a strong indicator. Normal algorithm fluctuations cause dips, not complete shutoffs.
                   </p>
                 </CardContent>
@@ -103,7 +103,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Test 2: The Super Like Test</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     Use a Super Like on someone who seems active (recently updated photos, Spotify currently playing). If they don't match or respond within a few days despite being a reasonable match, your profile might not be reaching them.
                   </p>
                 </CardContent>
@@ -112,7 +112,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Test 3: The Friend Test</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     Ask a friend to create a new account in your area and swipe until they either see you or run out of profiles. If they go through hundreds of profiles without seeing you, you're likely shadowbanned.
                   </p>
                 </CardContent>
@@ -121,7 +121,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Test 4: Check Your Tinder Gold Queue</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     If you have Tinder Gold or Platinum, check the "Likes You" section. If it's been completely empty for an extended period when it used to have activity, that's another signal.
                   </p>
                 </CardContent>
@@ -157,28 +157,28 @@ export default function TinderShadowbanTest() {
                 <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Zero matches for 1-2+ weeks</p>
-                  <p className="text-sm text-muted-foreground">Not fewer matches - literally zero, despite active swiping.</p>
+                  <p className="text-sm text-foreground/80">Not fewer matches - literally zero, despite active swiping.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Messages not being delivered</p>
-                  <p className="text-sm text-muted-foreground">Existing matches stop responding, or new matches never reply.</p>
+                  <p className="text-sm text-foreground/80">Existing matches stop responding, or new matches never reply.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Running out of profiles quickly</p>
-                  <p className="text-sm text-muted-foreground">If you hit "there's no one new around you" in a populated area, something's wrong.</p>
+                  <p className="text-sm text-foreground/80">If you hit "there's no one new around you" in a populated area, something's wrong.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <XCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-medium">Super Likes going nowhere</p>
-                  <p className="text-sm text-muted-foreground">Super Likes usually get at least some response. Zero activity is suspicious.</p>
+                  <p className="text-sm text-foreground/80">Super Likes usually get at least some response. Zero activity is suspicious.</p>
                 </div>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function TinderShadowbanTest() {
             <p className="leading-relaxed">
               Tinder doesn't publish their rules, but these behaviors commonly trigger shadowbans:
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground mt-4">
+            <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 mt-4">
               <li><strong className="text-foreground">Being reported multiple times</strong> - Even false reports add up</li>
               <li><strong className="text-foreground">Resetting your account too often</strong> - Tinder tracks device IDs and phone numbers</li>
               <li><strong className="text-foreground">Using banned photos</strong> - Shirtless bathroom selfies, group photos where it's unclear who you are</li>
@@ -213,7 +213,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Step 1: Delete Your Account</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     Go to Settings in Tinder, scroll down, and select "Delete Account." Don't just delete the app - actually delete the account through the settings.
                   </p>
                 </CardContent>
@@ -222,7 +222,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Step 2: Wait at Least 3 Months</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     Tinder retains data for about 3 months. Creating a new account too soon will just link to your old shadowbanned profile. Yes, 3 months is a long time. That's the reality.
                   </p>
                 </CardContent>
@@ -231,7 +231,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Step 3: Use a New Phone Number</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     Get a new phone number (prepaid SIM works). Tinder tracks phone numbers aggressively. Using the same number will likely result in another shadowban.
                   </p>
                 </CardContent>
@@ -240,7 +240,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Step 4: New Photos and Bio</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     Don't reuse your old photos. Tinder uses image recognition to link accounts. Take new photos and write a new bio.
                   </p>
                 </CardContent>
@@ -249,7 +249,7 @@ export default function TinderShadowbanTest() {
               <Card>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold mb-2 text-foreground">Step 5: Reset Device Advertising ID</h3>
-                  <p className="text-muted-foreground">
+                  <p className="text-foreground/80">
                     On iPhone: Settings &gt; Privacy &gt; Tracking &gt; Reset Advertising Identifier. On Android: Settings &gt; Google &gt; Ads &gt; Reset Advertising ID. This helps prevent device-level tracking.
                   </p>
                 </CardContent>
@@ -262,7 +262,7 @@ export default function TinderShadowbanTest() {
             <p className="leading-relaxed">
               Before going through a full reset, consider that your profile might just need work. Many people assume they're shadowbanned when the real problem is:
             </p>
-            <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground mt-4">
+            <ul className="list-disc list-inside space-y-2 ml-4 text-foreground/80 mt-4">
               <li><strong className="text-foreground">Bad photos</strong> - Poor lighting, group photos, or low quality images</li>
               <li><strong className="text-foreground">Empty or weak bio</strong> - Gives people no reason to swipe right</li>
               <li><strong className="text-foreground">Location issues</strong> - Small population area or traveling in a saturated market</li>
@@ -295,28 +295,28 @@ export default function TinderShadowbanTest() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Can I appeal a shadowban?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Tinder doesn't officially acknowledge shadowbans, so there's nothing to appeal. Contacting support rarely helps because they'll just say your account is "working normally."
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Does paying for Tinder Gold/Platinum help?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   No. If you're shadowbanned, paying won't fix it. You'll just be paying for an invisible profile. Save your money until you've confirmed your account is working.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">How long does a shadowban last?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   There's no set duration. Some people report bans lifting after a few weeks. Others seem permanent. The only reliable fix is a complete reset with new credentials.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Can I use Bumble or Hinge instead?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Yes. Match Group owns Tinder but their sister apps have separate ban systems. If Tinder isn't working for you, other apps might be worth trying while you wait out a reset period.
                 </p>
               </div>
@@ -324,7 +324,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               A shadowban is frustrating, but it's diagnosable. If you've confirmed you're banned, a full reset is your only option. If you're not sure, start by getting your <Link href="/fix-profile" className="text-primary underline">profile analyzed</Link> - the problem might be simpler than you think.
             </p>
           </section>

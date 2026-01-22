@@ -224,21 +224,21 @@ export default function TinderBiosForEngineers() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Should I mention I'm an engineer in my bio?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Yes, but don't make it the focus. Your job is one aspect of who you are. Mentioning it casually or with humor works better than leading with your LinkedIn headline.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Is it bad to mention gaming?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   Not at all. Gaming is a massive hobby and plenty of people find it attractive. The key is how you mention it. Self-aware humor works. "I'm a gamer" with nothing else doesn't.
                 </p>
               </div>
 
               <div>
                 <h3 className="font-semibold mb-2 text-foreground">Do these work for Hinge and Bumble too?</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-foreground/80 leading-relaxed">
                   The tone and style translate, but you might need to adapt them to fit prompt formats on Hinge. The core idea of being specific and self-aware works everywhere.
                 </p>
               </div>
@@ -246,7 +246,7 @@ export default function TinderBiosForEngineers() {
           </section>
 
           <section className="border-t border-border pt-8 mt-12">
-            <p className="text-muted-foreground leading-relaxed">
+            <p className="text-foreground/80 leading-relaxed">
               Being nerdy isn't a dating disadvantage. Being boring is. Pick a bio that feels like you, customize it, and don't take yourself too seriously. If you want more personalized help, our <Link href="/fix-profile" className="text-primary underline">AI profile analyzer</Link> can give you specific feedback on your entire profile.
             </p>
           </section>
