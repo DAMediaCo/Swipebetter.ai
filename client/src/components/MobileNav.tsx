@@ -5,7 +5,7 @@ import { useAuth, useLogout } from "@/lib/auth";
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/dashboard", icon: Wrench, label: "Dashboard" },
-  { href: "/blog/", icon: BookOpen, label: "Blog", external: true },
+  { href: "/blog", icon: BookOpen, label: "Blog" },
   { href: "/account", icon: CreditCard, label: "Account", requiresAuth: true },
 ];
 

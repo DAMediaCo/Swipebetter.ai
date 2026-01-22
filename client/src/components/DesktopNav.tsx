@@ -13,7 +13,7 @@ import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", requiresAuth: true },
-  { href: "/blog/", label: "Blog", requiresAuth: false, external: true },
+  { href: "/blog", label: "Blog", requiresAuth: false },
   { href: "/pricing", label: "Pricing", requiresAuth: false },
 ];
 
