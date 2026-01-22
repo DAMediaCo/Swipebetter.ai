@@ -247,7 +247,10 @@ export default function AuditView() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm dark:prose-invert max-w-none" data-testid="text-bio-suggestions">
+              <div 
+                className="prose prose-sm dark:prose-invert max-w-none prose-strong:text-foreground prose-strong:font-semibold prose-p:text-foreground/90 prose-li:text-foreground/90 prose-headings:text-foreground" 
+                data-testid="text-bio-suggestions"
+              >
                 <ReactMarkdown>{analysis.bioSuggestions || "No suggestions available."}</ReactMarkdown>
               </div>
             </CardContent>
@@ -295,7 +298,10 @@ export default function AuditView() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm dark:prose-invert max-w-none" data-testid="text-photo-feedback">
+              <div 
+                className="prose prose-sm dark:prose-invert max-w-none prose-strong:text-foreground prose-strong:font-semibold prose-p:text-foreground/90 prose-li:text-foreground/90 prose-headings:text-foreground" 
+                data-testid="text-photo-feedback"
+              >
                 <ReactMarkdown>{analysis.photoFeedback || "No feedback available."}</ReactMarkdown>
               </div>
             </CardContent>
@@ -345,7 +351,10 @@ export default function AuditView() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm dark:prose-invert max-w-none" data-testid="text-improvements">
+              <div 
+                className="prose prose-sm dark:prose-invert max-w-none prose-strong:text-foreground prose-strong:font-semibold prose-p:text-foreground/90 prose-li:text-foreground/90 prose-headings:text-foreground" 
+                data-testid="text-improvements"
+              >
                 <ReactMarkdown>{analysis.improvements || "No improvements available."}</ReactMarkdown>
               </div>
             </CardContent>
