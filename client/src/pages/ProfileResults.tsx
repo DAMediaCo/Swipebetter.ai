@@ -88,10 +88,10 @@ function ScoreBreakdown({
 
   return (
     <div className="flex items-center gap-3">
-      <div className="text-muted-foreground">{icon}</div>
+      <div className="text-foreground/70">{icon}</div>
       <div className="flex-1">
         <div className="flex justify-between text-sm mb-1">
-          <span>{label}</span>
+          <span className="text-foreground/90">{label}</span>
           <span className={getScoreColor(score)}>{score}/100</span>
         </div>
         <Progress value={score} className={`h-2 ${getProgressColor(score)}`} />
@@ -408,46 +408,38 @@ export default function ProfileResults() {
 
           {isPro && (
             <>
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-semibold">Bio Suggestions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {parseBioSuggestions(result.bioSuggestions).map((bio, index) => (
-                    <div 
-                      key={index} 
-                      className="flex items-start gap-3 p-3 rounded-md bg-muted/50"
-                    >
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">
-                        {index + 1}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <ReactMarkdown
-                          components={{
-                            p: ({ children }) => <p className="text-sm leading-relaxed text-muted-foreground">{children}</p>,
-                            strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Bio Options</h3>
+                {parseBioSuggestions(result.bioSuggestions).map((bio, index) => (
+                  <Card 
+                    key={index} 
+                    className="hover-elevate cursor-pointer"
+                    onClick={() => copyBio(bio, index)}
+                  >
+                    <CardContent className="py-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-primary">Option {index + 1}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyBio(bio, index);
                           }}
+                          data-testid={`button-copy-bio-${index}`}
                         >
-                          {bio}
-                        </ReactMarkdown>
+                          {copiedBioIndex === index ? (
+                            <Check className="w-4 h-4 text-primary" />
+                          ) : (
+                            <Clipboard className="w-4 h-4" />
+                          )}
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => copyBio(bio, index)}
-                        className="flex-shrink-0"
-                        data-testid={`button-copy-bio-${index}`}
-                      >
-                        {copiedBioIndex === index ? (
-                          <Check className="w-4 h-4 text-primary" />
-                        ) : (
-                          <Clipboard className="w-4 h-4" />
-                        )}
-                      </Button>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                      <p className="text-foreground/90 leading-relaxed">{bio}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
               <ResultCard
                 title="Photo Feedback"
@@ -538,7 +530,7 @@ function ResultCard({
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="text-muted-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-0">
+        <div className="text-foreground/90 leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-p:text-foreground/90 prose-ul:my-2 prose-li:my-0 prose-li:text-foreground/90 prose-strong:text-foreground">
           <ReactMarkdown>{contentString}</ReactMarkdown>
         </div>
       </CardContent>
