@@ -242,6 +242,11 @@ export function ProfileOptimizer() {
             Upload at least 1 screenshot to continue
           </p>
         )}
+        {preferencesComplete && images.length > 0 && !subscriptionData?.canAnalyze && (
+          <p className="text-sm text-muted-foreground text-center mt-2">
+            Credits required to analyze your profile
+          </p>
+        )}
       </div>
 
       <div className="bg-muted/50 rounded-xl p-4 mt-6">
