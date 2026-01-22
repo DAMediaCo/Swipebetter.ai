@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap, Search, Pencil, Eye, MessageCircle } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap, Search, Pencil, Eye, MessageCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
@@ -440,6 +440,70 @@ export default function Home() {
               </AccordionItem>
             ))}
           </Accordion>
+        </div>
+      </section>
+
+      <section className="py-12 md:py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10 space-y-3">
+            <h2 className="text-2xl md:text-3xl font-bold">Latest Dating Insights</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Expert tips and strategies to improve your dating success
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6 pb-6">
+                <span className="text-xs font-medium text-primary uppercase tracking-wide">Profile Tips</span>
+                <h3 className="font-semibold text-lg mt-2 mb-2">Why You're Getting No Matches</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Stop guessing. Here is the data-driven reason your profile isn't performing and exactly how to fix it.
+                </p>
+                <a 
+                  href="/blog/why-am-i-getting-no-matches.html" 
+                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                  data-testid="link-blog-no-matches"
+                >
+                  Read Guide <ArrowRight className="w-4 h-4" />
+                </a>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6 pb-6">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Coming Soon</span>
+                <h3 className="font-semibold text-lg mt-2 mb-2">The Perfect First Message</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  What to say after matching to maximize your response rate and start great conversations.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                  Coming Soon
+                </span>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6 pb-6">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Coming Soon</span>
+                <h3 className="font-semibold text-lg mt-2 mb-2">Photo Order That Works</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  The science behind which photos to put first and how order affects your match rate.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
+                  Coming Soon
+                </span>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="text-center mt-8">
+            <a href="/blog/">
+              <Button variant="outline" className="border-primary/30 hover:bg-primary/10" data-testid="button-view-all-blog">
+                View All Articles <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </a>
+          </div>
         </div>
       </section>
 

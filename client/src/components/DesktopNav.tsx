@@ -12,7 +12,9 @@ import { useAuth } from "@/lib/auth";
 import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
 const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/dashboard", label: "Dashboard", requiresAuth: true },
+  { href: "/blog/", label: "Blog", requiresAuth: false },
+  { href: "/pricing", label: "Pricing", requiresAuth: false },
 ];
 
 export function DesktopNav() {
@@ -30,9 +32,10 @@ export function DesktopNav() {
             <span className="font-bold text-xl">SwipeBetter</span>
           </div>
         </Link>
-        {user && (
-          <div className="flex items-center gap-1">
-            {navItems.map((item) => {
+        <div className="flex items-center gap-1">
+          {navItems
+            .filter((item) => !item.requiresAuth || user)
+            .map((item) => {
               const isActive = location === item.href || location.startsWith(item.href + "/");
               return (
                 <Link key={item.href} href={item.href}>
@@ -46,8 +49,7 @@ export function DesktopNav() {
                 </Link>
               );
             })}
-          </div>
-        )}
+        </div>
       </div>
 
       <div className="flex items-center gap-4">
