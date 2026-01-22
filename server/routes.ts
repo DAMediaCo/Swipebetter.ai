@@ -601,38 +601,10 @@ export async function registerRoutes(
 
   app.get("/api/my-analyses", requireAuth, async (req: any, res) => {
     const userId = req.session.userId;
-    const subscription = await storage.getUserSubscription(userId);
-    const isSubscribed = subscription?.status === "active";
-    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
-    const isPaidUser = isSubscribed || hasOneTimeCredits;
-
     const profileAnalyses = await storage.getProfileAnalyses(userId);
     const replyAnalyses = await storage.getReplyAnalyses(userId);
     
-    // Redact detailed content for free users
-    if (!isPaidUser) {
-      const redactedProfiles = profileAnalyses.map((a: any) => ({
-        id: a.id,
-        userId: a.userId,
-        platform: a.platform,
-        overallScore: a.overallScore,
-        createdAt: a.createdAt,
-        bioSuggestions: "[Upgrade to unlock]",
-        photoFeedback: "[Upgrade to unlock]",
-        improvements: "[Upgrade to unlock]",
-      }));
-      const redactedReplies = replyAnalyses.map((a: any) => ({
-        id: a.id,
-        userId: a.userId,
-        tone: a.tone,
-        createdAt: a.createdAt,
-        suggestedReplies: ["[Upgrade to unlock reply suggestions]"],
-        conversationContext: "[Upgrade to unlock]",
-      }));
-      res.json({ profileAnalyses: redactedProfiles, replyAnalyses: redactedReplies });
-      return;
-    }
-
+    // All audit results are now accessible to all users
     res.json({ profileAnalyses, replyAnalyses });
   });
 
@@ -692,27 +664,9 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const subscription = await storage.getUserSubscription(userId);
-      const isSubscribed = subscription?.status === "active";
-      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
-      const isPaidUser = isSubscribed || hasOneTimeCredits;
-
       const analyses = await storage.getProfileAnalyses(userId);
-
-      if (!isPaidUser) {
-        const redacted = analyses.map((a: any) => ({
-          id: a.id,
-          userId: a.userId,
-          platform: a.platform,
-          overallScore: a.overallScore,
-          createdAt: a.createdAt,
-          bioSuggestions: "[Upgrade to unlock]",
-          photoFeedback: "[Upgrade to unlock]",
-          improvements: "[Upgrade to unlock]",
-        }));
-        return res.json(redacted);
-      }
-
+      
+      // All audit results are now accessible to all users
       res.json(analyses);
     } catch (error) {
       console.error("Get profile analyses error:", error);
@@ -743,24 +697,7 @@ export async function registerRoutes(
         return res.status(403).json({ error: "Forbidden" });
       }
 
-      const subscription = await storage.getUserSubscription(userId);
-      const isSubscribed = subscription?.status === "active";
-      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
-      const isPaidUser = isSubscribed || hasOneTimeCredits;
-
-      if (!isPaidUser) {
-        return res.json({
-          id: analysis.id,
-          userId: analysis.userId,
-          platform: analysis.platform,
-          overallScore: analysis.overallScore,
-          createdAt: analysis.createdAt,
-          bioSuggestions: "[Upgrade to unlock]",
-          photoFeedback: "[Upgrade to unlock]",
-          improvements: "[Upgrade to unlock]",
-        });
-      }
-
+      // All audit results are now accessible to all users
       res.json(analysis);
     } catch (error) {
       console.error("Get profile analysis error:", error);
@@ -819,25 +756,9 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Unauthorized" });
       }
 
-      const subscription = await storage.getUserSubscription(userId);
-      const isSubscribed = subscription?.status === "active";
-      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
-      const isPaidUser = isSubscribed || hasOneTimeCredits;
-
       const analyses = await storage.getReplyAnalyses(userId);
-
-      if (!isPaidUser) {
-        const redacted = analyses.map((a: any) => ({
-          id: a.id,
-          userId: a.userId,
-          tone: a.tone,
-          createdAt: a.createdAt,
-          suggestedReplies: ["[Upgrade to unlock reply suggestions]"],
-          conversationContext: "[Upgrade to unlock]",
-        }));
-        return res.json(redacted);
-      }
-
+      
+      // All audit results are now accessible to all users
       res.json(analyses);
     } catch (error) {
       console.error("Get reply analyses error:", error);
