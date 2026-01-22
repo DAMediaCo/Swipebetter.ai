@@ -26,6 +26,7 @@ export interface IStorage {
   getProfileAnalyses(userId: string): Promise<ProfileAnalysis[]>;
   createProfileAnalysis(data: InsertProfileAnalysis): Promise<ProfileAnalysis>;
   getProfileAnalysis(id: number): Promise<ProfileAnalysis | undefined>;
+  cleanupOldProfileAnalyses(userId: string, keepCount: number): Promise<void>;
 
   getReplyAnalyses(userId: string): Promise<ReplyAnalysis[]>;
   createReplyAnalysis(data: InsertReplyAnalysis): Promise<ReplyAnalysis>;
@@ -111,7 +112,29 @@ export class DatabaseStorage implements IStorage {
 
   async createProfileAnalysis(data: InsertProfileAnalysis): Promise<ProfileAnalysis> {
     const [analysis] = await db.insert(profileAnalyses).values(data).returning();
+    
+    // Keep only the last 10 analyses per user
+    if (data.userId) {
+      await this.cleanupOldProfileAnalyses(data.userId, 10);
+    }
+    
     return analysis;
+  }
+
+  async cleanupOldProfileAnalyses(userId: string, keepCount: number): Promise<void> {
+    // Get all analysis IDs for this user, ordered by newest first
+    const allAnalyses = await db.select({ id: profileAnalyses.id })
+      .from(profileAnalyses)
+      .where(eq(profileAnalyses.userId, userId))
+      .orderBy(desc(profileAnalyses.createdAt));
+    
+    // If we have more than keepCount, delete the extras
+    if (allAnalyses.length > keepCount) {
+      const idsToDelete = allAnalyses.slice(keepCount).map(a => a.id);
+      for (const id of idsToDelete) {
+        await db.delete(profileAnalyses).where(eq(profileAnalyses.id, id));
+      }
+    }
   }
 
   async getProfileAnalysis(id: number): Promise<ProfileAnalysis | undefined> {

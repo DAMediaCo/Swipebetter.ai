@@ -543,6 +543,54 @@ export async function registerRoutes(
     }
   });
 
+  // Get single profile analysis by ID
+  app.get("/api/analyses/profile/:id", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const analysisId = parseInt(req.params.id, 10);
+      if (isNaN(analysisId)) {
+        return res.status(400).json({ error: "Invalid analysis ID" });
+      }
+
+      const analysis = await storage.getProfileAnalysis(analysisId);
+      if (!analysis) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+
+      // Ensure user owns this analysis
+      if (analysis.userId !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      const subscription = await storage.getUserSubscription(userId);
+      const isSubscribed = subscription?.status === "active";
+      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+      const isPaidUser = isSubscribed || hasOneTimeCredits;
+
+      if (!isPaidUser) {
+        return res.json({
+          id: analysis.id,
+          userId: analysis.userId,
+          platform: analysis.platform,
+          overallScore: analysis.overallScore,
+          createdAt: analysis.createdAt,
+          bioSuggestions: "[Upgrade to unlock]",
+          photoFeedback: "[Upgrade to unlock]",
+          improvements: "[Upgrade to unlock]",
+        });
+      }
+
+      res.json(analysis);
+    } catch (error) {
+      console.error("Get profile analysis error:", error);
+      res.status(500).json({ error: "Failed to retrieve profile analysis" });
+    }
+  });
+
   // Reply analyses CRUD endpoints (for mobile app)
   // Schema for storing completed reply analysis results
   const storeReplyAnalysisSchema = z.object({

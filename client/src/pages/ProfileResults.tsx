@@ -338,10 +338,6 @@ export default function ProfileResults() {
                 />
               </div>
 
-              <div className="flex items-center justify-center gap-2 mt-4 text-muted-foreground">
-                <Clock className="w-3 h-3" />
-                <span className="text-xs">Analysis valid for 24 hours</span>
-              </div>
             </CardContent>
           </Card>
 

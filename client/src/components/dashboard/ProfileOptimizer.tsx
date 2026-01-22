@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrustBar } from "@/components/TrustBar";
 import { ImageUpload } from "@/components/ImageUpload";
+import { RecentAudits } from "@/components/dashboard/RecentAudits";
 import { useSubscription } from "@/lib/auth";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
@@ -60,6 +61,9 @@ export function ProfileOptimizer() {
       return response.json();
     },
     onSuccess: (data) => {
+      // Invalidate the analyses cache so Recent Audits updates
+      queryClient.invalidateQueries({ queryKey: ["/api/analyses/profile"] });
+      
       if (data.parsed) {
         saveAnalysis('profile', data.parsed);
         setLocation('/fix-profile/results');
@@ -243,6 +247,10 @@ export function ProfileOptimizer() {
 
       <div className="bg-muted/50 rounded-xl p-4 mt-6">
         <TrustBar />
+      </div>
+
+      <div className="mt-8">
+        <RecentAudits />
       </div>
     </div>
   );

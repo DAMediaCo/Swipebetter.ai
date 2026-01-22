@@ -42,6 +42,7 @@ import AcceptableUse from "@/pages/AcceptableUse";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import Account from "@/pages/Account";
+import AuditView from "@/pages/AuditView";
 import NotFound from "@/pages/not-found";
 import { LegalFooter } from "@/components/LegalFooter";
 
@@ -83,6 +84,7 @@ function Router() {
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/account" component={Account} />
+      <Route path="/audit/:id" component={AuditView} />
       <Route component={NotFound} />
     </Switch>
   );
