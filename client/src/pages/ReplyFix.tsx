@@ -11,7 +11,7 @@ import { PrivacyFAQ } from "@/components/PrivacyFAQ";
 import { ConvoDemo } from "@/components/ConvoDemo";
 import { ExampleReplies } from "@/components/ExampleReplies";
 import { HowItWorks } from "@/components/HowItWorks";
-import { useAuth, useSubscription } from "@/lib/auth";
+import { useAuth, useCredits, useCheckReplyAccess } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
@@ -26,7 +26,8 @@ import {
   HelpCircle,
   Loader2,
   Shield,
-  Trash2
+  Trash2,
+  Unlock
 } from "lucide-react";
 import { StepIndicator } from "@/components/StepIndicator";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,10 +53,12 @@ const heroTones = [
 
 export default function ReplyFix() {
   const { data: authData, isLoading: authLoading } = useAuth();
-  const { data: subscriptionData } = useSubscription();
+  const { credits, hasUnlimitedAccess, refreshCredits } = useCredits();
+  const checkAccessMutation = useCheckReplyAccess();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const user = authData?.user;
+  const canGenerate = hasUnlimitedAccess || credits > 0;
 
   useEffect(() => {
     document.title = "Fix Your Reply | SwipeBetter";
@@ -121,6 +124,14 @@ export default function ReplyFix() {
 
   const heroAnalyzeMutation = useMutation({
     mutationFn: async () => {
+      // For non-unlimited users, check and deduct credit first
+      if (!hasUnlimitedAccess) {
+        const accessResult = await checkAccessMutation.mutateAsync(true);
+        if (accessResult.access !== 'granted') {
+          throw new Error('402: Payment required');
+        }
+      }
+      
       trackAnalysisStarted("reply");
       const selectedTone = heroTone === "direct" ? "confident" : heroTone;
       const response = await apiRequest("POST", "/api/analyze-reply", {
@@ -133,14 +144,22 @@ export default function ReplyFix() {
     onSuccess: (data) => {
       if (data.parsed) {
         saveAnalysis('reply', data.parsed);
+        refreshCredits();
         setLocation('/fix-reply/results');
       }
     },
     onError: (error: any) => {
-      if (error.message?.includes("403")) {
+      if (error.message?.includes("402")) {
         toast({
-          title: "Subscription required",
-          description: "Upgrade to Pro to use this feature.",
+          title: "Credits required",
+          description: "Get credits to use this feature.",
+          variant: "destructive",
+        });
+        setLocation('/pricing');
+      } else if (error.message?.includes("403")) {
+        toast({
+          title: "Access denied",
+          description: "Please try again or contact support.",
           variant: "destructive",
         });
         setLocation('/pricing');
@@ -311,16 +330,19 @@ export default function ReplyFix() {
           <TrustBar />
         </div>
 
-        {!subscriptionData?.canAnalyze && (
+        {!canGenerate && (
           <Card className="mb-6 border-primary/50 bg-primary/5">
             <CardContent className="py-4 flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-primary" />
               <div className="flex-1">
-                <p className="font-medium text-sm">Pro subscription required</p>
-                <p className="text-xs text-muted-foreground">Subscribe to access AI-powered analysis</p>
+                <p className="font-medium text-sm">Credits required</p>
+                <p className="text-xs text-muted-foreground">Get credits to access AI-powered analysis</p>
               </div>
               <Link href="/pricing">
-                <Button size="sm" data-testid="button-upgrade-banner">Subscribe</Button>
+                <Button size="sm" data-testid="button-upgrade-banner">
+                  <Unlock className="w-4 h-4 mr-1" />
+                  Get Credits
+                </Button>
               </Link>
             </CardContent>
           </Card>
@@ -414,7 +436,7 @@ export default function ReplyFix() {
                   analyzeMutation.mutate();
                 }
               }}
-              disabled={!canProceed() || analyzeMutation.isPending || (step === 2 && !subscriptionData?.canAnalyze)}
+              disabled={!canProceed() || analyzeMutation.isPending || (step === 2 && !canGenerate)}
               className="w-full py-6"
               data-testid="button-next-step"
             >
