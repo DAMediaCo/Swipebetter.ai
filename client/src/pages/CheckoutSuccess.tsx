@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryClient, apiRequest } from "@/lib/queryClient";
-import { useEntitlement } from "@/lib/auth";
+import { useEntitlement, useAuth } from "@/lib/auth";
 import { trackPurchaseCompleted } from "@/lib/analytics";
 import { CheckCircle, Sparkles, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -28,21 +28,41 @@ export default function CheckoutSuccess() {
   const [error, setError] = useState<string | null>(null);
   const [pollingEntitlement, setPollingEntitlement] = useState(false);
   const { isPro, refreshEntitlement } = useEntitlement();
+  const { data: authData, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
   // Get returnTo from URL query params
   const urlParams = new URLSearchParams(window.location.search);
   const returnTo = urlParams.get('returnTo');
+  const sessionId = urlParams.get('session_id');
 
   useEffect(() => {
+    // Wait for auth check to complete
+    if (authLoading) return;
+    
     const verifyCheckout = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('session_id');
-      
       if (!sessionId) {
         setError("No session ID found");
         setVerifying(false);
+        return;
+      }
+
+      // If user is not authenticated, the webhook will still process the payment
+      // Show success and poll for entitlement anyway
+      if (!authData?.user) {
+        console.log("User not authenticated, skipping verify-checkout but payment was processed via webhook");
+        setVerifying(false);
+        // Still poll in case they log in
+        setPollingEntitlement(true);
+        await pollForEntitlement();
+        setPollingEntitlement(false);
+        
+        if (returnTo) {
+          setTimeout(() => {
+            setLocation(returnTo);
+          }, 1500);
+        }
         return;
       }
 
@@ -77,13 +97,25 @@ export default function CheckoutSuccess() {
           }, 1500);
         }
       } catch (err) {
-        setError("Failed to verify payment. Please contact support.");
+        // Even if verify fails, the webhook processes the payment
+        // Show success and continue
+        console.error("Verify checkout failed, but webhook should have processed payment:", err);
         setVerifying(false);
+        
+        setPollingEntitlement(true);
+        await pollForEntitlement();
+        setPollingEntitlement(false);
+        
+        if (returnTo) {
+          setTimeout(() => {
+            setLocation(returnTo);
+          }, 1500);
+        }
       }
     };
 
     verifyCheckout();
-  }, [returnTo, setLocation]);
+  }, [returnTo, setLocation, authLoading, authData]);
 
   const pollForEntitlement = async () => {
     const delays = [500, 1000, 2000, 4000, 8000];
@@ -159,12 +191,14 @@ export default function CheckoutSuccess() {
           
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">
-              {pollingEntitlement ? "Activating..." : "Welcome to Pro!"}
+              {pollingEntitlement ? "Activating..." : "Payment Successful!"}
             </h1>
             <p className="text-muted-foreground">
               {pollingEntitlement 
-                ? "Setting up your subscription..."
-                : "Your subscription is now active. You have unlimited access to all features."
+                ? "Setting up your access..."
+                : returnTo 
+                  ? "Redirecting you back to your results..."
+                  : "Your purchase is complete. You now have full access."
               }
             </p>
           </div>

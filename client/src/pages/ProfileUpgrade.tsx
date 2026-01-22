@@ -89,7 +89,7 @@ export default function ProfileUpgrade() {
               Back to Results
             </Button>
           </Link>
-          <Link href="/pricing" className="flex-1">
+          <Link href="/pricing?returnTo=/fix-profile/results" className="flex-1">
             <Button
               className="w-full"
               data-testid="button-unlock-now"
