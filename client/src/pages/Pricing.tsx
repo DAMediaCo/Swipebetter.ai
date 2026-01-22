@@ -146,7 +146,7 @@ export default function Pricing() {
               </CardHeader>
               <CardContent className="flex flex-col flex-1 text-center pt-4">
                 <div className="mb-3">
-                  <span className="text-4xl font-bold">$9</span>
+                  <span className="text-4xl font-bold">$3</span>
                   <span className="text-muted-foreground"> one-time</span>
                 </div>
                 <ul className="text-sm space-y-1 text-left flex-1">
@@ -184,7 +184,7 @@ export default function Pricing() {
               </CardHeader>
               <CardContent className="flex flex-col flex-1 text-center pt-4">
                 <div className="mb-3">
-                  <span className="text-4xl font-bold">$19</span>
+                  <span className="text-4xl font-bold">$13</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
                 <ul className="text-sm space-y-1 text-left flex-1">
@@ -217,10 +217,10 @@ export default function Pricing() {
               </CardHeader>
               <CardContent className="flex flex-col flex-1 text-center pt-4">
                 <div className="mb-3">
-                  <span className="text-4xl font-bold">$99</span>
+                  <span className="text-4xl font-bold">$79</span>
                   <span className="text-muted-foreground">/year</span>
                   <p className="text-sm text-primary font-medium mt-1">
-                    Save 57% – $8.25/mo billed annually
+                    Save 49% – $6.58/mo billed annually
                   </p>
                 </div>
                 <ul className="text-sm space-y-1 text-left flex-1">
