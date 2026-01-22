@@ -69,8 +69,9 @@ export class WebhookHandlers {
     const amountTotal = session.amount_total || 0;
     const mode = session.mode;
     const subscriptionId = session.subscription as string | null;
+    const sessionId = session.id;
 
-    console.log(`[Checkout Complete] Customer: ${customerId}, Amount: ${amountTotal}, Mode: ${mode}`);
+    console.log(`[Checkout Complete] Customer: ${customerId}, Amount: ${amountTotal}, Mode: ${mode}, Session: ${sessionId}`);
 
     const user = await this.findUserByStripeCustomerId(customerId);
     if (!user) {
@@ -79,6 +80,13 @@ export class WebhookHandlers {
     }
 
     const userId = user.id;
+    
+    // Atomic claim of checkout session - prevents race conditions with verify-checkout endpoint
+    const claimed = await storage.claimCheckoutSession(userId, sessionId);
+    if (!claimed) {
+      console.log(`[Checkout] Session ${sessionId} already processed for user ${userId}, skipping`);
+      return;
+    }
     const amountDollars = amountTotal / 100;
 
     // Determine plan type from session metadata, price, or amount
@@ -91,7 +99,7 @@ export class WebhookHandlers {
       // Monthly ($13) or Annual ($79) - both grant unlimited access
       await storage.setPlanTier(userId, 'unlimited');
       
-      // Update subscription status
+      // Update subscription status (session already claimed atomically)
       await storage.updateUserSubscription(userId, {
         status: 'active',
         planType: amountDollars >= 70 ? 'annual' : 'monthly',

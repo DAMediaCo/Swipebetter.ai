@@ -1028,13 +1028,18 @@ export async function registerRoutes(
         userSub = await storage.createUserSubscription({ userId });
       }
       
-      // Idempotency check: skip if this session was already processed
-      if (userSub.lastCheckoutSessionId === sessionId) {
-        console.log(`Session ${sessionId} already processed for user ${userId}, returning cached result`);
+      // Atomic claim of checkout session - prevents race conditions with webhook
+      const claimed = await storage.claimCheckoutSession(userId, sessionId);
+      if (!claimed) {
+        console.log(`Session ${sessionId} already processed for user ${userId}, returning current state`);
+        const currentCredits = await storage.getCredits(userId);
+        const currentTier = await storage.getPlanTier(userId);
         return res.json({ 
           success: true, 
           status: 'already_processed',
-          alreadyProcessed: true
+          alreadyProcessed: true,
+          credits: currentCredits,
+          planTier: currentTier
         });
       }
       
@@ -1055,7 +1060,6 @@ export async function registerRoutes(
           stripeCustomerId: customerId,
           stripePriceId: priceId,
           planType: planType,
-          lastCheckoutSessionId: sessionId,
         });
         res.json({ 
           success: true, 
@@ -1086,7 +1090,6 @@ export async function registerRoutes(
           currentPeriodEnd: subscription.current_period_end 
             ? new Date(subscription.current_period_end * 1000) 
             : null,
-          lastCheckoutSessionId: sessionId,
         });
 
         res.json({ 

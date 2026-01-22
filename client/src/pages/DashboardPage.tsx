@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/lib/auth";
+import { useAuth, useCredits } from "@/lib/auth";
 import { ProfileOptimizer } from "@/components/dashboard/ProfileOptimizer";
 import { ReplyAssistant } from "@/components/dashboard/ReplyAssistant";
 import { RecentAudits } from "@/components/dashboard/RecentAudits";
 import { User, MessageCircle, History } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 type Tab = "profile" | "reply" | "history";
 
@@ -14,6 +16,8 @@ export default function DashboardPage() {
   const [, setLocation] = useLocation();
   const searchString = useSearch();
   const user = authData?.user;
+  const { toast } = useToast();
+  const { refreshCredits } = useCredits();
 
   const getInitialTab = (): Tab => {
     const params = new URLSearchParams(searchString);
@@ -28,6 +32,47 @@ export default function DashboardPage() {
   useEffect(() => {
     document.title = "Dating AI Toolkit | SwipeBetter";
   }, []);
+
+  // Verify payment if session_id is present in URL (fallback for webhook race condition)
+  useEffect(() => {
+    const verifyPaymentFromUrl = async () => {
+      const params = new URLSearchParams(searchString);
+      const sessionId = params.get("session_id");
+      
+      if (!sessionId || !user) return;
+      
+      try {
+        const response = await apiRequest("POST", "/api/verify-checkout", { sessionId });
+        const data = await response.json();
+        
+        if (data.success) {
+          // Always refresh caches to ensure UI is up to date
+          queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+          refreshCredits();
+          
+          if (!data.alreadyProcessed) {
+            toast({
+              title: "Payment Successful!",
+              description: "Your credits have been added.",
+            });
+          }
+          
+          // Clean up URL
+          window.history.replaceState({}, "", "/dashboard");
+        }
+      } catch (error) {
+        toast({
+          title: "Payment verification failed",
+          description: "Please contact support if your credits were not added.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    verifyPaymentFromUrl();
+  }, [searchString, user, toast, refreshCredits]);
 
   useEffect(() => {
     if (!authLoading && !user) {

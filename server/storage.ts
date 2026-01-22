@@ -69,6 +69,7 @@ export interface IStorage {
   unlockReport(userId: string, reportId: string): Promise<void>;
   unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }>;
   getUnlockedReports(userId: string): Promise<string[]>;
+  claimCheckoutSession(userId: string, sessionId: string): Promise<boolean>;
 
   // billingStatus: derived status for billing classification
   // - subscription: has active subscription in Stripe
@@ -481,6 +482,22 @@ export class DatabaseStorage implements IStorage {
     const sub = await this.getUserSubscription(userId);
     if (!sub) return [];
     return (sub as any).reportsUnlocked || [];
+  }
+
+  // Atomic claim of checkout session - returns true if claimed, false if already processed
+  async claimCheckoutSession(userId: string, sessionId: string): Promise<boolean> {
+    // Atomic update: only set session ID if it's not already this session ID
+    // This uses a conditional WHERE to prevent race conditions
+    const result = await db.execute(
+      sql`UPDATE user_subscriptions 
+          SET last_checkout_session_id = ${sessionId},
+              updated_at = NOW()
+          WHERE user_id = ${userId} 
+          AND (last_checkout_session_id IS NULL OR last_checkout_session_id != ${sessionId})
+          RETURNING id`
+    );
+    
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   async getAdminStats(): Promise<{
