@@ -59,6 +59,16 @@ export interface IStorage {
   hasUserRedeemedCode(userId: string, promoCodeId: number): Promise<boolean>;
   createPromoRedemption(userId: string, promoCodeId: number): Promise<PromoRedemption>;
 
+  // Credit & Subscription System
+  getPlanTier(userId: string): Promise<'free' | 'starter' | 'unlimited'>;
+  getCredits(userId: string): Promise<number>;
+  addCredits(userId: string, amount: number): Promise<void>;
+  deductCredit(userId: string): Promise<boolean>;
+  setPlanTier(userId: string, tier: 'free' | 'starter' | 'unlimited'): Promise<void>;
+  isReportUnlocked(userId: string, reportId: string): Promise<boolean>;
+  unlockReport(userId: string, reportId: string): Promise<void>;
+  getUnlockedReports(userId: string): Promise<string[]>;
+
   // billingStatus: derived status for billing classification
   // - subscription: has active subscription in Stripe
   // - one_time: has at least one successful payment but no active subscription
@@ -355,6 +365,105 @@ export class DatabaseStorage implements IStorage {
       promoCodeId,
     }).returning();
     return redemption;
+  }
+
+  // Credit & Subscription System Methods
+  async getPlanTier(userId: string): Promise<'free' | 'starter' | 'unlimited'> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return 'free';
+    const tier = (sub as any).planTier;
+    if (tier === 'unlimited' || tier === 'starter') return tier;
+    return 'free';
+  }
+
+  async getCredits(userId: string): Promise<number> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return 0;
+    return (sub as any).credits || 0;
+  }
+
+  async addCredits(userId: string, amount: number): Promise<void> {
+    const existing = await this.getUserSubscription(userId);
+    if (existing) {
+      const currentCredits = (existing as any).credits || 0;
+      await db.update(userSubscriptions)
+        .set({ 
+          credits: currentCredits + amount,
+          updatedAt: new Date()
+        } as any)
+        .where(eq(userSubscriptions.userId, userId));
+    } else {
+      await db.insert(userSubscriptions).values({
+        userId,
+        credits: amount,
+        planTier: 'starter',
+      } as any);
+    }
+  }
+
+  async deductCredit(userId: string): Promise<boolean> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return false;
+    const currentCredits = (sub as any).credits || 0;
+    if (currentCredits <= 0) return false;
+    
+    await db.update(userSubscriptions)
+      .set({ 
+        credits: currentCredits - 1,
+        updatedAt: new Date()
+      } as any)
+      .where(eq(userSubscriptions.userId, userId));
+    return true;
+  }
+
+  async setPlanTier(userId: string, tier: 'free' | 'starter' | 'unlimited'): Promise<void> {
+    const existing = await this.getUserSubscription(userId);
+    if (existing) {
+      await db.update(userSubscriptions)
+        .set({ 
+          planTier: tier,
+          updatedAt: new Date()
+        } as any)
+        .where(eq(userSubscriptions.userId, userId));
+    } else {
+      await db.insert(userSubscriptions).values({
+        userId,
+        planTier: tier,
+      } as any);
+    }
+  }
+
+  async isReportUnlocked(userId: string, reportId: string): Promise<boolean> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return false;
+    const unlocked = (sub as any).reportsUnlocked || [];
+    return unlocked.includes(reportId);
+  }
+
+  async unlockReport(userId: string, reportId: string): Promise<void> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) {
+      await db.insert(userSubscriptions).values({
+        userId,
+        reportsUnlocked: [reportId],
+      } as any);
+      return;
+    }
+    const currentUnlocked = (sub as any).reportsUnlocked || [];
+    if (!currentUnlocked.includes(reportId)) {
+      await db.update(userSubscriptions)
+        .set({ 
+          reportsUnlocked: [...currentUnlocked, reportId],
+          updatedAt: new Date()
+        } as any)
+        .where(eq(userSubscriptions.userId, userId));
+    }
+  }
+
+  async getUnlockedReports(userId: string): Promise<string[]> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return [];
+    return (sub as any).reportsUnlocked || [];
   }
 
   async getAdminStats(): Promise<{

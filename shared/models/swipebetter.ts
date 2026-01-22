@@ -36,6 +36,10 @@ export const replyAnalyses = pgTable("reply_analyses", {
 // - "admin_grant": Manually granted by admin
 // - "referral": Credits from referral program
 // - "migration": Credits migrated from old system
+// planTier values:
+// - 'free': No paid access
+// - 'starter': Has purchased one-time credits
+// - 'unlimited': Has active monthly or annual subscription
 export const userSubscriptions = pgTable("user_subscriptions", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
@@ -51,6 +55,10 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   lifetimeSpendCents: integer("lifetime_spend_cents").default(0),
   lastPaymentAt: timestamp("last_payment_at"),
   currentPeriodEnd: timestamp("current_period_end"),
+  // New credit/subscription system fields
+  planTier: text("plan_tier").default("free"), // 'free' | 'starter' | 'unlimited'
+  credits: integer("credits").default(0), // Number of credits remaining
+  reportsUnlocked: text("reports_unlocked").array().default([]), // Array of report IDs permanently unlocked
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
