@@ -73,6 +73,14 @@ export default function ReplyFix() {
 
   const analyzeMutation = useMutation({
     mutationFn: async () => {
+      // For non-unlimited users, check and deduct credit first
+      if (!hasUnlimitedAccess) {
+        const accessResult = await checkAccessMutation.mutateAsync(true);
+        if (accessResult.access !== 'granted') {
+          throw new Error('402: Payment required');
+        }
+      }
+      
       trackAnalysisStarted("reply");
       const response = await apiRequest("POST", "/api/analyze-reply", {
         tone,
@@ -84,16 +92,25 @@ export default function ReplyFix() {
     onSuccess: (data) => {
       if (data.parsed) {
         saveAnalysis('reply', data.parsed);
+        refreshCredits();
         setLocation('/fix-reply/results');
       }
     },
     onError: (error: any) => {
-      if (error.message?.includes("403")) {
+      if (error.message?.includes("402")) {
         toast({
-          title: "Subscription required",
-          description: "Upgrade to Pro to use this feature.",
+          title: "Credits required",
+          description: "Get credits to use this feature.",
           variant: "destructive",
         });
+        setLocation('/pricing');
+      } else if (error.message?.includes("403")) {
+        toast({
+          title: "Access denied",
+          description: "Please try again or contact support.",
+          variant: "destructive",
+        });
+        setLocation('/pricing');
       } else {
         toast({
           title: "Analysis failed",
