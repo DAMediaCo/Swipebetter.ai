@@ -71,7 +71,7 @@ export default function ReplyResults() {
                 <CardTitle className="text-lg font-semibold">Conversation Context</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{result.conversationContext}</p>
+                <p className="text-foreground/90">{result.conversationContext}</p>
               </CardContent>
             </Card>
           )}
@@ -85,7 +85,7 @@ export default function ReplyResults() {
                 onClick={() => copyToClipboard(reply, index)}
               >
                 <CardContent className="py-4 flex items-start gap-4">
-                  <div className="flex-1 prose prose-sm dark:prose-invert max-w-none prose-p:my-1">
+                  <div className="flex-1 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-p:text-foreground/90">
                     <ReactMarkdown>{reply}</ReactMarkdown>
                   </div>
                   <Button
