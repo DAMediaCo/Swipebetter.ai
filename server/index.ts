@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import path from "path";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -172,6 +173,13 @@ async function initStripe() {
     res.status(status).json({ message });
     throw err;
   });
+
+  // Serve static blog files before SPA handler
+  const blogPath = path.resolve(import.meta.dirname, "..", "client", "public", "blog");
+  app.use("/blog", express.static(blogPath, {
+    extensions: ['html'],
+    index: 'index.html'
+  }));
 
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
