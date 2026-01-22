@@ -115,7 +115,7 @@ export default function TinderBiosForEngineers() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why Most Nerd Bios Fail</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Why Most Nerd Bios Fail</h2>
             <p className="leading-relaxed">
               The problem isn't being nerdy. It's being boring about it. "I like video games and coding" tells someone nothing. Everyone in tech likes those things. What makes you different?
             </p>
@@ -144,7 +144,7 @@ export default function TinderBiosForEngineers() {
 
           {engineerBios.map((category, categoryIndex) => (
             <section key={categoryIndex}>
-              <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground flex items-center gap-2">
                 {category.category === "The Gamer" && <Gamepad2 className="w-6 h-6 text-primary" />}
                 {category.category === "The Self-Aware Engineer" && <Code className="w-6 h-6 text-primary" />}
                 {category.category === "The Nerdy But Charming" && <Brain className="w-6 h-6 text-primary" />}
@@ -178,7 +178,7 @@ export default function TinderBiosForEngineers() {
           ))}
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">How to Customize These for Yourself</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">How to Customize These for Yourself</h2>
             <p className="leading-relaxed">
               These bios work as starting points, but the best results come from personalizing them. Swap out the specific games, hobbies, or references for your own. The structure and tone matter more than the exact words.
             </p>
@@ -188,7 +188,7 @@ export default function TinderBiosForEngineers() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What to Avoid</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What to Avoid</h2>
             <p className="leading-relaxed">
               <strong>Don't list your tech stack.</strong> "Proficient in Python, JavaScript, and SQL" is a resume, not a dating profile.
             </p>
@@ -219,7 +219,7 @@ export default function TinderBiosForEngineers() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>

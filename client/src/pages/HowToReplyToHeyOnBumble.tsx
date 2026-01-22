@@ -143,7 +143,7 @@ export default function HowToReplyToHeyOnBumble() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Why "Hey" Isn't a Red Flag</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Why "Hey" Isn't a Red Flag</h2>
             <p className="leading-relaxed">
               Before we get into responses, let's clear something up: "hey" doesn't mean she's not interested. It usually means she:
             </p>
@@ -178,7 +178,7 @@ export default function HowToReplyToHeyOnBumble() {
 
           {replyCategories.map((category, categoryIndex) => (
             <section key={categoryIndex}>
-              <h2 className="text-2xl font-bold mt-10 mb-2 flex items-center gap-2">
+              <h2 className="text-2xl font-bold mt-10 mb-2 text-foreground flex items-center gap-2">
                 {category.icon === "funny" && <Laugh className="w-6 h-6 text-primary" />}
                 {category.icon === "smooth" && <Heart className="w-6 h-6 text-primary" />}
                 {category.icon === "bold" && <Zap className="w-6 h-6 text-primary" />}
@@ -218,7 +218,7 @@ export default function HowToReplyToHeyOnBumble() {
           ))}
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What NOT to Do</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What NOT to Do</h2>
             <p className="leading-relaxed">
               <strong>Don't reply with just "Hey" back.</strong> You're now both stuck. Someone has to make the first real move, and since she already messaged, it's your turn.
             </p>
@@ -231,7 +231,7 @@ export default function HowToReplyToHeyOnBumble() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">The Real Strategy</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">The Real Strategy</h2>
             <p className="leading-relaxed">
               The best response to "hey" is one that:
             </p>
@@ -264,7 +264,7 @@ export default function HowToReplyToHeyOnBumble() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>

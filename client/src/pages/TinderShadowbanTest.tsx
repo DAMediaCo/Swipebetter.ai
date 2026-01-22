@@ -66,7 +66,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What Is a Tinder Shadowban?</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What Is a Tinder Shadowban?</h2>
             <p className="leading-relaxed">
               A shadowban is when Tinder restricts your account without officially banning you. Your profile still exists, and you can use the app, but:
             </p>
@@ -82,7 +82,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground flex items-center gap-2">
               <Eye className="w-6 h-6 text-primary" />
               How to Test If You're Shadowbanned
             </h2>
@@ -148,7 +148,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground flex items-center gap-2">
               <AlertTriangle className="w-6 h-6 text-amber-500" />
               Signs You're Shadowbanned
             </h2>
@@ -185,7 +185,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">What Causes a Shadowban?</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What Causes a Shadowban?</h2>
             <p className="leading-relaxed">
               Tinder doesn't publish their rules, but these behaviors commonly trigger shadowbans:
             </p>
@@ -201,7 +201,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground flex items-center gap-2">
               <CheckCircle className="w-6 h-6 text-primary" />
               How to Reset Your Tinder Account Properly
             </h2>
@@ -258,7 +258,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Maybe You're Not Shadowbanned</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Maybe You're Not Shadowbanned</h2>
             <p className="leading-relaxed">
               Before going through a full reset, consider that your profile might just need work. Many people assume they're shadowbanned when the real problem is:
             </p>
@@ -290,7 +290,7 @@ export default function TinderShadowbanTest() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold mt-10 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">Frequently Asked Questions</h2>
             
             <div className="space-y-6">
               <div>
