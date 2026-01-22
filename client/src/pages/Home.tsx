@@ -327,9 +327,10 @@ export default function Home() {
                   <h3 className="text-xl font-bold mb-1">Unlimited</h3>
                   <p className="text-sm text-muted-foreground mb-4">For serious daters who want results fast.</p>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-bold">$12</span>
-                    <span className="text-muted-foreground">/ month</span>
+                    <span className="text-4xl font-bold">$79</span>
+                    <span className="text-muted-foreground">/ year</span>
                   </div>
+                  <p className="text-xs text-primary mt-1">Save 45% vs monthly</p>
                 </div>
                 
                 <ul className="space-y-3 mb-6">
