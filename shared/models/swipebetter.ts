@@ -59,6 +59,7 @@ export const userSubscriptions = pgTable("user_subscriptions", {
   planTier: text("plan_tier").default("free"), // 'free' | 'starter' | 'unlimited'
   credits: integer("credits").default(0), // Number of credits remaining
   reportsUnlocked: text("reports_unlocked").array().default([]), // Array of report IDs permanently unlocked
+  lastCheckoutSessionId: text("last_checkout_session_id"), // Prevents double-crediting from same session
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });

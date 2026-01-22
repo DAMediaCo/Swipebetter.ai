@@ -1028,6 +1028,16 @@ export async function registerRoutes(
         userSub = await storage.createUserSubscription({ userId });
       }
       
+      // Idempotency check: skip if this session was already processed
+      if (userSub.lastCheckoutSessionId === sessionId) {
+        console.log(`Session ${sessionId} already processed for user ${userId}, returning cached result`);
+        return res.json({ 
+          success: true, 
+          status: 'already_processed',
+          alreadyProcessed: true
+        });
+      }
+      
       const lineItem = session.line_items?.data?.[0];
       const priceAmount = (session.amount_total ?? 0) / 100;
       const priceId = lineItem?.price?.id ?? '';
@@ -1045,6 +1055,7 @@ export async function registerRoutes(
           stripeCustomerId: customerId,
           stripePriceId: priceId,
           planType: planType,
+          lastCheckoutSessionId: sessionId,
         });
         res.json({ 
           success: true, 
@@ -1075,6 +1086,7 @@ export async function registerRoutes(
           currentPeriodEnd: subscription.current_period_end 
             ? new Date(subscription.current_period_end * 1000) 
             : null,
+          lastCheckoutSessionId: sessionId,
         });
 
         res.json({ 
