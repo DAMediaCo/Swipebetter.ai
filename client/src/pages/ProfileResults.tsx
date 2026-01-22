@@ -228,8 +228,23 @@ export default function ProfileResults() {
   const parseBioSuggestions = (content: string | string[] | undefined): string[] => {
     if (!content) return [];
     
+    // Helper to clean a single bio text
+    const cleanBioText = (text: string): string => {
+      let cleaned = text.trim();
+      // Remove "**Alternative X**" or "**Option X**" patterns
+      cleaned = cleaned.replace(/^\*\*\s*(Alternative|Option)\s*\d+\s*\*\*[:\s]*/i, '');
+      // Remove "Alternative X:" or "Option X:" without markdown
+      cleaned = cleaned.replace(/^(Alternative|Option)\s*\d+[:\s]*/i, '');
+      // Remove any remaining ** markdown
+      cleaned = cleaned.replace(/\*\*/g, '');
+      return cleaned.trim();
+    };
+    
     if (Array.isArray(content)) {
-      return content.filter(item => typeof item === 'string' && item.trim());
+      return content
+        .filter(item => typeof item === 'string' && item.trim())
+        .map(cleanBioText)
+        .filter(item => item.length > 0);
     }
     
     if (typeof content !== 'string') {
@@ -241,26 +256,34 @@ export default function ProfileResults() {
     let currentBio = '';
     
     for (const line of lines) {
+      // Check for numbered items or "Alternative X" headers
       const numberedMatch = line.match(/^\d+\.\s*(.+)/);
-      if (numberedMatch) {
+      const altMatch = line.match(/^\*?\*?\s*(Alternative|Option)\s*\d+\s*\*?\*?[:\s]*(.*)/i);
+      
+      if (altMatch) {
         if (currentBio) {
-          bios.push(currentBio.trim());
+          bios.push(cleanBioText(currentBio));
+        }
+        currentBio = altMatch[2] || '';
+      } else if (numberedMatch) {
+        if (currentBio) {
+          bios.push(cleanBioText(currentBio));
         }
         currentBio = numberedMatch[1];
-      } else if (currentBio) {
+      } else if (currentBio || bios.length === 0) {
         currentBio += ' ' + line.trim();
       }
     }
     
     if (currentBio) {
-      bios.push(currentBio.trim());
+      bios.push(cleanBioText(currentBio));
     }
     
     if (bios.length === 0 && content.trim()) {
-      bios.push(content.trim());
+      bios.push(cleanBioText(content));
     }
     
-    return bios;
+    return bios.filter(bio => bio.length > 0);
   };
 
   if (!result) {
