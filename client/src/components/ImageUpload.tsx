@@ -62,8 +62,8 @@ export function ImageUpload({ images, onChange, maxImages = 5 }: ImageUploadProp
       <div
         className={`relative min-h-48 border-2 border-dashed rounded-xl flex flex-col items-center justify-center p-6 transition-all duration-300 cursor-pointer ${
           isDragging
-            ? "border-pink-500 bg-pink-50/50 dark:bg-pink-900/20"
-            : "border-border bg-slate-50 dark:bg-slate-900/50 hover:border-pink-500 hover:bg-pink-50/50 dark:hover:bg-pink-900/20"
+            ? "border-primary bg-primary/10"
+            : "border-border bg-muted/50 hover:border-primary hover:bg-primary/5"
         } ${images.length >= maxImages ? "opacity-50 pointer-events-none" : ""}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -85,18 +85,18 @@ export function ImageUpload({ images, onChange, maxImages = 5 }: ImageUploadProp
           data-testid="input-file-upload"
         />
         <div className="flex flex-col items-center gap-3 text-center">
-          <div className="w-16 h-16 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
             {isDragging ? (
-              <Upload className="w-8 h-8 text-pink-500" />
+              <Upload className="w-8 h-8 text-primary" />
             ) : (
-              <Camera className="w-8 h-8 text-pink-500" />
+              <Camera className="w-8 h-8 text-primary" />
             )}
           </div>
           <div>
             <p className="font-bold text-lg">
               {isDragging ? "Drop images here" : "Upload Screenshots"}
             </p>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Drag & drop or tap to select ({images.length}/{maxImages})
             </p>
           </div>

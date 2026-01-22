@@ -102,7 +102,7 @@ export function ProfileOptimizer() {
         </Card>
       )}
 
-      <Card className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
+      <Card className="bg-card shadow-sm rounded-2xl">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold">1. Your Goals</CardTitle>
           <p className="text-sm text-muted-foreground">Help us personalize your feedback</p>
@@ -185,7 +185,7 @@ export function ProfileOptimizer() {
         </CardContent>
       </Card>
 
-      <Card className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
+      <Card className="bg-card shadow-sm rounded-2xl">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg font-semibold">2. Upload Screenshots</CardTitle>
           <p className="text-sm text-muted-foreground">Upload screenshots of your dating profile</p>
@@ -214,7 +214,7 @@ export function ProfileOptimizer() {
         <Button
           onClick={() => analyzeMutation.mutate()}
           disabled={!canAnalyze || analyzeMutation.isPending}
-          className="w-full py-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+          className="w-full py-6 font-bold shadow-md hover:shadow-lg transition-shadow"
           data-testid="button-analyze"
         >
           {analyzeMutation.isPending ? (
@@ -241,7 +241,7 @@ export function ProfileOptimizer() {
         )}
       </div>
 
-      <div className="bg-white/50 dark:bg-slate-900/50 rounded-xl p-4 mt-6">
+      <div className="bg-muted/50 rounded-xl p-4 mt-6">
         <TrustBar />
       </div>
     </div>

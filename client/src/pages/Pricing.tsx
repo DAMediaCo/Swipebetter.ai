@@ -158,7 +158,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-5 mt-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+                  className="w-full py-5 mt-4 font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: starter");
                     if (oneTimePrice) handleCheckout(oneTimePrice.id);
@@ -171,9 +171,9 @@ export default function Pricing() {
               </CardContent>
             </Card>
 
-            <Card className="border-pink-500 border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl">
+            <Card className="border-primary border-2 relative overflow-visible flex flex-col md:scale-105 md:z-10 shadow-lg shadow-primary/10 transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-pink-500 to-red-500 text-white px-4 py-1.5">
+                <Badge className="bg-primary text-primary-foreground px-4 py-1.5">
                   <Star className="w-3.5 h-3.5 mr-1.5" />
                   Most Popular
                 </Badge>
@@ -196,7 +196,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-5 mt-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+                  className="w-full py-5 mt-4 font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: monthly");
                     if (monthlyPrice) handleCheckout(monthlyPrice.id);
@@ -232,7 +232,7 @@ export default function Pricing() {
                   ))}
                 </ul>
                 <Button
-                  className="w-full py-5 mt-4 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+                  className="w-full py-5 mt-4 font-bold shadow-md hover:shadow-lg transition-shadow"
                   onClick={() => {
                     console.log("Selected plan: annual");
                     if (annualPrice) handleCheckout(annualPrice.id);
@@ -262,7 +262,7 @@ export default function Pricing() {
         )}
 
         {!isSubscribed && (
-          <div className="mt-8 max-w-2xl mx-auto bg-white/50 dark:bg-slate-900/50 rounded-xl p-4">
+          <div className="mt-8 max-w-2xl mx-auto bg-muted/50 rounded-xl p-4">
             <div className="flex items-center justify-center gap-3">
               <Lock className="w-4 h-4 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Guaranteed safe & secure checkout via Stripe</span>

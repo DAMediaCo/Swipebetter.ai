@@ -60,12 +60,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex justify-center mb-8">
-          <div className="inline-flex bg-slate-100 dark:bg-slate-800 rounded-full p-1">
+          <div className="inline-flex bg-muted rounded-full p-1">
             <button
               onClick={() => handleTabChange("profile")}
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all ${
                 activeTab === "profile"
-                  ? "bg-white dark:bg-slate-900 text-pink-600 shadow-md"
+                  ? "bg-card text-primary shadow-md"
                   : "text-muted-foreground hover:text-foreground"
               }`}
               data-testid="tab-profile"
@@ -77,7 +77,7 @@ export default function DashboardPage() {
               onClick={() => handleTabChange("reply")}
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all ${
                 activeTab === "reply"
-                  ? "bg-white dark:bg-slate-900 text-pink-600 shadow-md"
+                  ? "bg-card text-primary shadow-md"
                   : "text-muted-foreground hover:text-foreground"
               }`}
               data-testid="tab-reply"

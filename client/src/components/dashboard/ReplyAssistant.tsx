@@ -186,7 +186,7 @@ export function ReplyAssistant() {
           </label>
           <Select value={goal} onValueChange={setGoal}>
             <SelectTrigger 
-              className="w-full bg-white dark:bg-slate-900"
+              className="w-full bg-card"
               data-testid="select-goal"
             >
               <SelectValue placeholder="Select your conversation goal..." />
@@ -208,7 +208,7 @@ export function ReplyAssistant() {
               value={conversationText}
               onChange={(e) => setConversationText(e.target.value)}
               placeholder="Paste their message or upload a screenshot..."
-              className="h-48 bg-white dark:bg-slate-900 rounded-2xl border border-border/50 p-4 pr-14 text-base resize-none"
+              className="h-48 bg-card rounded-2xl border border-border/50 p-4 pr-14 text-base resize-none"
               data-testid="textarea-conversation"
             />
             <div className="absolute right-3 top-3 flex flex-col gap-2">
@@ -306,8 +306,8 @@ export function ReplyAssistant() {
                   onClick={() => setHeroTone(t.id)}
                   className={`px-5 py-2.5 rounded-full font-medium text-sm transition-all flex items-center gap-1.5 ${
                     heroTone === t.id
-                      ? "bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-md"
-                      : "bg-slate-100 dark:bg-slate-800 text-foreground hover:bg-slate-200 dark:hover:bg-slate-700"
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "bg-muted text-foreground hover:bg-muted/80"
                   }`}
                   data-testid={`button-hero-tone-${t.id}`}
                 >
@@ -323,7 +323,7 @@ export function ReplyAssistant() {
           size="lg" 
           onClick={handleHeroSubmit}
           disabled={heroAnalyzeMutation.isPending || !conversationText.trim() || !subscriptionData?.canAnalyze}
-          className="w-full py-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-lg hover:shadow-xl transition-shadow border-0 disabled:opacity-50"
+          className="w-full py-6 font-bold shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50"
           data-testid="button-generate-replies"
         >
           {heroAnalyzeMutation.isPending ? (
@@ -340,7 +340,7 @@ export function ReplyAssistant() {
         </Button>
       </div>
       
-      <div className="bg-white/50 dark:bg-slate-900/50 rounded-xl p-4 backdrop-blur-sm flex flex-wrap items-center justify-center gap-4">
+      <div className="bg-muted/50 rounded-xl p-4 backdrop-blur-sm flex flex-wrap items-center justify-center gap-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Shield className="w-4 h-4 text-green-500" />
           <span>Private & Secure</span>

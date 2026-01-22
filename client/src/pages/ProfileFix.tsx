@@ -121,7 +121,7 @@ export default function ProfileFix() {
             
             <div 
               onClick={startAnalysis}
-              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-slate-50 dark:bg-slate-900/50 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-slate-100 dark:hover:bg-slate-800/50 group"
+              className="max-w-xl mx-auto p-8 border-2 border-dashed border-muted-foreground/30 rounded-xl bg-muted/50 cursor-pointer transition-all duration-200 hover:border-primary hover:bg-primary/5 group"
               data-testid="button-start-upload"
             >
               <div className="flex flex-col items-center gap-3">
@@ -161,7 +161,7 @@ export default function ProfileFix() {
             </Button>
             
             <div className="pt-2">
-              <div className="inline-block bg-slate-50 dark:bg-slate-900/50 rounded-lg px-6 py-4">
+              <div className="inline-block bg-muted/50 rounded-lg px-6 py-4">
                 <TrustBar />
               </div>
             </div>
@@ -183,11 +183,11 @@ export default function ProfileFix() {
             <PrivacyFAQ />
           </section>
 
-          <section className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-8 text-center">
+          <section className="bg-muted/50 rounded-2xl p-8 text-center">
             <p className="text-muted-foreground mb-4">Need help with replies instead?</p>
             <Link href="/fix-reply">
               <Button 
-                className="bg-white dark:bg-slate-800 text-foreground shadow-md hover:shadow-lg transition-shadow border border-border"
+                className="bg-card text-foreground shadow-md hover:shadow-lg transition-shadow border border-border"
                 data-testid="link-fix-reply-cross"
               >
                 Try Fix My Reply
@@ -222,7 +222,7 @@ export default function ProfileFix() {
           </Card>
         )}
 
-        <Card className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
+        <Card className="bg-card shadow-sm rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold">1. Your Goals</CardTitle>
             <p className="text-sm text-muted-foreground">Help us personalize your feedback</p>
@@ -305,7 +305,7 @@ export default function ProfileFix() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-slate-900 shadow-sm rounded-2xl">
+        <Card className="bg-card shadow-sm rounded-2xl">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-semibold">2. Upload Screenshots</CardTitle>
             <p className="text-sm text-muted-foreground">Upload screenshots of your dating profile</p>
@@ -334,7 +334,7 @@ export default function ProfileFix() {
           <Button
             onClick={() => analyzeMutation.mutate()}
             disabled={!canAnalyze || analyzeMutation.isPending}
-            className="w-full py-6 bg-gradient-to-r from-pink-500 to-red-500 text-white font-bold shadow-md hover:shadow-lg transition-shadow"
+            className="w-full py-6 font-bold shadow-md hover:shadow-lg transition-shadow"
             data-testid="button-analyze"
           >
             {analyzeMutation.isPending ? (
@@ -361,7 +361,7 @@ export default function ProfileFix() {
           )}
         </div>
 
-        <div className="bg-white/50 dark:bg-slate-900/50 rounded-xl p-4 mt-6">
+        <div className="bg-muted/50 rounded-xl p-4 mt-6">
           <TrustBar />
         </div>
       </div>
