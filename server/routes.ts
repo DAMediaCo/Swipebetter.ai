@@ -767,6 +767,37 @@ export async function registerRoutes(
     }
   });
 
+  // Get single reply analysis by ID
+  app.get("/api/analyses/reply/:id", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session?.userId || req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const analysisId = parseInt(req.params.id, 10);
+      if (isNaN(analysisId)) {
+        return res.status(400).json({ error: "Invalid analysis ID" });
+      }
+
+      const analysis = await storage.getReplyAnalysis(analysisId);
+      if (!analysis) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+
+      // Ensure user owns this analysis
+      if (analysis.userId !== userId) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      // All audit results are now accessible to all users
+      res.json(analysis);
+    } catch (error) {
+      console.error("Get reply analysis error:", error);
+      res.status(500).json({ error: "Failed to retrieve reply analysis" });
+    }
+  });
+
   app.get("/api/stripe/publishable-key", async (req, res) => {
     try {
       const publishableKey = await getStripePublishableKey();
