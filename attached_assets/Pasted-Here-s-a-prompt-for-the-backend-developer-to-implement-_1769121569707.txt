@@ -1,0 +1,79 @@
+Here's a prompt for the backend developer to implement the promo code and credits endpoints on swipebetter.ai:
+
+Backend Implementation Needed: Promo Code & Credits System
+Overview
+The SwipeBetter mobile app needs two API endpoints implemented on the swipebetter.ai backend to support promo code redemption and credit balance tracking.
+
+Endpoint 1: Promo Code Redemption
+URL: POST /api/promo/redeem
+
+Authentication: Required (session cookie or Bearer token)
+
+Request Body:
+
+{
+  "code": "TWITTER"
+}
+Success Response (200):
+
+{
+  "success": true,
+  "credits": 3,
+  "message": "You received 3 free credits!"
+}
+Error Responses:
+
+400: Invalid or expired promo code
+400: Code already redeemed by this user
+401: User not authenticated
+Business Logic:
+
+Validate the promo code exists and is active
+Check if user has already redeemed this specific code
+Add credits to user's account
+Mark code as redeemed for this user
+Return number of credits granted
+Endpoint 2: User Credits Balance
+URL: GET /api/user/credits
+
+Authentication: Required (session cookie or Bearer token)
+
+Success Response (200):
+
+{
+  "credits": 5
+}
+Error Responses:
+
+401: User not authenticated
+Business Logic:
+
+Return current credit balance for authenticated user
+Database Schema Suggestions
+promo_codes table:
+
+id (primary key)
+code (unique string, uppercase)
+credits (integer - credits to award)
+max_redemptions (integer, nullable - total uses allowed)
+current_redemptions (integer - times used)
+expires_at (timestamp, nullable)
+is_active (boolean)
+user_promo_redemptions table:
+
+id (primary key)
+user_id (foreign key)
+promo_code_id (foreign key)
+redeemed_at (timestamp)
+users table (add column):
+
+credits or analysis_credits (integer, default 0)
+Sample Promo Codes to Create
+Code	Credits	Description
+TWITTER	3	Social media promotion
+WELCOME	5	New user welcome
+LAUNCH	3	Launch promotion
+Notes
+The mobile app sends Authorization: Bearer <token> header
+Ensure CORS headers allow the Authorization header
+Credits are used for profile analyses and reply suggestions
