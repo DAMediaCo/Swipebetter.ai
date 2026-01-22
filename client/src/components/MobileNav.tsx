@@ -1,10 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { Home, Wrench, LogIn, User, CreditCard } from "lucide-react";
+import { Home, Wrench, LogIn, User, CreditCard, BookOpen } from "lucide-react";
 import { useAuth, useLogout } from "@/lib/auth";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/dashboard", icon: Wrench, label: "Dashboard" },
+  { href: "/blog/", icon: BookOpen, label: "Blog" },
   { href: "/account", icon: CreditCard, label: "Account", requiresAuth: true },
 ];
 

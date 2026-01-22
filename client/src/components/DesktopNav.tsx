@@ -11,7 +11,6 @@ import {
 import { useAuth } from "@/lib/auth";
 import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
-import { SidebarDrawer } from "@/components/SidebarDrawer";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", requiresAuth: true },
   { href: "/blog/", label: "Blog", requiresAuth: false },
@@ -94,7 +93,6 @@ export function DesktopNav() {
             </Button>
           </Link>
         )}
-        <SidebarDrawer />
       </div>
     </nav>
   );
