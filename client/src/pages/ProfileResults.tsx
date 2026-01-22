@@ -216,7 +216,7 @@ export default function ProfileResults() {
   const [shareClicked, setShareClicked] = useState(false);
   const shareResult = async () => {
     const score = result?.overallScore || 0;
-    const shareText = `My dating profile just got roasted by AI! I scored a ${score}/100. Find out why you aren't getting matches: https://swipebetter.ai`;
+    const shareText = `I got my dating profile analyzed by AI! Score: ${score}/100. Get your free profile audit: https://swipebetter.ai`;
     await navigator.clipboard.writeText(shareText);
     setShareClicked(true);
     toast({

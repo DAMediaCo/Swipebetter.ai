@@ -17,7 +17,7 @@ Preferred communication style: Simple, everyday language.
 - **Routing**: Wouter for lightweight client-side routing
 - **State Management**: TanStack React Query for server state and caching
 - **UI Components**: shadcn/ui component library built on Radix UI primitives
-- **Styling**: Tailwind CSS with custom design tokens for a dating-app inspired theme
+- **Styling**: Tailwind CSS with custom design tokens for a dark mode, tech-inspired theme (electric cyan accents)
 - **Design Philosophy**: Mobile-first with thumb-friendly touch targets (44x44px minimum), sticky bottom CTAs, and progressive disclosure
 
 ### Backend Architecture
