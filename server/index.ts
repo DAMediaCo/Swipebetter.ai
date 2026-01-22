@@ -174,6 +174,11 @@ async function initStripe() {
     throw err;
   });
 
+  // Redirect /blog to /blog/ for consistency
+  app.get("/blog", (_req, res) => {
+    res.redirect(301, "/blog/");
+  });
+
   // Serve static blog files before SPA handler
   const blogPath = path.resolve(import.meta.dirname, "..", "client", "public", "blog");
   app.use("/blog", express.static(blogPath, {
