@@ -600,43 +600,51 @@ export default function Home() {
             <Card className="hover-elevate transition-all">
               <CardContent className="pt-6 pb-6">
                 <span className="text-xs font-medium text-primary uppercase tracking-wide">Profile Tips</span>
-                <h3 className="font-semibold text-lg mt-2 mb-2">Why You're Getting No Matches</h3>
+                <h3 className="font-semibold text-lg mt-2 mb-2">Tinder Bios for Engineers & Nerds</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Stop guessing. Here is the data-driven reason your profile isn't performing and exactly how to fix it.
+                  Smart, geeky, and actually attractive. 15+ copy-paste bios for tech guys, gamers, and introverts.
                 </p>
-                <a 
-                  href="/blog/why-am-i-getting-no-matches.html" 
+                <Link 
+                  href="/blog/best-tinder-bios-for-engineers-and-nerds" 
                   className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                  data-testid="link-blog-no-matches"
+                  data-testid="link-blog-engineer-bios"
                 >
                   Read Guide <ArrowRight className="w-4 h-4" />
-                </a>
+                </Link>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate transition-all">
               <CardContent className="pt-6 pb-6">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Coming Soon</span>
-                <h3 className="font-semibold text-lg mt-2 mb-2">The Perfect First Message</h3>
+                <span className="text-xs font-medium text-primary uppercase tracking-wide">Conversation</span>
+                <h3 className="font-semibold text-lg mt-2 mb-2">How to Reply to "Hey" on Bumble</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  What to say after matching to maximize your response rate and start great conversations.
+                  She messaged first, but it's boring. 10 copy-paste replies that save the conversation.
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                  Coming Soon
-                </span>
+                <Link 
+                  href="/blog/how-to-reply-to-hey-on-bumble" 
+                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                  data-testid="link-blog-hey-reply"
+                >
+                  Read Guide <ArrowRight className="w-4 h-4" />
+                </Link>
               </CardContent>
             </Card>
 
             <Card className="hover-elevate transition-all">
               <CardContent className="pt-6 pb-6">
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Coming Soon</span>
-                <h3 className="font-semibold text-lg mt-2 mb-2">Photo Order That Works</h3>
+                <span className="text-xs font-medium text-primary uppercase tracking-wide">Technical Guide</span>
+                <h3 className="font-semibold text-lg mt-2 mb-2">Am I Shadowbanned on Tinder?</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  The science behind which photos to put first and how order affects your match rate.
+                  Getting 0 matches might mean a shadowban. Here's how to check and what to do.
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground">
-                  Coming Soon
-                </span>
+                <Link 
+                  href="/blog/tinder-shadowban-test-2026" 
+                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+                  data-testid="link-blog-shadowban"
+                >
+                  Read Guide <ArrowRight className="w-4 h-4" />
+                </Link>
               </CardContent>
             </Card>
           </div>
