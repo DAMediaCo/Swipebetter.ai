@@ -67,6 +67,7 @@ export interface IStorage {
   setPlanTier(userId: string, tier: 'free' | 'starter' | 'unlimited'): Promise<void>;
   isReportUnlocked(userId: string, reportId: string): Promise<boolean>;
   unlockReport(userId: string, reportId: string): Promise<void>;
+  unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }>;
   getUnlockedReports(userId: string): Promise<string[]>;
 
   // billingStatus: derived status for billing classification
@@ -402,18 +403,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deductCredit(userId: string): Promise<boolean> {
-    const sub = await this.getUserSubscription(userId);
-    if (!sub) return false;
-    const currentCredits = (sub as any).credits || 0;
-    if (currentCredits <= 0) return false;
-    
-    await db.update(userSubscriptions)
-      .set({ 
-        credits: currentCredits - 1,
-        updatedAt: new Date()
-      } as any)
-      .where(eq(userSubscriptions.userId, userId));
-    return true;
+    // Atomic credit deduction - only deducts if credits > 0
+    const result = await db.execute(
+      sql`UPDATE user_subscriptions 
+          SET credits = credits - 1, updated_at = NOW()
+          WHERE user_id = ${userId} AND credits > 0
+          RETURNING credits`
+    );
+    return result.rowCount !== null && result.rowCount > 0;
   }
 
   async setPlanTier(userId: string, tier: 'free' | 'starter' | 'unlimited'): Promise<void> {
@@ -441,23 +438,43 @@ export class DatabaseStorage implements IStorage {
   }
 
   async unlockReport(userId: string, reportId: string): Promise<void> {
-    const sub = await this.getUserSubscription(userId);
-    if (!sub) {
-      await db.insert(userSubscriptions).values({
-        userId,
-        reportsUnlocked: [reportId],
-      } as any);
-      return;
+    // Atomic report unlock using array_append
+    await db.execute(
+      sql`UPDATE user_subscriptions 
+          SET reports_unlocked = array_append(COALESCE(reports_unlocked, '{}'), ${reportId}),
+              updated_at = NOW()
+          WHERE user_id = ${userId} 
+          AND NOT (${reportId} = ANY(COALESCE(reports_unlocked, '{}')))`
+    );
+  }
+
+  // Atomic unlock report with credit deduction (single transaction)
+  async unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }> {
+    // Single atomic SQL that deducts credit AND unlocks report
+    const result = await db.execute(
+      sql`UPDATE user_subscriptions 
+          SET credits = credits - 1,
+              reports_unlocked = array_append(COALESCE(reports_unlocked, '{}'), ${reportId}),
+              updated_at = NOW()
+          WHERE user_id = ${userId} 
+          AND credits > 0
+          AND NOT (${reportId} = ANY(COALESCE(reports_unlocked, '{}')))
+          RETURNING credits`
+    );
+    
+    if (result.rowCount !== null && result.rowCount > 0) {
+      const remaining = (result.rows[0] as any).credits;
+      return { success: true, creditsRemaining: remaining };
     }
-    const currentUnlocked = (sub as any).reportsUnlocked || [];
-    if (!currentUnlocked.includes(reportId)) {
-      await db.update(userSubscriptions)
-        .set({ 
-          reportsUnlocked: [...currentUnlocked, reportId],
-          updatedAt: new Date()
-        } as any)
-        .where(eq(userSubscriptions.userId, userId));
+    
+    // Check if already unlocked
+    const isUnlocked = await this.isReportUnlocked(userId, reportId);
+    if (isUnlocked) {
+      const credits = await this.getCredits(userId);
+      return { success: true, creditsRemaining: credits };
     }
+    
+    return { success: false, creditsRemaining: 0 };
   }
 
   async getUnlockedReports(userId: string): Promise<string[]> {

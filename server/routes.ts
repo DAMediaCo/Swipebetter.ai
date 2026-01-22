@@ -111,6 +111,183 @@ export async function registerRoutes(
     });
   });
 
+  // ===== USAGE GATE ENDPOINTS =====
+  
+  // Unlock Report Gate (Profile Optimizer)
+  // - If unlimited tier: ALLOW
+  // - If already unlocked this report: ALLOW  
+  // - If has credits > 0: ALLOW, deduct 1 credit, add report to unlocked
+  // - Else: DENY (402 Payment Required)
+  app.post("/api/unlock-report", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { reportId } = req.body;
+
+      if (!reportId) {
+        return res.status(400).json({ error: "Report ID is required" });
+      }
+
+      const planTier = await storage.getPlanTier(userId);
+      
+      // Unlimited users can access everything
+      if (planTier === 'unlimited') {
+        return res.json({ 
+          access: 'granted', 
+          reason: 'unlimited_plan',
+          planTier 
+        });
+      }
+
+      // Check if report is already unlocked
+      const isUnlocked = await storage.isReportUnlocked(userId, reportId);
+      if (isUnlocked) {
+        return res.json({ 
+          access: 'granted', 
+          reason: 'already_unlocked',
+          planTier 
+        });
+      }
+
+      // Try atomic credit deduction + unlock
+      const result = await storage.unlockReportWithCredit(userId, reportId);
+      if (result.success) {
+        return res.json({ 
+          access: 'granted', 
+          reason: 'credit_used',
+          creditsRemaining: result.creditsRemaining,
+          planTier 
+        });
+      }
+
+      // No access - payment required
+      return res.status(402).json({ 
+        error: 'Payment required',
+        access: 'denied',
+        reason: 'no_credits',
+        planTier,
+        creditsRemaining: 0
+      });
+    } catch (error) {
+      console.error("Unlock report error:", error);
+      res.status(500).json({ error: "Failed to process unlock request" });
+    }
+  });
+
+  // Check if user can access a report (without deducting)
+  app.get("/api/check-report-access/:reportId", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { reportId } = req.params;
+
+      const planTier = await storage.getPlanTier(userId);
+      const credits = await storage.getCredits(userId);
+      const isUnlocked = await storage.isReportUnlocked(userId, reportId);
+
+      const canAccess = planTier === 'unlimited' || isUnlocked || credits > 0;
+
+      res.json({
+        canAccess,
+        isUnlocked,
+        planTier,
+        credits,
+        reason: planTier === 'unlimited' ? 'unlimited_plan' : 
+                isUnlocked ? 'already_unlocked' : 
+                credits > 0 ? 'has_credits' : 'no_access'
+      });
+    } catch (error) {
+      console.error("Check access error:", error);
+      res.status(500).json({ error: "Failed to check access" });
+    }
+  });
+
+  // Generate Reply Gate (Rizz Assistant)
+  // - If unlimited tier: ALLOW
+  // - If has credits > 0: ALLOW and deduct 1 credit (atomic)
+  // - Else: DENY (402 Payment Required)
+  app.post("/api/check-reply-access", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const { deductCredit } = req.body;
+
+      const planTier = await storage.getPlanTier(userId);
+      
+      // Unlimited users can access everything
+      if (planTier === 'unlimited') {
+        return res.json({ 
+          access: 'granted', 
+          reason: 'unlimited_plan',
+          planTier 
+        });
+      }
+
+      // If just checking (not deducting), report current status
+      if (!deductCredit) {
+        const credits = await storage.getCredits(userId);
+        if (credits > 0) {
+          return res.json({ 
+            access: 'granted', 
+            reason: 'has_credits',
+            creditsRemaining: credits,
+            planTier 
+          });
+        }
+        return res.status(402).json({ 
+          error: 'Payment required',
+          access: 'denied',
+          reason: 'no_credits',
+          planTier,
+          creditsRemaining: 0
+        });
+      }
+
+      // Atomic credit deduction - returns true only if successful
+      const deducted = await storage.deductCredit(userId);
+      if (deducted) {
+        const remainingCredits = await storage.getCredits(userId);
+        return res.json({ 
+          access: 'granted', 
+          reason: 'credit_used',
+          creditsRemaining: remainingCredits,
+          planTier 
+        });
+      }
+
+      // No access - payment required (atomic deduction failed)
+      return res.status(402).json({ 
+        error: 'Payment required',
+        access: 'denied',
+        reason: 'no_credits',
+        planTier,
+        creditsRemaining: 0
+      });
+    } catch (error) {
+      console.error("Check reply access error:", error);
+      res.status(500).json({ error: "Failed to check reply access" });
+    }
+  });
+
+  // Get user's credit/subscription status
+  app.get("/api/credits", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.userId;
+      const planTier = await storage.getPlanTier(userId);
+      const credits = await storage.getCredits(userId);
+      const unlockedReports = await storage.getUnlockedReports(userId);
+
+      res.json({
+        planTier,
+        credits,
+        unlockedReports,
+        isUnlimited: planTier === 'unlimited'
+      });
+    } catch (error) {
+      console.error("Get credits error:", error);
+      res.status(500).json({ error: "Failed to get credits" });
+    }
+  });
+
+  // ===== END USAGE GATE ENDPOINTS =====
+
   app.post("/api/analyze-profile", async (req: any, res) => {
     try {
       const parseResult = profileAnalysisSchema.safeParse(req.body);

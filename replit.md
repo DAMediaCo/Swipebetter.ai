@@ -42,6 +42,22 @@ Preferred communication style: Simple, everyday language.
 - **Audit History**: Users can view their last 10 profile analyses with paid/free redaction.
 - **Reply Assistant**: Screenshot OCR for chat analysis and goal-oriented reply suggestions.
 
+### Credit & Subscription System (Tripwire Model)
+- **Plan Tiers**: 
+  - `free`: No paid access, gets redacted results
+  - `starter`: One-time $3 purchase, gets 1 credit for full access
+  - `unlimited`: Monthly ($13) or Annual ($79) subscription, unlimited access
+- **Database Fields** (in `user_subscriptions` table):
+  - `plan_tier`: Current tier ('free', 'starter', 'unlimited')
+  - `credits`: Number of credits remaining (for starter tier)
+  - `reports_unlocked`: Array of report IDs permanently unlocked
+- **Usage Gate Endpoints**:
+  - `POST /api/unlock-report`: Atomic unlock with credit deduction for Profile Optimizer
+  - `GET /api/check-report-access/:reportId`: Check access without deducting
+  - `POST /api/check-reply-access`: Atomic check/deduct for Rizz Assistant
+  - `GET /api/credits`: Get user's current credit/plan status
+- **Stripe Webhook Logic**: Handles checkout.session.completed, subscription changes, and invoice.paid events to update plan tier and credits
+
 ## External Dependencies
 
 ### Third-Party Services
