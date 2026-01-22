@@ -223,21 +223,21 @@ export default function TinderBiosForEngineers() {
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">Should I mention I'm an engineer in my bio?</h3>
+                <h3 className="font-semibold mb-2 text-foreground">Should I mention I'm an engineer in my bio?</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Yes, but don't make it the focus. Your job is one aspect of who you are. Mentioning it casually or with humor works better than leading with your LinkedIn headline.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Is it bad to mention gaming?</h3>
+                <h3 className="font-semibold mb-2 text-foreground">Is it bad to mention gaming?</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Not at all. Gaming is a massive hobby and plenty of people find it attractive. The key is how you mention it. Self-aware humor works. "I'm a gamer" with nothing else doesn't.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Do these work for Hinge and Bumble too?</h3>
+                <h3 className="font-semibold mb-2 text-foreground">Do these work for Hinge and Bumble too?</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   The tone and style translate, but you might need to adapt them to fit prompt formats on Hinge. The core idea of being specific and self-aware works everywhere.
                 </p>

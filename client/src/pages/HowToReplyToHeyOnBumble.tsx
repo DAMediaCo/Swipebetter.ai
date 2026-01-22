@@ -268,21 +268,21 @@ export default function HowToReplyToHeyOnBumble() {
             
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold mb-2">What if she doesn't respond to my reply?</h3>
+                <h3 className="font-semibold mb-2 text-foreground">What if she doesn't respond to my reply?</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Give it 24-48 hours, then try one more message. If nothing after that, move on. Some matches just don't go anywhere, and that's normal.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">Should I use a pickup line?</h3>
+                <h3 className="font-semibold mb-2 text-foreground">Should I use a pickup line?</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Generally no. Pickup lines work better as openers than responses. When replying to "hey," something conversational usually works better than something cheesy.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold mb-2">How long should I wait to respond?</h3>
+                <h3 className="font-semibold mb-2 text-foreground">How long should I wait to respond?</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   Don't play games. Respond when you see it and have time to write a real response. Playing hard to get over text just kills momentum.
                 </p>
