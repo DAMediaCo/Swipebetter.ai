@@ -44,6 +44,9 @@ import ResetPassword from "@/pages/ResetPassword";
 import Account from "@/pages/Account";
 import AuditView from "@/pages/AuditView";
 import ReplyAuditView from "@/pages/ReplyAuditView";
+import TinderBiosForEngineers from "@/pages/TinderBiosForEngineers";
+import HowToReplyToHeyOnBumble from "@/pages/HowToReplyToHeyOnBumble";
+import TinderShadowbanTest from "@/pages/TinderShadowbanTest";
 import NotFound from "@/pages/not-found";
 import { LegalFooter } from "@/components/LegalFooter";
 
@@ -87,6 +90,9 @@ function Router() {
       <Route path="/account" component={Account} />
       <Route path="/audit/:id" component={AuditView} />
       <Route path="/audit/reply/:id" component={ReplyAuditView} />
+      <Route path="/blog/best-tinder-bios-for-engineers-and-nerds" component={TinderBiosForEngineers} />
+      <Route path="/blog/how-to-reply-to-hey-on-bumble" component={HowToReplyToHeyOnBumble} />
+      <Route path="/blog/tinder-shadowban-test-2026" component={TinderShadowbanTest} />
       <Route component={NotFound} />
     </Switch>
   );
