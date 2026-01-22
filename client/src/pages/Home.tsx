@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap, Search, Pencil, Eye, MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
@@ -149,6 +149,83 @@ export default function Home() {
                 <div className="absolute -top-6 -left-6 w-20 h-20 bg-primary/15 rounded-full blur-2xl" />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12 md:py-16 px-4">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10 space-y-3">
+            <h2 className="text-2xl md:text-3xl font-bold">Your Dating Toolkit</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Four AI-powered tools to transform your dating game
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Search className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">The Deep Dive Audit</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Our AI scans your profile for red flags. Get a precise 0-100 score and objective feedback.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Pencil className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">The Bio Architect</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Writer's block is over. Generate 5 custom, witty bios tailored to your specific vibe in seconds.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Eye className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">Vibe Check (Photo Analysis)</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Data-driven photo scoring. See exactly how your photos rate on 'Trust,' 'Attractiveness,' and 'Intelligence.'
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="hover-elevate transition-all">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <MessageCircle className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-1">The Rizz Assistant</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Never send a boring text again. Upload a screenshot and let AI craft the perfect reply.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
