@@ -642,11 +642,11 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-8">
-            <a href="/blog/">
+            <Link href="/blog">
               <Button variant="outline" className="border-primary/30 hover:bg-primary/10" data-testid="button-view-all-blog">
                 View All Articles <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
