@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
@@ -20,7 +20,7 @@ export default function Home() {
   const [location] = useLocation();
 
   useEffect(() => {
-    document.title = "Swipe Better | AI Dating Profile Review & Bio Generator";
+    document.title = "AI Dating Profile Audit | SwipeBetter.ai";
   }, []);
 
   const handleToolClick = (toolType: "profile" | "reply") => {
@@ -51,119 +51,118 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <section className="relative flex items-center px-4 pt-6 pb-10 md:pt-8 md:pb-12 bg-gradient-to-br from-primary/5 via-background to-accent/10">
+    <div className="flex flex-col min-h-screen bg-background">
+      <section className="relative flex items-center px-4 pt-8 pb-12 md:pt-16 md:pb-20">
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full blur-3xl opacity-50" />
         </div>
         
         <div className="relative z-10 max-w-6xl mx-auto w-full">
-          <div className="flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="space-y-3 md:space-y-4 text-center md:text-left order-1">
-              <Badge variant="secondary" className="px-4 py-1.5">
-                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                AI-Powered Dating Profile Coach
+          <div className="flex flex-col md:grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+            <div className="space-y-5 md:space-y-6 text-center md:text-left order-1">
+              <Badge variant="secondary" className="px-4 py-1.5 border-primary/30">
+                <Zap className="w-3.5 h-3.5 mr-1.5 text-primary" />
+                AI-Powered Profile Analysis
               </Badge>
               
-              <h1 className="text-4xl font-bold tracking-tight leading-[1.2] text-center md:text-left">
-                Why Aren't You Getting Matches?{" "}
-                <span className="text-primary">Let AI Roast Your Profile.</span>
+              <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.15]">
+                Is Your Profile{" "}
+                <span className="text-primary">Holding You Back?</span>
               </h1>
               
-              <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 text-center md:text-left">
-                <Shield className="w-4 h-4 inline-block align-middle mr-1.5 -mt-0.5" />
-                100% Private. Photos deleted immediately after analysis.
-              </p>
-              
-              <p className="text-base md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-                Get brutally honest, data-driven feedback on your bio and photos. Stop guessing and start converting.
+              <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
+                Stop guessing. Start dating. Get a professional AI audit with a 0-100 score and actionable improvements.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
                 <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                   <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
-                    <Camera className="w-5 h-5 mr-2" />
-                    Analyze My Profile (Free)
+                    <Sparkles className="w-5 h-5 mr-2" />
+                    Get My Free Score
                   </Button>
                 </Link>
                 <a href="#example-feedback">
-                  <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target" data-testid="button-see-example-hero">
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    See an Example
+                  <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target border-primary/30 hover:bg-primary/10" data-testid="button-see-example-hero">
+                    See Example Report
                   </Button>
                 </a>
               </div>
               
-              <p className="text-sm text-muted-foreground flex items-center justify-center md:justify-start gap-1.5 pt-1">
-                <Check className="w-4 h-4" />
-                Works with Tinder, Hinge, Bumble, and more
-              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-1 text-sm text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Shield className="w-4 h-4 text-primary" />
+                  100% Private
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Check className="w-4 h-4 text-primary" />
+                  Works with Tinder, Hinge, Bumble & more
+                </span>
+              </div>
             </div>
             
             <div className="flex items-center justify-center order-2 md:order-2">
-              <div className="relative" role="img" aria-label="Phone mockup showing AI analysis of a dating profile">
-                <div className="w-48 h-[320px] md:w-72 md:h-[520px] bg-card rounded-[1.5rem] md:rounded-[2.5rem] border-4 border-border shadow-2xl shadow-black/10 dark:shadow-black/30 p-2 md:p-3 flex flex-col">
-                  <div className="w-14 md:w-20 h-4 md:h-5 bg-border rounded-full mx-auto mb-2 md:mb-3" />
-                  <div className="flex-1 bg-muted/50 rounded-lg md:rounded-[1.5rem] flex flex-col gap-2 md:gap-3 p-2 md:p-4 overflow-hidden">
-                    <div className="text-center">
-                      <div className="text-2xl md:text-4xl font-bold text-orange-500">42/100</div>
-                      <p className="text-[10px] md:text-xs text-muted-foreground">Profile Score</p>
+              <div className="relative" role="img" aria-label="Profile report card showing AI analysis with score">
+                <div className="w-72 md:w-80 bg-card rounded-2xl border border-border shadow-2xl shadow-primary/10 p-5 md:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Profile Audit Report</span>
+                    <Badge variant="outline" className="text-xs border-primary/30 text-primary">AI Analysis</Badge>
+                  </div>
+                  
+                  <div className="text-center mb-6">
+                    <div className="inline-flex items-center justify-center w-28 h-28 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 border-4 border-amber-500/50 mb-3">
+                      <span className="text-4xl font-bold text-amber-500">64</span>
+                      <span className="text-lg text-amber-500/70">/100</span>
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">Overall Score</p>
+                    <p className="text-xs text-amber-500">Room for improvement</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-destructive" />
+                        <span className="text-sm font-medium">Photos</span>
+                      </div>
+                      <Badge variant="outline" className="text-xs border-destructive/30 text-destructive">Needs Work</Badge>
                     </div>
                     
-                    <div className="bg-orange-500/10 border border-orange-500/30 rounded p-2 md:p-3">
-                      <div className="flex items-center gap-1 md:gap-2 mb-1">
-                        <XCircle className="w-3 h-3 md:w-4 md:h-4 text-orange-500 flex-shrink-0" />
-                        <p className="text-[10px] md:text-sm font-semibold text-orange-600 dark:text-orange-400">Trust Issue</p>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500" />
+                        <span className="text-sm font-medium">Bio</span>
                       </div>
-                      <p className="text-[9px] md:text-xs text-muted-foreground leading-tight md:leading-relaxed hidden md:block">
-                        Your main photo has poor lighting and sunglasses, which lowers trust by 40%.
-                      </p>
+                      <Badge variant="outline" className="text-xs border-green-500/30 text-green-500">Excellent</Badge>
                     </div>
                     
-                    <div className="space-y-1.5 md:space-y-2 mt-auto">
-                      <div>
-                        <p className="text-[8px] md:text-[10px] text-muted-foreground mb-0.5">Photos</p>
-                        <div className="flex items-center gap-1 md:gap-2">
-                          <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-orange-500" />
-                          <div className="h-1.5 md:h-2 bg-orange-500/40 rounded-full flex-1" />
-                        </div>
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                        <span className="text-sm font-medium">First Impression</span>
                       </div>
-                      <div>
-                        <p className="text-[8px] md:text-[10px] text-muted-foreground mb-0.5">Bio</p>
-                        <div className="flex items-center gap-1 md:gap-2">
-                          <AlertTriangle className="w-2.5 h-2.5 md:w-3 md:h-3 text-amber-500" />
-                          <div className="h-1.5 md:h-2 bg-amber-500/30 rounded-full flex-1" />
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-[8px] md:text-[10px] text-muted-foreground mb-0.5">Conversation</p>
-                        <div className="flex items-center gap-1 md:gap-2">
-                          <Check className="w-2.5 h-2.5 md:w-3 md:h-3 text-green-500" />
-                          <div className="h-1.5 md:h-2 bg-green-500/30 rounded-full flex-1" />
-                        </div>
-                      </div>
+                      <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-500">Average</Badge>
                     </div>
                   </div>
                 </div>
-                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-orange-500/20 rounded-full blur-xl" />
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-amber-500/30 rounded-full blur-xl" />
+                <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-primary/20 rounded-full blur-2xl" />
+                <div className="absolute -top-6 -left-6 w-20 h-20 bg-primary/15 rounded-full blur-2xl" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="example-feedback" className="py-7 md:py-10 px-4 bg-muted/30 scroll-mt-4">
+      <section id="example-feedback" className="py-10 md:py-14 px-4 bg-card/50 border-y border-border scroll-mt-4">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-5 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold">Example AI Feedback</h2>
+          <div className="text-center mb-6 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-bold">Example AI Analysis</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
               See what kind of actionable insights you will get
             </p>
           </div>
           
-          <div className="bg-card rounded-2xl shadow-lg shadow-black/5 dark:shadow-black/20 p-6 md:p-8">
+          <div className="bg-card rounded-2xl border border-border shadow-lg p-6 md:p-8">
             <div className="grid md:grid-cols-3 gap-6 items-start">
               <div className="flex flex-col items-center text-center">
                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border-4 border-primary flex items-center justify-center mb-3">
@@ -178,7 +177,7 @@ export default function Home() {
                   <div className="w-2 h-2 rounded-full bg-destructive" />
                   <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Top Issue</span>
                 </div>
-                <p className="text-base">Your first photo reads as low trust. Facial expression unclear and lighting is dim.</p>
+                <p className="text-base">Your first photo has unclear lighting and facial expression, reducing trust signals.</p>
               </div>
               
               <div className="space-y-2">
@@ -193,52 +192,52 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-7 md:py-10 px-4">
+      <section className="py-10 md:py-14 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-6 space-y-2">
+          <div className="text-center mb-8 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">Two Powerful Tools</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Everything you need to improve your dating app success
+              Everything you need to optimize your dating app success
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-6">
-            <Card className="overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <Card className="overflow-hidden border-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10">
               <CardContent className="p-0">
-                <div className="bg-gradient-to-br from-primary/20 to-primary/5 p-8">
-                  <Camera className="w-12 h-12 text-primary mb-4" aria-label="Icon for dating bio writer" />
-                  <h3 className="text-xl font-bold mb-2">Profile Fix</h3>
+                <div className="bg-gradient-to-br from-primary/15 to-primary/5 p-8">
+                  <Camera className="w-12 h-12 text-primary mb-4" aria-label="Icon for profile audit" />
+                  <h3 className="text-xl font-bold mb-2">Profile Audit</h3>
                   <p className="text-muted-foreground mb-6">
-                    Get AI-powered feedback on your bio, photos, and overall profile appeal.
+                    Get AI-powered analysis of your bio, photos, and overall profile appeal with a 0-100 score.
                   </p>
                   <ul className="space-y-2 text-sm mb-6">
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary" />
-                      Bio rewrite suggestions
+                      Professional 0-100 score
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary" />
-                      Photo order optimization
+                      Bio optimization suggestions
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary" />
-                      Profile score rating
+                      Photo order recommendations
                     </li>
                   </ul>
                   <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                     <Button className="w-full" data-testid="button-try-profile-fix">
-                      Try Profile Fix
+                      Get My Score
                     </Button>
                   </Link>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
+            <Card className="overflow-hidden border-border transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10">
               <CardContent className="p-0">
                 <div className="bg-gradient-to-br from-accent/40 to-accent/10 p-8">
-                  <MessageSquare className="w-12 h-12 text-primary mb-4" aria-label="Icon for reply generator" />
-                  <h3 className="text-xl font-bold mb-2">Reply Fix</h3>
+                  <MessageSquare className="w-12 h-12 text-primary mb-4" aria-label="Icon for reply assistant" />
+                  <h3 className="text-xl font-bold mb-2">Reply Assistant</h3>
                   <p className="text-muted-foreground mb-6">
                     Get perfect reply suggestions based on your conversation context.
                   </p>
@@ -257,8 +256,8 @@ export default function Home() {
                     </li>
                   </ul>
                   <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
-                    <Button variant="outline" className="w-full" data-testid="button-try-reply-fix">
-                      Try Reply Fix
+                    <Button variant="outline" className="w-full border-primary/30 hover:bg-primary/10" data-testid="button-try-reply-fix">
+                      Try Reply Assistant
                     </Button>
                   </Link>
                 </div>
@@ -268,19 +267,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-7 md:py-10 px-4 bg-muted/30">
+      <section className="py-10 md:py-14 px-4 bg-card/50 border-y border-border">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-6 space-y-2">
+          <div className="text-center mb-8 space-y-2">
             <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Three simple steps to transform your dating profile
+              Three simple steps to optimize your dating profile
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-4">
-            <Card className="text-center">
+            <Card className="text-center border-border">
               <CardContent className="pt-8 pb-6 px-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto border border-primary/20">
                   <Camera className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold">1. Upload Screenshots</h3>
@@ -290,26 +289,26 @@ export default function Home() {
               </CardContent>
             </Card>
             
-            <Card className="text-center">
+            <Card className="text-center border-border">
               <CardContent className="pt-8 pb-6 px-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto border border-primary/20">
                   <Sparkles className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold">2. Get AI Analysis</h3>
                 <p className="text-sm text-muted-foreground">
-                  Our AI analyzes your profile and provides specific, actionable feedback instantly.
+                  Our AI analyzes your profile and provides a professional score with specific, actionable feedback.
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="text-center">
+            <Card className="text-center border-border">
               <CardContent className="pt-8 pb-6 px-6 space-y-4">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto border border-primary/20">
                   <TrendingUp className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="text-lg font-semibold">3. Improve Your Profile</h3>
+                <h3 className="text-lg font-semibold">3. Optimize Your Profile</h3>
                 <p className="text-sm text-muted-foreground">
-                  Apply the suggestions to strengthen your profile and messaging.
+                  Apply the suggestions to strengthen your profile and improve your match rate.
                 </p>
               </CardContent>
             </Card>
@@ -317,44 +316,44 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-7 md:py-10 px-4">
+      <section className="py-10 md:py-14 px-4">
         <div className="text-center mb-6 space-y-2">
           <h2 className="text-2xl md:text-3xl font-bold">What People Are Saying</h2>
         </div>
         <RedditSocialProof />
       </section>
 
-      <section className="py-7 md:py-10 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center space-y-5">
+      <section className="py-10 md:py-14 px-4 bg-gradient-to-br from-primary/10 via-background to-primary/5 border-y border-border">
+        <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold">
-            Ready to find out why you're not getting matches?
+            Ready to see your profile score?
           </h2>
           <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-            Get brutally honest feedback in under a minute. No account required.
+            Get a professional AI audit in under a minute. See your 0-100 score and exactly what to improve.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
-              <Button size="lg" className="text-lg px-8 py-6" data-testid="button-start-profile">
-                <Camera className="w-5 h-5 mr-2" />
-                Analyze My Profile (Free)
+              <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" data-testid="button-start-profile">
+                <Sparkles className="w-5 h-5 mr-2" />
+                Get My Free Score
               </Button>
             </Link>
             <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6" data-testid="button-start-reply">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/10" data-testid="button-start-reply">
                 <MessageSquare className="w-5 h-5 mr-2" />
-                Fix My Reply
+                Try Reply Assistant
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="py-7 md:py-10 px-4">
+      <section className="py-10 md:py-14 px-4">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">FAQ</h2>
           <Accordion type="single" collapsible className="w-full">
             {faqItems.map((item, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionItem key={index} value={`item-${index}`} className="border-border">
                 <AccordionTrigger className="text-left" data-testid={`faq-trigger-${index}`}>
                   {item.question}
                 </AccordionTrigger>
@@ -367,16 +366,16 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="py-8 px-4 bg-slate-50 dark:bg-slate-900/50 border-t border-border">
+      <footer className="py-8 px-4 bg-card/80 border-t border-border">
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
+              <Zap className="w-5 h-5 text-primary" />
               <span className="font-bold text-lg">SwipeBetter</span>
             </div>
             
             <p className="text-sm text-muted-foreground">
-              © 2026 SwipeBetter.ai. All rights reserved.
+              &copy; 2026 SwipeBetter.ai. All rights reserved.
             </p>
             
             <div className="flex items-center gap-6 text-sm">
