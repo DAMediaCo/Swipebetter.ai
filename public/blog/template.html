@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[Post Title] | SwipeBetter.ai Blog</title>
+  <meta name="description" content="[Post meta description - 150-160 characters]">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: hsl(222, 47%, 6%);
+      color: hsl(210, 40%, 98%);
+      line-height: 1.7;
+    }
+    a { color: hsl(180, 100%, 50%); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    
+    .header {
+      border-bottom: 1px solid hsl(217, 33%, 17%);
+      padding: 1rem 1.5rem;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: hsl(180, 100%, 50%);
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      color: hsl(215, 20%, 65%);
+      font-size: 0.875rem;
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+    .nav-links a:hover { color: hsl(180, 100%, 50%); text-decoration: none; }
+    
+    .article-container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    
+    .breadcrumb {
+      font-size: 0.875rem;
+      color: hsl(215, 20%, 65%);
+      margin-bottom: 2rem;
+    }
+    .breadcrumb a { color: hsl(215, 20%, 65%); }
+    .breadcrumb a:hover { color: hsl(180, 100%, 50%); }
+    
+    .article-meta {
+      margin-bottom: 1.5rem;
+    }
+    .article-category {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: hsl(180, 100%, 50%);
+      margin-bottom: 0.75rem;
+    }
+    .article-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    .article-date {
+      font-size: 0.875rem;
+      color: hsl(215, 20%, 65%);
+    }
+    
+    .article-content {
+      font-size: 1.0625rem;
+    }
+    .article-content h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+    }
+    .article-content h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 2rem 0 0.75rem;
+    }
+    .article-content p {
+      margin-bottom: 1.25rem;
+    }
+    .article-content ul, .article-content ol {
+      margin-bottom: 1.25rem;
+      padding-left: 1.5rem;
+    }
+    .article-content li {
+      margin-bottom: 0.5rem;
+    }
+    .article-content blockquote {
+      border-left: 3px solid hsl(180, 100%, 50%);
+      padding-left: 1rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: hsl(215, 20%, 75%);
+    }
+    
+    .cta-box {
+      background: linear-gradient(135deg, hsl(180, 100%, 50%, 0.1), hsl(180, 100%, 50%, 0.05));
+      border: 1px solid hsl(180, 100%, 50%, 0.3);
+      border-radius: 0.75rem;
+      padding: 2rem;
+      margin: 2.5rem 0;
+      text-align: center;
+    }
+    .cta-box h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .cta-box p {
+      color: hsl(215, 20%, 65%);
+      margin-bottom: 1rem;
+    }
+    .cta-button {
+      display: inline-block;
+      background: hsl(180, 100%, 50%);
+      color: hsl(222, 47%, 6%);
+      padding: 0.875rem 2rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: opacity 0.2s;
+      text-decoration: none;
+    }
+    .cta-button:hover { opacity: 0.9; text-decoration: none; }
+    
+    .article-footer {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid hsl(217, 33%, 17%);
+    }
+    .back-link {
+      color: hsl(215, 20%, 65%);
+      font-size: 0.875rem;
+    }
+    
+    .footer {
+      border-top: 1px solid hsl(217, 33%, 17%);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: hsl(215, 20%, 65%);
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="/" class="logo">SwipeBetter.ai</a>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/blog/">Blog</a>
+        <a href="/fix-profile">Get Your Score</a>
+      </nav>
+    </div>
+  </header>
+
+  <article class="article-container">
+    <nav class="breadcrumb">
+      <a href="/">Home</a> / <a href="/blog/">Blog</a> / <span>[Category]</span>
+    </nav>
+    
+    <header class="article-meta">
+      <span class="article-category">[Category Name]</span>
+      <h1 class="article-title">[Post Title Goes Here]</h1>
+      <p class="article-date">Published on [Date]</p>
+    </header>
+    
+    <div class="article-content">
+      <p>[Opening paragraph that hooks the reader and introduces the topic.]</p>
+      
+      <h2>[First Section Heading]</h2>
+      <p>[Section content goes here...]</p>
+      
+      <div class="cta-box">
+        <h3>Not sure what's wrong?</h3>
+        <p>Get your Free Profile Score now and find out exactly what's holding you back.</p>
+        <a href="/fix-profile" class="cta-button">Get My Free Score</a>
+      </div>
+      
+      <h2>[Second Section Heading]</h2>
+      <p>[More content...]</p>
+      
+      <h2>[Conclusion]</h2>
+      <p>[Wrap up the article with key takeaways.]</p>
+    </div>
+    
+    <footer class="article-footer">
+      <a href="/blog/" class="back-link">← Back to all articles</a>
+    </footer>
+  </article>
+
+  <footer class="footer">
+    <p>© 2024 SwipeBetter.ai. All rights reserved.</p>
+  </footer>
+</body>
+</html>
