@@ -48,6 +48,9 @@ import TinderBiosForEngineers from "@/pages/TinderBiosForEngineers";
 import HowToReplyToHeyOnBumble from "@/pages/HowToReplyToHeyOnBumble";
 import TinderShadowbanTest from "@/pages/TinderShadowbanTest";
 import Blog from "@/pages/Blog";
+import TinderBioGenerator from "@/pages/tools/TinderBioGenerator";
+import HingePromptWriter from "@/pages/tools/HingePromptWriter";
+import DatingPhotoAnalyzer from "@/pages/tools/DatingPhotoAnalyzer";
 import NotFound from "@/pages/not-found";
 import { LegalFooter } from "@/components/LegalFooter";
 
@@ -95,6 +98,12 @@ function Router() {
       <Route path="/blog/best-tinder-bios-for-engineers-and-nerds" component={TinderBiosForEngineers} />
       <Route path="/blog/how-to-reply-to-hey-on-bumble" component={HowToReplyToHeyOnBumble} />
       <Route path="/blog/tinder-shadowban-test-2026" component={TinderShadowbanTest} />
+      <Route path="/tools/tinder-bio-generator" component={TinderBioGenerator} />
+      <Route path="/tools/tinder-bio-generator.html" component={TinderBioGenerator} />
+      <Route path="/tools/hinge-prompt-writer" component={HingePromptWriter} />
+      <Route path="/tools/hinge-prompt-writer.html" component={HingePromptWriter} />
+      <Route path="/tools/dating-photo-analyzer" component={DatingPhotoAnalyzer} />
+      <Route path="/tools/dating-photo-analyzer.html" component={DatingPhotoAnalyzer} />
       <Route component={NotFound} />
     </Switch>
   );
