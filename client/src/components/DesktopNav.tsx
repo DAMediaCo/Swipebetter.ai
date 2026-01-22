@@ -13,7 +13,7 @@ import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
 const navItems = [
   { href: "/dashboard", label: "Dashboard", requiresAuth: true },
-  { href: "/blog/", label: "Blog", requiresAuth: false },
+  { href: "/blog/", label: "Blog", requiresAuth: false, external: true },
   { href: "/pricing", label: "Pricing", requiresAuth: false },
 ];
 
@@ -37,15 +37,27 @@ export function DesktopNav() {
             .filter((item) => !item.requiresAuth || user)
             .map((item) => {
               const isActive = location === item.href || location.startsWith(item.href + "/");
+              const button = (
+                <Button
+                  variant="ghost"
+                  className={isActive ? "text-primary font-semibold" : ""}
+                  data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
+                >
+                  {item.label}
+                </Button>
+              );
+              
+              if (item.external) {
+                return (
+                  <a key={item.href} href={item.href}>
+                    {button}
+                  </a>
+                );
+              }
+              
               return (
                 <Link key={item.href} href={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={isActive ? "text-primary font-semibold" : ""}
-                    data-testid={`nav-${item.label.toLowerCase().replace(" ", "-")}`}
-                  >
-                    {item.label}
-                  </Button>
+                  {button}
                 </Link>
               );
             })}
