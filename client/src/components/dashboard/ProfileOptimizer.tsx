@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrustBar } from "@/components/TrustBar";
 import { ImageUpload } from "@/components/ImageUpload";
-import { useSubscription } from "@/lib/auth";
+import { useSubscription, useCredits } from "@/lib/auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
@@ -12,7 +12,8 @@ import { Link, useLocation } from "wouter";
 import { 
   HelpCircle,
   Sparkles,
-  Loader2
+  Loader2,
+  Unlock
 } from "lucide-react";
 import { SiTinder } from "react-icons/si";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,6 +30,7 @@ const intents = ["Relationship", "Casual Dating", "Friendship", "Not Sure"];
 
 export function ProfileOptimizer() {
   const { data: subscriptionData } = useSubscription();
+  const { planTier, credits, hasUnlimitedAccess } = useCredits();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -38,6 +40,8 @@ export function ProfileOptimizer() {
   const [isEnm, setIsEnm] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const analyzeButtonRef = useRef<HTMLDivElement>(null);
+  
+  const canGenerate = hasUnlimitedAccess || credits > 0;
 
   useEffect(() => {
     if (images.length > 0 && analyzeButtonRef.current) {
@@ -90,17 +94,35 @@ export function ProfileOptimizer() {
 
   return (
     <div className="space-y-6">
-      {!subscriptionData?.canAnalyze && (
+      {!canGenerate && (
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-primary" />
             <div className="flex-1">
-              <p className="font-medium text-sm">Pro subscription required</p>
-              <p className="text-xs text-muted-foreground">Subscribe to access AI-powered analysis</p>
+              <p className="font-medium text-sm">Credits required</p>
+              <p className="text-xs text-muted-foreground">
+                {planTier === 'free' && "Get 1 credit for $3 or go unlimited"}
+                {planTier === 'starter' && "Get more credits to continue"}
+              </p>
             </div>
-            <Link href="/pricing">
-              <Button size="sm" data-testid="button-upgrade-banner">Subscribe</Button>
+            <Link href="/pricing?returnTo=/dashboard?tab=profile">
+              <Button size="sm" data-testid="button-upgrade-banner">
+                <Unlock className="w-4 h-4 mr-1" />
+                Get Credits
+              </Button>
             </Link>
+          </CardContent>
+        </Card>
+      )}
+      
+      {canGenerate && !hasUnlimitedAccess && (
+        <Card className="border-green-500/50 bg-green-500/5">
+          <CardContent className="py-3 flex items-center gap-3">
+            <Unlock className="w-4 h-4 text-green-500" />
+            <p className="text-sm">
+              <span className="font-medium">{credits} credit{credits !== 1 ? 's' : ''}</span>
+              <span className="text-muted-foreground"> remaining - 1 credit per profile</span>
+            </p>
           </CardContent>
         </Card>
       )}
