@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap, Search, Pencil, Eye, MessageCircle, ArrowRight } from "lucide-react";
+import { Sparkles, Camera, MessageSquare, TrendingUp, Shield, Check, AlertTriangle, XCircle, Zap, Search, Pencil, Eye, MessageCircle, ArrowRight, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { RedditSocialProof } from "@/components/RedditSocialProof";
 import { trackToolEntry } from "@/lib/analytics";
@@ -224,6 +224,142 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" className="py-12 md:py-16 px-4 bg-card/50 border-y border-border">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10 space-y-3">
+            <h2 className="text-2xl md:text-3xl font-bold">Simple, Transparent Pricing</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Start for free. Pay only for what you need.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="border-border">
+              <CardContent className="pt-6 pb-6 px-6">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold mb-1">The Scan</h3>
+                  <p className="text-sm text-muted-foreground mb-4">See where you stand.</p>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl font-bold">$0</span>
+                    <span className="text-muted-foreground">Free</span>
+                  </div>
+                </div>
+                
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Instant 0-100 Profile Score</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Red Flag Detection</span>
+                  </li>
+                  <li className="flex items-center gap-3 opacity-50">
+                    <Lock className="w-5 h-5 text-muted-foreground shrink-0" />
+                    <span className="text-sm text-muted-foreground">Detailed Feedback</span>
+                  </li>
+                  <li className="flex items-center gap-3 opacity-50">
+                    <Lock className="w-5 h-5 text-muted-foreground shrink-0" />
+                    <span className="text-sm text-muted-foreground">Bio Suggestions</span>
+                  </li>
+                </ul>
+                
+                <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
+                  <Button variant="outline" className="w-full border-primary/30" data-testid="button-pricing-free">
+                    Get My Free Score
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-primary/50 shadow-lg shadow-primary/20 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="bg-primary text-primary-foreground px-3 py-1 text-xs font-semibold">
+                  Best Value
+                </Badge>
+              </div>
+              <CardContent className="pt-8 pb-6 px-6">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold mb-1">Starter Fix</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Perfect for a quick profile refresh.</p>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl font-bold text-primary">$3</span>
+                    <span className="text-muted-foreground">one-time</span>
+                  </div>
+                </div>
+                
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Unlock Full Audit Report</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">See the 'Why' behind your score</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">5 AI-Generated Custom Bios</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Photo Analysis for 1 Profile</span>
+                  </li>
+                </ul>
+                
+                <Link href="/pricing">
+                  <Button className="w-full" data-testid="button-pricing-starter">
+                    Fix My Profile ($3)
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-border">
+              <CardContent className="pt-6 pb-6 px-6">
+                <div className="text-center mb-6">
+                  <h3 className="text-xl font-bold mb-1">Unlimited</h3>
+                  <p className="text-sm text-muted-foreground mb-4">For serious daters who want results fast.</p>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl font-bold">$12</span>
+                    <span className="text-muted-foreground">/ month</span>
+                  </div>
+                </div>
+                
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Unlimited Profile Audits</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Unlimited Bio Generation</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm font-medium">Rizz Assistant (Chat Help)</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Deep Dive Photo Analytics</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-500 shrink-0" />
+                    <span className="text-sm">Priority Processing</span>
+                  </li>
+                </ul>
+                
+                <Link href="/pricing">
+                  <Button variant="outline" className="w-full border-primary/50 bg-gradient-to-r from-primary/10 to-primary/5 hover:from-primary/20 hover:to-primary/10" data-testid="button-pricing-unlimited">
+                    Go Unlimited
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </div>

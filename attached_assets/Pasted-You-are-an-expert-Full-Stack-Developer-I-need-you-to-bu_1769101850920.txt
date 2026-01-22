@@ -1,0 +1,46 @@
+You are an expert Full-Stack Developer. I need you to build the "Pricing & Plans" section on `index.html`. We are using a high-conversion "Tripwire" model.
+
+Please execute the following tasks:
+
+1.  **Section Setup:**
+    * Create a new `<section id="pricing">` below the Features grid.
+    * Headline: "Simple, Transparent Pricing."
+    * Sub-headline: "Start for free. Pay only for what you need."
+
+2.  **The 3-Column Pricing Grid:**
+    * **Column 1: "The Scan" (Free)**
+        * **Price:** $0
+        * **Description:** "See where you stand."
+        * **Features:**
+            * "Instant 0-100 Profile Score" (Green Check).
+            * "Red Flag Detection" (Green Check).
+            * "Detailed Feedback" (Grayed out / Locked icon).
+            * "Bio Suggestions" (Grayed out / Locked icon).
+        * **Button:** "Get My Free Score" (Secondary style: Outline or Ghost button).
+
+    * **Column 2: "Starter Fix" (One-Time Payment)**
+        * **Price:** $3 (One-time)
+        * **Badge:** "Best Value" or "Quick Fix" (Neon Accent Color).
+        * **Description:** "Perfect for a quick profile refresh."
+        * **Features:**
+            * "Unlock Full Audit Report (One-time)" (Green Check).
+            * "See the 'Why' behind your score" (Green Check).
+            * "5 AI-Generated Custom Bios" (Green Check).
+            * "Photo Analysis for 1 Profile" (Green Check).
+        * **Button:** "Fix My Profile ($3)" (Primary style: Neon Background, Dark Text).
+
+    * **Column 3: "Unlimited" (Monthly Subscription)**
+        * **Price:** $12 / month
+        * **Description:** "For serious daters who want results fast."
+        * **Features:**
+            * "Unlimited Profile Audits" (Green Check).
+            * "Unlimited Bio Generation" (Green Check).
+            * "Rizz Assistant (Chat Help)" (Green Check - **Key Selling Point**).
+            * "Deep Dive Photo Analytics" (Green Check).
+            * "Priority Processing" (Green Check).
+        * **Button:** "Go Unlimited" (Premium style: Gradient or distinct border).
+
+3.  **Design Constraints:**
+    * Use the **Dark Mode** theme (Dark slate backgrounds).
+    * Ensure the "$3 One-Time" card visually "pops" slightly (maybe a border or glow) as it is the target impulse buy.
+    * Ensure the layout stacks vertically on Mobile (1 column) and expands to 3 columns on Desktop.
