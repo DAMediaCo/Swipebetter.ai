@@ -1,18 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { useAuth, useSubscription } from "@/lib/auth";
+import { useAuth, useCredits, useUnlockReport } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import { 
   ArrowLeft, 
   Camera, 
   FileText, 
   Sparkles, 
   Lock,
-  Calendar
+  Calendar,
+  Unlock,
+  Loader2
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
@@ -33,10 +37,15 @@ export default function AuditView() {
   const [, params] = useRoute("/audit/:id");
   const [, setLocation] = useLocation();
   const { data: authData, isLoading: authLoading } = useAuth();
-  const { data: subscriptionData } = useSubscription();
+  const { planTier, credits, hasUnlimitedAccess, reportsUnlocked, refreshCredits } = useCredits();
+  const unlockMutation = useUnlockReport();
+  const { toast } = useToast();
   const user = authData?.user;
+  const [isUnlocking, setIsUnlocking] = useState(false);
   
   const analysisId = params?.id;
+  const reportId = analysisId ? String(analysisId) : '';
+  const isReportUnlocked = reportsUnlocked.includes(reportId);
 
   useEffect(() => {
     document.title = "Audit Results | SwipeBetter";
@@ -48,15 +57,72 @@ export default function AuditView() {
     }
   }, [authLoading, user, setLocation]);
 
-  const { data: analysis, isLoading, error } = useQuery<ProfileAnalysis>({
-    queryKey: [`/api/analyses/profile/${analysisId}`],
+  const { data: analysis, isLoading, error, refetch: refetchAnalysis } = useQuery<ProfileAnalysis>({
+    queryKey: ['/api/analyses/profile', analysisId],
     enabled: !!analysisId && !!user,
   });
 
-  const isPro = subscriptionData?.isPaidUser || false;
+  const canAccessFullReport = hasUnlimitedAccess || isReportUnlocked;
 
   const isLocked = (content: string | null) => {
     return content === "[Upgrade to unlock]";
+  };
+
+  const handleUnlock = async () => {
+    if (!reportId) return;
+    
+    setIsUnlocking(true);
+    try {
+      const result = await unlockMutation.mutateAsync(reportId);
+      if (result.access === 'granted') {
+        toast({
+          title: "Report unlocked",
+          description: result.reason === 'credit_used' 
+            ? `1 credit used. ${result.creditsRemaining} remaining.`
+            : "You have full access to this report.",
+        });
+        await refreshCredits();
+        await queryClient.invalidateQueries({ queryKey: ['/api/analyses/profile', analysisId] });
+        await refetchAnalysis();
+      }
+    } catch (error: any) {
+      if (error.message?.includes("402")) {
+        setLocation('/pricing');
+      } else {
+        toast({
+          title: "Failed to unlock",
+          description: "Please try again or contact support.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsUnlocking(false);
+    }
+  };
+
+  const getUnlockButtonContent = () => {
+    if (isUnlocking) {
+      return (
+        <>
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          Unlocking...
+        </>
+      );
+    }
+    if (credits > 0) {
+      return (
+        <>
+          <Unlock className="w-4 h-4 mr-2" />
+          Use 1 Credit to Unlock
+        </>
+      );
+    }
+    return (
+      <>
+        <Lock className="w-4 h-4 mr-2" />
+        Get Credits to Unlock
+      </>
+    );
   };
 
   const getScoreColor = (score: number | null) => {
@@ -154,12 +220,21 @@ export default function AuditView() {
                 <p>Your bio needs some work. Here are 5 suggestions to make it more engaging and authentic...</p>
               </div>
               <div className="absolute inset-0 flex items-center justify-center bg-card/80">
-                <Link href="/pricing">
-                  <Button data-testid="button-unlock-bio">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Unlock Full Report
+                {credits > 0 ? (
+                  <Button 
+                    onClick={handleUnlock} 
+                    disabled={isUnlocking}
+                    data-testid="button-unlock-bio"
+                  >
+                    {getUnlockButtonContent()}
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/pricing">
+                    <Button data-testid="button-unlock-bio">
+                      {getUnlockButtonContent()}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -193,12 +268,21 @@ export default function AuditView() {
                 <p>Your photos could use some improvements. The lighting in your first photo is good but...</p>
               </div>
               <div className="absolute inset-0 flex items-center justify-center bg-card/80">
-                <Link href="/pricing">
-                  <Button data-testid="button-unlock-photos">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Unlock Full Report
+                {credits > 0 ? (
+                  <Button 
+                    onClick={handleUnlock} 
+                    disabled={isUnlocking}
+                    data-testid="button-unlock-photos"
+                  >
+                    {getUnlockButtonContent()}
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/pricing">
+                    <Button data-testid="button-unlock-photos">
+                      {getUnlockButtonContent()}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -234,12 +318,21 @@ export default function AuditView() {
                 <p>3. Consider adding prompts that show personality...</p>
               </div>
               <div className="absolute inset-0 flex items-center justify-center bg-card/80">
-                <Link href="/pricing">
-                  <Button data-testid="button-unlock-improvements">
-                    <Lock className="w-4 h-4 mr-2" />
-                    Unlock Full Report
+                {credits > 0 ? (
+                  <Button 
+                    onClick={handleUnlock} 
+                    disabled={isUnlocking}
+                    data-testid="button-unlock-improvements"
+                  >
+                    {getUnlockButtonContent()}
                   </Button>
-                </Link>
+                ) : (
+                  <Link href="/pricing">
+                    <Button data-testid="button-unlock-improvements">
+                      {getUnlockButtonContent()}
+                    </Button>
+                  </Link>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -259,16 +352,26 @@ export default function AuditView() {
           </Card>
         )}
 
-        {!isPro && (
+        {!canAccessFullReport && isLocked(analysis.bioSuggestions) && (
           <div className="text-center mt-8">
-            <p className="text-muted-foreground mb-4">
-              Upgrade to unlock the full detailed report
+            <p className="text-muted-foreground mb-2">
+              {credits > 0 
+                ? `You have ${credits} credit${credits > 1 ? 's' : ''} available`
+                : "Get credits to unlock full reports"
+              }
             </p>
-            <Link href="/pricing">
-              <Button size="lg" data-testid="button-upgrade">
-                Upgrade Now
-              </Button>
-            </Link>
+            <p className="text-sm text-muted-foreground mb-4">
+              {planTier === 'free' && "Start with 1 credit for $3 or go unlimited"}
+              {planTier === 'starter' && credits > 0 && "Use your credit above to unlock this report"}
+              {planTier === 'starter' && credits === 0 && "Get more credits or upgrade to unlimited"}
+            </p>
+            {credits === 0 && (
+              <Link href="/pricing">
+                <Button size="lg" data-testid="button-upgrade">
+                  View Pricing
+                </Button>
+              </Link>
+            )}
           </div>
         )}
       </div>

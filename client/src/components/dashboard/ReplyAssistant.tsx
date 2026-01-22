@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useSubscription } from "@/lib/auth";
+import { useCredits, useCheckReplyAccess } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
@@ -18,7 +18,8 @@ import {
   HelpCircle,
   Camera,
   X,
-  Target
+  Target,
+  Unlock
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
@@ -49,7 +50,8 @@ const goalOptions = [
 ];
 
 export function ReplyAssistant() {
-  const { data: subscriptionData } = useSubscription();
+  const { planTier, credits, hasUnlimitedAccess, refreshCredits } = useCredits();
+  const checkAccessMutation = useCheckReplyAccess();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -59,6 +61,8 @@ export function ReplyAssistant() {
   const [goal, setGoal] = useState<string>("");
   const [isEnm, setIsEnm] = useState(false);
   const [uploadedScreenshot, setUploadedScreenshot] = useState<string | null>(null);
+  
+  const canGenerate = hasUnlimitedAccess || credits > 0;
 
   const ocrMutation = useMutation({
     mutationFn: async (screenshot: string) => {
@@ -85,6 +89,14 @@ export function ReplyAssistant() {
 
   const heroAnalyzeMutation = useMutation({
     mutationFn: async () => {
+      // For non-unlimited users, check and deduct credit first
+      if (!hasUnlimitedAccess) {
+        const accessResult = await checkAccessMutation.mutateAsync(true);
+        if (accessResult.access !== 'granted') {
+          throw new Error('402: Payment required');
+        }
+      }
+      
       trackAnalysisStarted("reply");
       const selectedTone = heroTone === "direct" ? "confident" : heroTone;
       const response = await apiRequest("POST", "/api/analyze-reply", {
@@ -98,17 +110,24 @@ export function ReplyAssistant() {
     onSuccess: (data) => {
       if (data.parsed) {
         saveAnalysis('reply', data.parsed);
+        refreshCredits();
         setLocation('/fix-reply/results');
       }
     },
     onError: (error: any) => {
-      if (error.message?.includes("403")) {
+      if (error.message?.includes("402")) {
         toast({
-          title: "Subscription required",
-          description: "Upgrade to Pro to use this feature.",
+          title: "Credits required",
+          description: "Get credits to use this feature.",
           variant: "destructive",
         });
         setLocation('/pricing');
+      } else if (error.message?.includes("403")) {
+        toast({
+          title: "Access denied",
+          description: "Please try again or contact support.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Analysis failed",
@@ -163,17 +182,35 @@ export function ReplyAssistant() {
 
   return (
     <div className="space-y-6">
-      {!subscriptionData?.canAnalyze && (
+      {!canGenerate && (
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-primary" />
             <div className="flex-1">
-              <p className="font-medium text-sm">Pro subscription required</p>
-              <p className="text-xs text-muted-foreground">Subscribe to access AI-powered replies</p>
+              <p className="font-medium text-sm">Credits required</p>
+              <p className="text-xs text-muted-foreground">
+                {planTier === 'free' && "Get 1 credit for $3 or go unlimited"}
+                {planTier === 'starter' && "Get more credits to continue"}
+              </p>
             </div>
             <Link href="/pricing">
-              <Button size="sm" data-testid="button-upgrade-banner-reply">Subscribe</Button>
+              <Button size="sm" data-testid="button-upgrade-banner-reply">
+                <Unlock className="w-4 h-4 mr-1" />
+                Get Credits
+              </Button>
             </Link>
+          </CardContent>
+        </Card>
+      )}
+      
+      {canGenerate && !hasUnlimitedAccess && (
+        <Card className="border-green-500/50 bg-green-500/5">
+          <CardContent className="py-3 flex items-center gap-3">
+            <Unlock className="w-4 h-4 text-green-500" />
+            <p className="text-sm">
+              <span className="font-medium">{credits} credit{credits !== 1 ? 's' : ''}</span>
+              <span className="text-muted-foreground"> remaining - 1 credit per reply</span>
+            </p>
           </CardContent>
         </Card>
       )}
@@ -322,7 +359,7 @@ export function ReplyAssistant() {
         <Button 
           size="lg" 
           onClick={handleHeroSubmit}
-          disabled={heroAnalyzeMutation.isPending || !conversationText.trim() || !subscriptionData?.canAnalyze}
+          disabled={heroAnalyzeMutation.isPending || !conversationText.trim() || !canGenerate}
           className="w-full py-6 font-bold shadow-lg hover:shadow-xl transition-shadow disabled:opacity-50"
           data-testid="button-generate-replies"
         >
@@ -331,10 +368,20 @@ export function ReplyAssistant() {
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               Generating...
             </>
-          ) : (
+          ) : !canGenerate ? (
+            <>
+              <Unlock className="w-5 h-5 mr-2" />
+              Get Credits to Generate
+            </>
+          ) : hasUnlimitedAccess ? (
             <>
               <Sparkles className="w-5 h-5 mr-2" />
               Generate Replies
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5 mr-2" />
+              Generate Replies (1 Credit)
             </>
           )}
         </Button>

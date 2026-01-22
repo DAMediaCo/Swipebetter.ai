@@ -138,3 +138,55 @@ export function useCustomerPortal() {
     },
   });
 }
+
+// Credit & Subscription System (Tripwire Model)
+export interface CreditStatus {
+  planTier: 'free' | 'starter' | 'unlimited';
+  credits: number;
+  reportsUnlocked: string[];
+}
+
+export function useCredits() {
+  const query = useQuery<CreditStatus>({
+    queryKey: ["/api/credits"],
+    staleTime: 1000 * 30,
+  });
+
+  const refreshCredits = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+  };
+
+  return {
+    ...query,
+    planTier: query.data?.planTier ?? 'free',
+    credits: query.data?.credits ?? 0,
+    reportsUnlocked: query.data?.reportsUnlocked ?? [],
+    hasUnlimitedAccess: query.data?.planTier === 'unlimited',
+    hasCredits: (query.data?.credits ?? 0) > 0,
+    refreshCredits,
+  };
+}
+
+export function useUnlockReport() {
+  return useMutation({
+    mutationFn: async (reportId: string) => {
+      const response = await apiRequest("POST", "/api/unlock-report", { reportId });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+    },
+  });
+}
+
+export function useCheckReplyAccess() {
+  return useMutation({
+    mutationFn: async (deductCredit: boolean = true) => {
+      const response = await apiRequest("POST", "/api/check-reply-access", { deductCredit });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+    },
+  });
+}
