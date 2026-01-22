@@ -237,6 +237,8 @@ export default function ProfileResults() {
       cleaned = cleaned.replace(/^(Alternative|Option)\s*\d+[:\s]*/i, '');
       // Remove any remaining ** markdown
       cleaned = cleaned.replace(/\*\*/g, '');
+      // Remove surrounding quotes (single or double)
+      cleaned = cleaned.replace(/^['"""']+/, '').replace(/['"""']+$/, '');
       return cleaned.trim();
     };
     
