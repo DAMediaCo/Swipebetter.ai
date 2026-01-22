@@ -1108,7 +1108,13 @@ export async function registerRoutes(
           return res.status(500).json({ error: "Authentication failed" });
         }
         req.session.isAdmin = true;
-        res.json({ success: true });
+        req.session.save((saveErr: any) => {
+          if (saveErr) {
+            console.error("Session save error:", saveErr);
+            return res.status(500).json({ error: "Authentication failed" });
+          }
+          res.json({ success: true });
+        });
       });
     } catch (error) {
       console.error("Admin login error:", error);

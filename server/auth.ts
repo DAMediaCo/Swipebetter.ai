@@ -16,6 +16,7 @@ declare module "express-session" {
   interface SessionData {
     userId: string;
     appleOAuthState?: string;
+    isAdmin?: boolean;
   }
 }
 
