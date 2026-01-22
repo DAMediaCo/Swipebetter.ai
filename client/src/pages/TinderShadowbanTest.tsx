@@ -190,13 +190,13 @@ export default function TinderShadowbanTest() {
               Tinder doesn't publish their rules, but these behaviors commonly trigger shadowbans:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground mt-4">
-              <li><strong>Being reported multiple times</strong> - Even false reports add up</li>
-              <li><strong>Resetting your account too often</strong> - Tinder tracks device IDs and phone numbers</li>
-              <li><strong>Using banned photos</strong> - Shirtless bathroom selfies, group photos where it's unclear who you are</li>
-              <li><strong>Copy-paste messages</strong> - Sending the same opener to everyone can flag you as spam</li>
-              <li><strong>Third-party apps</strong> - Bots, auto-swipers, or any app that accesses Tinder's API</li>
-              <li><strong>Inappropriate messages</strong> - Even if reported by just one person</li>
-              <li><strong>Using the same phone number after being banned</strong> - The ban follows the number, not the account</li>
+              <li><strong className="text-foreground">Being reported multiple times</strong> - Even false reports add up</li>
+              <li><strong className="text-foreground">Resetting your account too often</strong> - Tinder tracks device IDs and phone numbers</li>
+              <li><strong className="text-foreground">Using banned photos</strong> - Shirtless bathroom selfies, group photos where it's unclear who you are</li>
+              <li><strong className="text-foreground">Copy-paste messages</strong> - Sending the same opener to everyone can flag you as spam</li>
+              <li><strong className="text-foreground">Third-party apps</strong> - Bots, auto-swipers, or any app that accesses Tinder's API</li>
+              <li><strong className="text-foreground">Inappropriate messages</strong> - Even if reported by just one person</li>
+              <li><strong className="text-foreground">Using the same phone number after being banned</strong> - The ban follows the number, not the account</li>
             </ul>
           </section>
 
@@ -263,11 +263,11 @@ export default function TinderShadowbanTest() {
               Before going through a full reset, consider that your profile might just need work. Many people assume they're shadowbanned when the real problem is:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4 text-muted-foreground mt-4">
-              <li><strong>Bad photos</strong> - Poor lighting, group photos, or low quality images</li>
-              <li><strong>Empty or weak bio</strong> - Gives people no reason to swipe right</li>
-              <li><strong>Location issues</strong> - Small population area or traveling in a saturated market</li>
-              <li><strong>Algorithm placement</strong> - New accounts get boosted, then normalize</li>
-              <li><strong>Swiping habits</strong> - Swiping right on everyone tanks your score</li>
+              <li><strong className="text-foreground">Bad photos</strong> - Poor lighting, group photos, or low quality images</li>
+              <li><strong className="text-foreground">Empty or weak bio</strong> - Gives people no reason to swipe right</li>
+              <li><strong className="text-foreground">Location issues</strong> - Small population area or traveling in a saturated market</li>
+              <li><strong className="text-foreground">Algorithm placement</strong> - New accounts get boosted, then normalize</li>
+              <li><strong className="text-foreground">Swiping habits</strong> - Swiping right on everyone tanks your score</li>
             </ul>
           </section>
 

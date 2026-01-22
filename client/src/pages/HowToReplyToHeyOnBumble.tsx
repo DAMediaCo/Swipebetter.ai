@@ -220,13 +220,13 @@ export default function HowToReplyToHeyOnBumble() {
           <section>
             <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What NOT to Do</h2>
             <p className="leading-relaxed">
-              <strong>Don't reply with just "Hey" back.</strong> You're now both stuck. Someone has to make the first real move, and since she already messaged, it's your turn.
+              <strong className="text-foreground">Don't reply with just "Hey" back.</strong> You're now both stuck. Someone has to make the first real move, and since she already messaged, it's your turn.
             </p>
             <p className="leading-relaxed">
-              <strong>Don't lecture her about bad openers.</strong> Nothing kills attraction faster than "Is that really the best you could do?" You're not her dating coach.
+              <strong className="text-foreground">Don't lecture her about bad openers.</strong> Nothing kills attraction faster than "Is that really the best you could do?" You're not her dating coach.
             </p>
             <p className="leading-relaxed">
-              <strong>Don't overthink it.</strong> She swiped right on you. She messaged. She's interested enough. Just be normal and interesting.
+              <strong className="text-foreground">Don't overthink it.</strong> She swiped right on you. She messaged. She's interested enough. Just be normal and interesting.
             </p>
           </section>
 
@@ -235,10 +235,10 @@ export default function HowToReplyToHeyOnBumble() {
             <p className="leading-relaxed">
               The best response to "hey" is one that:
             </p>
-            <ol className="list-decimal list-inside space-y-2 ml-4">
-              <li><strong>Acknowledges the message</strong> without making it awkward</li>
-              <li><strong>Gives her something to respond to</strong> (a question or hook)</li>
-              <li><strong>Shows your personality</strong> in some small way</li>
+            <ol className="list-decimal list-inside space-y-2 ml-4 text-foreground">
+              <li><strong className="text-foreground">Acknowledges the message</strong> without making it awkward</li>
+              <li><strong className="text-foreground">Gives her something to respond to</strong> (a question or hook)</li>
+              <li><strong className="text-foreground">Shows your personality</strong> in some small way</li>
             </ol>
             <p className="leading-relaxed mt-4">
               That's it. You don't need the perfect line. You need to move the conversation forward in a way that's easy for her to engage with.

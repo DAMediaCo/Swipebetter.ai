@@ -190,13 +190,13 @@ export default function TinderBiosForEngineers() {
           <section>
             <h2 className="text-2xl font-bold mt-10 mb-4 text-foreground">What to Avoid</h2>
             <p className="leading-relaxed">
-              <strong>Don't list your tech stack.</strong> "Proficient in Python, JavaScript, and SQL" is a resume, not a dating profile.
+              <strong className="text-foreground">Don't list your tech stack.</strong> "Proficient in Python, JavaScript, and SQL" is a resume, not a dating profile.
             </p>
             <p className="leading-relaxed">
-              <strong>Skip the Rick and Morty quotes.</strong> Having good taste in shows is fine. Making it your whole personality is not.
+              <strong className="text-foreground">Skip the Rick and Morty quotes.</strong> Having good taste in shows is fine. Making it your whole personality is not.
             </p>
             <p className="leading-relaxed">
-              <strong>Avoid the "I'm awkward" disclaimer.</strong> Everyone's a little awkward. Announcing it upfront just makes it a bigger deal than it needs to be.
+              <strong className="text-foreground">Avoid the "I'm awkward" disclaimer.</strong> Everyone's a little awkward. Announcing it upfront just makes it a bigger deal than it needs to be.
             </p>
           </section>
 
