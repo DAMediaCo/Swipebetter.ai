@@ -4,9 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth";
 import { ProfileOptimizer } from "@/components/dashboard/ProfileOptimizer";
 import { ReplyAssistant } from "@/components/dashboard/ReplyAssistant";
-import { User, MessageCircle } from "lucide-react";
+import { RecentAudits } from "@/components/dashboard/RecentAudits";
+import { User, MessageCircle, History } from "lucide-react";
 
-type Tab = "profile" | "reply";
+type Tab = "profile" | "reply" | "history";
 
 export default function DashboardPage() {
   const { data: authData, isLoading: authLoading } = useAuth();
@@ -18,6 +19,7 @@ export default function DashboardPage() {
     const params = new URLSearchParams(searchString);
     const tab = params.get("tab");
     if (tab === "reply") return "reply";
+    if (tab === "history") return "history";
     return "profile";
   };
 
@@ -35,7 +37,7 @@ export default function DashboardPage() {
 
   const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
-    const newUrl = tab === "profile" ? "/dashboard" : "/dashboard?tab=reply";
+    const newUrl = tab === "profile" ? "/dashboard" : `/dashboard?tab=${tab}`;
     window.history.replaceState({}, "", newUrl);
   };
 
@@ -85,6 +87,18 @@ export default function DashboardPage() {
               <MessageCircle className="w-4 h-4" />
               Reply Assistant
             </button>
+            <button
+              onClick={() => handleTabChange("history")}
+              className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all ${
+                activeTab === "history"
+                  ? "bg-card text-primary shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+              data-testid="tab-history"
+            >
+              <History className="w-4 h-4" />
+              Recent Audits
+            </button>
           </div>
         </div>
 
@@ -92,11 +106,9 @@ export default function DashboardPage() {
           key={activeTab}
           className="animate-in fade-in duration-200"
         >
-          {activeTab === "profile" ? (
-            <ProfileOptimizer />
-          ) : (
-            <ReplyAssistant />
-          )}
+          {activeTab === "profile" && <ProfileOptimizer />}
+          {activeTab === "reply" && <ReplyAssistant />}
+          {activeTab === "history" && <RecentAudits />}
         </div>
       </div>
     </div>
