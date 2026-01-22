@@ -43,6 +43,10 @@ export default function Pricing() {
   const checkoutMutation = useCheckout();
   const portalMutation = useCustomerPortal();
   const user = authData?.user;
+  
+  // Get returnTo from URL query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const returnTo = urlParams.get('returnTo') || undefined;
 
   useEffect(() => {
     document.title = "Pricing | SwipeBetter";
@@ -67,7 +71,7 @@ export default function Pricing() {
       setLocation("/auth");
       return;
     }
-    checkoutMutation.mutate(priceId);
+    checkoutMutation.mutate({ priceId, returnTo });
   };
 
   const unlimitedFeatures = [

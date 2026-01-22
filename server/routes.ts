@@ -46,6 +46,7 @@ const ocrSchema = z.object({
 
 const checkoutSchema = z.object({
   priceId: z.string().startsWith("price_"),
+  returnTo: z.string().optional(),
 });
 
 export async function registerRoutes(
@@ -877,7 +878,7 @@ export async function registerRoutes(
           error: "Invalid price ID" 
         });
       }
-      const { priceId } = parseResult.data;
+      const { priceId, returnTo } = parseResult.data;
       const userId = req.session.userId;
       const stripe = await getUncachableStripeClient();
 
@@ -902,12 +903,18 @@ export async function registerRoutes(
       const recurring = price?.recurring;
       const isRecurring = recurring && (typeof recurring === 'object' ? !!recurring.interval : !!recurring);
       
+      // Build success URL with optional returnTo parameter
+      let successUrl = `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+      if (returnTo) {
+        successUrl += `&returnTo=${encodeURIComponent(returnTo)}`;
+      }
+      
       const checkoutSession = await stripe.checkout.sessions.create({
         customer: customerId,
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
         mode: isRecurring ? 'subscription' : 'payment',
-        success_url: `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: successUrl,
         cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
       });
 

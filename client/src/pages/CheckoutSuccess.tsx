@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,6 +29,11 @@ export default function CheckoutSuccess() {
   const [pollingEntitlement, setPollingEntitlement] = useState(false);
   const { isPro, refreshEntitlement } = useEntitlement();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  
+  // Get returnTo from URL query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const returnTo = urlParams.get('returnTo');
 
   useEffect(() => {
     const verifyCheckout = async () => {
@@ -64,6 +69,13 @@ export default function CheckoutSuccess() {
         setPollingEntitlement(true);
         await pollForEntitlement();
         setPollingEntitlement(false);
+        
+        // Auto-redirect if returnTo is specified
+        if (returnTo) {
+          setTimeout(() => {
+            setLocation(returnTo);
+          }, 1500);
+        }
       } catch (err) {
         setError("Failed to verify payment. Please contact support.");
         setVerifying(false);
@@ -71,7 +83,7 @@ export default function CheckoutSuccess() {
     };
 
     verifyCheckout();
-  }, []);
+  }, [returnTo, setLocation]);
 
   const pollForEntitlement = async () => {
     const delays = [500, 1000, 2000, 4000, 8000];

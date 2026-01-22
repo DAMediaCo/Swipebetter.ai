@@ -113,8 +113,8 @@ export function useLogout() {
 
 export function useCheckout() {
   return useMutation({
-    mutationFn: async (priceId: string) => {
-      const response = await apiRequest("POST", "/api/checkout", { priceId });
+    mutationFn: async ({ priceId, returnTo }: { priceId: string; returnTo?: string }) => {
+      const response = await apiRequest("POST", "/api/checkout", { priceId, returnTo });
       return response.json();
     },
     onSuccess: (data) => {

@@ -121,7 +121,7 @@ export function ReplyAssistant() {
           description: "Get credits to use this feature.",
           variant: "destructive",
         });
-        setLocation('/pricing');
+        setLocation('/pricing?returnTo=/dashboard?tab=reply');
       } else if (error.message?.includes("403")) {
         toast({
           title: "Access denied",
@@ -193,7 +193,7 @@ export function ReplyAssistant() {
                 {planTier === 'starter' && "Get more credits to continue"}
               </p>
             </div>
-            <Link href="/pricing">
+            <Link href="/pricing?returnTo=/dashboard?tab=reply">
               <Button size="sm" data-testid="button-upgrade-banner-reply">
                 <Unlock className="w-4 h-4 mr-1" />
                 Get Credits
