@@ -174,19 +174,6 @@ async function initStripe() {
     throw err;
   });
 
-  // Serve static blog files before SPA handler
-  const blogPath = path.resolve(import.meta.dirname, "..", "client", "public", "blog");
-  
-  // Handle /blog without trailing slash
-  app.get("/blog", (_req, res) => {
-    res.sendFile(path.join(blogPath, "index.html"));
-  });
-  
-  app.use("/blog/", express.static(blogPath, {
-    extensions: ['html'],
-    index: 'index.html'
-  }));
-
   if (process.env.NODE_ENV === "production") {
     serveStatic(app);
   } else {
