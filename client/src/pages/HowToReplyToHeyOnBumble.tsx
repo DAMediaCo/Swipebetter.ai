@@ -129,7 +129,7 @@ export default function HowToReplyToHeyOnBumble() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               You matched with someone you're actually interested in. She messaged first (thanks, Bumble). And then... "Hey."

@@ -104,7 +104,7 @@ export default function TinderBiosForEngineers() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               Let's be honest: most engineer and gamer bios are terrible. Either they're trying way too hard to be quirky, or they're so bland that nobody can tell you apart from the other 500 software developers in the stack.

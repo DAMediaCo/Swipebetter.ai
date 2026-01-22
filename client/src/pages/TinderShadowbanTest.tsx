@@ -55,7 +55,7 @@ export default function TinderShadowbanTest() {
           </p>
         </header>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8 text-foreground">
           <section>
             <p className="text-lg leading-relaxed">
               You've been swiping for days. Maybe weeks. And you're getting nothing. Not just fewer matches than usual - literally zero. If this sounds familiar, you might be dealing with a Tinder shadowban.
