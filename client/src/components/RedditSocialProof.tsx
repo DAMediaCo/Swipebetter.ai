@@ -1,20 +1,20 @@
-import { Quote } from "lucide-react";
+import { Quote, CheckCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 const testimonials = [
   {
     quote: "I actually changed my first pic like the AI said and got 3 matches today. The bio rewrite was surprisingly good.",
-    author: "Early Beta Tester",
+    author: "Verified User",
     platform: "Tinder"
   },
   {
     quote: "The photo order suggestions were spot on. Moved my group photo to the end and saw way more likes.",
-    author: "Hinge User",
+    author: "Verified User",
     platform: "Hinge"
   },
   {
     quote: "Wasn't expecting much but the feedback was actually brutally honest. Fixed my bio and it's working.",
-    author: "Bumble User",
+    author: "Verified User",
     platform: "Bumble"
   }
 ];
@@ -30,7 +30,10 @@ export function RedditSocialProof() {
               "{testimonial.quote}"
             </p>
             <div className="pt-2 border-t border-border">
-              <p className="text-sm font-medium text-foreground">{testimonial.author}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-sm font-medium text-foreground">{testimonial.author}</p>
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              </div>
               <p className="text-xs text-muted-foreground">{testimonial.platform}</p>
             </div>
           </Card>

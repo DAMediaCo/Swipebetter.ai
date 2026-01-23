@@ -62,10 +62,15 @@ export default function Home() {
         <div className="relative z-10 max-w-6xl mx-auto w-full">
           <div className="flex flex-col md:grid md:grid-cols-2 gap-10 md:gap-16 items-center">
             <div className="space-y-5 md:space-y-6 text-center md:text-left order-1">
-              <Badge variant="secondary" className="px-4 py-1.5 border-primary/30">
-                <Zap className="w-3.5 h-3.5 mr-1.5 text-primary" />
-                AI-Powered Profile Analysis
-              </Badge>
+              {/* Social Proof Trust Badge */}
+              <div className="flex items-center justify-center md:justify-start gap-3 px-4 py-2 bg-card/60 backdrop-blur-sm rounded-full border border-border/50 w-fit mx-auto md:mx-0">
+                <div className="flex -space-x-2">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/40 to-primary/20 border-2 border-background flex items-center justify-center text-xs font-medium">J</div>
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-green-500/40 to-green-500/20 border-2 border-background flex items-center justify-center text-xs font-medium">M</div>
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500/40 to-amber-500/20 border-2 border-background flex items-center justify-center text-xs font-medium">K</div>
+                </div>
+                <span className="text-sm text-muted-foreground">Trusted by <span className="text-foreground font-medium">12,000+</span> daters to fix their profiles</span>
+              </div>
               
               <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.15]">
                 Is Your Profile{" "}
@@ -77,12 +82,18 @@ export default function Home() {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
-                <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
-                  <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Get My Free Score
-                  </Button>
-                </Link>
+                <div className="flex flex-col items-center">
+                  <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
+                    <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Get My Free Score
+                    </Button>
+                  </Link>
+                  <span className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+                    <Lock className="w-3 h-3 text-primary" />
+                    100% Private. Photos deleted immediately after analysis.
+                  </span>
+                </div>
                 <a href="#example-feedback">
                   <Button variant="outline" size="lg" className="text-lg px-8 py-6 touch-target border-primary/30 hover:bg-primary/10" data-testid="button-see-example-hero">
                     See Example Report
@@ -553,12 +564,18 @@ export default function Home() {
             Get a professional AI audit in under a minute. See your 0-100 score and exactly what to improve.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
-              <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" data-testid="button-start-profile">
-                <Sparkles className="w-5 h-5 mr-2" />
-                Get My Free Score
-              </Button>
-            </Link>
+            <div className="flex flex-col items-center">
+              <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
+                <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" data-testid="button-start-profile">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Get My Free Score
+                </Button>
+              </Link>
+              <span className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+                <Lock className="w-3 h-3 text-primary" />
+                100% Private. Photos deleted immediately after analysis.
+              </span>
+            </div>
             <Link href="/fix-reply" onClick={() => handleToolClick("reply")}>
               <Button variant="outline" size="lg" className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/10" data-testid="button-start-reply">
                 <MessageSquare className="w-5 h-5 mr-2" />
@@ -667,20 +684,30 @@ export default function Home() {
               <span className="font-bold text-lg">SwipeBetter</span>
             </div>
             
-            <p className="text-sm text-muted-foreground">
-              &copy; 2026 SwipeBetter.ai. All rights reserved.
-            </p>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-sm text-muted-foreground">
+                &copy; 2026 SwipeBetter.ai. All rights reserved.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Made with love in Coconut Creek, FL
+              </p>
+            </div>
             
-            <div className="flex items-center gap-6 text-sm">
-              <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
-                Terms of Service
-              </Link>
-              <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                Contact
-              </Link>
+            <div className="flex flex-col items-center md:items-end gap-2">
+              <div className="flex items-center gap-6 text-sm">
+                <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Terms of Service
+                </Link>
+                <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Contact Support
+                </Link>
+              </div>
+              <a href="mailto:hello@swipebetter.ai" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                hello@swipebetter.ai
+              </a>
             </div>
           </div>
         </div>
