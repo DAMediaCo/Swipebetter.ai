@@ -41,33 +41,49 @@ export default function DashboardPage() {
       
       if (!sessionId || !user) return;
       
-      try {
-        const response = await apiRequest("POST", "/api/verify-checkout", { sessionId });
-        const data = await response.json();
-        
-        if (data.success) {
-          // Always refresh caches to ensure UI is up to date
-          queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/me"] });
-          refreshCredits();
+      const attemptVerification = async (): Promise<boolean> => {
+        try {
+          const response = await apiRequest("POST", "/api/verify-checkout", { sessionId });
+          const data = await response.json();
           
-          if (!data.alreadyProcessed) {
-            toast({
-              title: "Payment Successful!",
-              description: "Your credits have been added.",
-            });
+          if (data.success) {
+            queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/subscription"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+            refreshCredits();
+            
+            if (!data.alreadyProcessed) {
+              toast({
+                title: "Payment Successful!",
+                description: "Your credits have been added.",
+              });
+            }
+            
+            window.history.replaceState({}, "", "/dashboard");
+            return true;
           }
-          
-          // Clean up URL
-          window.history.replaceState({}, "", "/dashboard");
+          return false;
+        } catch {
+          return false;
         }
-      } catch (error) {
-        toast({
-          title: "Payment verification failed",
-          description: "Please contact support if your credits were not added.",
-          variant: "destructive",
-        });
+      };
+      
+      // First attempt
+      const firstAttemptSuccess = await attemptVerification();
+      
+      if (!firstAttemptSuccess) {
+        // Wait 1500ms and retry once (in case DB/webhook is slow)
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const secondAttemptSuccess = await attemptVerification();
+        
+        if (!secondAttemptSuccess) {
+          // Only show error if BOTH attempts fail
+          toast({
+            title: "Payment verification failed",
+            description: "Please contact support if your credits were not added.",
+            variant: "destructive",
+          });
+        }
       }
     };
     
