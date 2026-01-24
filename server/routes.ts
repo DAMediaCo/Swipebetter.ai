@@ -8,6 +8,31 @@ import { users } from "@shared/models/auth";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
+import sharp from "sharp";
+
+// Compress base64 image to reduce payload size for AI processing
+async function compressImage(base64DataUrl: string, maxWidth = 800, quality = 70): Promise<string> {
+  try {
+    // Extract base64 data and mime type
+    const matches = base64DataUrl.match(/^data:([^;]+);base64,(.+)$/);
+    if (!matches) return base64DataUrl;
+    
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // Compress with sharp
+    const compressed = await sharp(buffer)
+      .resize(maxWidth, null, { withoutEnlargement: true })
+      .jpeg({ quality })
+      .toBuffer();
+    
+    return `data:image/jpeg;base64,${compressed.toString('base64')}`;
+  } catch (error) {
+    console.error("Image compression failed, using original:", error);
+    return base64DataUrl;
+  }
+}
 
 const grok = new OpenAI({
   apiKey: process.env.XAI_API_KEY,
@@ -338,7 +363,14 @@ export async function registerRoutes(
       Be constructive, specific, and actionable. Format your response as JSON with keys:
       overallScore (number), bioSuggestions (string with suggestions), photoFeedback (string), improvements (string with numbered list).`;
 
-      const userContent = screenshots.map((img: string) => ({
+      // Compress images to reduce payload size and prevent timeouts
+      console.log(`[analyze-profile] Compressing ${screenshots.length} images...`);
+      const compressedScreenshots = await Promise.all(
+        screenshots.map((img: string) => compressImage(img, 800, 65))
+      );
+      console.log(`[analyze-profile] Compression complete`);
+
+      const userContent = compressedScreenshots.map((img: string) => ({
         type: "image_url" as const,
         image_url: { url: img }
       }));
