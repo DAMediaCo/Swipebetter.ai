@@ -181,6 +181,22 @@ async function initStripe() {
     await setupVite(httpServer, app);
   }
 
+  // Ensure super user access for key accounts on startup
+  try {
+    const { storage } = await import("./storage");
+    const superUserEmail = "dave@d1t2.com";
+    const superUserId = "366ffc60-c8ee-49e7-87fb-5a28bd80a2ee";
+    const isSuperUser = await storage.isSuperUser(superUserId);
+    if (!isSuperUser) {
+      await storage.setSuperUser(superUserId, true);
+      log(`[startup] Set super user status for ${superUserEmail}`);
+    } else {
+      log(`[startup] Super user ${superUserEmail} already configured`);
+    }
+  } catch (err) {
+    log(`[startup] Error setting up super user: ${err}`);
+  }
+
   const port = parseInt(process.env.PORT || "5000", 10);
   httpServer.listen(
     {
