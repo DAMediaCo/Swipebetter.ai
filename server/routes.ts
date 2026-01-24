@@ -19,7 +19,7 @@ const openai = new OpenAI({
   baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
 });
 
-const MAX_SCREENSHOTS = 5;
+const MAX_SCREENSHOTS = 10;
 const MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024; // 10MB base64
 
 const profileAnalysisSchema = z.object({
@@ -444,9 +444,18 @@ export async function registerRoutes(
         },
         isPaidUser: true,
       });
-    } catch (error) {
-      console.error("Profile analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze profile" });
+    } catch (error: any) {
+      console.error("Profile analysis error:", {
+        message: error?.message,
+        code: error?.code,
+        status: error?.status,
+        type: error?.type,
+        stack: error?.stack?.slice(0, 500)
+      });
+      res.status(500).json({ 
+        error: "Failed to analyze profile",
+        details: error?.message || "Unknown error"
+      });
     }
   });
 
