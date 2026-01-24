@@ -217,7 +217,7 @@ export function ProfileOptimizer() {
         </CardHeader>
         
         <CardContent className="pt-2">
-          <ImageUpload images={images} onChange={setImages} maxImages={5} />
+          <ImageUpload images={images} onChange={setImages} maxImages={10} />
         </CardContent>
       </Card>
 

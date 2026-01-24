@@ -8,7 +8,7 @@ interface ImageUploadProps {
   maxImages?: number;
 }
 
-export function ImageUpload({ images, onChange, maxImages = 5 }: ImageUploadProps) {
+export function ImageUpload({ images, onChange, maxImages = 10 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileChange = useCallback(
