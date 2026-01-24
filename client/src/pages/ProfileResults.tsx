@@ -225,32 +225,63 @@ export default function ProfileResults() {
     setTimeout(() => setShareClicked(false), 2000);
   };
 
+  // Helper to clean a single bio/improvement text
+  const cleanText = (text: string): string => {
+    let cleaned = text.trim();
+    // Remove "**Alternative X**" or "**Option X**" patterns
+    cleaned = cleaned.replace(/^\*\*\s*(Alternative|Option)\s*\d+\s*\*\*[:\s]*/i, '');
+    // Remove "Alternative X:" or "Option X:" without markdown
+    cleaned = cleaned.replace(/^(Alternative|Option)\s*\d+[:\s]*/i, '');
+    // Remove numbered prefixes like "1. " or "1) "
+    cleaned = cleaned.replace(/^\d+[\.\)]\s*/, '');
+    // Remove any remaining ** markdown
+    cleaned = cleaned.replace(/\*\*/g, '');
+    // Remove surrounding quotes (single or double)
+    cleaned = cleaned.replace(/^['"""']+/, '').replace(/['"""']+$/, '');
+    // Clean up JSON-like artifacts
+    cleaned = cleaned.replace(/^\{|\}$/g, '');
+    return cleaned.trim();
+  };
+
+  // Try to parse JSON if the content looks like JSON
+  const tryParseJson = (content: string): string[] | null => {
+    const trimmed = content.trim();
+    // Check if it looks like JSON (starts with [ or {)
+    if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed.map(item => typeof item === 'string' ? item : JSON.stringify(item));
+        }
+        // If it's an object, extract values
+        if (typeof parsed === 'object' && parsed !== null) {
+          return Object.values(parsed).map(item => typeof item === 'string' ? item : JSON.stringify(item));
+        }
+      } catch {
+        // Not valid JSON, continue with other parsing
+      }
+    }
+    return null;
+  };
+
   const parseBioSuggestions = (content: string | string[] | undefined): string[] => {
     if (!content) return [];
-    
-    // Helper to clean a single bio text
-    const cleanBioText = (text: string): string => {
-      let cleaned = text.trim();
-      // Remove "**Alternative X**" or "**Option X**" patterns
-      cleaned = cleaned.replace(/^\*\*\s*(Alternative|Option)\s*\d+\s*\*\*[:\s]*/i, '');
-      // Remove "Alternative X:" or "Option X:" without markdown
-      cleaned = cleaned.replace(/^(Alternative|Option)\s*\d+[:\s]*/i, '');
-      // Remove any remaining ** markdown
-      cleaned = cleaned.replace(/\*\*/g, '');
-      // Remove surrounding quotes (single or double)
-      cleaned = cleaned.replace(/^['"""']+/, '').replace(/['"""']+$/, '');
-      return cleaned.trim();
-    };
     
     if (Array.isArray(content)) {
       return content
         .filter(item => typeof item === 'string' && item.trim())
-        .map(cleanBioText)
+        .map(cleanText)
         .filter(item => item.length > 0);
     }
     
     if (typeof content !== 'string') {
       return [];
+    }
+
+    // Try JSON parsing first
+    const jsonParsed = tryParseJson(content);
+    if (jsonParsed) {
+      return jsonParsed.map(cleanText).filter(item => item.length > 0);
     }
     
     const lines = content.split('\n').filter(line => line.trim());
@@ -264,12 +295,12 @@ export default function ProfileResults() {
       
       if (altMatch) {
         if (currentBio) {
-          bios.push(cleanBioText(currentBio));
+          bios.push(cleanText(currentBio));
         }
         currentBio = altMatch[2] || '';
       } else if (numberedMatch) {
         if (currentBio) {
-          bios.push(cleanBioText(currentBio));
+          bios.push(cleanText(currentBio));
         }
         currentBio = numberedMatch[1];
       } else if (currentBio || bios.length === 0) {
@@ -278,14 +309,49 @@ export default function ProfileResults() {
     }
     
     if (currentBio) {
-      bios.push(cleanBioText(currentBio));
+      bios.push(cleanText(currentBio));
     }
     
     if (bios.length === 0 && content.trim()) {
-      bios.push(cleanBioText(content));
+      bios.push(cleanText(content));
     }
     
     return bios.filter(bio => bio.length > 0);
+  };
+
+  // Parse improvements into a clean array
+  const parseImprovements = (content: string | string[] | undefined): string[] => {
+    if (!content) return [];
+    
+    if (Array.isArray(content)) {
+      return content
+        .filter(item => typeof item === 'string' && item.trim())
+        .map(cleanText)
+        .filter(item => item.length > 0);
+    }
+    
+    if (typeof content !== 'string') {
+      return [];
+    }
+
+    // Try JSON parsing first
+    const jsonParsed = tryParseJson(content);
+    if (jsonParsed) {
+      return jsonParsed.map(cleanText).filter(item => item.length > 0);
+    }
+    
+    // Parse numbered lines
+    const lines = content.split('\n').filter(line => line.trim());
+    const improvements: string[] = [];
+    
+    for (const line of lines) {
+      const cleaned = cleanText(line);
+      if (cleaned.length > 0) {
+        improvements.push(cleaned);
+      }
+    }
+    
+    return improvements;
   };
 
   if (!result) {
@@ -473,12 +539,48 @@ export default function ProfileResults() {
                 copied={copiedField === "photo"}
               />
 
-              <ResultCard
-                title="Top Improvements"
-                content={result.improvements}
-                onCopy={() => copyToClipboard(result.improvements, "improvements")}
-                copied={copiedField === "improvements"}
-              />
+              <Card>
+                <CardHeader className="pb-2 flex flex-row items-center justify-between gap-2">
+                  <CardTitle className="text-lg font-semibold">Top Improvements</CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(result.improvements, "improvements")}
+                    data-testid="button-copy-top-improvements"
+                  >
+                    {copiedField === "improvements" ? (
+                      <Check className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Clipboard className="w-4 h-4" />
+                    )}
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const improvements = parseImprovements(result.improvements);
+                    if (improvements.length > 0) {
+                      return (
+                        <ul className="space-y-3">
+                          {improvements.map((improvement, index) => (
+                            <li key={index} className="flex gap-3 text-foreground/90 leading-relaxed">
+                              <TrendingUp className="w-4 h-4 text-primary mt-1 flex-shrink-0" />
+                              <span>{improvement}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      );
+                    }
+                    const contentString = Array.isArray(result.improvements) 
+                      ? result.improvements.join('\n\n') 
+                      : (typeof result.improvements === 'string' ? result.improvements : '');
+                    return (
+                      <div className="text-foreground/90 leading-relaxed prose prose-sm dark:prose-invert max-w-none">
+                        <ReactMarkdown>{contentString || "No improvements available."}</ReactMarkdown>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
             </>
           )}
 

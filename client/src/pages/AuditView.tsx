@@ -11,9 +11,54 @@ import {
   Camera, 
   FileText, 
   Sparkles, 
-  Calendar
+  Calendar,
+  TrendingUp
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+
+// Helper to clean text from various formats
+const cleanText = (text: string): string => {
+  let cleaned = text.trim();
+  cleaned = cleaned.replace(/^\*\*\s*(Alternative|Option)\s*\d+\s*\*\*[:\s]*/i, '');
+  cleaned = cleaned.replace(/^(Alternative|Option)\s*\d+[:\s]*/i, '');
+  cleaned = cleaned.replace(/^\d+[\.\)]\s*/, '');
+  cleaned = cleaned.replace(/\*\*/g, '');
+  cleaned = cleaned.replace(/^['"""']+/, '').replace(/['"""']+$/, '');
+  cleaned = cleaned.replace(/^\{|\}$/g, '');
+  return cleaned.trim();
+};
+
+// Try to parse JSON if content looks like JSON
+const tryParseJson = (content: string): string[] | null => {
+  const trimmed = content.trim();
+  if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => typeof item === 'string' ? item : JSON.stringify(item));
+      }
+      if (typeof parsed === 'object' && parsed !== null) {
+        return Object.values(parsed).map(item => typeof item === 'string' ? item : JSON.stringify(item));
+      }
+    } catch {
+      // Not valid JSON
+    }
+  }
+  return null;
+};
+
+// Parse content into array for list display
+const parseContentToList = (content: string | null): string[] => {
+  if (!content) return [];
+  
+  const jsonParsed = tryParseJson(content);
+  if (jsonParsed) {
+    return jsonParsed.map(cleanText).filter(item => item.length > 0);
+  }
+  
+  const lines = content.split('\n').filter(line => line.trim());
+  return lines.map(cleanText).filter(item => item.length > 0);
+};
 
 interface ProfileAnalysis {
   id: number;
@@ -140,11 +185,19 @@ export default function AuditView() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div 
-              className="prose prose-sm dark:prose-invert max-w-none prose-strong:text-foreground prose-strong:font-semibold prose-p:text-foreground/90 prose-li:text-foreground/90 prose-headings:text-foreground" 
-              data-testid="text-bio-suggestions"
-            >
-              <ReactMarkdown>{analysis.bioSuggestions || "No suggestions available."}</ReactMarkdown>
+            <div data-testid="text-bio-suggestions" className="space-y-4">
+              {parseContentToList(analysis.bioSuggestions).length > 0 ? (
+                parseContentToList(analysis.bioSuggestions).map((bio, index) => (
+                  <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                    <span className="text-xs font-medium text-primary mb-1 block">Option {index + 1}</span>
+                    <p className="text-foreground/90 leading-relaxed text-sm">{bio}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown>{analysis.bioSuggestions || "No suggestions available."}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -174,11 +227,21 @@ export default function AuditView() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div 
-              className="prose prose-sm dark:prose-invert max-w-none prose-strong:text-foreground prose-strong:font-semibold prose-p:text-foreground/90 prose-li:text-foreground/90 prose-headings:text-foreground" 
-              data-testid="text-improvements"
-            >
-              <ReactMarkdown>{analysis.improvements || "No improvements available."}</ReactMarkdown>
+            <div data-testid="text-improvements">
+              {parseContentToList(analysis.improvements).length > 0 ? (
+                <ul className="space-y-3">
+                  {parseContentToList(analysis.improvements).map((improvement, index) => (
+                    <li key={index} className="flex gap-3 text-foreground/90 leading-relaxed text-sm">
+                      <TrendingUp className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <span>{improvement}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown>{analysis.improvements || "No improvements available."}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
