@@ -145,6 +145,7 @@ export interface CreditStatus {
   credits: number;
   reportsUnlocked: string[];
   isSuperUser?: boolean;
+  isUnlimited?: boolean;
 }
 
 export function useCredits() {
@@ -158,18 +159,22 @@ export function useCredits() {
   };
 
   // isLoading is true only during initial load with no cached data
-  // isPending is true when query is fetching (including refetches)
-  // We consider it "loading" if we don't have data yet
-  const isLoading = query.isLoading || query.isPending || !query.data;
+  const isLoading = query.isLoading || !query.data;
+  
+  // Calculate access based on API response
+  const planTier = query.data?.planTier ?? 'free';
+  const isSuperUser = query.data?.isSuperUser === true;
+  const isUnlimited = query.data?.isUnlimited === true;
+  const hasUnlimitedAccess = planTier === 'unlimited' || isSuperUser || isUnlimited;
 
   return {
     ...query,
     isLoading,
-    planTier: query.data?.planTier ?? 'free',
+    planTier,
     credits: query.data?.credits ?? 0,
     reportsUnlocked: query.data?.reportsUnlocked ?? [],
-    hasUnlimitedAccess: query.data?.planTier === 'unlimited' || query.data?.isSuperUser === true,
-    isSuperUser: query.data?.isSuperUser === true,
+    hasUnlimitedAccess,
+    isSuperUser,
     hasCredits: (query.data?.credits ?? 0) > 0,
     refreshCredits,
   };
