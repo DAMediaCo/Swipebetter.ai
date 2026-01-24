@@ -363,10 +363,20 @@ export async function registerRoutes(
       Be constructive, specific, and actionable. Format your response as JSON with keys:
       overallScore (number), bioSuggestions (string with suggestions), photoFeedback (string), improvements (string with numbered list).`;
 
-      // Compress images to reduce payload size and prevent timeouts
-      console.log(`[analyze-profile] Compressing ${screenshots.length} images...`);
+      // Limit to 5 images for AI processing to stay within production timeout limits
+      // Users can upload up to 10, but we analyze the first 5 in detail
+      const maxImagesToAnalyze = 5;
+      const imagesToProcess = screenshots.slice(0, maxImagesToAnalyze);
+      const skippedCount = screenshots.length - imagesToProcess.length;
+      
+      if (skippedCount > 0) {
+        console.log(`[analyze-profile] Processing first ${maxImagesToAnalyze} of ${screenshots.length} images (skipping ${skippedCount} for performance)`);
+      }
+
+      // Compress images aggressively to reduce payload size and prevent timeouts
+      console.log(`[analyze-profile] Compressing ${imagesToProcess.length} images (600px, 50% quality)...`);
       const compressedScreenshots = await Promise.all(
-        screenshots.map((img: string) => compressImage(img, 800, 65))
+        imagesToProcess.map((img: string) => compressImage(img, 600, 50))
       );
       console.log(`[analyze-profile] Compression complete`);
 
