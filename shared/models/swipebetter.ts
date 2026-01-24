@@ -4,6 +4,11 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { users } from "./auth";
 
+// analysisStatus values:
+// - 'pending': Job submitted, waiting to process
+// - 'processing': Currently being analyzed
+// - 'completed': Analysis finished successfully
+// - 'failed': Analysis failed with error
 export const profileAnalyses = pgTable("profile_analyses", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
@@ -15,6 +20,9 @@ export const profileAnalyses = pgTable("profile_analyses", {
   photoFeedback: text("photo_feedback"),
   overallScore: integer("overall_score"),
   improvements: text("improvements"),
+  analysisStatus: text("analysis_status").default("completed"), // 'pending' | 'processing' | 'completed' | 'failed'
+  errorMessage: text("error_message"),
+  enm: boolean("enm").default(false),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
