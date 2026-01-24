@@ -274,14 +274,16 @@ export async function registerRoutes(
       const planTier = await storage.getPlanTier(userId);
       const credits = await storage.getCredits(userId);
       const reportsUnlocked = await storage.getUnlockedReports(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
 
-      console.log(`[credits] User ${userId}: planTier=${planTier}, credits=${credits}`);
+      console.log(`[credits] User ${userId}: planTier=${planTier}, credits=${credits}, isSuperUser=${isSuperUser}`);
 
       res.json({
         planTier,
         credits,
         reportsUnlocked,
-        isUnlimited: planTier === 'unlimited'
+        isUnlimited: planTier === 'unlimited',
+        isSuperUser
       });
     } catch (error) {
       console.error("Get credits error:", error);
@@ -1201,6 +1203,22 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Get admin stats error:", error);
       res.status(500).json({ error: "Failed to get user statistics" });
+    }
+  });
+
+  // Admin endpoint to toggle super user status
+  app.post("/api/admin/toggle-super-user", requireAdmin, async (req, res) => {
+    try {
+      const { userId, isSuperUser } = req.body;
+      if (!userId || typeof isSuperUser !== 'boolean') {
+        return res.status(400).json({ error: "userId and isSuperUser (boolean) required" });
+      }
+      await storage.setSuperUser(userId, isSuperUser);
+      console.log(`[admin] Set super user for ${userId}: ${isSuperUser}`);
+      res.json({ success: true, userId, isSuperUser });
+    } catch (error) {
+      console.error("Toggle super user error:", error);
+      res.status(500).json({ error: "Failed to toggle super user" });
     }
   });
 

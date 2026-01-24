@@ -144,6 +144,7 @@ export interface CreditStatus {
   planTier: 'free' | 'starter' | 'unlimited';
   credits: number;
   reportsUnlocked: string[];
+  isSuperUser?: boolean;
 }
 
 export function useCredits() {
@@ -167,7 +168,8 @@ export function useCredits() {
     planTier: query.data?.planTier ?? 'free',
     credits: query.data?.credits ?? 0,
     reportsUnlocked: query.data?.reportsUnlocked ?? [],
-    hasUnlimitedAccess: query.data?.planTier === 'unlimited',
+    hasUnlimitedAccess: query.data?.planTier === 'unlimited' || query.data?.isSuperUser === true,
+    isSuperUser: query.data?.isSuperUser === true,
     hasCredits: (query.data?.credits ?? 0) > 0,
     refreshCredits,
   };

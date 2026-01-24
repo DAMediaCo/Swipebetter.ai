@@ -70,6 +70,10 @@ export interface IStorage {
   unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }>;
   getUnlockedReports(userId: string): Promise<string[]>;
   claimCheckoutSession(userId: string, sessionId: string): Promise<boolean>;
+  
+  // Super User (admin-granted free access)
+  isSuperUser(userId: string): Promise<boolean>;
+  setSuperUser(userId: string, isSuperUser: boolean): Promise<void>;
 
   // billingStatus: derived status for billing classification
   // - subscription: has active subscription in Stripe
@@ -498,6 +502,28 @@ export class DatabaseStorage implements IStorage {
     );
     
     return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  async isSuperUser(userId: string): Promise<boolean> {
+    const sub = await this.getUserSubscription(userId);
+    if (!sub) return false;
+    return (sub as any).isSuperUser === true;
+  }
+
+  async setSuperUser(userId: string, isSuperUser: boolean): Promise<void> {
+    const existing = await this.getUserSubscription(userId);
+    if (existing) {
+      await db.update(userSubscriptions)
+        .set({ isSuperUser, updatedAt: new Date() })
+        .where(eq(userSubscriptions.userId, userId));
+    } else {
+      await db.insert(userSubscriptions).values({
+        userId,
+        isSuperUser,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
   }
 
   async getAdminStats(): Promise<{
