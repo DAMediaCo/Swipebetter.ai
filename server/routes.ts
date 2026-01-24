@@ -154,12 +154,13 @@ export async function registerRoutes(
       }
 
       const planTier = await storage.getPlanTier(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
       
-      // Unlimited users can access everything
-      if (planTier === 'unlimited') {
+      // Unlimited users or super users can access everything
+      if (planTier === 'unlimited' || isSuperUser) {
         return res.json({ 
           access: 'granted', 
-          reason: 'unlimited_plan',
+          reason: isSuperUser ? 'super_user' : 'unlimited_plan',
           planTier 
         });
       }
@@ -206,17 +207,20 @@ export async function registerRoutes(
       const { reportId } = req.params;
 
       const planTier = await storage.getPlanTier(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
       const credits = await storage.getCredits(userId);
       const isUnlocked = await storage.isReportUnlocked(userId, reportId);
 
-      const canAccess = planTier === 'unlimited' || isUnlocked || credits > 0;
+      const canAccess = planTier === 'unlimited' || isSuperUser || isUnlocked || credits > 0;
 
       res.json({
         canAccess,
         isUnlocked,
         planTier,
         credits,
-        reason: planTier === 'unlimited' ? 'unlimited_plan' : 
+        isSuperUser,
+        reason: isSuperUser ? 'super_user' :
+                planTier === 'unlimited' ? 'unlimited_plan' : 
                 isUnlocked ? 'already_unlocked' : 
                 credits > 0 ? 'has_credits' : 'no_access'
       });
@@ -236,12 +240,13 @@ export async function registerRoutes(
       const { deductCredit } = req.body;
 
       const planTier = await storage.getPlanTier(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
       
-      // Unlimited users can access everything
-      if (planTier === 'unlimited') {
+      // Unlimited users or super users can access everything
+      if (planTier === 'unlimited' || isSuperUser) {
         return res.json({ 
           access: 'granted', 
-          reason: 'unlimited_plan',
+          reason: isSuperUser ? 'super_user' : 'unlimited_plan',
           planTier 
         });
       }
