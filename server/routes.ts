@@ -1106,19 +1106,15 @@ export async function registerRoutes(
         return res.status(401).json({ error: "Invalid credentials" });
       }
       
-      req.session.regenerate((err: any) => {
-        if (err) {
-          console.error("Session regeneration error:", err);
+      // Set admin flag directly without regenerating session
+      req.session.isAdmin = true;
+      req.session.save((saveErr: any) => {
+        if (saveErr) {
+          console.error("Session save error:", saveErr);
           return res.status(500).json({ error: "Authentication failed" });
         }
-        req.session.isAdmin = true;
-        req.session.save((saveErr: any) => {
-          if (saveErr) {
-            console.error("Session save error:", saveErr);
-            return res.status(500).json({ error: "Authentication failed" });
-          }
-          res.json({ success: true });
-        });
+        console.log("[admin] Login successful, session saved");
+        res.json({ success: true });
       });
     } catch (error) {
       console.error("Admin login error:", error);
