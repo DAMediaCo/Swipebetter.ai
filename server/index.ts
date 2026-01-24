@@ -185,13 +185,20 @@ async function initStripe() {
   try {
     const { storage } = await import("./storage");
     const superUserEmail = "dave@d1t2.com";
-    const superUserId = "366ffc60-c8ee-49e7-87fb-5a28bd80a2ee";
-    const isSuperUser = await storage.isSuperUser(superUserId);
-    if (!isSuperUser) {
-      await storage.setSuperUser(superUserId, true);
-      log(`[startup] Set super user status for ${superUserEmail}`);
+    
+    // Look up user by email to get correct ID in any environment
+    const user = await storage.getUserByEmail(superUserEmail);
+    if (user) {
+      const isSuperUser = await storage.isSuperUser(user.id);
+      log(`[startup] Found user ${superUserEmail} with ID ${user.id}, isSuperUser=${isSuperUser}`);
+      if (!isSuperUser) {
+        await storage.setSuperUser(user.id, true);
+        log(`[startup] Set super user status for ${superUserEmail} (${user.id})`);
+      } else {
+        log(`[startup] Super user ${superUserEmail} already configured`);
+      }
     } else {
-      log(`[startup] Super user ${superUserEmail} already configured`);
+      log(`[startup] User ${superUserEmail} not found in database`);
     }
   } catch (err) {
     log(`[startup] Error setting up super user: ${err}`);
