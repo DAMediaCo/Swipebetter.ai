@@ -1,0 +1,28 @@
+You are an expert Full Stack Developer. We have two critical display bugs on the User Dashboard that appeared after the last update.
+
+**The Issues (See attached screenshot context):**
+1.  **Top Improvements:** The dashboard is displaying raw JSON strings (e.g., `{"1. Enhance lighting...", "2. Prioritize..."}`) instead of a clean bulleted list.
+2.  **Bio Options:** The "Bio Options" section is showing one giant block of text instead of multiple distinct options with individual copy buttons.
+
+**Please execute the following fixes:**
+
+### Step 1: Update the AI Generation Prompt (Backend)
+* Locate the backend function that calls the AI (likely in `routes.py` or `ai_service.py`).
+* **Enforce Strict JSON Arrays:** Update the system prompt to explicitly request:
+    * `bio_suggestions`: Must be a **JSON Array of strings** (e.g., `["Bio option 1...", "Bio option 2..."]`).
+    * `top_improvements`: Must be a **JSON Array of strings** (e.g., `["Fix lighting...", "Smile more..."]`).
+* **Strip Markdown:** Ensure you strip any ```json``` or ``` markers from the response before saving to the database.
+
+### Step 2: Fix the Frontend Display (Dashboard)
+* Open the file responsible for rendering the results (likely `dashboard.js` or `index.html` script section).
+* **Fix "Top Improvements" Rendering:**
+    * Add a check: If `top_improvements` is a string, use `JSON.parse()` to convert it into an object/array.
+    * Map through the values and render them as `<li>` items inside a `<ul>` list.
+    * *Fallback:* If parsing fails, display the raw text but clean up the `{}` and `""` characters.
+* **Fix "Bio Options" Rendering:**
+    * Add a check: If `bio_suggestions` is a string, try to `JSON.parse()` it.
+    * **Loop:** Iterate through the array of bios. For EACH bio:
+        * Create a distinct "Card" or "Block".
+        * Add a functional **"Copy" button** specific to that block (copying only that bio's text).
+
+**Goal:** The user should see a clean bulleted list for improvements, and 3 distinct boxes for bios, each with a working Copy button.

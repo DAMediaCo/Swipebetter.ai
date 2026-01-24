@@ -51,13 +51,54 @@ const tryParseJson = (content: string): string[] | null => {
 const parseContentToList = (content: string | null): string[] => {
   if (!content) return [];
   
-  const jsonParsed = tryParseJson(content);
-  if (jsonParsed) {
+  // Strip markdown code block markers
+  let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+  
+  // Remove leading/trailing braces if it looks like a malformed object
+  if (cleaned.startsWith('{') && !cleaned.startsWith('{"') && !cleaned.startsWith('{ "')) {
+    cleaned = cleaned.replace(/^\{|\}$/g, '');
+  }
+  
+  const jsonParsed = tryParseJson(cleaned);
+  if (jsonParsed && jsonParsed.length > 0) {
     return jsonParsed.map(cleanText).filter(item => item.length > 0);
   }
   
-  const lines = content.split('\n').filter(line => line.trim());
-  return lines.map(cleanText).filter(item => item.length > 0);
+  // Try parsing as object with numeric keys
+  try {
+    const obj = JSON.parse(cleaned);
+    if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
+      const values = Object.values(obj).filter(v => typeof v === 'string') as string[];
+      if (values.length > 0) {
+        return values.map(cleanText).filter(item => item.length > 0);
+      }
+    }
+  } catch {
+    // Continue with text parsing
+  }
+  
+  const lines = cleaned.split('\n').filter(line => line.trim());
+  const items: string[] = [];
+  
+  for (const line of lines) {
+    // Split by commas if line contains multiple quoted items
+    if (line.includes('",') || line.includes('", ')) {
+      const parts = line.split(/",\s*"/).map(s => s.replace(/^["'\s]+|["'\s]+$/g, ''));
+      for (const part of parts) {
+        const cleanedPart = cleanText(part);
+        if (cleanedPart.length > 0) {
+          items.push(cleanedPart);
+        }
+      }
+    } else {
+      const cleanedLine = cleanText(line);
+      if (cleanedLine.length > 0) {
+        items.push(cleanedLine);
+      }
+    }
+  }
+  
+  return items;
 };
 
 interface ProfileAnalysis {

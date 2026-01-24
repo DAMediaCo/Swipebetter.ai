@@ -278,13 +278,34 @@ export default function ProfileResults() {
       return [];
     }
 
+    // Strip markdown code block markers
+    let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    
+    // Remove leading/trailing braces if it looks like a malformed object
+    if (cleaned.startsWith('{') && !cleaned.startsWith('{"') && !cleaned.startsWith('{ "')) {
+      cleaned = cleaned.replace(/^\{|\}$/g, '');
+    }
+
     // Try JSON parsing first
-    const jsonParsed = tryParseJson(content);
-    if (jsonParsed) {
+    const jsonParsed = tryParseJson(cleaned);
+    if (jsonParsed && jsonParsed.length > 0) {
       return jsonParsed.map(cleanText).filter(item => item.length > 0);
     }
     
-    const lines = content.split('\n').filter(line => line.trim());
+    // Try parsing as object with numeric keys like {"1": "...", "2": "..."}
+    try {
+      const obj = JSON.parse(cleaned);
+      if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
+        const values = Object.values(obj).filter(v => typeof v === 'string') as string[];
+        if (values.length > 0) {
+          return values.map(cleanText).filter(item => item.length > 0);
+        }
+      }
+    } catch {
+      // Continue with text parsing
+    }
+    
+    const lines = cleaned.split('\n').filter(line => line.trim());
     const bios: string[] = [];
     let currentBio = '';
     
@@ -312,8 +333,8 @@ export default function ProfileResults() {
       bios.push(cleanText(currentBio));
     }
     
-    if (bios.length === 0 && content.trim()) {
-      bios.push(cleanText(content));
+    if (bios.length === 0 && cleaned.trim()) {
+      bios.push(cleanText(cleaned));
     }
     
     return bios.filter(bio => bio.length > 0);
@@ -334,20 +355,52 @@ export default function ProfileResults() {
       return [];
     }
 
+    // Strip markdown code block markers
+    let cleaned = content.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    
+    // Remove leading/trailing braces if it looks like a malformed object like {1. item, 2. item}
+    if (cleaned.startsWith('{') && !cleaned.startsWith('{"') && !cleaned.startsWith('{ "')) {
+      cleaned = cleaned.replace(/^\{|\}$/g, '');
+    }
+
     // Try JSON parsing first
-    const jsonParsed = tryParseJson(content);
-    if (jsonParsed) {
+    const jsonParsed = tryParseJson(cleaned);
+    if (jsonParsed && jsonParsed.length > 0) {
       return jsonParsed.map(cleanText).filter(item => item.length > 0);
     }
     
-    // Parse numbered lines
-    const lines = content.split('\n').filter(line => line.trim());
+    // Try parsing as object with numeric keys like {"1": "...", "2": "..."}
+    try {
+      const obj = JSON.parse(cleaned);
+      if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
+        const values = Object.values(obj).filter(v => typeof v === 'string') as string[];
+        if (values.length > 0) {
+          return values.map(cleanText).filter(item => item.length > 0);
+        }
+      }
+    } catch {
+      // Continue with text parsing
+    }
+    
+    // Parse numbered lines or comma-separated items
+    const lines = cleaned.split('\n').filter(line => line.trim());
     const improvements: string[] = [];
     
     for (const line of lines) {
-      const cleaned = cleanText(line);
-      if (cleaned.length > 0) {
-        improvements.push(cleaned);
+      // Split by commas if line contains multiple quoted items
+      if (line.includes('",') || line.includes('", ')) {
+        const items = line.split(/",\s*"/).map(s => s.replace(/^["'\s]+|["'\s]+$/g, ''));
+        for (const item of items) {
+          const cleanedItem = cleanText(item);
+          if (cleanedItem.length > 0) {
+            improvements.push(cleanedItem);
+          }
+        }
+      } else {
+        const cleanedLine = cleanText(line);
+        if (cleanedLine.length > 0) {
+          improvements.push(cleanedLine);
+        }
       }
     }
     

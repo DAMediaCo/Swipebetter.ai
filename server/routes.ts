@@ -439,12 +439,45 @@ export async function registerRoutes(
 
       console.log(`[analyze-job:${jobId}] Analysis completed in ${Date.now() - startTime}ms`);
 
-      // Update the job with results
+      // Helper to normalize arrays - strip markdown, ensure clean JSON array string
+      const normalizeToJsonArray = (data: any): string => {
+        if (Array.isArray(data)) {
+          return JSON.stringify(data);
+        }
+        if (typeof data === 'string') {
+          // Strip markdown code block markers
+          let cleaned = data.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+          // Try to parse as JSON
+          try {
+            const parsed = JSON.parse(cleaned);
+            if (Array.isArray(parsed)) {
+              return JSON.stringify(parsed);
+            }
+            // If it's an object with numeric keys, convert to array
+            if (typeof parsed === 'object' && parsed !== null) {
+              const values = Object.values(parsed);
+              if (values.every(v => typeof v === 'string')) {
+                return JSON.stringify(values);
+              }
+            }
+          } catch {
+            // Not JSON, split by newlines or keep as single item
+            const lines = cleaned.split('\n').filter((l: string) => l.trim());
+            if (lines.length > 1) {
+              return JSON.stringify(lines.map((l: string) => l.replace(/^\d+\.\s*/, '').trim()));
+            }
+          }
+          return JSON.stringify([cleaned]);
+        }
+        return JSON.stringify([]);
+      };
+
+      // Update the job with results - normalize arrays
       await storage.updateProfileAnalysisStatus(jobId, 'completed', {
-        bioSuggestions: analysis.bioSuggestions,
-        photoFeedback: analysis.photoFeedback,
+        bioSuggestions: normalizeToJsonArray(analysis.bioSuggestions),
+        photoFeedback: typeof analysis.photoFeedback === 'string' ? analysis.photoFeedback : JSON.stringify(analysis.photoFeedback),
         overallScore: analysis.overallScore,
-        improvements: analysis.improvements,
+        improvements: normalizeToJsonArray(analysis.improvements),
       });
 
     } catch (error: any) {
