@@ -151,8 +151,8 @@ function fileToBase64(file: File): Promise<string> {
           return;
         }
         
-        // Max dimension 800px (smaller for faster uploads)
-        const maxDim = 800;
+        // Max dimension 600px for smaller payload
+        const maxDim = 600;
         let width = img.width;
         let height = img.height;
         
@@ -172,8 +172,8 @@ function fileToBase64(file: File): Promise<string> {
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
         
-        // Compress to JPEG at 40% quality
-        const compressed = canvas.toDataURL('image/jpeg', 0.4);
+        // Compress to JPEG at 30% quality for smaller payload
+        const compressed = canvas.toDataURL('image/jpeg', 0.3);
         resolve(compressed);
       };
       img.onerror = reject;
