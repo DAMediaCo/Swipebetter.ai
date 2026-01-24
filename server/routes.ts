@@ -476,6 +476,8 @@ export async function registerRoutes(
       const isUnlimited = planTier === 'unlimited' || isSuperUser;
       const hasCredits = credits > 0;
 
+      console.log(`[analyze-profile] Access check for user ${userId}: planTier=${planTier}, isSuperUser=${isSuperUser}, credits=${credits}, isUnlimited=${isUnlimited}`);
+
       if (!isUnlimited && !hasCredits) {
         return res.status(403).json({ 
           error: "Credits required",
