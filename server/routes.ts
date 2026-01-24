@@ -363,53 +363,100 @@ export async function registerRoutes(
       Be constructive, specific, and actionable. Format your response as JSON with keys:
       overallScore (number), bioSuggestions (string with suggestions), photoFeedback (string), improvements (string with numbered list).`;
 
-      // Compress images very aggressively for many photos to stay within production timeout
-      // Scale compression based on number of images
-      const imageCount = screenshots.length;
-      const maxWidth = imageCount > 7 ? 400 : imageCount > 5 ? 500 : 600;
-      const quality = imageCount > 7 ? 35 : imageCount > 5 ? 40 : 50;
-      
-      console.log(`[analyze-profile] Compressing ${imageCount} images (${maxWidth}px, ${quality}% quality)...`);
+      // Compress all images aggressively
+      console.log(`[analyze-profile] Compressing ${screenshots.length} images (500px, 45% quality)...`);
       const compressedScreenshots = await Promise.all(
-        screenshots.map((img: string) => compressImage(img, maxWidth, quality))
+        screenshots.map((img: string) => compressImage(img, 500, 45))
       );
       console.log(`[analyze-profile] Compression complete`);
-
-      const userContent = compressedScreenshots.map((img: string) => ({
-        type: "image_url" as const,
-        image_url: { url: img }
-      }));
 
       console.log(`[analyze-profile] Starting analysis for ${screenshots.length} photos, user: ${userId || 'anonymous'}`);
       const startTime = Date.now();
 
-      const response = await grok.chat.completions.create({
-        model: "grok-2-vision-1212",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: [
-            { type: "text", text: `Please analyze this ${platform} dating profile for a ${gender} looking for ${intent}.${enm ? ' This is an ENM/Poly profile - keep that context in mind.' : ''}` },
-            ...userContent
-          ]}
-        ],
-        response_format: { type: "json_object" },
-        max_completion_tokens: 2048,
-      });
+      // Process images in batches to avoid timeout
+      const BATCH_SIZE = 4;
+      const batches: string[][] = [];
+      for (let i = 0; i < compressedScreenshots.length; i += BATCH_SIZE) {
+        batches.push(compressedScreenshots.slice(i, i + BATCH_SIZE));
+      }
+
+      console.log(`[analyze-profile] Processing ${batches.length} batch(es) of images`);
+
+      // Analyze each batch and collect photo feedback
+      const batchResults: string[] = [];
+      for (let i = 0; i < batches.length; i++) {
+        const batch = batches[i];
+        const batchContent = batch.map((img: string) => ({
+          type: "image_url" as const,
+          image_url: { url: img }
+        }));
+
+        const batchPrompt = batches.length > 1 
+          ? `Analyze photos ${i * BATCH_SIZE + 1}-${i * BATCH_SIZE + batch.length} of ${screenshots.length} total photos from this ${platform} dating profile. Provide specific feedback for each photo.`
+          : `Please analyze this ${platform} dating profile for a ${gender} looking for ${intent}.${enm ? ' This is an ENM/Poly profile - keep that context in mind.' : ''}`;
+
+        const batchResponse = await grok.chat.completions.create({
+          model: "grok-2-vision-1212",
+          messages: [
+            { role: "system", content: batches.length > 1 
+              ? "You are a dating profile expert. Analyze these profile photos and provide specific feedback. Format as JSON with: photoFeedback (string with numbered feedback for each photo)."
+              : systemPrompt 
+            },
+            { role: "user", content: [
+              { type: "text", text: batchPrompt },
+              ...batchContent
+            ]}
+          ],
+          response_format: { type: "json_object" },
+          max_completion_tokens: batches.length > 1 ? 512 : 2048,
+        });
+
+        const batchText = batchResponse.choices[0]?.message?.content || "{}";
+        try {
+          const batchAnalysis = JSON.parse(batchText);
+          if (batches.length === 1) {
+            // Single batch - this is the full analysis
+            batchResults.push(JSON.stringify(batchAnalysis));
+          } else {
+            batchResults.push(batchAnalysis.photoFeedback || batchText);
+          }
+        } catch {
+          batchResults.push(batchText);
+        }
+        console.log(`[analyze-profile] Batch ${i + 1}/${batches.length} complete`);
+      }
+
+      let analysis;
+      if (batches.length === 1) {
+        // Single batch - parse the full result
+        try {
+          analysis = JSON.parse(batchResults[0]);
+        } catch {
+          analysis = { overallScore: 70, bioSuggestions: batchResults[0], photoFeedback: "", improvements: "" };
+        }
+      } else {
+        // Multiple batches - make a final synthesis call
+        const combinedFeedback = batchResults.join('\n\n');
+        const synthesisResponse = await grok.chat.completions.create({
+          model: "grok-3-mini-beta",
+          messages: [
+            { role: "system", content: `You are a dating profile expert. Based on the photo-by-photo feedback below, provide a comprehensive profile analysis. Format as JSON with: overallScore (1-100), bioSuggestions (string), photoFeedback (combined summary), improvements (numbered list of top 3 improvements).` },
+            { role: "user", content: `This is a ${platform} profile for a ${gender} looking for ${intent}.${enm ? ' ENM/Poly profile.' : ''}\n\nPhoto feedback:\n${combinedFeedback}\n\nProvide the final analysis.` }
+          ],
+          response_format: { type: "json_object" },
+          max_completion_tokens: 1024,
+        });
+        
+        const synthesisText = synthesisResponse.choices[0]?.message?.content || "{}";
+        try {
+          analysis = JSON.parse(synthesisText);
+          analysis.photoFeedback = combinedFeedback + '\n\n' + (analysis.photoFeedback || '');
+        } catch {
+          analysis = { overallScore: 70, bioSuggestions: synthesisText, photoFeedback: combinedFeedback, improvements: "" };
+        }
+      }
 
       console.log(`[analyze-profile] Analysis completed in ${Date.now() - startTime}ms`);
-
-      const analysisText = response.choices[0]?.message?.content || "{}";
-      let analysis;
-      try {
-        analysis = JSON.parse(analysisText);
-      } catch {
-        analysis = { 
-          overallScore: 70, 
-          bioSuggestions: analysisText, 
-          photoFeedback: "", 
-          improvements: "" 
-        };
-      }
 
       // Only save analysis to database if user is logged in
       let savedAnalysis = null;
