@@ -343,6 +343,9 @@ export async function registerRoutes(
         image_url: { url: img }
       }));
 
+      console.log(`[analyze-profile] Starting analysis for ${screenshots.length} photos, user: ${userId || 'anonymous'}`);
+      const startTime = Date.now();
+
       const response = await grok.chat.completions.create({
         model: "grok-2-vision-1212",
         messages: [
@@ -355,6 +358,8 @@ export async function registerRoutes(
         response_format: { type: "json_object" },
         max_completion_tokens: 2048,
       });
+
+      console.log(`[analyze-profile] Analysis completed in ${Date.now() - startTime}ms`);
 
       const analysisText = response.choices[0]?.message?.content || "{}";
       let analysis;
