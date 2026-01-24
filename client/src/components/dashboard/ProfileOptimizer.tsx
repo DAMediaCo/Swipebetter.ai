@@ -55,9 +55,14 @@ export function ProfileOptimizer() {
     }
   }, [images.length]);
 
+  const [analysisProgress, setAnalysisProgress] = useState("");
+
   const analyzeMutation = useMutation({
     mutationFn: async () => {
       trackAnalysisStarted("profile");
+      setAnalysisProgress("Submitting...");
+      
+      // Submit the job
       const response = await apiRequest("POST", "/api/analyze-profile", {
         platform,
         gender,
@@ -65,7 +70,57 @@ export function ProfileOptimizer() {
         screenshots: images,
         enm: isEnm,
       });
-      return response.json();
+      const jobData = await response.json();
+      
+      if (!jobData.jobId) {
+        throw new Error("Failed to create analysis job");
+      }
+
+      // Poll for completion
+      const jobId = jobData.jobId;
+      const maxAttempts = 60; // 2 minutes max (2s intervals)
+      let attempts = 0;
+
+      while (attempts < maxAttempts) {
+        attempts++;
+        setAnalysisProgress(`Analyzing... ${Math.min(attempts * 3, 95)}%`);
+        
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const statusResponse = await fetch(`/api/analyze-profile/status/${jobId}`, {
+          credentials: 'include'
+        });
+        
+        // Handle HTTP errors
+        if (!statusResponse.ok) {
+          setAnalysisProgress("");
+          if (statusResponse.status === 401) {
+            throw new Error("401: Session expired. Please log in again.");
+          }
+          if (statusResponse.status === 403) {
+            throw new Error("403: Access denied.");
+          }
+          throw new Error(`Server error: ${statusResponse.status}`);
+        }
+        
+        const statusData = await statusResponse.json();
+
+        if (statusData.status === 'completed') {
+          setAnalysisProgress("");
+          return { 
+            parsed: statusData.analysis,
+            analysis: statusData.analysis 
+          };
+        }
+
+        if (statusData.status === 'failed') {
+          setAnalysisProgress("");
+          throw new Error(statusData.error || 'Analysis failed');
+        }
+      }
+
+      setAnalysisProgress("");
+      throw new Error('Analysis timed out. Please try again.');
     },
     onSuccess: (data) => {
       // Invalidate the analyses cache so Recent Audits updates
@@ -77,16 +132,23 @@ export function ProfileOptimizer() {
       }
     },
     onError: (error: any) => {
+      setAnalysisProgress("");
       if (error.message?.includes("403")) {
         toast({
           title: "Subscription required",
           description: "Upgrade to Pro to use this feature.",
           variant: "destructive",
         });
+      } else if (error.message?.includes("401")) {
+        toast({
+          title: "Please log in",
+          description: "You need to be logged in to analyze your profile.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Analysis failed",
-          description: "Please try again.",
+          description: error.message || "Please try again.",
           variant: "destructive",
         });
       }
@@ -249,7 +311,7 @@ export function ProfileOptimizer() {
           {analyzeMutation.isPending ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-              Analyzing...
+              {analysisProgress || "Analyzing..."}
             </>
           ) : (
             <>

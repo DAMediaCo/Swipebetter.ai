@@ -26,6 +26,7 @@ export interface IStorage {
   getProfileAnalyses(userId: string): Promise<ProfileAnalysis[]>;
   createProfileAnalysis(data: InsertProfileAnalysis): Promise<ProfileAnalysis>;
   getProfileAnalysis(id: number): Promise<ProfileAnalysis | undefined>;
+  updateProfileAnalysisStatus(id: number, status: string, result?: { bioSuggestions?: string; photoFeedback?: string; overallScore?: number; improvements?: string; errorMessage?: string }): Promise<void>;
   cleanupOldProfileAnalyses(userId: string, keepCount: number): Promise<void>;
 
   getReplyAnalyses(userId: string): Promise<ReplyAnalysis[]>;
@@ -156,6 +157,18 @@ export class DatabaseStorage implements IStorage {
   async getProfileAnalysis(id: number): Promise<ProfileAnalysis | undefined> {
     const [analysis] = await db.select().from(profileAnalyses).where(eq(profileAnalyses.id, id));
     return analysis;
+  }
+
+  async updateProfileAnalysisStatus(id: number, status: string, result?: { bioSuggestions?: string; photoFeedback?: string; overallScore?: number; improvements?: string; errorMessage?: string }): Promise<void> {
+    const updateData: any = { analysisStatus: status };
+    if (result) {
+      if (result.bioSuggestions !== undefined) updateData.bioSuggestions = result.bioSuggestions;
+      if (result.photoFeedback !== undefined) updateData.photoFeedback = result.photoFeedback;
+      if (result.overallScore !== undefined) updateData.overallScore = result.overallScore;
+      if (result.improvements !== undefined) updateData.improvements = result.improvements;
+      if (result.errorMessage !== undefined) updateData.errorMessage = result.errorMessage;
+    }
+    await db.update(profileAnalyses).set(updateData).where(eq(profileAnalyses.id, id));
   }
 
   async getReplyAnalyses(userId: string): Promise<ReplyAnalysis[]> {

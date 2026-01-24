@@ -318,31 +318,13 @@ export async function registerRoutes(
 
   // ===== END USAGE GATE ENDPOINTS =====
 
-  app.post("/api/analyze-profile", async (req: any, res) => {
+  // Background analysis processor - runs in detached promise
+  async function processAnalysisJob(jobId: number, platform: string, gender: string, intent: string, screenshots: string[], enm: boolean) {
+    const startTime = Date.now();
     try {
-      const parseResult = profileAnalysisSchema.safeParse(req.body);
-      if (!parseResult.success) {
-        return res.status(400).json({ 
-          error: "Invalid input", 
-          details: parseResult.error.flatten() 
-        });
-      }
-      const { platform, gender, intent, screenshots, enm } = parseResult.data;
-      const userId = req.session?.userId || null;
-
-      // Check if user is paid (only if logged in)
-      let isPaidUser = false;
-      if (userId) {
-        const subscription = await storage.getUserSubscription(userId);
-        const isSubscribed = subscription?.status === "active";
-        const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
-        isPaidUser = isSubscribed || hasOneTimeCredits;
-
-        // Decrement credits only for paying users with one-time credits
-        if (!isSubscribed && hasOneTimeCredits) {
-          await storage.decrementOneTimeCredits(userId);
-        }
-      }
+      console.log(`[analyze-job:${jobId}] Starting background analysis for ${screenshots.length} photos`);
+      
+      await storage.updateProfileAnalysisStatus(jobId, 'processing');
 
       const enmContext = enm ? `
       IMPORTANT: This is an ENM (Ethical Non-Monogamy) / Polyamorous profile. The user may be married, partnered, or in existing relationships while seeking additional connections. This is normal and healthy in the ENM community. Do NOT suggest:
@@ -364,23 +346,20 @@ export async function registerRoutes(
       overallScore (number), bioSuggestions (string with suggestions), photoFeedback (string), improvements (string with numbered list).`;
 
       // Compress all images aggressively
-      console.log(`[analyze-profile] Compressing ${screenshots.length} images (500px, 45% quality)...`);
+      console.log(`[analyze-job:${jobId}] Compressing ${screenshots.length} images (500px, 45% quality)...`);
       const compressedScreenshots = await Promise.all(
         screenshots.map((img: string) => compressImage(img, 500, 45))
       );
-      console.log(`[analyze-profile] Compression complete`);
+      console.log(`[analyze-job:${jobId}] Compression complete`);
 
-      console.log(`[analyze-profile] Starting analysis for ${screenshots.length} photos, user: ${userId || 'anonymous'}`);
-      const startTime = Date.now();
-
-      // Process images in batches to avoid timeout
+      // Process images in batches
       const BATCH_SIZE = 4;
       const batches: string[][] = [];
       for (let i = 0; i < compressedScreenshots.length; i += BATCH_SIZE) {
         batches.push(compressedScreenshots.slice(i, i + BATCH_SIZE));
       }
 
-      console.log(`[analyze-profile] Processing ${batches.length} batch(es) of images`);
+      console.log(`[analyze-job:${jobId}] Processing ${batches.length} batch(es) of images`);
 
       // Analyze each batch and collect photo feedback
       const batchResults: string[] = [];
@@ -415,7 +394,6 @@ export async function registerRoutes(
         try {
           const batchAnalysis = JSON.parse(batchText);
           if (batches.length === 1) {
-            // Single batch - this is the full analysis
             batchResults.push(JSON.stringify(batchAnalysis));
           } else {
             batchResults.push(batchAnalysis.photoFeedback || batchText);
@@ -423,19 +401,17 @@ export async function registerRoutes(
         } catch {
           batchResults.push(batchText);
         }
-        console.log(`[analyze-profile] Batch ${i + 1}/${batches.length} complete`);
+        console.log(`[analyze-job:${jobId}] Batch ${i + 1}/${batches.length} complete`);
       }
 
       let analysis;
       if (batches.length === 1) {
-        // Single batch - parse the full result
         try {
           analysis = JSON.parse(batchResults[0]);
         } catch {
           analysis = { overallScore: 70, bioSuggestions: batchResults[0], photoFeedback: "", improvements: "" };
         }
       } else {
-        // Multiple batches - make a final synthesis call
         const combinedFeedback = batchResults.join('\n\n');
         const synthesisResponse = await grok.chat.completions.create({
           model: "grok-3-mini-beta",
@@ -456,28 +432,138 @@ export async function registerRoutes(
         }
       }
 
-      console.log(`[analyze-profile] Analysis completed in ${Date.now() - startTime}ms`);
+      console.log(`[analyze-job:${jobId}] Analysis completed in ${Date.now() - startTime}ms`);
 
-      // Only save analysis to database if user is logged in
-      let savedAnalysis = null;
-      if (userId) {
-        savedAnalysis = await storage.createProfileAnalysis({
-          userId,
-          platform,
-          gender,
-          intent,
-          screenshots,
-          bioSuggestions: analysis.bioSuggestions,
-          photoFeedback: analysis.photoFeedback,
-          overallScore: analysis.overallScore,
-          improvements: analysis.improvements,
+      // Update the job with results
+      await storage.updateProfileAnalysisStatus(jobId, 'completed', {
+        bioSuggestions: analysis.bioSuggestions,
+        photoFeedback: analysis.photoFeedback,
+        overallScore: analysis.overallScore,
+        improvements: analysis.improvements,
+      });
+
+    } catch (error: any) {
+      console.error(`[analyze-job:${jobId}] Analysis failed:`, error?.message);
+      await storage.updateProfileAnalysisStatus(jobId, 'failed', {
+        errorMessage: error?.message || 'Unknown error occurred'
+      });
+    }
+  }
+
+  // Submit analysis job - returns immediately with job ID
+  app.post("/api/analyze-profile", async (req: any, res) => {
+    try {
+      const parseResult = profileAnalysisSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ 
+          error: "Invalid input", 
+          details: parseResult.error.flatten() 
         });
-        await storage.updateLastActiveAt(userId);
+      }
+      const { platform, gender, intent, screenshots, enm } = parseResult.data;
+      const userId = req.session?.userId || null;
+
+      // Must be logged in for async processing
+      if (!userId) {
+        return res.status(401).json({ error: "Please log in to analyze your profile" });
       }
 
-      // For free/anonymous users, return score + first tip + blurred teasers
-      // Extract first improvement for the "Key Improvement" teaser
-      const getFirstTip = (improvements: string): string => {
+      // Check if user has access (unlimited or credits)
+      const subscription = await storage.getUserSubscription(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
+      const planTier = await storage.getPlanTier(userId);
+      const credits = await storage.getCredits(userId);
+      const isUnlimited = planTier === 'unlimited' || isSuperUser;
+      const hasCredits = credits > 0;
+
+      if (!isUnlimited && !hasCredits) {
+        return res.status(403).json({ 
+          error: "Credits required",
+          message: "You need credits to generate a new analysis. Visit /pricing to get credits."
+        });
+      }
+
+      // Deduct credit if not unlimited
+      if (!isUnlimited && hasCredits) {
+        await storage.deductCredit(userId);
+        console.log(`[analyze-profile] Deducted 1 credit from user ${userId}`);
+      }
+
+      // Create pending job in database
+      const savedAnalysis = await storage.createProfileAnalysis({
+        userId,
+        platform,
+        gender,
+        intent,
+        screenshots,
+        analysisStatus: 'pending',
+        enm: enm || false,
+      });
+
+      console.log(`[analyze-profile] Created job ${savedAnalysis.id} for user ${userId}, starting background processing`);
+
+      // Start background processing - don't await!
+      processAnalysisJob(savedAnalysis.id, platform, gender, intent, screenshots, enm || false);
+
+      // Return immediately with job ID
+      res.json({
+        jobId: savedAnalysis.id,
+        status: 'pending',
+        message: 'Analysis started. Poll /api/analyze-profile/status/:jobId for results.'
+      });
+
+      await storage.updateLastActiveAt(userId);
+    } catch (error: any) {
+      console.error("Profile analysis job creation error:", {
+        message: error?.message,
+        stack: error?.stack?.slice(0, 500)
+      });
+      res.status(500).json({ 
+        error: "Failed to start profile analysis",
+        details: error?.message || "Unknown error"
+      });
+    }
+  });
+
+  // Check analysis job status
+  app.get("/api/analyze-profile/status/:jobId", requireAuth, async (req: any, res) => {
+    try {
+      const jobId = parseInt(req.params.jobId);
+      if (isNaN(jobId)) {
+        return res.status(400).json({ error: "Invalid job ID" });
+      }
+
+      const analysis = await storage.getProfileAnalysis(jobId);
+      if (!analysis) {
+        return res.status(404).json({ error: "Analysis not found" });
+      }
+
+      // Only allow owner to check status
+      if (analysis.userId !== req.session?.userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
+
+      const status = (analysis as any).analysisStatus || 'completed';
+      const errorMessage = (analysis as any).errorMessage;
+
+      if (status === 'pending' || status === 'processing') {
+        return res.json({
+          jobId,
+          status,
+          message: status === 'pending' ? 'Analysis queued' : 'Analysis in progress'
+        });
+      }
+
+      if (status === 'failed') {
+        return res.json({
+          jobId,
+          status: 'failed',
+          error: errorMessage || 'Analysis failed'
+        });
+      }
+
+      // Status is 'completed' - return full results
+      const getFirstTip = (improvements: string | null): string => {
         if (!improvements) return "";
         const lines = improvements.split('\n').filter((l: string) => l.trim());
         for (const line of lines) {
@@ -488,56 +574,26 @@ export async function registerRoutes(
         return improvements.substring(0, 200);
       };
 
-      const firstTip = getFirstTip(analysis.improvements || "");
-      
-      // Create teaser content (truncated for blur effect)
-      const createTeaser = (content: string, maxLines: number = 3): string => {
-        if (!content) return "";
-        const lines = content.split('\n').filter((l: string) => l.trim()).slice(0, maxLines);
-        return lines.join('\n');
-      };
+      const firstTip = getFirstTip(analysis.improvements);
 
-      if (!isPaidUser) {
-        res.json({ 
-          analysis: {
-            id: savedAnalysis?.id || null,
-            platform,
-            overallScore: analysis.overallScore,
-            firstTip,
-            bioTeaser: createTeaser(analysis.bioSuggestions, 3),
-            photoTeaser: createTeaser(analysis.photoFeedback, 3),
-            improvementsTeaser: createTeaser(analysis.improvements, 4),
-          },
-          parsed: {
-            overallScore: analysis.overallScore,
-            firstTip,
-            bioSuggestions: createTeaser(analysis.bioSuggestions, 3),
-            photoFeedback: createTeaser(analysis.photoFeedback, 3),
-            improvements: createTeaser(analysis.improvements, 4),
-          },
-          isPaidUser: false,
-        });
-        return;
-      }
-
-      res.json({ 
-        analysis: savedAnalysis,
-        parsed: {
-          ...analysis,
+      res.json({
+        jobId,
+        status: 'completed',
+        analysis: {
+          id: analysis.id,
+          platform: analysis.platform,
+          overallScore: analysis.overallScore,
+          bioSuggestions: analysis.bioSuggestions,
+          photoFeedback: analysis.photoFeedback,
+          improvements: analysis.improvements,
           firstTip,
         },
-        isPaidUser: true,
+        isPaidUser: true
       });
     } catch (error: any) {
-      console.error("Profile analysis error:", {
-        message: error?.message,
-        code: error?.code,
-        status: error?.status,
-        type: error?.type,
-        stack: error?.stack?.slice(0, 500)
-      });
+      console.error("Analysis status check error:", error?.message);
       res.status(500).json({ 
-        error: "Failed to analyze profile",
+        error: "Failed to check analysis status",
         details: error?.message || "Unknown error"
       });
     }
