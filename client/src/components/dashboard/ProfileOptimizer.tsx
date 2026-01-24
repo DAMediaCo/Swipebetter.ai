@@ -30,7 +30,7 @@ const intents = ["Relationship", "Casual Dating", "Friendship", "Not Sure"];
 
 export function ProfileOptimizer() {
   const { data: subscriptionData } = useSubscription();
-  const { planTier, credits, hasUnlimitedAccess } = useCredits();
+  const { planTier, credits, hasUnlimitedAccess, isLoading: creditsLoading } = useCredits();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -94,7 +94,7 @@ export function ProfileOptimizer() {
 
   return (
     <div className="space-y-6">
-      {!canGenerate && (
+      {!creditsLoading && !canGenerate && (
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-primary" />

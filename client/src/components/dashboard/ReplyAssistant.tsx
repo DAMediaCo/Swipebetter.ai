@@ -50,7 +50,7 @@ const goalOptions = [
 ];
 
 export function ReplyAssistant() {
-  const { planTier, credits, hasUnlimitedAccess, refreshCredits } = useCredits();
+  const { planTier, credits, hasUnlimitedAccess, refreshCredits, isLoading: creditsLoading } = useCredits();
   const checkAccessMutation = useCheckReplyAccess();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -182,7 +182,7 @@ export function ReplyAssistant() {
 
   return (
     <div className="space-y-6">
-      {!canGenerate && (
+      {!creditsLoading && !canGenerate && (
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-primary" />

@@ -53,7 +53,7 @@ const heroTones = [
 
 export default function ReplyFix() {
   const { data: authData, isLoading: authLoading } = useAuth();
-  const { credits, hasUnlimitedAccess, refreshCredits } = useCredits();
+  const { credits, hasUnlimitedAccess, refreshCredits, isLoading: creditsLoading, planTier } = useCredits();
   const checkAccessMutation = useCheckReplyAccess();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -347,7 +347,7 @@ export default function ReplyFix() {
           <TrustBar />
         </div>
 
-        {!canGenerate && (
+        {!creditsLoading && !canGenerate && (
           <Card className="mb-6 border-primary/50 bg-primary/5">
             <CardContent className="py-4 flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-primary" />
