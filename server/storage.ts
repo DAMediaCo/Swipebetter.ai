@@ -519,8 +519,15 @@ export class DatabaseStorage implements IStorage {
 
   async isSuperUser(userId: string): Promise<boolean> {
     const sub = await this.getUserSubscription(userId);
-    if (!sub) return false;
-    return (sub as any).isSuperUser === true;
+    if (!sub) {
+      console.log(`[isSuperUser] No subscription found for user ${userId}`);
+      return false;
+    }
+    // Handle boolean in various formats (true, 't', 1, 'true')
+    const superUserValue = (sub as any).isSuperUser;
+    const result = superUserValue === true || superUserValue === 't' || superUserValue === 1 || superUserValue === 'true';
+    console.log(`[isSuperUser] User ${userId}: raw value=${superUserValue}, type=${typeof superUserValue}, result=${result}`);
+    return result;
   }
 
   async setSuperUser(userId: string, isSuperUser: boolean): Promise<void> {
