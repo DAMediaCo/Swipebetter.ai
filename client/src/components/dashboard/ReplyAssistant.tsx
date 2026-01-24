@@ -67,7 +67,7 @@ export function ReplyAssistant() {
   const isSubscribedViaSubscription = subscriptionData?.subscription?.status === "active";
   const isPaidViaSubscription = subscriptionData?.isPaidUser;
   const canGenerate = hasUnlimitedAccess || isSubscribedViaSubscription || isPaidViaSubscription || credits > 0;
-  const isLoadingAccess = creditsLoading && subscriptionLoading;
+  const isLoadingAccess = creditsLoading || subscriptionLoading;
 
   const ocrMutation = useMutation({
     mutationFn: async (screenshot: string) => {

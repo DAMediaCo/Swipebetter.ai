@@ -64,7 +64,7 @@ export default function ReplyFix() {
   const isSubscribedViaSubscription = subscriptionData?.subscription?.status === "active";
   const isPaidViaSubscription = subscriptionData?.isPaidUser;
   const canGenerate = hasUnlimitedAccess || isSubscribedViaSubscription || isPaidViaSubscription || credits > 0;
-  const isLoadingAccess = creditsLoading && subscriptionLoading;
+  const isLoadingAccess = creditsLoading || subscriptionLoading;
 
   useEffect(() => {
     document.title = "Fix Your Reply | SwipeBetter";

@@ -45,7 +45,8 @@ export function ProfileOptimizer() {
   const isSubscribedViaSubscription = subscriptionData?.subscription?.status === "active";
   const isPaidViaSubscription = subscriptionData?.isPaidUser;
   const canGenerate = hasUnlimitedAccess || isSubscribedViaSubscription || isPaidViaSubscription || credits > 0;
-  const isLoadingAccess = creditsLoading && subscriptionLoading;
+  // Use OR - show loading if either query is still loading
+  const isLoadingAccess = creditsLoading || subscriptionLoading;
 
   useEffect(() => {
     if (images.length > 0 && analyzeButtonRef.current) {
