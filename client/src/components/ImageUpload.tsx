@@ -138,8 +138,47 @@ export function ImageUpload({ images, onChange, maxImages = 10 }: ImageUploadPro
 
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
+    const img = new Image();
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
+    
+    reader.onload = (e) => {
+      img.onload = () => {
+        // Compress and resize image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        // Max dimension 800px (smaller for faster uploads)
+        const maxDim = 800;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > height) {
+          if (width > maxDim) {
+            height = (height * maxDim) / width;
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = (width * maxDim) / height;
+            height = maxDim;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Compress to JPEG at 40% quality
+        const compressed = canvas.toDataURL('image/jpeg', 0.4);
+        resolve(compressed);
+      };
+      img.onerror = reject;
+      img.src = e.target?.result as string;
+    };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
