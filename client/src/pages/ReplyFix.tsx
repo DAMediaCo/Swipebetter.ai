@@ -11,7 +11,7 @@ import { PrivacyFAQ } from "@/components/PrivacyFAQ";
 import { ConvoDemo } from "@/components/ConvoDemo";
 import { ExampleReplies } from "@/components/ExampleReplies";
 import { HowItWorks } from "@/components/HowItWorks";
-import { useAuth, useCredits, useCheckReplyAccess } from "@/lib/auth";
+import { useAuth, useCredits, useCheckReplyAccess, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
@@ -54,11 +54,17 @@ const heroTones = [
 export default function ReplyFix() {
   const { data: authData, isLoading: authLoading } = useAuth();
   const { credits, hasUnlimitedAccess, refreshCredits, isLoading: creditsLoading, planTier } = useCredits();
+  const { data: subscriptionData, isLoading: subscriptionLoading } = useSubscription();
   const checkAccessMutation = useCheckReplyAccess();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const user = authData?.user;
-  const canGenerate = hasUnlimitedAccess || credits > 0;
+  
+  // Check for pro access using multiple sources for robustness
+  const isSubscribedViaSubscription = subscriptionData?.subscription?.status === "active";
+  const isPaidViaSubscription = subscriptionData?.isPaidUser;
+  const canGenerate = hasUnlimitedAccess || isSubscribedViaSubscription || isPaidViaSubscription || credits > 0;
+  const isLoadingAccess = creditsLoading && subscriptionLoading;
 
   useEffect(() => {
     document.title = "Fix Your Reply | SwipeBetter";
@@ -347,7 +353,7 @@ export default function ReplyFix() {
           <TrustBar />
         </div>
 
-        {!creditsLoading && !canGenerate && (
+        {!isLoadingAccess && !canGenerate && (
           <Card className="mb-6 border-primary/50 bg-primary/5">
             <CardContent className="py-4 flex items-center gap-3">
               <Sparkles className="w-5 h-5 text-primary" />

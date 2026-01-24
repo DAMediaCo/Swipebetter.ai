@@ -29,7 +29,7 @@ const genders = ["Man", "Woman", "Non-binary"];
 const intents = ["Relationship", "Casual Dating", "Friendship", "Not Sure"];
 
 export function ProfileOptimizer() {
-  const { data: subscriptionData } = useSubscription();
+  const { data: subscriptionData, isLoading: subscriptionLoading } = useSubscription();
   const { planTier, credits, hasUnlimitedAccess, isLoading: creditsLoading } = useCredits();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -41,7 +41,11 @@ export function ProfileOptimizer() {
   const [images, setImages] = useState<string[]>([]);
   const analyzeButtonRef = useRef<HTMLDivElement>(null);
   
-  const canGenerate = hasUnlimitedAccess || credits > 0;
+  // Check for pro access using multiple sources for robustness
+  const isSubscribedViaSubscription = subscriptionData?.subscription?.status === "active";
+  const isPaidViaSubscription = subscriptionData?.isPaidUser;
+  const canGenerate = hasUnlimitedAccess || isSubscribedViaSubscription || isPaidViaSubscription || credits > 0;
+  const isLoadingAccess = creditsLoading && subscriptionLoading;
 
   useEffect(() => {
     if (images.length > 0 && analyzeButtonRef.current) {
@@ -94,7 +98,7 @@ export function ProfileOptimizer() {
 
   return (
     <div className="space-y-6">
-      {!creditsLoading && !canGenerate && (
+      {!isLoadingAccess && !canGenerate && (
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-primary" />

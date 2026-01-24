@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useCredits, useCheckReplyAccess } from "@/lib/auth";
+import { useCredits, useCheckReplyAccess, useSubscription } from "@/lib/auth";
 import { apiRequest } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
@@ -51,6 +51,7 @@ const goalOptions = [
 
 export function ReplyAssistant() {
   const { planTier, credits, hasUnlimitedAccess, refreshCredits, isLoading: creditsLoading } = useCredits();
+  const { data: subscriptionData, isLoading: subscriptionLoading } = useSubscription();
   const checkAccessMutation = useCheckReplyAccess();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -62,7 +63,11 @@ export function ReplyAssistant() {
   const [isEnm, setIsEnm] = useState(false);
   const [uploadedScreenshot, setUploadedScreenshot] = useState<string | null>(null);
   
-  const canGenerate = hasUnlimitedAccess || credits > 0;
+  // Check for pro access using multiple sources for robustness
+  const isSubscribedViaSubscription = subscriptionData?.subscription?.status === "active";
+  const isPaidViaSubscription = subscriptionData?.isPaidUser;
+  const canGenerate = hasUnlimitedAccess || isSubscribedViaSubscription || isPaidViaSubscription || credits > 0;
+  const isLoadingAccess = creditsLoading && subscriptionLoading;
 
   const ocrMutation = useMutation({
     mutationFn: async (screenshot: string) => {
@@ -182,7 +187,7 @@ export function ReplyAssistant() {
 
   return (
     <div className="space-y-6">
-      {!creditsLoading && !canGenerate && (
+      {!isLoadingAccess && !canGenerate && (
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="py-4 flex items-center gap-3">
             <Sparkles className="w-5 h-5 text-primary" />

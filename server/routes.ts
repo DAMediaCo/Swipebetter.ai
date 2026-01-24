@@ -273,12 +273,14 @@ export async function registerRoutes(
       const userId = req.session.userId;
       const planTier = await storage.getPlanTier(userId);
       const credits = await storage.getCredits(userId);
-      const unlockedReports = await storage.getUnlockedReports(userId);
+      const reportsUnlocked = await storage.getUnlockedReports(userId);
+
+      console.log(`[credits] User ${userId}: planTier=${planTier}, credits=${credits}`);
 
       res.json({
         planTier,
         credits,
-        unlockedReports,
+        reportsUnlocked,
         isUnlimited: planTier === 'unlimited'
       });
     } catch (error) {

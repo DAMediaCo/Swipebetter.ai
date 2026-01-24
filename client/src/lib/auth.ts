@@ -156,8 +156,14 @@ export function useCredits() {
     await queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
   };
 
+  // isLoading is true only during initial load with no cached data
+  // isPending is true when query is fetching (including refetches)
+  // We consider it "loading" if we don't have data yet
+  const isLoading = query.isLoading || query.isPending || !query.data;
+
   return {
     ...query,
+    isLoading,
     planTier: query.data?.planTier ?? 'free',
     credits: query.data?.credits ?? 0,
     reportsUnlocked: query.data?.reportsUnlocked ?? [],
