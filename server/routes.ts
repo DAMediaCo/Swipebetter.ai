@@ -343,12 +343,12 @@ export async function registerRoutes(
       
       Analyze their profile screenshots and provide:
       1. An overall score from 1-100
-      2. Specific bio suggestions (3-5 alternatives)
-      3. Photo feedback (what works, what to change)
-      4. Top 3 improvements to make
+      2. THREE complete, ready-to-use bio alternatives (not advice - write the actual bios they can copy/paste)
+      3. Photo feedback (what works, what to change for each photo)
+      4. Top 3 specific improvements to make
       
       Be constructive, specific, and actionable. Format your response as JSON with keys:
-      overallScore (number), bioSuggestions (string with suggestions), photoFeedback (string), improvements (string with numbered list).`;
+      overallScore (number), bioSuggestions (JSON array of 3 complete bio strings they can use directly), photoFeedback (string), improvements (JSON array of 3 improvement strings).`;
 
       // Compress all images aggressively
       console.log(`[analyze-job:${jobId}] Compressing ${screenshots.length} images (500px, 45% quality)...`);
@@ -421,7 +421,7 @@ export async function registerRoutes(
         const synthesisResponse = await grok.chat.completions.create({
           model: "grok-3-mini-beta",
           messages: [
-            { role: "system", content: `You are a dating profile expert. Based on the photo-by-photo feedback below, provide a comprehensive profile analysis. Format as JSON with: overallScore (1-100), bioSuggestions (string), photoFeedback (combined summary), improvements (numbered list of top 3 improvements).` },
+            { role: "system", content: `You are a dating profile expert. Based on the photo-by-photo feedback below, provide a comprehensive profile analysis. Format as JSON with: overallScore (1-100), bioSuggestions (JSON array of 3 complete ready-to-use bio strings they can copy/paste directly), photoFeedback (combined summary string), improvements (JSON array of 3 specific improvement strings).` },
             { role: "user", content: `This is a ${platform} profile for a ${gender} looking for ${intent}.${enm ? ' ENM/Poly profile.' : ''}\n\nPhoto feedback:\n${combinedFeedback}\n\nProvide the final analysis.` }
           ],
           response_format: { type: "json_object" },
