@@ -123,3 +123,25 @@ export const insertPromoCodeSchema = createInsertSchema(promoCodes).omit({
 export type PromoCode = typeof promoCodes.$inferSelect;
 export type InsertPromoCode = z.infer<typeof insertPromoCodeSchema>;
 export type PromoRedemption = typeof promoRedemptions.$inferSelect;
+
+export const archetypePages = pgTable("archetype_pages", {
+  id: serial("id").primaryKey(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  archetypeId: varchar("archetype_id", { length: 50 }).notNull(),
+  archetypeName: varchar("archetype_name", { length: 100 }).notNull(),
+  archetypeDescription: text("archetype_description").notNull(),
+  datingApp: varchar("dating_app", { length: 50 }).notNull(),
+  metaTitle: varchar("meta_title", { length: 200 }).notNull(),
+  metaDescription: text("meta_description").notNull(),
+  examples: text("examples").notNull(),
+  relatedPages: text("related_pages").notNull(),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertArchetypePageSchema = createInsertSchema(archetypePages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ArchetypePage = typeof archetypePages.$inferSelect;
+export type InsertArchetypePage = z.infer<typeof insertArchetypePageSchema>;
