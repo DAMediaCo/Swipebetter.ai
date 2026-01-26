@@ -1,0 +1,54 @@
+{
+  "slug": "fitness-feeld-bios",
+  "archetype": {
+    "id": "fitness",
+    "name": "The Fitness Enthusiast",
+    "emoji": "",
+    "description": "Health-conscious individuals who prioritize physical wellness"
+  },
+  "app": "Feeld",
+  "meta": {
+    "title": "Top 10 The Fitness Enthusiast Dating Bios for Feeld | SwipeBetter.ai",
+    "description": "Get the best the fitness enthusiast bio examples for Feeld. AI-crafted dating bios that actually get matches. Health-conscious individuals who prioritize physical wellness."
+  },
+  "examples": [
+    {
+      "bio": "Current PRs: Run - a 7-minute mile. Current dating goals: Someone who drive and doesn't judge my protein shakes.",
+      "whyItWorks": "Filters for compatible lifestyles"
+    },
+    {
+      "bio": "Looking for a running partner or someone to stretch with after. Both equally important.",
+      "whyItWorks": "Demonstrates self-improvement mindset"
+    },
+    {
+      "bio": "I meal prep on Sundays and never skip leg day. But I also believe in balance - pizza is a food group.",
+      "whyItWorks": "Physical fitness signals health and vitality"
+    },
+    {
+      "bio": "Yes, I wake up at 5am to work out. No, I won't make you join me. Unless you want to.",
+      "whyItWorks": "Balance between commitment and humor makes it approachable"
+    },
+    {
+      "bio": "I take my health seriously but not myself. Will flex for you if asked nicely.",
+      "whyItWorks": "Shows discipline and dedication - transferable relationship qualities"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "fitness-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "fitness-bumble-bios",
+      "app": "Bumble"
+    },
+    {
+      "slug": "fitness-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "fitness-okcupid-bios",
+      "app": "OkCupid"
+    }
+  ]
+}

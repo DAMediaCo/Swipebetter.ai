@@ -1,0 +1,54 @@
+{
+  "slug": "professional-tinder-bios",
+  "archetype": {
+    "id": "professional",
+    "name": "The Professional",
+    "emoji": "",
+    "description": "Ambitious career-focused individuals who know what they want"
+  },
+  "app": "Tinder",
+  "meta": {
+    "title": "Top 10 The Professional Dating Bios for Tinder | SwipeBetter.ai",
+    "description": "Get the best the professional bio examples for Tinder. AI-crafted dating bios that actually get matches. Ambitious career-focused individuals who know what they want."
+  },
+  "examples": [
+    {
+      "bio": "Work-life balance is my love language. Solving problems during the week, hiking on weekends. Join me?",
+      "whyItWorks": "Balance of professional ambition with personal interests is attractive"
+    },
+    {
+      "bio": "Marketing Director by day, reading enthusiast by night. Looking for someone who matches my energy and supports my goals.",
+      "whyItWorks": "Shows stability and maturity - signals long-term potential"
+    },
+    {
+      "bio": "Yes, I actually love my job. Tech professional who believes you can have it all - career, love, and photography.",
+      "whyItWorks": "Direct about intentions, which saves everyone's time"
+    },
+    {
+      "bio": "My calendar is full but I'll make room for the right person. Currently obsessed with evolutionary biology and my morning routine.",
+      "whyItWorks": "Demonstrates they have their own life and aren't looking for completion"
+    },
+    {
+      "bio": "Building my empire one idea at a time. I work hard but I know how to unwind. Let's grab craft beer and talk dreams.",
+      "whyItWorks": "Confidence without arrogance - appealing to mature daters"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "professional-bumble-bios",
+      "app": "Bumble"
+    },
+    {
+      "slug": "professional-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "professional-okcupid-bios",
+      "app": "OkCupid"
+    },
+    {
+      "slug": "professional-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

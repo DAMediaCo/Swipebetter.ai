@@ -1,0 +1,54 @@
+{
+  "slug": "adventurer-okcupid-bios",
+  "archetype": {
+    "id": "adventurer",
+    "name": "The Adventurer",
+    "emoji": "",
+    "description": "Thrill-seekers who live for experiences and spontaneous adventures"
+  },
+  "app": "OkCupid",
+  "meta": {
+    "title": "Top 10 The Adventurer Dating Bios for OkCupid | SwipeBetter.ai",
+    "description": "Get the best the adventurer bio examples for OkCupid. AI-crafted dating bios that actually get matches. Thrill-seekers who live for experiences and spontaneous adventures."
+  },
+  "examples": [
+    {
+      "bio": "Life's too short for boring weekends. Currently planning my next Iceland trip. Looking for someone who says 'yes' first and asks questions later.",
+      "whyItWorks": "Invites the reader into the adventure, making them imagine experiences together"
+    },
+    {
+      "bio": "Weekend forecast: surfing with a chance of spontaneous road trips. Warning: I might convince you to go skydiving.",
+      "whyItWorks": "Creates excitement and suggests an active, fulfilling lifestyle"
+    },
+    {
+      "bio": "Looking for a co-pilot for life's adventures. Must be okay with packing light and spontaneous 'let's just go' moments.",
+      "whyItWorks": "Filters for compatible matches who also value experiences"
+    },
+    {
+      "bio": "Passport stamps > material things. scuba diving enthusiast who believes the best stories start with 'So there I was...'",
+      "whyItWorks": "Demonstrates passion and enthusiasm without being boastful"
+    },
+    {
+      "bio": "23 countries and counting. Next stop: wherever you want to go. I bring the snacks and killer playlist.",
+      "whyItWorks": "Shows confidence and decisiveness - attractive qualities"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "adventurer-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "adventurer-bumble-bios",
+      "app": "Bumble"
+    },
+    {
+      "slug": "adventurer-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "adventurer-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

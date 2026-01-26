@@ -1,0 +1,54 @@
+{
+  "slug": "homebody-okcupid-bios",
+  "archetype": {
+    "id": "homebody",
+    "name": "The Cozy Homebody",
+    "emoji": "",
+    "description": "Comfort-seekers who treasure quality time at home"
+  },
+  "app": "OkCupid",
+  "meta": {
+    "title": "Top 10 The Cozy Homebody Dating Bios for OkCupid | SwipeBetter.ai",
+    "description": "Get the best the cozy homebody bio examples for OkCupid. AI-crafted dating bios that actually get matches. Comfort-seekers who treasure quality time at home."
+  },
+  "examples": [
+    {
+      "bio": "My ideal weekend: napping, grilled cheese, and no pants required. Join me?",
+      "whyItWorks": "Authentically attracts compatible introverts"
+    },
+    {
+      "bio": "Let's be the old couple who stays in on Friday nights. We can start practicing now.",
+      "whyItWorks": "Cozy vibes feel safe and comforting"
+    },
+    {
+      "bio": "I have strong opinions about candle scents and I'm not ashamed. My couch has permanent butt imprints.",
+      "whyItWorks": "Shows comfort with themselves and their needs"
+    },
+    {
+      "bio": "Introvert looking for another introvert to cancel plans with. Let's stay home and camping together.",
+      "whyItWorks": "Honest about lifestyle expectations"
+    },
+    {
+      "bio": "Netflix and actually chill. Looking for someone who appreciates a quiet night in with board games.",
+      "whyItWorks": "Filters out high-maintenance matches"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "homebody-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "homebody-bumble-bios",
+      "app": "Bumble"
+    },
+    {
+      "slug": "homebody-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "homebody-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "slug": "foodie-bumble-bios",
+  "archetype": {
+    "id": "foodie",
+    "name": "The Foodie",
+    "emoji": "",
+    "description": "Culinary explorers who express love through food"
+  },
+  "app": "Bumble",
+  "meta": {
+    "title": "Top 10 The Foodie Dating Bios for Bumble | SwipeBetter.ai",
+    "description": "Get the best the foodie bio examples for Bumble. AI-crafted dating bios that actually get matches. Culinary explorers who express love through food."
+  },
+  "examples": [
+    {
+      "bio": "The way to my heart is through Mexican food. Currently obsessed with a hidden gem taco spot. Take me somewhere I haven't been.",
+      "whyItWorks": "Creates easy date ideas and conversation topics"
+    },
+    {
+      "bio": "I have a running list of 25 restaurants to try. Looking for a dining partner with adventurous taste buds.",
+      "whyItWorks": "Demonstrates appreciation for experiences and culture"
+    },
+    {
+      "bio": "My kitchen is the heart of my home. I make a mean the perfect steak and I'm working on perfecting my authentic pad thai.",
+      "whyItWorks": "Food is universal - everyone can relate"
+    },
+    {
+      "bio": "Looking for someone to share tapas with. I don't share dessert though - we'll order two.",
+      "whyItWorks": "Suggests they'll put effort into the relationship"
+    },
+    {
+      "bio": "I cook better than your ex and I'm not afraid to admit I have opinions about the best tacos in the city.",
+      "whyItWorks": "Shows nurturing qualities through cooking"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "foodie-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "foodie-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "foodie-okcupid-bios",
+      "app": "OkCupid"
+    },
+    {
+      "slug": "foodie-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

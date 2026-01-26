@@ -1,0 +1,54 @@
+{
+  "slug": "creative-feeld-bios",
+  "archetype": {
+    "id": "creative",
+    "name": "The Creative",
+    "emoji": "",
+    "description": "Artists and dreamers who see the world differently"
+  },
+  "app": "Feeld",
+  "meta": {
+    "title": "Top 10 The Creative Dating Bios for Feeld | SwipeBetter.ai",
+    "description": "Get the best the creative bio examples for Feeld. AI-crafted dating bios that actually get matches. Artists and dreamers who see the world differently."
+  },
+  "examples": [
+    {
+      "bio": "My apartment looks like a vintage thrift store painting exploded. I make art from trash and collect houseplants I forget to water. Let's create something together.",
+      "whyItWorks": "Shows depth and emotional intelligence"
+    },
+    {
+      "bio": "Normal is boring. I want someone who stays up too late thinking and doesn't mind that I packing light.",
+      "whyItWorks": "Unique and memorable - stands out from generic profiles"
+    },
+    {
+      "bio": "Filmmaker by passion, barista by necessity. Looking for someone who appreciates street art and late-night scuba diving.",
+      "whyItWorks": "Signals openness and creativity in relationships too"
+    },
+    {
+      "bio": "I process emotions through photography. Currently feeling inspired about pizza toppings. Looking for my muse.",
+      "whyItWorks": "Invites curiosity and questions from potential matches"
+    },
+    {
+      "bio": "Warning: I will photograph our food, sketch you while you sleep, and write songs about our arguments. Worth it?",
+      "whyItWorks": "Demonstrates passion and dedication to interests"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "creative-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "creative-bumble-bios",
+      "app": "Bumble"
+    },
+    {
+      "slug": "creative-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "creative-okcupid-bios",
+      "app": "OkCupid"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "slug": "funny-bumble-bios",
+  "archetype": {
+    "id": "funny",
+    "name": "The Funny One",
+    "emoji": "",
+    "description": "Life of the party who uses humor to connect and charm"
+  },
+  "app": "Bumble",
+  "meta": {
+    "title": "Top 10 The Funny One Dating Bios for Bumble | SwipeBetter.ai",
+    "description": "Get the best the funny one bio examples for Bumble. AI-crafted dating bios that actually get matches. Life of the party who uses humor to connect and charm."
+  },
+  "examples": [
+    {
+      "bio": "Pro: I'll make you laugh until you snort. Con: I might snort when I laugh. It's a package deal.",
+      "whyItWorks": "Demonstrates social intelligence and quick wit"
+    },
+    {
+      "bio": "I peaked in 7th grade when I caught a grape in my mouth from 20 feet. Been riding that high ever since. Looking for my biggest fan.",
+      "whyItWorks": "Shows personality immediately - no boring generic bios here"
+    },
+    {
+      "bio": "Warning: I will quote It's Always Sunny at least 18 times on our first date. Second date? We're at literally every scene.",
+      "whyItWorks": "Humor is universally attractive and memorable"
+    },
+    {
+      "bio": "My therapist says I use humor as a defense mechanism. I told her that's hilarious.",
+      "whyItWorks": "Creates a warm, approachable vibe that makes messaging feel low-pressure"
+    },
+    {
+      "bio": "Looking for someone to rate cereal. I promise I'm funnier in person. My texts are like movie trailers - they don't do it justice.",
+      "whyItWorks": "Self-deprecating jokes show confidence and humility"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "funny-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "funny-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "funny-okcupid-bios",
+      "app": "OkCupid"
+    },
+    {
+      "slug": "funny-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

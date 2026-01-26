@@ -1,0 +1,54 @@
+{
+  "slug": "fitness-hinge-bios",
+  "archetype": {
+    "id": "fitness",
+    "name": "The Fitness Enthusiast",
+    "emoji": "",
+    "description": "Health-conscious individuals who prioritize physical wellness"
+  },
+  "app": "Hinge",
+  "meta": {
+    "title": "Top 10 The Fitness Enthusiast Dating Bios for Hinge | SwipeBetter.ai",
+    "description": "Get the best the fitness enthusiast bio examples for Hinge. AI-crafted dating bios that actually get matches. Health-conscious individuals who prioritize physical wellness."
+  },
+  "examples": [
+    {
+      "bio": "Yes, I wake up at 5:30am to work out. No, I won't make you join me. Unless you want to.",
+      "whyItWorks": "Shows discipline and dedication - transferable relationship qualities"
+    },
+    {
+      "bio": "Swimming is my therapy. Looking for someone who can keep up or at least cheer from the sidelines.",
+      "whyItWorks": "Demonstrates self-improvement mindset"
+    },
+    {
+      "bio": "I take my health seriously but not myself. Will flex for you if asked nicely.",
+      "whyItWorks": "Filters for compatible lifestyles"
+    },
+    {
+      "bio": "Fitness journey > fitness destination. Let's grow together, in and out of the gym.",
+      "whyItWorks": "Balance between commitment and humor makes it approachable"
+    },
+    {
+      "bio": "Looking for a hiking partner or someone to stretch with after. Both equally important.",
+      "whyItWorks": "Physical fitness signals health and vitality"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "fitness-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "fitness-bumble-bios",
+      "app": "Bumble"
+    },
+    {
+      "slug": "fitness-okcupid-bios",
+      "app": "OkCupid"
+    },
+    {
+      "slug": "fitness-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

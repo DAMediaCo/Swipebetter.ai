@@ -1,0 +1,54 @@
+{
+  "slug": "romantic-bumble-bios",
+  "archetype": {
+    "id": "romantic",
+    "name": "The Hopeless Romantic",
+    "emoji": "",
+    "description": "Old souls who believe in love and grand gestures"
+  },
+  "app": "Bumble",
+  "meta": {
+    "title": "Top 10 The Hopeless Romantic Dating Bios for Bumble | SwipeBetter.ai",
+    "description": "Get the best the hopeless romantic bio examples for Bumble. AI-crafted dating bios that actually get matches. Old souls who believe in love and grand gestures."
+  },
+  "examples": [
+    {
+      "bio": "I'll plan surprise dates and remember how you take your coffee. Looking for someone who matches my energy.",
+      "whyItWorks": "Clear about relationship goals and expectations"
+    },
+    {
+      "bio": "Looking for my person. The one I can stargaze with and still feel butterflies years from now.",
+      "whyItWorks": "Appeals to others seeking serious relationships"
+    },
+    {
+      "bio": "Hopeless romantic in a hookup culture. I want the real thing - the slow dancing in the kitchen and the growing old together.",
+      "whyItWorks": "Demonstrates emotional availability and investment"
+    },
+    {
+      "bio": "Old soul looking for a love story. Not interested in games - let's be embarrassingly in love.",
+      "whyItWorks": "Romantic energy is magnetic and hopeful"
+    },
+    {
+      "bio": "Still believe in love at first sight. Looking for someone who wants to be swept off their feet.",
+      "whyItWorks": "Vulnerable and genuine - rare in dating app culture"
+    }
+  ],
+  "relatedPages": [
+    {
+      "slug": "romantic-tinder-bios",
+      "app": "Tinder"
+    },
+    {
+      "slug": "romantic-hinge-bios",
+      "app": "Hinge"
+    },
+    {
+      "slug": "romantic-okcupid-bios",
+      "app": "OkCupid"
+    },
+    {
+      "slug": "romantic-feeld-bios",
+      "app": "Feeld"
+    }
+  ]
+}

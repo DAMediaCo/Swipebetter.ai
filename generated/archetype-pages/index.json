@@ -1,0 +1,355 @@
+{
+  "generated_at": "2026-01-26T22:46:09.373Z",
+  "total_pages": 50,
+  "archetypes": [
+    {
+      "id": "adventurer",
+      "name": "The Adventurer"
+    },
+    {
+      "id": "intellectual",
+      "name": "The Intellectual"
+    },
+    {
+      "id": "funny",
+      "name": "The Funny One"
+    },
+    {
+      "id": "professional",
+      "name": "The Professional"
+    },
+    {
+      "id": "creative",
+      "name": "The Creative"
+    },
+    {
+      "id": "fitness",
+      "name": "The Fitness Enthusiast"
+    },
+    {
+      "id": "foodie",
+      "name": "The Foodie"
+    },
+    {
+      "id": "homebody",
+      "name": "The Cozy Homebody"
+    },
+    {
+      "id": "romantic",
+      "name": "The Hopeless Romantic"
+    },
+    {
+      "id": "mystery",
+      "name": "The Mysterious One"
+    }
+  ],
+  "apps": [
+    "Tinder",
+    "Bumble",
+    "Hinge",
+    "OkCupid",
+    "Feeld"
+  ],
+  "pages": [
+    {
+      "slug": "adventurer-tinder-bios",
+      "archetype": "The Adventurer",
+      "app": "Tinder",
+      "url": "/examples/adventurer-tinder-bios"
+    },
+    {
+      "slug": "adventurer-bumble-bios",
+      "archetype": "The Adventurer",
+      "app": "Bumble",
+      "url": "/examples/adventurer-bumble-bios"
+    },
+    {
+      "slug": "adventurer-hinge-bios",
+      "archetype": "The Adventurer",
+      "app": "Hinge",
+      "url": "/examples/adventurer-hinge-bios"
+    },
+    {
+      "slug": "adventurer-okcupid-bios",
+      "archetype": "The Adventurer",
+      "app": "OkCupid",
+      "url": "/examples/adventurer-okcupid-bios"
+    },
+    {
+      "slug": "adventurer-feeld-bios",
+      "archetype": "The Adventurer",
+      "app": "Feeld",
+      "url": "/examples/adventurer-feeld-bios"
+    },
+    {
+      "slug": "intellectual-tinder-bios",
+      "archetype": "The Intellectual",
+      "app": "Tinder",
+      "url": "/examples/intellectual-tinder-bios"
+    },
+    {
+      "slug": "intellectual-bumble-bios",
+      "archetype": "The Intellectual",
+      "app": "Bumble",
+      "url": "/examples/intellectual-bumble-bios"
+    },
+    {
+      "slug": "intellectual-hinge-bios",
+      "archetype": "The Intellectual",
+      "app": "Hinge",
+      "url": "/examples/intellectual-hinge-bios"
+    },
+    {
+      "slug": "intellectual-okcupid-bios",
+      "archetype": "The Intellectual",
+      "app": "OkCupid",
+      "url": "/examples/intellectual-okcupid-bios"
+    },
+    {
+      "slug": "intellectual-feeld-bios",
+      "archetype": "The Intellectual",
+      "app": "Feeld",
+      "url": "/examples/intellectual-feeld-bios"
+    },
+    {
+      "slug": "funny-tinder-bios",
+      "archetype": "The Funny One",
+      "app": "Tinder",
+      "url": "/examples/funny-tinder-bios"
+    },
+    {
+      "slug": "funny-bumble-bios",
+      "archetype": "The Funny One",
+      "app": "Bumble",
+      "url": "/examples/funny-bumble-bios"
+    },
+    {
+      "slug": "funny-hinge-bios",
+      "archetype": "The Funny One",
+      "app": "Hinge",
+      "url": "/examples/funny-hinge-bios"
+    },
+    {
+      "slug": "funny-okcupid-bios",
+      "archetype": "The Funny One",
+      "app": "OkCupid",
+      "url": "/examples/funny-okcupid-bios"
+    },
+    {
+      "slug": "funny-feeld-bios",
+      "archetype": "The Funny One",
+      "app": "Feeld",
+      "url": "/examples/funny-feeld-bios"
+    },
+    {
+      "slug": "professional-tinder-bios",
+      "archetype": "The Professional",
+      "app": "Tinder",
+      "url": "/examples/professional-tinder-bios"
+    },
+    {
+      "slug": "professional-bumble-bios",
+      "archetype": "The Professional",
+      "app": "Bumble",
+      "url": "/examples/professional-bumble-bios"
+    },
+    {
+      "slug": "professional-hinge-bios",
+      "archetype": "The Professional",
+      "app": "Hinge",
+      "url": "/examples/professional-hinge-bios"
+    },
+    {
+      "slug": "professional-okcupid-bios",
+      "archetype": "The Professional",
+      "app": "OkCupid",
+      "url": "/examples/professional-okcupid-bios"
+    },
+    {
+      "slug": "professional-feeld-bios",
+      "archetype": "The Professional",
+      "app": "Feeld",
+      "url": "/examples/professional-feeld-bios"
+    },
+    {
+      "slug": "creative-tinder-bios",
+      "archetype": "The Creative",
+      "app": "Tinder",
+      "url": "/examples/creative-tinder-bios"
+    },
+    {
+      "slug": "creative-bumble-bios",
+      "archetype": "The Creative",
+      "app": "Bumble",
+      "url": "/examples/creative-bumble-bios"
+    },
+    {
+      "slug": "creative-hinge-bios",
+      "archetype": "The Creative",
+      "app": "Hinge",
+      "url": "/examples/creative-hinge-bios"
+    },
+    {
+      "slug": "creative-okcupid-bios",
+      "archetype": "The Creative",
+      "app": "OkCupid",
+      "url": "/examples/creative-okcupid-bios"
+    },
+    {
+      "slug": "creative-feeld-bios",
+      "archetype": "The Creative",
+      "app": "Feeld",
+      "url": "/examples/creative-feeld-bios"
+    },
+    {
+      "slug": "fitness-tinder-bios",
+      "archetype": "The Fitness Enthusiast",
+      "app": "Tinder",
+      "url": "/examples/fitness-tinder-bios"
+    },
+    {
+      "slug": "fitness-bumble-bios",
+      "archetype": "The Fitness Enthusiast",
+      "app": "Bumble",
+      "url": "/examples/fitness-bumble-bios"
+    },
+    {
+      "slug": "fitness-hinge-bios",
+      "archetype": "The Fitness Enthusiast",
+      "app": "Hinge",
+      "url": "/examples/fitness-hinge-bios"
+    },
+    {
+      "slug": "fitness-okcupid-bios",
+      "archetype": "The Fitness Enthusiast",
+      "app": "OkCupid",
+      "url": "/examples/fitness-okcupid-bios"
+    },
+    {
+      "slug": "fitness-feeld-bios",
+      "archetype": "The Fitness Enthusiast",
+      "app": "Feeld",
+      "url": "/examples/fitness-feeld-bios"
+    },
+    {
+      "slug": "foodie-tinder-bios",
+      "archetype": "The Foodie",
+      "app": "Tinder",
+      "url": "/examples/foodie-tinder-bios"
+    },
+    {
+      "slug": "foodie-bumble-bios",
+      "archetype": "The Foodie",
+      "app": "Bumble",
+      "url": "/examples/foodie-bumble-bios"
+    },
+    {
+      "slug": "foodie-hinge-bios",
+      "archetype": "The Foodie",
+      "app": "Hinge",
+      "url": "/examples/foodie-hinge-bios"
+    },
+    {
+      "slug": "foodie-okcupid-bios",
+      "archetype": "The Foodie",
+      "app": "OkCupid",
+      "url": "/examples/foodie-okcupid-bios"
+    },
+    {
+      "slug": "foodie-feeld-bios",
+      "archetype": "The Foodie",
+      "app": "Feeld",
+      "url": "/examples/foodie-feeld-bios"
+    },
+    {
+      "slug": "homebody-tinder-bios",
+      "archetype": "The Cozy Homebody",
+      "app": "Tinder",
+      "url": "/examples/homebody-tinder-bios"
+    },
+    {
+      "slug": "homebody-bumble-bios",
+      "archetype": "The Cozy Homebody",
+      "app": "Bumble",
+      "url": "/examples/homebody-bumble-bios"
+    },
+    {
+      "slug": "homebody-hinge-bios",
+      "archetype": "The Cozy Homebody",
+      "app": "Hinge",
+      "url": "/examples/homebody-hinge-bios"
+    },
+    {
+      "slug": "homebody-okcupid-bios",
+      "archetype": "The Cozy Homebody",
+      "app": "OkCupid",
+      "url": "/examples/homebody-okcupid-bios"
+    },
+    {
+      "slug": "homebody-feeld-bios",
+      "archetype": "The Cozy Homebody",
+      "app": "Feeld",
+      "url": "/examples/homebody-feeld-bios"
+    },
+    {
+      "slug": "romantic-tinder-bios",
+      "archetype": "The Hopeless Romantic",
+      "app": "Tinder",
+      "url": "/examples/romantic-tinder-bios"
+    },
+    {
+      "slug": "romantic-bumble-bios",
+      "archetype": "The Hopeless Romantic",
+      "app": "Bumble",
+      "url": "/examples/romantic-bumble-bios"
+    },
+    {
+      "slug": "romantic-hinge-bios",
+      "archetype": "The Hopeless Romantic",
+      "app": "Hinge",
+      "url": "/examples/romantic-hinge-bios"
+    },
+    {
+      "slug": "romantic-okcupid-bios",
+      "archetype": "The Hopeless Romantic",
+      "app": "OkCupid",
+      "url": "/examples/romantic-okcupid-bios"
+    },
+    {
+      "slug": "romantic-feeld-bios",
+      "archetype": "The Hopeless Romantic",
+      "app": "Feeld",
+      "url": "/examples/romantic-feeld-bios"
+    },
+    {
+      "slug": "mystery-tinder-bios",
+      "archetype": "The Mysterious One",
+      "app": "Tinder",
+      "url": "/examples/mystery-tinder-bios"
+    },
+    {
+      "slug": "mystery-bumble-bios",
+      "archetype": "The Mysterious One",
+      "app": "Bumble",
+      "url": "/examples/mystery-bumble-bios"
+    },
+    {
+      "slug": "mystery-hinge-bios",
+      "archetype": "The Mysterious One",
+      "app": "Hinge",
+      "url": "/examples/mystery-hinge-bios"
+    },
+    {
+      "slug": "mystery-okcupid-bios",
+      "archetype": "The Mysterious One",
+      "app": "OkCupid",
+      "url": "/examples/mystery-okcupid-bios"
+    },
+    {
+      "slug": "mystery-feeld-bios",
+      "archetype": "The Mysterious One",
+      "app": "Feeld",
+      "url": "/examples/mystery-feeld-bios"
+    }
+  ]
+}
