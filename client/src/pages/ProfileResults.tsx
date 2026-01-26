@@ -34,7 +34,6 @@ interface ProfileAnalysisData {
 
 // Helper function to extract the first improvement tip
 function getFirstTip(improvements: string | string[]): string {
-  // Check if improvements is empty or is the old placeholder text
   if (!improvements) return "";
   
   const isPlaceholder = (text: string): boolean => {
@@ -43,6 +42,7 @@ function getFirstTip(improvements: string | string[]): string {
            text.includes("Upgrade to see");
   };
   
+  // If it's already an array, use the first item
   if (Array.isArray(improvements) && improvements.length > 0) {
     const first = improvements[0];
     if (!isPlaceholder(first)) return first;
@@ -52,6 +52,20 @@ function getFirstTip(improvements: string | string[]): string {
   if (typeof improvements === 'string') {
     if (isPlaceholder(improvements)) return "";
     
+    // Try parsing as JSON array first
+    try {
+      const parsed = JSON.parse(improvements);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const first = parsed[0];
+        if (typeof first === 'string' && !isPlaceholder(first)) {
+          return first;
+        }
+      }
+    } catch {
+      // Not JSON, try line-by-line parsing
+    }
+    
+    // Fall back to line-by-line parsing for plain text
     const lines = improvements.split('\n').filter(line => line.trim());
     for (const line of lines) {
       if (isPlaceholder(line)) continue;
