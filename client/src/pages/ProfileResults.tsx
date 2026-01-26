@@ -191,6 +191,11 @@ export default function ProfileResults() {
 
   useEffect(() => {
     const data = loadAnalysis<ProfileAnalysisData>('profile');
+    console.log('[ProfileResults] Loaded analysis data:', { 
+      hasData: !!data, 
+      isFreeAnalysis: data?.isFreeAnalysis,
+      keys: data ? Object.keys(data) : []
+    });
     if (!data) {
       setLocation('/fix-profile');
       return;
