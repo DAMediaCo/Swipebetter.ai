@@ -4,6 +4,7 @@ export interface SoftwareApplicationJsonLdProps {
   url: string;
   applicationCategory?: 'BusinessApplication' | 'LifestyleApplication' | 'SocialNetworkingApplication';
   operatingSystem?: string;
+  softwareVersion?: string;
   featureList?: string[];
   screenshot?: string;
   isFree?: boolean;
@@ -22,6 +23,7 @@ export function generateSoftwareApplicationJsonLd(props: SoftwareApplicationJson
     url,
     applicationCategory = 'LifestyleApplication',
     operatingSystem = 'Web, iOS, Android',
+    softwareVersion = '1.0.0',
     featureList = [],
     screenshot,
     isFree = true,
@@ -38,6 +40,7 @@ export function generateSoftwareApplicationJsonLd(props: SoftwareApplicationJson
     url,
     applicationCategory,
     operatingSystem,
+    softwareVersion,
     offers: {
       '@type': 'Offer',
       price: isFree ? '0' : price,
