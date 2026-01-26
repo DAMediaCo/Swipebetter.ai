@@ -611,6 +611,17 @@ export async function registerRoutes(
       // Status is 'completed' - return full results
       const getFirstTip = (improvements: string | null): string => {
         if (!improvements) return "";
+        
+        // Try parsing as JSON array first
+        try {
+          const parsed = JSON.parse(improvements);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed[0];
+          }
+        } catch {
+          // Not JSON, try line-by-line parsing
+        }
+        
         const lines = improvements.split('\n').filter((l: string) => l.trim());
         for (const line of lines) {
           const match = line.match(/^\d+\.\s*(.+)/);
