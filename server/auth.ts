@@ -33,6 +33,10 @@ export function setupSession(app: Express) {
   });
 
   app.set("trust proxy", 1);
+  
+  // Replit always uses HTTPS, so secure should be true in both dev and prod
+  const isSecure = process.env.NODE_ENV === "production" || !!process.env.REPL_ID;
+  
   app.use(
     session({
       secret: process.env.SESSION_SECRET!,
@@ -41,7 +45,7 @@ export function setupSession(app: Express) {
       saveUninitialized: false,
       cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isSecure,
         sameSite: "lax",
         maxAge: sessionTtl,
       },

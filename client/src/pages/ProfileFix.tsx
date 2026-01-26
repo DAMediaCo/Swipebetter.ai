@@ -10,7 +10,7 @@ import { ExampleResults } from "@/components/ExampleResults";
 import { HowItWorks } from "@/components/HowItWorks";
 import { ImageUpload } from "@/components/ImageUpload";
 import { useAuth, useSubscription } from "@/lib/auth";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import { saveAnalysis } from "@/lib/analysisStorage";
 import { trackAnalysisStarted } from "@/lib/analytics";
 import { Link, useLocation } from "wouter";
@@ -106,6 +106,7 @@ export default function ProfileFix() {
     },
     onSuccess: (data) => {
       saveAnalysis('profile', data);
+      queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
       setLocation('/fix-profile/results');
     },
     onError: (error: any) => {

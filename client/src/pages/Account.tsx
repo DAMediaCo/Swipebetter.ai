@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth, useSubscription, useEntitlement, useCustomerPortal, useLogout } from "@/lib/auth";
+import { useAuth, useSubscription, useCredits, useCustomerPortal, useLogout } from "@/lib/auth";
 import { 
   Crown,
   CreditCard,
@@ -19,7 +19,7 @@ export default function Account() {
   const [, setLocation] = useLocation();
   const { data: authData, isLoading: authLoading } = useAuth();
   const { data: subscriptionData, isLoading: subLoading } = useSubscription();
-  const { data: entitlementData } = useEntitlement();
+  const { data: creditsData } = useCredits();
   const portalMutation = useCustomerPortal();
   const logoutMutation = useLogout();
   const user = authData?.user;
@@ -53,7 +53,7 @@ export default function Account() {
   const subscription = subscriptionData?.subscription;
   const isSubscribed = subscription?.status === "active";
   const isPaidUser = subscriptionData?.isPaidUser;
-  const oneTimeCredits = entitlementData?.oneTimeCredits ?? 0;
+  const oneTimeCredits = creditsData?.credits ?? 0;
   const canManageBilling = isSubscribed && !!subscription?.stripeCustomerId;
 
   const formatDate = (dateString: string | null | undefined) => {
