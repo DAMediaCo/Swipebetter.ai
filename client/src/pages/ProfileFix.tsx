@@ -60,6 +60,28 @@ export default function ProfileFix() {
     setShowDashboard(true);
   };
 
+  const pollForResults = async (jobId: number, isFreeAnalysis: boolean): Promise<any> => {
+    const maxAttempts = 60;
+    const pollInterval = 2000;
+    
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const response = await fetch(`/api/analyze-profile/status/${jobId}`);
+      const data = await response.json();
+      
+      if (data.status === 'completed') {
+        return { ...data.analysis, isFreeAnalysis };
+      }
+      
+      if (data.status === 'failed') {
+        throw new Error(data.error || 'Analysis failed');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+    }
+    
+    throw new Error('Analysis timed out');
+  };
+
   const analyzeMutation = useMutation({
     mutationFn: async () => {
       trackAnalysisStarted("profile");
@@ -70,13 +92,21 @@ export default function ProfileFix() {
         screenshots: images,
         enm: isEnm,
       });
-      return response.json();
+      const data = await response.json();
+      
+      if (data.jobId) {
+        return await pollForResults(data.jobId, data.isFreeAnalysis);
+      }
+      
+      if (data.parsed) {
+        return data.parsed;
+      }
+      
+      throw new Error('Unexpected response format');
     },
     onSuccess: (data) => {
-      if (data.parsed) {
-        saveAnalysis('profile', data.parsed);
-        setLocation('/fix-profile/results');
-      }
+      saveAnalysis('profile', data);
+      setLocation('/fix-profile/results');
     },
     onError: (error: any) => {
       if (error.message?.includes("403")) {
@@ -88,7 +118,7 @@ export default function ProfileFix() {
       } else {
         toast({
           title: "Analysis failed",
-          description: "Please try again.",
+          description: error.message || "Please try again.",
           variant: "destructive",
         });
       }
