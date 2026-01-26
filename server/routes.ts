@@ -489,6 +489,7 @@ export async function registerRoutes(
   }
 
   // Submit analysis job - returns immediately with job ID
+  // Supports anonymous (free) analysis - shows basic score with details locked
   app.post("/api/analyze-profile", async (req: any, res) => {
     try {
       const parseResult = profileAnalysisSchema.safeParse(req.body);
@@ -501,32 +502,33 @@ export async function registerRoutes(
       const { platform, gender, intent, screenshots, enm } = parseResult.data;
       const userId = req.session?.userId || null;
 
-      // Must be logged in for async processing
-      if (!userId) {
-        return res.status(401).json({ error: "Please log in to analyze your profile" });
-      }
+      // For logged-in users, check credits (unless super user or unlimited)
+      let isFreeAnalysis = !userId;
+      let isSuperUser = false;
+      let isUnlimited = false;
 
-      // Check if user has access (unlimited or credits)
-      const subscription = await storage.getUserSubscription(userId);
-      const isSuperUser = await storage.isSuperUser(userId);
-      const planTier = await storage.getPlanTier(userId);
-      const credits = await storage.getCredits(userId);
-      const isUnlimited = planTier === 'unlimited' || isSuperUser;
-      const hasCredits = credits > 0;
+      if (userId) {
+        isSuperUser = await storage.isSuperUser(userId);
+        const planTier = await storage.getPlanTier(userId);
+        const credits = await storage.getCredits(userId);
+        isUnlimited = planTier === 'unlimited' || isSuperUser;
+        const hasCredits = credits > 0;
 
-      console.log(`[analyze-profile] Access check for user ${userId}: planTier=${planTier}, isSuperUser=${isSuperUser}, credits=${credits}, isUnlimited=${isUnlimited}`);
+        console.log(`[analyze-profile] Access check for user ${userId}: planTier=${planTier}, isSuperUser=${isSuperUser}, credits=${credits}, isUnlimited=${isUnlimited}`);
 
-      if (!isUnlimited && !hasCredits) {
-        return res.status(403).json({ 
-          error: "Credits required",
-          message: "You need credits to generate a new analysis. Visit /pricing to get credits."
-        });
-      }
+        // Free users with no credits get a free analysis (score only, details locked)
+        if (!isUnlimited && !hasCredits) {
+          isFreeAnalysis = true;
+          console.log(`[analyze-profile] User ${userId} has no credits, providing free analysis with locked details`);
+        }
 
-      // Deduct credit if not unlimited
-      if (!isUnlimited && hasCredits) {
-        await storage.deductCredit(userId);
-        console.log(`[analyze-profile] Deducted 1 credit from user ${userId}`);
+        // Deduct credit if not unlimited and not a free analysis
+        if (!isUnlimited && hasCredits && !isFreeAnalysis) {
+          await storage.deductCredit(userId);
+          console.log(`[analyze-profile] Deducted 1 credit from user ${userId}`);
+        }
+      } else {
+        console.log(`[analyze-profile] Anonymous user, providing free analysis with locked details`);
       }
 
       // Create pending job in database
@@ -540,7 +542,7 @@ export async function registerRoutes(
         enm: enm || false,
       });
 
-      console.log(`[analyze-profile] Created job ${savedAnalysis.id} for user ${userId}, starting background processing`);
+      console.log(`[analyze-profile] Created job ${savedAnalysis.id} for user ${userId || 'anonymous'}, isFreeAnalysis=${isFreeAnalysis}, starting background processing`);
 
       // Start background processing - don't await!
       processAnalysisJob(savedAnalysis.id, platform, gender, intent, screenshots, enm || false);
@@ -549,10 +551,13 @@ export async function registerRoutes(
       res.json({
         jobId: savedAnalysis.id,
         status: 'pending',
+        isFreeAnalysis,
         message: 'Analysis started. Poll /api/analyze-profile/status/:jobId for results.'
       });
 
-      await storage.updateLastActiveAt(userId);
+      if (userId) {
+        await storage.updateLastActiveAt(userId);
+      }
     } catch (error: any) {
       console.error("Profile analysis job creation error:", {
         message: error?.message,
@@ -565,8 +570,8 @@ export async function registerRoutes(
     }
   });
 
-  // Check analysis job status
-  app.get("/api/analyze-profile/status/:jobId", requireAuth, async (req: any, res) => {
+  // Check analysis job status - allows anonymous access for free analyses
+  app.get("/api/analyze-profile/status/:jobId", async (req: any, res) => {
     try {
       const jobId = parseInt(req.params.jobId);
       if (isNaN(jobId)) {
@@ -578,8 +583,9 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Analysis not found" });
       }
 
-      // Only allow owner to check status
-      if (analysis.userId !== req.session?.userId) {
+      // For analyses with a userId, verify ownership (unless anonymous)
+      const userId = req.session?.userId;
+      if (analysis.userId && analysis.userId !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
 
