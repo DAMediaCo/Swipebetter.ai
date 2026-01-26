@@ -735,7 +735,7 @@ function ResultCard({
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="text-foreground/90 leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-p:text-foreground/90 prose-ul:my-2 prose-li:my-0 prose-li:text-foreground/90 prose-strong:text-foreground">
+        <div className="text-foreground/90 leading-relaxed prose dark:prose-invert max-w-none prose-p:my-2 prose-p:text-foreground/90 prose-ul:my-2 prose-li:my-0 prose-li:text-foreground/90 prose-strong:text-foreground">
           <ReactMarkdown>{contentString}</ReactMarkdown>
         </div>
       </CardContent>
