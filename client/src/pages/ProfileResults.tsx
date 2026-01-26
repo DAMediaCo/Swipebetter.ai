@@ -30,6 +30,7 @@ interface ProfileAnalysisData {
   photoFeedback: string | string[];
   improvements: string | string[];
   firstTip?: string;
+  isFreeAnalysis?: boolean;
 }
 
 // Helper function to extract the first improvement tip
@@ -182,6 +183,11 @@ export default function ProfileResults() {
   const { toast } = useToast();
   
   const isLoggedIn = !!authData?.user;
+  
+  // If this analysis was a "free" one (no credits used), lock the details
+  // regardless of user's current subscription status
+  const isFreeAnalysis = result?.isFreeAnalysis === true;
+  const hasFullAccess = isPro && !isFreeAnalysis;
 
   useEffect(() => {
     const data = loadAnalysis<ProfileAnalysisData>('profile');
@@ -210,7 +216,7 @@ export default function ProfileResults() {
   }, []);
 
   const copyToClipboard = async (text: string | string[], field: string) => {
-    if (!isPro) return;
+    if (!hasFullAccess) return;
     const textString = Array.isArray(text) ? text.join('\n\n') : String(text || '');
     await navigator.clipboard.writeText(textString);
     setCopiedField(field);
@@ -218,7 +224,7 @@ export default function ProfileResults() {
   };
 
   const copyBio = async (bioText: string, index: number) => {
-    if (!isPro) return;
+    if (!hasFullAccess) return;
     await navigator.clipboard.writeText(bioText);
     setCopiedBioIndex(index);
     toast({
@@ -433,7 +439,7 @@ export default function ProfileResults() {
         </div>
 
         <div className="flex justify-center mb-6">
-          {isPro ? (
+          {hasFullAccess ? (
             <Badge variant="default" className="bg-primary/10 text-primary border-primary/20" data-testid="badge-full-access">
               <Check className="w-3 h-3 mr-1" />
               {planType === 'starter' ? 'Starter Fix' : planType === 'annual' ? 'Annual Member' : planType === 'monthly' ? 'Monthly Member' : 'Full Results Unlocked'}
@@ -499,7 +505,7 @@ export default function ProfileResults() {
             </CardContent>
           </Card>
 
-          {!isPro && (
+          {!hasFullAccess && (
             <>
               <Card>
                 <CardHeader className="pb-2">
@@ -564,7 +570,7 @@ export default function ProfileResults() {
             </>
           )}
 
-          {isPro && (
+          {hasFullAccess && (
             <>
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Bio Options</h3>
@@ -662,7 +668,7 @@ export default function ProfileResults() {
                 Analyze Another Profile
               </Button>
             </Link>
-            {isPro && proActive ? (
+            {hasFullAccess && proActive ? (
               <Button
                 variant="outline"
                 className="flex-1"
@@ -680,7 +686,7 @@ export default function ProfileResults() {
                   data-testid="button-upgrade"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  {isPro ? 'Upgrade' : 'Unlock Full Report'}
+                  {hasFullAccess ? 'Upgrade' : 'Unlock Full Report'}
                 </Button>
               </Link>
             )}
