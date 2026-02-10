@@ -17,6 +17,9 @@ const app = express();
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: false,
+  crossOriginOpenerPolicy: false,
+  frameguard: false,
 }));
 
 // CORS configuration - only allow known origins
@@ -28,10 +31,10 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin) || origin.endsWith('.replit.dev') || origin.endsWith('.replit.app')) {
+    if (allowedOrigins.includes(origin) || origin.endsWith('.replit.dev') || origin.endsWith('.replit.app') || origin.endsWith('.repl.co')) {
       return callback(null, true);
     }
-    callback(new Error("Not allowed by CORS"));
+    callback(null, false);
   },
   credentials: true,
 }));
