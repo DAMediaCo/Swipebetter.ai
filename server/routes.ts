@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { getUncachableStripeClient, getStripePublishableKey } from "./stripeClient";
 import { requireAuth, getCurrentUserId } from "./auth";
@@ -9,6 +10,22 @@ import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 import sharp from "sharp";
+
+const analysisLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many analysis requests, please wait a moment" },
+});
+
+const generalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please slow down" },
+});
 
 // Compress base64 image to reduce payload size for AI processing
 async function compressImage(base64DataUrl: string, maxWidth = 800, quality = 70): Promise<string> {
@@ -79,7 +96,14 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
-  // Note: /api/auth/user is now registered in server/auth.ts
+  app.use("/api/", generalLimiter);
+
+  const requireAdmin = (req: any, res: any, next: any) => {
+    if (!req.session.isAdmin) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    next();
+  };
 
   app.get("/api/me", requireAuth, async (req: any, res) => {
     const userId = req.session.userId;
@@ -306,7 +330,6 @@ export async function registerRoutes(
       const reportsUnlocked = await storage.getUnlockedReports(userId);
       const isSuperUser = await storage.isSuperUser(userId);
 
-      console.log(`[credits] User ${userId}: planTier=${planTier}, credits=${credits}, isSuperUser=${isSuperUser}`);
 
       res.json({
         planTier,
@@ -488,9 +511,7 @@ export async function registerRoutes(
     }
   }
 
-  // Submit analysis job - returns immediately with job ID
-  // Supports anonymous (free) analysis - shows basic score with details locked
-  app.post("/api/analyze-profile", async (req: any, res) => {
+  app.post("/api/analyze-profile", analysisLimiter, async (req: any, res) => {
     try {
       const parseResult = profileAnalysisSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -657,7 +678,7 @@ export async function registerRoutes(
   });
 
   // OCR endpoint to extract text from chat screenshots
-  app.post("/api/ocr", requireAuth, async (req: any, res) => {
+  app.post("/api/ocr", analysisLimiter, requireAuth, async (req: any, res) => {
     try {
       const parseResult = ocrSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -696,7 +717,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/analyze-reply", requireAuth, async (req: any, res) => {
+  app.post("/api/analyze-reply", analysisLimiter, requireAuth, async (req: any, res) => {
     try {
       const parseResult = replyAnalysisSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -1032,7 +1053,7 @@ export async function registerRoutes(
     res.json({ clientId });
   });
 
-  app.post("/api/stripe/sync", async (req, res) => {
+  app.post("/api/stripe/sync", requireAdmin, async (req, res) => {
     try {
       const { getStripeSync } = await import('./stripeClient');
       const stripeSync = await getStripeSync();
@@ -1044,8 +1065,7 @@ export async function registerRoutes(
     }
   });
 
-  // Debug endpoint to check actual Stripe prices
-  app.get("/api/stripe/debug-prices", async (req, res) => {
+  app.get("/api/stripe/debug-prices", requireAdmin, async (req, res) => {
     try {
       const stripe = await getUncachableStripeClient();
       const prices = await stripe.prices.list({ limit: 100 });
@@ -1285,13 +1305,6 @@ export async function registerRoutes(
       res.status(500).json({ error: "Failed to verify checkout" });
     }
   });
-
-  const requireAdmin = (req: any, res: any, next: any) => {
-    if (!req.session.isAdmin) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-    next();
-  };
 
   const adminLoginSchema = z.object({
     email: z.string().email(),

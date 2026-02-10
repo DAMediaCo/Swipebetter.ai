@@ -76,3 +76,13 @@ Preferred communication style: Simple, everyday language.
 - **Lucide React**: Icon library.
 - **React Hook Form + Zod**: Form handling and validation.
 - **Embla Carousel**: Image carousel.
+
+### Security
+- **Helmet**: Security headers (XSS, clickjacking, MIME sniffing protection).
+- **Rate Limiting**: Auth endpoints (15 req/15min), analysis/AI endpoints (5 req/min), general API (60 req/min), password reset (5 req/15min).
+- **CORS**: Strict origin allowlist for *.replit.dev and *.replit.app; unknown origins are rejected.
+- **Admin-only endpoints**: `/api/stripe/sync`, `/api/stripe/debug-prices` require admin session.
+- **Auth-protected endpoints**: All data-modifying and AI endpoints require authentication via `requireAuth` middleware.
+- **Input validation**: Zod schemas on all user-facing POST/PATCH endpoints.
+- **SQL injection prevention**: Drizzle ORM parameterized queries throughout.
+- **Sensitive log sanitization**: Auth, admin, and webhook response bodies excluded from access logs; debug token/credential logging removed.

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import crypto from "crypto";
+import rateLimit from "express-rate-limit";
 import { db } from "./db";
 import { users, signupSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, passwordResetTokens, type SafeUser } from "@shared/models/auth";
 import { userSubscriptions, promoCodes, promoRedemptions } from "@shared/models/swipebetter";
@@ -11,6 +12,22 @@ import { signToken } from "./jwt";
 import { OAuth2Client } from "google-auth-library";
 import appleSignin from "apple-signin-auth";
 import { sendPasswordResetEmail } from "./email";
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many attempts, please try again later" },
+});
+
+const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many password reset attempts, please try again later" },
+});
 
 declare module "express-session" {
   interface SessionData {
@@ -91,8 +108,7 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // Signup
-  app.post("/api/auth/signup", async (req, res) => {
+  app.post("/api/auth/signup", authLimiter, async (req, res) => {
     try {
       const parsed = signupSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -188,8 +204,7 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // Login
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", authLimiter, async (req, res) => {
     try {
       const parsed = loginSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -243,8 +258,7 @@ export function registerAuthRoutes(app: Express) {
     });
   });
 
-  // Sign in with Apple (for mobile app)
-  app.post("/api/auth/apple", async (req, res) => {
+  app.post("/api/auth/apple", authLimiter, async (req, res) => {
     try {
       const { identityToken, user: appleUser } = req.body;
       
@@ -252,7 +266,6 @@ export function registerAuthRoutes(app: Express) {
         return res.status(400).json({ message: "Missing identity token" });
       }
 
-      // Decode token to inspect claims before verification (for debugging)
       let decodedToken: { header?: unknown; payload?: { aud?: string; iss?: string; exp?: number; sub?: string } } = {};
       try {
         const parts = identityToken.split('.');
@@ -261,17 +274,9 @@ export function registerAuthRoutes(app: Express) {
             header: JSON.parse(Buffer.from(parts[0], 'base64').toString()),
             payload: JSON.parse(Buffer.from(parts[1], 'base64').toString()),
           };
-          console.log("Apple token claims:", {
-            aud: decodedToken.payload?.aud,
-            iss: decodedToken.payload?.iss,
-            exp: decodedToken.payload?.exp,
-            expDate: decodedToken.payload?.exp ? new Date(decodedToken.payload.exp * 1000).toISOString() : null,
-            now: new Date().toISOString(),
-            sub: decodedToken.payload?.sub?.substring(0, 10) + "...",
-          });
         }
       } catch (decodeErr) {
-        console.error("Failed to decode token for debugging:", decodeErr);
+        // Token decode failed
       }
 
       // Accept multiple valid audiences for Apple Sign In:
@@ -285,7 +290,6 @@ export function registerAuthRoutes(app: Express) {
         "app.replit.swipebetter",
       ].filter(Boolean) as string[];
       
-      console.log("Valid audiences configured:", validAudiences);
 
       let payload;
       try {
@@ -293,7 +297,6 @@ export function registerAuthRoutes(app: Express) {
           audience: validAudiences,
           ignoreExpiration: false,
         });
-        console.log("Apple token verified successfully for sub:", payload.sub?.substring(0, 10) + "...");
       } catch (verifyError: unknown) {
         const errorMessage = verifyError instanceof Error ? verifyError.message : String(verifyError);
         const tokenAud = decodedToken.payload?.aud;
@@ -323,7 +326,7 @@ export function registerAuthRoutes(app: Express) {
           specificError = "Invalid token issuer";
         }
         
-        return res.status(401).json({ message: specificError, debug: { tokenAud, isExpired } });
+        return res.status(401).json({ message: specificError });
       }
 
       const appleId = payload.sub;
@@ -528,8 +531,7 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // Sign in with Google (for mobile app)
-  app.post("/api/auth/google", async (req, res) => {
+  app.post("/api/auth/google", authLimiter, async (req, res) => {
     try {
       const { idToken } = req.body;
       
@@ -613,8 +615,7 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // Token refresh endpoint for mobile
-  app.post("/api/auth/refresh", async (req, res) => {
+  app.post("/api/auth/refresh", authLimiter, async (req, res) => {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -653,8 +654,7 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // Forgot password - send reset email
-  app.post("/api/auth/forgot-password", async (req, res) => {
+  app.post("/api/auth/forgot-password", passwordResetLimiter, async (req, res) => {
     try {
       const parsed = forgotPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -698,19 +698,16 @@ export function registerAuthRoutes(app: Express) {
     }
   });
 
-  // Reset password with token
-  app.post("/api/auth/reset-password", async (req, res) => {
+  app.post("/api/auth/reset-password", passwordResetLimiter, async (req, res) => {
     try {
       const parsed = resetPasswordSchema.safeParse(req.body);
       if (!parsed.success) {
-        console.error("Reset password validation error:", parsed.error.errors);
         return res.status(400).json({ 
           message: parsed.error.errors[0]?.message || "Invalid input" 
         });
       }
 
       const { token, password } = parsed.data;
-      console.log("Reset password attempt with token length:", token?.length, "token preview:", token?.substring(0, 10));
 
       // Find valid token
       const [resetRecord] = await db
@@ -724,7 +721,6 @@ export function registerAuthRoutes(app: Express) {
         )
         .limit(1);
 
-      console.log("Reset record found:", resetRecord ? "yes" : "no", resetRecord ? `usedAt: ${resetRecord.usedAt}` : "");
 
       if (!resetRecord || resetRecord.usedAt) {
         return res.status(400).json({ message: "Invalid or expired reset link" });

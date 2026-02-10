@@ -1,5 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { registerRoutes } from "./routes";
@@ -12,7 +13,13 @@ import { setupSession, registerAuthRoutes } from "./auth";
 
 const app = express();
 
-// CORS configuration for dev domains (mobile app, etc.)
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
+
+// CORS configuration - only allow known origins
 const allowedOrigins = [
   "https://d3927c46-4ca2-4bc4-a717-3a83b7527b76-00-2zgdzqdobgm8a.janeway.replit.dev",
   "https://swipebetter.replit.app",
@@ -20,12 +27,11 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin) || origin.endsWith('.replit.dev') || origin.endsWith('.replit.app')) {
       return callback(null, true);
     }
-    callback(null, false);
+    callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
 }));
@@ -36,6 +42,8 @@ declare module "http" {
     rawBody: unknown;
   }
 }
+
+const SENSITIVE_PATHS = ['/api/auth/login', '/api/auth/signup', '/api/admin/login', '/api/stripe/webhook'];
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -125,14 +133,14 @@ async function initStripe() {
 
   app.use(
     express.json({
-      limit: "50mb",
+      limit: "15mb",
       verify: (req, _res, buf) => {
         req.rawBody = buf;
       },
     }),
   );
 
-  app.use(express.urlencoded({ extended: false, limit: "50mb" }));
+  app.use(express.urlencoded({ extended: false, limit: "1mb" }));
   app.use(cookieParser());
 
   setupSession(app);
@@ -140,7 +148,7 @@ async function initStripe() {
 
   app.use((req, res, next) => {
     const start = Date.now();
-    const path = req.path;
+    const reqPath = req.path;
     let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
     const originalResJson = res.json;
@@ -151,12 +159,14 @@ async function initStripe() {
 
     res.on("finish", () => {
       const duration = Date.now() - start;
-      if (path.startsWith("/api")) {
-        let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-        if (capturedJsonResponse) {
-          logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      if (reqPath.startsWith("/api")) {
+        let logLine = `${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`;
+        if (capturedJsonResponse && !SENSITIVE_PATHS.some(p => reqPath.startsWith(p))) {
+          const safeLog = JSON.stringify(capturedJsonResponse);
+          if (safeLog.length < 500) {
+            logLine += ` :: ${safeLog}`;
+          }
         }
-
         log(logLine);
       }
     });
@@ -168,10 +178,9 @@ async function initStripe() {
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const message = status === 500 ? "Internal Server Error" : (err.message || "Internal Server Error");
 
     res.status(status).json({ message });
-    throw err;
   });
 
   if (process.env.NODE_ENV === "production") {
@@ -186,7 +195,6 @@ async function initStripe() {
     const { storage } = await import("./storage");
     const superUserEmail = "dave@d1t2.com";
     
-    // Look up user by email to get correct ID in any environment
     const user = await storage.getUserByEmail(superUserEmail);
     if (user) {
       const isSuperUser = await storage.isSuperUser(user.id);
