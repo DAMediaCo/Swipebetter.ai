@@ -26,6 +26,7 @@ export interface IStorage {
   getProfileAnalyses(userId: string): Promise<ProfileAnalysis[]>;
   createProfileAnalysis(data: InsertProfileAnalysis): Promise<ProfileAnalysis>;
   getProfileAnalysis(id: number): Promise<ProfileAnalysis | undefined>;
+  getProfileAnalysisByPollToken(pollToken: string): Promise<ProfileAnalysis | undefined>;
   updateProfileAnalysisStatus(id: number, status: string, result?: { bioSuggestions?: string; photoFeedback?: string; overallScore?: number; improvements?: string; errorMessage?: string }): Promise<void>;
   cleanupOldProfileAnalyses(userId: string, keepCount: number): Promise<void>;
 
@@ -156,6 +157,11 @@ export class DatabaseStorage implements IStorage {
 
   async getProfileAnalysis(id: number): Promise<ProfileAnalysis | undefined> {
     const [analysis] = await db.select().from(profileAnalyses).where(eq(profileAnalyses.id, id));
+    return analysis;
+  }
+
+  async getProfileAnalysisByPollToken(pollToken: string): Promise<ProfileAnalysis | undefined> {
+    const [analysis] = await db.select().from(profileAnalyses).where(eq(profileAnalyses.pollToken, pollToken));
     return analysis;
   }
 

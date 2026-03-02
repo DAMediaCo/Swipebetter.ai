@@ -82,7 +82,10 @@ Preferred communication style: Simple, everyday language.
 - **Rate Limiting**: Auth endpoints (15 req/15min), analysis/AI endpoints (5 req/min), general API (60 req/min), password reset (5 req/15min).
 - **CORS**: Strict origin allowlist for *.replit.dev and *.replit.app; unknown origins are rejected.
 - **Admin-only endpoints**: `/api/stripe/sync`, `/api/stripe/debug-prices` require admin session.
-- **Auth-protected endpoints**: All data-modifying and AI endpoints require authentication via `requireAuth` middleware.
-- **Input validation**: Zod schemas on all user-facing POST/PATCH endpoints.
+- **Auth-protected endpoints**: All data-modifying and AI endpoints require authentication via `requireAuth` middleware. Profile analysis submission and status polling both require authentication.
+- **Anti-enumeration**: Analysis job status uses random UUID `pollToken` instead of sequential integer IDs, preventing IDOR attacks on the `/api/analyze-profile/status/:pollToken` endpoint.
+- **Admin login rate limiting**: `/api/admin/login` limited to 5 attempts per 15 minutes to prevent brute-force attacks.
+- **Clickjacking protection**: `X-Frame-Options: DENY` header enabled in production via Helmet `frameguard`; disabled in development to allow Replit webview embedding.
+- **Input validation**: Zod schemas on all user-facing POST/PATCH endpoints. UUID format validated on poll token parameters.
 - **SQL injection prevention**: Drizzle ORM parameterized queries throughout.
 - **Sensitive log sanitization**: Auth, admin, and webhook response bodies excluded from access logs; debug token/credential logging removed.

@@ -60,12 +60,14 @@ export default function ProfileFix() {
     setShowDashboard(true);
   };
 
-  const pollForResults = async (jobId: number, isFreeAnalysis: boolean): Promise<any> => {
+  const pollForResults = async (jobId: string, isFreeAnalysis: boolean): Promise<any> => {
     const maxAttempts = 60;
     const pollInterval = 2000;
     
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      const response = await fetch(`/api/analyze-profile/status/${jobId}`);
+      const response = await fetch(`/api/analyze-profile/status/${jobId}`, {
+        credentials: 'include'
+      });
       const data = await response.json();
       
       if (data.status === 'completed') {

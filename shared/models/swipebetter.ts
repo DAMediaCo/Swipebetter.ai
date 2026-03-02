@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, serial, text, varchar, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, varchar, integer, timestamp, boolean, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { users } from "./auth";
@@ -11,6 +11,7 @@ import { users } from "./auth";
 // - 'failed': Analysis failed with error
 export const profileAnalyses = pgTable("profile_analyses", {
   id: serial("id").primaryKey(),
+  pollToken: uuid("poll_token").default(sql`gen_random_uuid()`).notNull(),
   userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
   platform: text("platform").notNull(),
   gender: text("gender").notNull(),

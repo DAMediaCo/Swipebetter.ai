@@ -13,13 +13,14 @@ import { setupSession, registerAuthRoutes } from "./auth";
 
 const app = express();
 
-// Security headers
+const isProduction = process.env.NODE_ENV === "production";
+
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: false,
   crossOriginOpenerPolicy: false,
-  frameguard: false,
+  frameguard: isProduction ? { action: "deny" } : false,
 }));
 
 // CORS configuration - only allow known origins

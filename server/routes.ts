@@ -511,7 +511,7 @@ export async function registerRoutes(
     }
   }
 
-  app.post("/api/analyze-profile", analysisLimiter, async (req: any, res) => {
+  app.post("/api/analyze-profile", analysisLimiter, requireAuth, async (req: any, res) => {
     try {
       const parseResult = profileAnalysisSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -521,38 +521,27 @@ export async function registerRoutes(
         });
       }
       const { platform, gender, intent, screenshots, enm } = parseResult.data;
-      const userId = req.session?.userId || null;
+      const userId = req.session.userId;
 
-      // For logged-in users, check credits (unless super user or unlimited)
-      let isFreeAnalysis = !userId;
-      let isSuperUser = false;
-      let isUnlimited = false;
+      let isFreeAnalysis = false;
+      const isSuperUser = await storage.isSuperUser(userId);
+      const planTier = await storage.getPlanTier(userId);
+      const credits = await storage.getCredits(userId);
+      const isUnlimited = planTier === 'unlimited' || isSuperUser;
+      const hasCredits = credits > 0;
 
-      if (userId) {
-        isSuperUser = await storage.isSuperUser(userId);
-        const planTier = await storage.getPlanTier(userId);
-        const credits = await storage.getCredits(userId);
-        isUnlimited = planTier === 'unlimited' || isSuperUser;
-        const hasCredits = credits > 0;
+      console.log(`[analyze-profile] Access check for user ${userId}: planTier=${planTier}, credits=${credits}, isUnlimited=${isUnlimited}`);
 
-        console.log(`[analyze-profile] Access check for user ${userId}: planTier=${planTier}, isSuperUser=${isSuperUser}, credits=${credits}, isUnlimited=${isUnlimited}`);
-
-        // Free users with no credits get a free analysis (score only, details locked)
-        if (!isUnlimited && !hasCredits) {
-          isFreeAnalysis = true;
-          console.log(`[analyze-profile] User ${userId} has no credits, providing free analysis with locked details`);
-        }
-
-        // Deduct credit if not unlimited and not a free analysis
-        if (!isUnlimited && hasCredits && !isFreeAnalysis) {
-          await storage.deductCredit(userId);
-          console.log(`[analyze-profile] Deducted 1 credit from user ${userId}`);
-        }
-      } else {
-        console.log(`[analyze-profile] Anonymous user, providing free analysis with locked details`);
+      if (!isUnlimited && !hasCredits) {
+        isFreeAnalysis = true;
+        console.log(`[analyze-profile] User ${userId} has no credits, providing free analysis with locked details`);
       }
 
-      // Create pending job in database
+      if (!isUnlimited && hasCredits && !isFreeAnalysis) {
+        await storage.deductCredit(userId);
+        console.log(`[analyze-profile] Deducted 1 credit from user ${userId}`);
+      }
+
       const savedAnalysis = await storage.createProfileAnalysis({
         userId,
         platform,
@@ -563,22 +552,18 @@ export async function registerRoutes(
         enm: enm || false,
       });
 
-      console.log(`[analyze-profile] Created job ${savedAnalysis.id} for user ${userId || 'anonymous'}, isFreeAnalysis=${isFreeAnalysis}, starting background processing`);
+      console.log(`[analyze-profile] Created job ${savedAnalysis.id} (poll: ${savedAnalysis.pollToken}) for user ${userId}, isFreeAnalysis=${isFreeAnalysis}`);
 
-      // Start background processing - don't await!
       processAnalysisJob(savedAnalysis.id, platform, gender, intent, screenshots, enm || false);
 
-      // Return immediately with job ID
       res.json({
-        jobId: savedAnalysis.id,
+        jobId: savedAnalysis.pollToken,
         status: 'pending',
         isFreeAnalysis,
         message: 'Analysis started. Poll /api/analyze-profile/status/:jobId for results.'
       });
 
-      if (userId) {
-        await storage.updateLastActiveAt(userId);
-      }
+      await storage.updateLastActiveAt(userId);
     } catch (error: any) {
       console.error("Profile analysis job creation error:", {
         message: error?.message,
@@ -591,22 +576,21 @@ export async function registerRoutes(
     }
   });
 
-  // Check analysis job status - allows anonymous access for free analyses
-  app.get("/api/analyze-profile/status/:jobId", async (req: any, res) => {
+  app.get("/api/analyze-profile/status/:pollToken", requireAuth, async (req: any, res) => {
     try {
-      const jobId = parseInt(req.params.jobId);
-      if (isNaN(jobId)) {
+      const pollToken = req.params.pollToken;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(pollToken)) {
         return res.status(400).json({ error: "Invalid job ID" });
       }
 
-      const analysis = await storage.getProfileAnalysis(jobId);
+      const analysis = await storage.getProfileAnalysisByPollToken(pollToken);
       if (!analysis) {
         return res.status(404).json({ error: "Analysis not found" });
       }
 
-      // For analyses with a userId, verify ownership (unless anonymous)
-      const userId = req.session?.userId;
-      if (analysis.userId && analysis.userId !== userId) {
+      const userId = req.session.userId;
+      if (analysis.userId !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
 
@@ -615,7 +599,7 @@ export async function registerRoutes(
 
       if (status === 'pending' || status === 'processing') {
         return res.json({
-          jobId,
+          jobId: pollToken,
           status,
           message: status === 'pending' ? 'Analysis queued' : 'Analysis in progress'
         });
@@ -623,24 +607,21 @@ export async function registerRoutes(
 
       if (status === 'failed') {
         return res.json({
-          jobId,
+          jobId: pollToken,
           status: 'failed',
           error: errorMessage || 'Analysis failed'
         });
       }
 
-      // Status is 'completed' - return full results
       const getFirstTip = (improvements: string | null): string => {
         if (!improvements) return "";
         
-        // Try parsing as JSON array first
         try {
           const parsed = JSON.parse(improvements);
           if (Array.isArray(parsed) && parsed.length > 0) {
             return parsed[0];
           }
         } catch {
-          // Not JSON, try line-by-line parsing
         }
         
         const lines = improvements.split('\n').filter((l: string) => l.trim());
@@ -655,7 +636,7 @@ export async function registerRoutes(
       const firstTip = getFirstTip(analysis.improvements);
 
       res.json({
-        jobId,
+        jobId: pollToken,
         status: 'completed',
         analysis: {
           id: analysis.id,
@@ -1311,7 +1292,15 @@ export async function registerRoutes(
     password: z.string().min(1),
   });
 
-  app.post("/api/admin/login", async (req: any, res) => {
+  const adminLoginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many login attempts, please try again later" },
+  });
+
+  app.post("/api/admin/login", adminLoginLimiter, async (req: any, res) => {
     try {
       const parseResult = adminLoginSchema.safeParse(req.body);
       if (!parseResult.success) {
