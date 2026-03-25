@@ -403,7 +403,7 @@ export async function registerRoutes(
           : `Please analyze this ${platform} dating profile for a ${gender} looking for ${intent}.${enm ? ' This is an ENM/Poly profile - keep that context in mind.' : ''}`;
 
         const batchResponse = await grok.chat.completions.create({
-          model: "grok-2-vision-1212",
+          model: "grok-4-1-fast-non-reasoning",
           messages: [
             { role: "system", content: batches.length > 1 
               ? "You are a dating profile expert. Analyze these profile photos and provide specific feedback. Format as JSON with: photoFeedback (string with numbered feedback for each photo)."
@@ -442,7 +442,7 @@ export async function registerRoutes(
       } else {
         const combinedFeedback = batchResults.join('\n\n');
         const synthesisResponse = await grok.chat.completions.create({
-          model: "grok-3-mini-beta",
+          model: "grok-4-1-fast-non-reasoning",
           messages: [
             { role: "system", content: `You are a dating profile expert. Based on the photo-by-photo feedback below, provide a comprehensive profile analysis. Format as JSON with: overallScore (1-100), bioSuggestions (JSON array of 3 complete ready-to-use bio strings they can copy/paste directly), photoFeedback (combined summary string), improvements (JSON array of 3 specific improvement strings).` },
             { role: "user", content: `This is a ${platform} profile for a ${gender} looking for ${intent}.${enm ? ' ENM/Poly profile.' : ''}\n\nPhoto feedback:\n${combinedFeedback}\n\nProvide the final analysis.` }
@@ -777,7 +777,7 @@ export async function registerRoutes(
       }
 
       const response = await grok.chat.completions.create({
-        model: hasScreenshots ? "grok-2-vision-1212" : "grok-3-mini-beta",
+        model: "grok-4-1-fast-non-reasoning",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userContent }
