@@ -11,7 +11,15 @@ import {
 import { useAuth } from "@/lib/auth";
 import { useLogout } from "@/lib/auth";
 import { LogOut, Settings, Sparkles } from "lucide-react";
-const navItems = [
+
+type NavItem = {
+  href: string;
+  label: string;
+  requiresAuth: boolean;
+  external?: boolean;
+};
+
+const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", requiresAuth: true },
   { href: "/blog", label: "Blog", requiresAuth: false },
   { href: "/pricing", label: "Pricing", requiresAuth: false },
