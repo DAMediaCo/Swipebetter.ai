@@ -1,4 +1,4 @@
-const BACKEND_ORIGIN = "https://swipebetter.replit.app";
+const BACKEND_ORIGIN = "https://swipebetter-api.fly.dev";
 
 export async function onRequest({ request, env }) {
   const incomingUrl = new URL(request.url);
