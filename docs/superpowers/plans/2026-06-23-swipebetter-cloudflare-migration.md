@@ -18,8 +18,10 @@
 - Current Pages URL: `https://swipebetter-ai.pages.dev`
 - Cloudflare backend Worker shell created: `https://swipebetter-api.millerd79.workers.dev`
 - Existing Replit backend URL used for bridge testing: `https://swipebetter.replit.app`
-- Current domain `swipebetter.ai` is already on Cloudflare nameservers but still routes to the old Replit/Google backend.
-- `www.swipebetter.ai` did not resolve during the first inspection.
+- Pages custom domains added on 2026-06-23: `swipebetter.ai` and `www.swipebetter.ai`; both remained `pending` after polling.
+- Current domain `swipebetter.ai` is already on Cloudflare nameservers but still routes to the old Replit/Google backend (`via: 1.1 google`).
+- `www.swipebetter.ai` still does not resolve.
+- Current Wrangler OAuth token can attach Pages domains but cannot read/edit DNS records; DNS records API returns `403 Authentication error`.
 - `npm run build` passes.
 - `npm run check` fails on existing TypeScript errors in nav typing and Replit/Stripe integration files.
 - A temporary Pages Function proxy exists locally at `functions/api/[[path]].js`, forwarding `/api/*` to Replit. This is a bridge only, not the final Replit removal.
@@ -708,6 +710,16 @@ Add www.swipebetter.ai
 ```
 
 Expected: Cloudflare creates or asks for the required DNS records.
+
+Current status from 2026-06-23:
+
+```text
+swipebetter.ai added to Pages project; status pending
+www.swipebetter.ai added to Pages project; status pending
+DNS records cannot be read or edited by the current Wrangler OAuth token
+```
+
+The remaining domain work needs Cloudflare dashboard DNS access or an API token with DNS edit permission.
 
 - [ ] **Step 2: DNS target**
 
