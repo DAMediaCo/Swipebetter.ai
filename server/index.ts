@@ -14,6 +14,7 @@ import { setupSession, registerAuthRoutes } from "./auth";
 const app = express();
 
 const isProduction = process.env.NODE_ENV === "production";
+const appUrl = process.env.APP_URL || "https://swipebetter.ai";
 
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -25,7 +26,9 @@ app.use(helmet({
 
 // CORS configuration - only allow known origins
 const allowedOrigins = [
-  "https://d3927c46-4ca2-4bc4-a717-3a83b7527b76-00-2zgdzqdobgm8a.janeway.replit.dev",
+  "https://swipebetter.ai",
+  "https://www.swipebetter.ai",
+  "https://swipebetter-ai.pages.dev",
   "https://swipebetter.replit.app",
 ];
 
@@ -70,16 +73,13 @@ async function initStripe() {
 
   try {
     log("Initializing Stripe schema...", "stripe");
-    await runMigrations({ 
-      databaseUrl,
-      schema: 'stripe'
-    });
+    await runMigrations({ databaseUrl });
     log("Stripe schema ready", "stripe");
 
     const stripeSync = await getStripeSync();
 
     log("Setting up managed webhook...", "stripe");
-    const webhookBaseUrl = `https://${process.env.REPLIT_DOMAINS?.split(',')[0]}`;
+    const webhookBaseUrl = appUrl;
     try {
       const result = await stripeSync.findOrCreateManagedWebhook(
         `${webhookBaseUrl}/api/stripe/webhook`);

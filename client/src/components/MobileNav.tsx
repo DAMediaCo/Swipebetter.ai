@@ -1,8 +1,17 @@
 import { Link, useLocation } from "wouter";
 import { Home, Wrench, LogIn, User, CreditCard, BookOpen } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useAuth, useLogout } from "@/lib/auth";
 
-const navItems = [
+type NavItem = {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  requiresAuth?: boolean;
+  external?: boolean;
+};
+
+const navItems: NavItem[] = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/dashboard", icon: Wrench, label: "Dashboard" },
   { href: "/blog", icon: BookOpen, label: "Blog" },
