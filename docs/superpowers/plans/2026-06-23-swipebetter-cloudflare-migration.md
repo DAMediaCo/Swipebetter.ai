@@ -398,36 +398,78 @@ git push origin main
 
 ---
 
-### Task 5: Choose And Build The Final Backend Host
+### Task 5: Build The Cloudflare Container Backend
 
 **Files:**
-- Modify depending on chosen host: `server/*`, `package.json`, `wrangler.jsonc`, deployment config files
+- Create: `Dockerfile`
+- Create: `.dockerignore`
+- Create: `cloudflare/backend-worker.js`
+- Create: `wrangler.backend.jsonc`
+- Modify: `package.json`
+- Modify: `package-lock.json`
+- Modify: `functions/api/[[path]].js`
+- Modify: `wrangler.jsonc`
+- Modify: `.env.production.example`
 
-- [ ] **Step 1: Use this decision rule**
+- [ ] **Step 1: Use Cloudflare Containers for the existing backend**
 
 Use Cloudflare Pages only for frontend and lightweight functions. Do not force the current Express backend into Pages Functions in one shot. The current backend uses Express, sessions, Postgres TCP, Stripe, Resend, AI clients, `bcrypt`, `sharp`, and `stripe-replit-sync`; that is not a clean edge-runtime lift.
 
-Choose one:
+Use this target architecture:
 
 ```text
-Option A, safest short-term:
-Frontend on Cloudflare Pages.
-Backend on a Node runtime that supports Express and Postgres.
-Replit removed only after Node backend is live elsewhere.
-
-Option B, full Cloudflare:
-Rewrite API routes as Cloudflare Workers/Pages Functions.
-Replace Node-only dependencies and use edge-compatible database access.
-This takes longer and needs route-by-route testing.
+Frontend: Cloudflare Pages project `swipebetter-ai`
+Backend: Cloudflare Workers + Containers project `swipebetter-api`
+API routing: Pages Function `/api/*` proxies to `SWIPEBETTER_API_ORIGIN`
+Temporary API origin: `https://swipebetter.replit.app`
+Final API origin after backend smoke: `https://api.swipebetter.ai`
 ```
 
-- [ ] **Step 2: If using a Node backend, required env vars**
+- [ ] **Step 2: Add container deployment files**
+
+Required files:
+
+```text
+Dockerfile
+.dockerignore
+cloudflare/backend-worker.js
+wrangler.backend.jsonc
+```
+
+The backend worker must route requests to a single named container instance:
+
+```js
+const container = env.SWIPEBETTER_API.getByName("primary");
+await container.startAndWaitForPorts({
+  ports: [5000],
+  startOptions: { envVars: containerEnv(env) },
+});
+return container.fetch(request);
+```
+
+Expected dry-run:
+
+```bash
+npx wrangler deploy -c wrangler.backend.jsonc --dry-run --containers-rollout=none
+```
+
+Expected output includes:
+
+```text
+env.SWIPEBETTER_API (SwipeBetterApi) Durable Object
+The following containers are available:
+- swipebetter-api-swipebetterapi
+--dry-run: exiting now.
+```
+
+- [ ] **Step 3: Configure required env vars**
 
 Set these on the backend host:
 
 ```text
 NODE_ENV=production
 APP_URL=https://swipebetter.ai
+PORT=5000
 DATABASE_URL=<production postgres url>
 SESSION_SECRET=<existing session secret or rotated planned value>
 JWT_SECRET=<existing jwt secret or same value as session if current app expects it>
@@ -445,7 +487,25 @@ ADMIN_EMAIL=<admin email>
 ADMIN_PASSWORD=<admin password>
 ```
 
-- [ ] **Step 3: Migrate database carefully**
+Use `.env.production.example` as the checklist. Do not commit real values.
+
+- [ ] **Step 4: Build or deploy the container image**
+
+If Docker is available locally:
+
+```bash
+docker build -t swipebetter-api:local .
+```
+
+If Docker is not available locally, use Cloudflare's container command from an environment with Docker available:
+
+```bash
+npx wrangler containers build . -t swipebetter-api:latest
+```
+
+Expected: image build completes. If Docker is missing, document that as a local environment blocker, not an application code blocker.
+
+- [ ] **Step 5: Migrate database carefully**
 
 Before changing the app:
 
@@ -456,7 +516,17 @@ psql "$NEW_DATABASE_URL" < /Users/davidmiller/Downloads/swipebetter-migration-ba
 
 Expected: restore completes with no fatal errors. If the current DB is already external and will remain the same, skip restore and document that `DATABASE_URL` is unchanged.
 
-- [ ] **Step 4: Run backend smoke on new host**
+- [ ] **Step 6: Deploy backend Worker and container**
+
+Deploy only after secrets are configured:
+
+```bash
+npx wrangler deploy -c wrangler.backend.jsonc --containers-rollout=gradual --keep-vars
+```
+
+If the service will use `api.swipebetter.ai`, attach that custom domain to the Worker after deploy.
+
+- [ ] **Step 7: Run backend smoke on new host**
 
 Replace `<backend-url>` with the new backend URL:
 
@@ -474,18 +544,18 @@ Expected:
 
 Products endpoint returns JSON. Root route returns HTML or a known health response.
 
-- [ ] **Step 5: Point Cloudflare Pages proxy to the new backend**
+- [ ] **Step 8: Point Cloudflare Pages proxy to the new backend**
 
-In `functions/api/[[path]].js`, replace:
+In `wrangler.jsonc`, replace:
 
-```js
-const BACKEND_ORIGIN = "https://swipebetter.replit.app";
+```json
+"SWIPEBETTER_API_ORIGIN": "https://swipebetter.replit.app"
 ```
 
 With:
 
-```js
-const BACKEND_ORIGIN = "https://<new-backend-host>";
+```json
+"SWIPEBETTER_API_ORIGIN": "https://api.swipebetter.ai"
 ```
 
 Deploy:
@@ -495,7 +565,7 @@ npm run build
 npx wrangler pages deploy dist/public --project-name=swipebetter-ai --commit-dirty=true
 ```
 
-- [ ] **Step 6: Verify no API path uses Replit**
+- [ ] **Step 9: Verify no API path uses Replit**
 
 ```bash
 curl --tlsv1.2 -s -D - https://swipebetter-ai.pages.dev/api/auth/user -o -
@@ -514,10 +584,10 @@ Expected body for auth:
 {"user":null}
 ```
 
-- [ ] **Step 7: Commit and push backend host switch**
+- [ ] **Step 10: Commit and push backend host switch**
 
 ```bash
-git add functions/api/[[path]].js
+git add wrangler.jsonc functions/api/[[path]].js
 git -c user.name="David Miller" -c user.email="davidmiller@users.noreply.github.com" commit -m "chore: switch API proxy off Replit"
 git push origin main
 ```

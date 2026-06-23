@@ -1,8 +1,9 @@
 const BACKEND_ORIGIN = "https://swipebetter.replit.app";
 
-export async function onRequest({ request }) {
+export async function onRequest({ request, env }) {
   const incomingUrl = new URL(request.url);
-  const upstreamUrl = new URL(incomingUrl.pathname + incomingUrl.search, BACKEND_ORIGIN);
+  const backendOrigin = env.SWIPEBETTER_API_ORIGIN || BACKEND_ORIGIN;
+  const upstreamUrl = new URL(incomingUrl.pathname + incomingUrl.search, backendOrigin);
   const headers = new Headers(request.headers);
 
   headers.delete("host");
@@ -21,8 +22,8 @@ export async function onRequest({ request }) {
   const responseHeaders = new Headers(upstreamResponse.headers);
   const location = responseHeaders.get("location");
 
-  if (location?.startsWith(BACKEND_ORIGIN)) {
-    responseHeaders.set("location", location.replace(BACKEND_ORIGIN, incomingUrl.origin));
+  if (location?.startsWith(backendOrigin)) {
+    responseHeaders.set("location", location.replace(backendOrigin, incomingUrl.origin));
   }
 
   return new Response(upstreamResponse.body, {

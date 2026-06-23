@@ -1,5 +1,8 @@
 {
   "name": "swipebetter-ai",
   "pages_build_output_dir": "./dist/public",
-  "compatibility_date": "2026-06-23"
+  "compatibility_date": "2026-06-23",
+  "vars": {
+    "SWIPEBETTER_API_ORIGIN": "https://swipebetter.replit.app"
+  }
 }

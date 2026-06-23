@@ -1,0 +1,9 @@
+.git
+.local
+.wrangler
+node_modules
+dist
+server/public
+npm-debug.log
+*.tar.gz
+.DS_Store

@@ -3,9 +3,7 @@ import fs from "fs";
 import path from "path";
 import { getToolPageJsonLd } from "../shared/seo/jsonld";
 
-const BASE_URL = process.env.REPL_SLUG 
-  ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
-  : 'https://swipebetter.ai';
+const BASE_URL = process.env.APP_URL || 'https://swipebetter.ai';
 
 interface ToolMeta {
   title: string;
