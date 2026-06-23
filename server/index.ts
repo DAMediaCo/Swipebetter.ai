@@ -52,6 +52,10 @@ declare module "http" {
 
 const SENSITIVE_PATHS = ['/api/auth/login', '/api/auth/signup', '/api/admin/login', '/api/stripe/webhook'];
 
+app.get("/health", (_req, res) => {
+  res.json({ ok: true, service: "swipebetter-api" });
+});
+
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
