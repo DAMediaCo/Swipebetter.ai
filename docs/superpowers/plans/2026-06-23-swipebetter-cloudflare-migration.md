@@ -16,12 +16,14 @@
 - GitHub remote: `https://github.com/damediacoadmin/Swipebetter.ai`
 - Cloudflare Pages project created: `swipebetter-ai`
 - Current Pages URL: `https://swipebetter-ai.pages.dev`
+- Cloudflare backend Worker shell created: `https://swipebetter-api.millerd79.workers.dev`
 - Existing Replit backend URL used for bridge testing: `https://swipebetter.replit.app`
 - Current domain `swipebetter.ai` is already on Cloudflare nameservers but still routes to the old Replit/Google backend.
 - `www.swipebetter.ai` did not resolve during the first inspection.
 - `npm run build` passes.
 - `npm run check` fails on existing TypeScript errors in nav typing and Replit/Stripe integration files.
 - A temporary Pages Function proxy exists locally at `functions/api/[[path]].js`, forwarding `/api/*` to Replit. This is a bridge only, not the final Replit removal.
+- Cloudflare Containers access check failed on 2026-06-23: current account needs Workers Paid plan access before the containerized backend can be rolled out.
 
 ## File Structure
 
@@ -414,6 +416,24 @@ git push origin main
 - [ ] **Step 1: Use Cloudflare Containers for the existing backend**
 
 Use Cloudflare Pages only for frontend and lightweight functions. Do not force the current Express backend into Pages Functions in one shot. The current backend uses Express, sessions, Postgres TCP, Stripe, Resend, AI clients, `bcrypt`, `sharp`, and `stripe-replit-sync`; that is not a clean edge-runtime lift.
+
+Hard prerequisite: Cloudflare Containers require Workers Paid plan access. Verify before final backend rollout:
+
+```bash
+npx wrangler containers list -c wrangler.backend.jsonc
+```
+
+Expected before rollout:
+
+```text
+No authorization error.
+```
+
+Observed blocker on 2026-06-23:
+
+```text
+Unauthorized: You do not have access to Cloudflare Containers. Deploying containers requires the Workers Paid plan.
+```
 
 Use this target architecture:
 
