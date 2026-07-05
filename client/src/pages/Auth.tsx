@@ -77,7 +77,7 @@ export default function Auth() {
       }
       const { state } = await initResponse.json();
       
-      const redirectUri = `${window.location.origin}/api/auth/apple/callback`;
+      const redirectUri = "https://swipebetter.ai/api/auth/apple/callback";
       
       const appleAuthUrl = new URL("https://appleid.apple.com/auth/authorize");
       appleAuthUrl.searchParams.set("client_id", appleClientId);
