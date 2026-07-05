@@ -27,6 +27,8 @@ const generalLimiter = rateLimit({
   message: { error: "Too many requests, please slow down" },
 });
 
+const publicAppUrl = (process.env.APP_URL || "https://swipebetter.ai").replace(/\/$/, "");
+
 // Compress base64 image to reduce payload size for AI processing
 async function compressImage(base64DataUrl: string, maxWidth = 800, quality = 70): Promise<string> {
   try {
@@ -1151,7 +1153,7 @@ export async function registerRoutes(
       const isRecurring = recurring && (typeof recurring === 'object' ? !!recurring.interval : !!recurring);
       
       // Build success URL with optional returnTo parameter
-      let successUrl = `${req.protocol}://${req.get('host')}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
+      let successUrl = `${publicAppUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`;
       if (returnTo) {
         successUrl += `&returnTo=${encodeURIComponent(returnTo)}`;
       }
@@ -1162,7 +1164,7 @@ export async function registerRoutes(
         line_items: [{ price: priceId, quantity: 1 }],
         mode: isRecurring ? 'subscription' : 'payment',
         success_url: successUrl,
-        cancel_url: `${req.protocol}://${req.get('host')}/pricing`,
+        cancel_url: `${publicAppUrl}/pricing`,
       });
 
       res.json({ url: checkoutSession.url });
