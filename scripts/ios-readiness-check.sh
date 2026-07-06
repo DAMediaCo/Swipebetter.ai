@@ -55,6 +55,12 @@ for (const bundleId of [
   assertIncludes(project, bundleId, "project.yml bundle ID contract");
 }
 assertIncludes(project, "IPHONEOS_DEPLOYMENT_TARGET: \"17.0\"", "iOS deployment target");
+assertIncludes(project, "TARGETED_DEVICE_FAMILY: \"1\"", "iPhone-only target family");
+
+const pbxproj = fs.readFileSync("ios/SwipeBetter/SwipeBetter.xcodeproj/project.pbxproj", "utf8");
+if (pbxproj.includes('TARGETED_DEVICE_FAMILY = "1,2"')) {
+  throw new Error("Xcode project must stay iPhone-only until iPad is designed and smoke-tested");
+}
 
 const appInfo = readPlist("ios/SwipeBetter/SwipeBetterApp/Info.plist");
 assertEqual(appInfo.CFBundleDisplayName, "SwipeBetter", "main app display name");
