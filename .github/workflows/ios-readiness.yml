@@ -30,6 +30,8 @@ jobs:
         run: npm ci
 
       - name: Run iOS readiness checks
+        env:
+          IOS_READINESS_SKIP_XCODE_BUILDS: ${{ github.event_name == 'pull_request' && '1' || '0' }}
         run: scripts/ios-readiness-check.sh
 
       - name: Run native iOS UI tests
