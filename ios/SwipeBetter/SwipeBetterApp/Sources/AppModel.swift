@@ -94,6 +94,16 @@ final class AppModel {
     }
   }
 
+  func requestPasswordReset(email: String) async -> String? {
+    await runBusyReturning {
+      let response: APIMessage = try await api.post(
+        "/api/auth/forgot-password",
+        body: PasswordResetRequest(email: email)
+      )
+      return response.message ?? "If an account exists with that email, we sent a reset link."
+    }
+  }
+
   func signInWithApple(credential: ASAuthorizationAppleIDCredential) async {
     guard let tokenData = credential.identityToken,
           let identityToken = String(data: tokenData, encoding: .utf8) else {

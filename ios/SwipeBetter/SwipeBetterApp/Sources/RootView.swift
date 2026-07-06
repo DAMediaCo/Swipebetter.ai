@@ -89,6 +89,7 @@ struct AuthView: View {
   @State private var firstName = ""
   @State private var lastName = ""
   @State private var promoCode = ""
+  @State private var showingPasswordReset = false
 
   var body: some View {
     NavigationStack {
@@ -152,6 +153,14 @@ struct AuthView: View {
           .controlSize(.large)
           .disabled(email.isEmpty || password.count < 8)
 
+          if !isSignup {
+            Button("Forgot password?") {
+              showingPasswordReset = true
+            }
+            .font(.subheadline.weight(.semibold))
+            .frame(maxWidth: .infinity, alignment: .center)
+          }
+
           SignInWithAppleButton(.continue) { request in
             request.requestedScopes = [.fullName, .email]
           } onCompletion: { result in
@@ -172,10 +181,76 @@ struct AuthView: View {
           }
           .font(.footnote)
           .foregroundStyle(.secondary)
+
+          HStack(spacing: 16) {
+            Link("Terms", destination: authURL("/terms"))
+            Link("Privacy", destination: authURL("/privacy"))
+            Link("Support", destination: authURL("/contact"))
+          }
+          .font(.footnote.weight(.semibold))
         }
         .padding(22)
       }
       .background(Color(.systemGroupedBackground))
+    }
+    .sheet(isPresented: $showingPasswordReset) {
+      PasswordResetSheet(initialEmail: email)
+        .environment(model)
+    }
+  }
+
+  private func authURL(_ path: String) -> URL {
+    URL(string: "https://swipebetter.ai\(path)")!
+  }
+}
+
+struct PasswordResetSheet: View {
+  @Environment(AppModel.self) private var model
+  @Environment(\.dismiss) private var dismiss
+  @State private var email: String
+  @State private var message: String?
+
+  init(initialEmail: String) {
+    _email = State(initialValue: initialEmail)
+  }
+
+  var body: some View {
+    NavigationStack {
+      Form {
+        Section {
+          TextField("Email", text: $email)
+            .textContentType(.emailAddress)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+        }
+
+        Section {
+          Button {
+            Task {
+              message = await model.requestPasswordReset(email: email)
+            }
+          } label: {
+            Label("Send Reset Link", systemImage: "envelope")
+          }
+          .disabled(email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        }
+
+        if let message {
+          Section {
+            Text(message)
+              .foregroundStyle(.secondary)
+          }
+        }
+      }
+      .navigationTitle("Reset Password")
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Done") {
+            dismiss()
+          }
+        }
+      }
     }
   }
 }

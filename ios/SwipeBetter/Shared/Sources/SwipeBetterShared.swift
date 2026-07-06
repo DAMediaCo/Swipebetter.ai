@@ -52,6 +52,10 @@ public struct LoginRequest: Encodable {
   public let password: String
 }
 
+public struct PasswordResetRequest: Encodable {
+  public let email: String
+}
+
 public struct SignupRequest: Encodable {
   public let email: String
   public let password: String
