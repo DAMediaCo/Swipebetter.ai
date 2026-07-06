@@ -407,14 +407,22 @@ export class DatabaseStorage implements IStorage {
     const sub = await this.getUserSubscription(userId);
     if (!sub) return 'free';
     const tier = (sub as any).planTier;
-    if (tier === 'unlimited' || tier === 'starter') return tier;
+    if (tier === 'unlimited') {
+      const periodEnd = (sub as any).currentPeriodEnd ? new Date((sub as any).currentPeriodEnd) : null;
+      if (periodEnd && periodEnd.getTime() < Date.now()) {
+        const credits = Math.max((sub as any).credits || 0, (sub as any).oneTimeCredits || 0);
+        return credits > 0 ? 'starter' : 'free';
+      }
+      return 'unlimited';
+    }
+    if (tier === 'starter') return tier;
     return 'free';
   }
 
   async getCredits(userId: string): Promise<number> {
     const sub = await this.getUserSubscription(userId);
     if (!sub) return 0;
-    return (sub as any).credits || 0;
+    return Math.max((sub as any).credits || 0, (sub as any).oneTimeCredits || 0);
   }
 
   async addCredits(userId: string, amount: number): Promise<void> {
@@ -437,11 +445,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deductCredit(userId: string): Promise<boolean> {
-    // Atomic credit deduction - only deducts if credits > 0
+    // Atomic credit deduction, keeping legacy one_time_credits in sync.
     const result = await db.execute(
       sql`UPDATE user_subscriptions 
-          SET credits = credits - 1, updated_at = NOW()
-          WHERE user_id = ${userId} AND credits > 0
+          SET credits = GREATEST(COALESCE(credits, 0) - 1, 0),
+              one_time_credits = GREATEST(COALESCE(one_time_credits, 0) - 1, 0),
+              updated_at = NOW()
+          WHERE user_id = ${userId}
+          AND (COALESCE(credits, 0) > 0 OR COALESCE(one_time_credits, 0) > 0)
           RETURNING credits`
     );
     return result.rowCount !== null && result.rowCount > 0;
@@ -574,6 +585,7 @@ export class DatabaseStorage implements IStorage {
 
       const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
       const currentCredits = (existing as any)?.credits || 0;
+      const currentOneTimeCredits = (existing as any)?.oneTimeCredits || 0;
       const currentSpend = (existing as any)?.lifetimeSpendCents || 0;
       const patch = config.tier === "unlimited"
         ? {
@@ -591,8 +603,9 @@ export class DatabaseStorage implements IStorage {
             planTier: "starter",
             plan: "ios_starter",
             planType: "starter",
-            status: "active",
+            status: "inactive",
             credits: currentCredits + config.credits,
+            oneTimeCredits: currentOneTimeCredits + config.credits,
             creditsSource: "purchased",
             lifetimeSpendCents: currentSpend + config.priceCents,
             lastPaymentAt: data.purchaseDate || new Date(),

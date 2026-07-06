@@ -13,6 +13,9 @@
 		403EA46B4518C091852EF78D /* SwipeBetterShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		51BA230D3389EFA59887666B /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0619175018F158E01D1872EF /* AppModel.swift */; };
 		51D1A8D73AC20B5D1E243D99 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
+		6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
+		B18277A49A55449421BC6542 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
+		C00CA427102EBC6FA72E33E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
 		C53B40A58E51DAE9F0146CAB /* PurchaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */; };
 		C6BCD8D5A6BF6F11D73BC674 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224C6A0979B8FD308802F0B /* ShareViewController.swift */; };
 		DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */; };
@@ -57,7 +60,9 @@
 		1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterShared.swift; sourceTree = "<group>"; };
 		4224C6A0979B8FD308802F0B /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		45DD039E271ABCBEDB33ABD3 /* SwipeBetter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwipeBetter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseStore.swift; sourceTree = "<group>"; };
+		6E0CE9D34D18BAD25929CC49 /* Configuration.storekit */ = {isa = PBXFileReference; path = Configuration.storekit; sourceTree = "<group>"; };
 		7BAC957192BE2A009D79F187 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SwipeBetterKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
@@ -99,6 +104,8 @@
 		BB511B678F3D85E5496F4831 = {
 			isa = PBXGroup;
 			children = (
+				6E0CE9D34D18BAD25929CC49 /* Configuration.storekit */,
+				F2273D0FD61E7E7339F8205F /* Resources */,
 				4492890FEB68719EBD993946 /* Sources */,
 				559FA54B66DF9905E794170F /* Sources */,
 				BCF19E68754922959EBAA1DA /* Sources */,
@@ -126,6 +133,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		F2273D0FD61E7E7339F8205F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */,
+			);
+			name = Resources;
+			path = Shared/Resources;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -134,6 +150,7 @@
 			buildConfigurationList = 51916579B29F137EE630BD1F /* Build configuration list for PBXNativeTarget "SwipeBetterKeyboard" */;
 			buildPhases = (
 				986296AAEBCE162F417884AC /* Sources */,
+				9423419160D99048D921F06A /* Resources */,
 			);
 			buildRules = (
 			);
@@ -151,6 +168,7 @@
 			buildConfigurationList = ABBBF2C55DCCC519811C7E2F /* Build configuration list for PBXNativeTarget "SwipeBetter" */;
 			buildPhases = (
 				6AED08E983EB18BB0469E2E2 /* Sources */,
+				1FF2077A6B7397B602380A89 /* Resources */,
 				128F9EB7B39FFFE55E672173 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -171,6 +189,7 @@
 			buildConfigurationList = 21B68B6391D2C25C4BD67A1D /* Build configuration list for PBXNativeTarget "SwipeBetterShare" */;
 			buildPhases = (
 				7E2851D7824BA578F7DFF887 /* Sources */,
+				3C583FF6614D5E5352A2CB52 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -214,6 +233,33 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1FF2077A6B7397B602380A89 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C00CA427102EBC6FA72E33E2 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3C583FF6614D5E5352A2CB52 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9423419160D99048D921F06A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B18277A49A55449421BC6542 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6AED08E983EB18BB0469E2E2 /* Sources */ = {

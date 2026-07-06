@@ -199,12 +199,17 @@ export async function registerRoutes(
     const userId = req.session.userId;
     const user = await storage.getUser(userId);
     const subscription = await storage.getUserSubscription(userId);
+    const planTier = await storage.getPlanTier(userId);
+    const credits = await storage.getCredits(userId);
+    const isSuperUser = await storage.isSuperUser(userId);
     
-    const isActive = subscription?.status === "active";
+    const periodEnd = subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd) : null;
+    const periodActive = !periodEnd || periodEnd.getTime() >= Date.now();
+    const isActive = subscription?.status === "active" && periodActive;
     const isTrialing = subscription?.status === "trialing";
-    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0 || credits > 0;
     
-    const proActive = isActive || isTrialing;
+    const proActive = isActive || isTrialing || planTier === "unlimited" || isSuperUser;
     const isPro = proActive || hasOneTimeCredits;
     
     let planType: "monthly" | "annual" | "starter" | null = null;
@@ -231,23 +236,30 @@ export async function registerRoutes(
       } : null,
       isPro,
       proActive,
+      planTier,
       planType,
       subscriptionStatus: subscription?.status || null,
-      oneTimeCredits: subscription?.oneTimeCredits || 0,
+      oneTimeCredits: Math.max(subscription?.oneTimeCredits || 0, credits),
     });
   });
 
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     const subscription = await storage.getUserSubscription(req.session.userId);
-    const isActive = subscription?.status === "active";
-    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+    const planTier = await storage.getPlanTier(req.session.userId);
+    const credits = await storage.getCredits(req.session.userId);
+    const periodEnd = subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd) : null;
+    const periodActive = !periodEnd || periodEnd.getTime() >= Date.now();
+    const isActive = subscription?.status === "active" && periodActive;
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0 || credits > 0;
     
     res.json({ 
       subscription: subscription || null,
       canAnalyze: true, // Allow all users to analyze (freemium model)
-      isSubscribed: isActive,
-      oneTimeCredits: subscription?.oneTimeCredits || 0,
-      isPaidUser: isActive || hasOneTimeCredits, // For determining if user sees full results
+      isSubscribed: isActive || planTier === "unlimited",
+      planTier,
+      credits,
+      oneTimeCredits: Math.max(subscription?.oneTimeCredits || 0, credits),
+      isPaidUser: isActive || planTier === "unlimited" || hasOneTimeCredits, // For determining if user sees full results
     });
   });
 
@@ -800,19 +812,18 @@ export async function registerRoutes(
       const { tone, goal, screenshots, conversationText, enm } = parseResult.data;
       const userId = req.session.userId;
 
-      const subscription = await storage.getUserSubscription(userId);
-      const isSubscribed = subscription?.status === "active";
-      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+      const planTier = await storage.getPlanTier(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
+      const hasUnlimitedAccess = planTier === "unlimited" || isSuperUser;
 
-      if (!isSubscribed && !hasOneTimeCredits) {
-        return res.status(403).json({ 
-          error: "Subscription required",
-          requiresSubscription: true 
-        });
-      }
-
-      if (!isSubscribed && hasOneTimeCredits) {
-        await storage.decrementOneTimeCredits(userId);
+      if (!hasUnlimitedAccess) {
+        const deducted = await storage.deductCredit(userId);
+        if (!deducted) {
+          return res.status(402).json({
+            error: "Subscription required",
+            requiresSubscription: true
+          });
+        }
       }
 
       const hasScreenshots = screenshots && screenshots.length > 0;
@@ -1320,7 +1331,12 @@ export async function registerRoutes(
       }
       
       if (isOneTime) {
-        await storage.addOneTimeCredits(userId, 1);
+        const currentTier = await storage.getPlanTier(userId);
+        if (currentTier !== 'unlimited') {
+          await storage.setPlanTier(userId, 'starter');
+        }
+        await storage.addCredits(userId, 1);
+        await storage.addOneTimeCredits(userId, 1, 'purchased');
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
           stripePriceId: priceId,
@@ -1345,6 +1361,7 @@ export async function registerRoutes(
           return res.status(400).json({ error: "No subscription found" });
         }
         
+        await storage.setPlanTier(userId, 'unlimited');
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
           stripeSubscriptionId: subscription.id,

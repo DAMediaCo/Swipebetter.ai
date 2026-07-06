@@ -9,6 +9,16 @@ settings:
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     MARKETING_VERSION: "1.0"
     CURRENT_PROJECT_VERSION: "1"
+fileGroups:
+  - Configuration.storekit
+schemes:
+  SwipeBetter:
+    build:
+      targets:
+        SwipeBetter: all
+    run:
+      config: Debug
+      storeKitConfiguration: Configuration.storekit
 targets:
   SwipeBetter:
     type: application
@@ -16,6 +26,8 @@ targets:
     sources:
       - path: Shared/Sources
       - path: SwipeBetterApp/Sources
+      - path: Shared/Resources/PrivacyInfo.xcprivacy
+        buildPhase: resources
     resources:
       - path: SwipeBetterApp/Resources
         optional: true
@@ -35,6 +47,8 @@ targets:
     sources:
       - path: Shared/Sources
       - path: ShareExtension/Sources
+      - path: Shared/Resources/PrivacyInfo.xcprivacy
+        buildPhase: resources
     settings:
       base:
         APPLICATION_EXTENSION_API_ONLY: "YES"
@@ -47,6 +61,8 @@ targets:
     sources:
       - path: Shared/Sources
       - path: KeyboardExtension/Sources
+      - path: Shared/Resources/PrivacyInfo.xcprivacy
+        buildPhase: resources
     settings:
       base:
         APPLICATION_EXTENSION_API_ONLY: "YES"
