@@ -118,6 +118,10 @@ for (const expected of [
   "removeDirectoryIfEmpty(directoryURL)",
   "let cleanText = text?.trimmingCharacters(in: .whitespacesAndNewlines)",
   "guard cleanText?.isEmpty == false || !images.isEmpty else",
+  "SwipeBetterImageProcessor",
+  "maxPixelDimension: CGFloat = 1800",
+  "normalizedJPEGData(from data: Data)",
+  "let normalizedImages = images.compactMap(SwipeBetterImageProcessor.normalizedJPEGData(from:))",
 ]) {
   assertIncludes(shared, expected, "shared import cleanup contract");
 }
@@ -157,6 +161,7 @@ for (const expected of [
 for (const expected of [
   "try? await purchases.syncCurrentEntitlements(api: api)",
   "try await purchases.restorePurchases(api: api)",
+  "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
 ]) {
   assertIncludes(appModel, expected, "Apple restore sync contract");
 }
@@ -175,6 +180,7 @@ for (const expected of [
   'Label("Restore Purchases", systemImage: "arrow.clockwise.circle")',
   "model.purchases.isRestoringPurchases",
   'Label("Manage Subscription", systemImage: "creditcard")',
+  "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
 ]) {
   assertIncludes(rootView, expected, "iOS App Review UI contract");
 }

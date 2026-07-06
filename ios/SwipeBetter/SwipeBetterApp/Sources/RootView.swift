@@ -856,8 +856,9 @@ struct ResultBlock: View {
 func loadImages(from items: [PhotosPickerItem], limit: Int) async -> [Data] {
   var output: [Data] = []
   for item in items.prefix(limit) {
-    if let data = try? await item.loadTransferable(type: Data.self) {
-      output.append(data)
+    if let data = try? await item.loadTransferable(type: Data.self),
+       let normalized = SwipeBetterImageProcessor.normalizedJPEGData(from: data) {
+      output.append(normalized)
     }
   }
   return output

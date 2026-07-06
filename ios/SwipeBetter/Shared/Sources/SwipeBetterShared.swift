@@ -1,4 +1,5 @@
 import Foundation
+import UIKit
 
 public enum SwipeBetterConfig {
   public static let apiBaseURL = URL(string: "https://swipebetter.ai")!
@@ -181,6 +182,32 @@ public struct IAPSyncResponse: Decodable {
   public let credits: Int?
 }
 
+public enum SwipeBetterImageProcessor {
+  public static let maxPixelDimension: CGFloat = 1800
+  public static let jpegCompressionQuality: CGFloat = 0.82
+
+  public static func normalizedJPEGData(from data: Data) -> Data? {
+    guard let image = UIImage(data: data) else { return nil }
+
+    let maxSourceDimension = max(image.size.width, image.size.height)
+    let targetSize: CGSize
+    if maxSourceDimension > maxPixelDimension {
+      let scale = maxPixelDimension / maxSourceDimension
+      targetSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+    } else {
+      targetSize = image.size
+    }
+
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = 1
+    let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
+    let rendered = renderer.image { _ in
+      image.draw(in: CGRect(origin: .zero, size: targetSize))
+    }
+    return rendered.jpegData(compressionQuality: jpegCompressionQuality)
+  }
+}
+
 public final class SwipeBetterAPI: Sendable {
   public static let shared = SwipeBetterAPI()
   private let session: URLSession
@@ -285,7 +312,12 @@ public enum SharedImportStore {
     clearAll()
     try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
     let id = UUID().uuidString
-    let filenames = try images.enumerated().map { index, data in
+    let normalizedImages = images.compactMap(SwipeBetterImageProcessor.normalizedJPEGData(from:))
+    guard cleanText?.isEmpty == false || !normalizedImages.isEmpty else {
+      throw SwipeBetterAPIError.missingData
+    }
+
+    let filenames = try normalizedImages.enumerated().map { index, data in
       let filename = "\(id)-\(index).jpg"
       try data.write(to: directoryURL.appendingPathComponent(filename), options: .atomic)
       return filename

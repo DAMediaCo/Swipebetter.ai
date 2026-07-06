@@ -289,8 +289,7 @@ final class AppModel {
   }
 
   static func jpegDataURL(from data: Data) -> String? {
-    let image = UIImage(data: data)
-    let jpeg = image?.jpegData(compressionQuality: 0.82) ?? data
+    let jpeg = SwipeBetterImageProcessor.normalizedJPEGData(from: data) ?? data
     return "data:image/jpeg;base64,\(jpeg.base64EncodedString())"
   }
 }
