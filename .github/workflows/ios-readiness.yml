@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - main
-      - codex/ios-app
 
 jobs:
   ios-readiness:
