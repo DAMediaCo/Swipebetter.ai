@@ -9,6 +9,7 @@ DESTINATION="${IOS_DESTINATION:-generic/platform=iOS Simulator}"
 STOREKIT="ios/SwipeBetter/Configuration.storekit"
 PRIVACY="ios/SwipeBetter/Shared/Resources/PrivacyInfo.xcprivacy"
 KEYBOARD_PLIST="ios/SwipeBetter/KeyboardExtension/Info.plist"
+METADATA="ios/SwipeBetter/AppStoreMetadata.json"
 
 echo "Checking plist files..."
 plutil -lint \
@@ -53,6 +54,89 @@ for (const group of storekit.subscriptionGroups || []) {
 
 if (expected.size) {
   throw new Error(`Missing StoreKit products: ${Array.from(expected.keys()).join(", ")}`);
+}
+NODE
+
+echo "Checking App Store metadata package..."
+node <<'NODE'
+const fs = require("fs");
+
+const metadata = JSON.parse(fs.readFileSync("ios/SwipeBetter/AppStoreMetadata.json", "utf8"));
+const requiredStrings = [
+  "appName",
+  "subtitle",
+  "promotionalText",
+  "description",
+  "keywords",
+  "supportUrl",
+  "privacyUrl",
+  "marketingUrl",
+  "reviewNotes",
+];
+
+for (const field of requiredStrings) {
+  if (typeof metadata[field] !== "string" || metadata[field].trim() === "") {
+    throw new Error(`Missing App Store metadata field: ${field}`);
+  }
+}
+
+function charLimit(field, limit) {
+  if ([...metadata[field]].length > limit) {
+    throw new Error(`${field} exceeds ${limit} characters`);
+  }
+}
+
+charLimit("appName", 30);
+charLimit("subtitle", 30);
+charLimit("promotionalText", 170);
+charLimit("description", 4000);
+
+if (Buffer.byteLength(metadata.keywords, "utf8") > 100) {
+  throw new Error("keywords exceeds 100 bytes");
+}
+
+if (/,\s/.test(metadata.keywords)) {
+  throw new Error("keywords should be comma-separated without spaces");
+}
+
+for (const field of ["supportUrl", "privacyUrl", "marketingUrl"]) {
+  if (!/^https:\/\//.test(metadata[field])) {
+    throw new Error(`${field} must be a full https URL`);
+  }
+}
+
+const expectedProducts = new Map([
+  ["ai.swipebetter.starter", "$3.99"],
+  ["ai.swipebetter.unlimited.monthly", "$16.99"],
+  ["ai.swipebetter.unlimited.annual", "$104.99"],
+]);
+
+if (!Array.isArray(metadata.inAppPurchases)) {
+  throw new Error("inAppPurchases must be an array");
+}
+
+for (const item of metadata.inAppPurchases) {
+  if (!expectedProducts.has(item.productId)) {
+    throw new Error(`Unexpected in-app purchase product: ${item.productId}`);
+  }
+  if (item.price !== expectedProducts.get(item.productId)) {
+    throw new Error(`In-app purchase price drifted for ${item.productId}`);
+  }
+  if ([...(item.displayName || "")].length > 30) {
+    throw new Error(`IAP display name exceeds 30 characters: ${item.productId}`);
+  }
+  if ([...(item.description || "")].length > 45) {
+    throw new Error(`IAP description exceeds 45 characters: ${item.productId}`);
+  }
+  expectedProducts.delete(item.productId);
+}
+
+if (expectedProducts.size) {
+  throw new Error(`Missing IAP metadata: ${Array.from(expectedProducts.keys()).join(", ")}`);
+}
+
+if (!Array.isArray(metadata.screenshots) || metadata.screenshots.length < 5) {
+  throw new Error("At least five screenshot targets are required");
 }
 NODE
 
