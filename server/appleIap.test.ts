@@ -107,6 +107,11 @@ test("Apple app account tokens are normalized before user matching", () => {
   assert.equal(appleAppAccountTokenMatchesUser("d0c13a6c-882e-4c22-8788-0d44559f8418", userId), false);
 });
 
+test("authenticated purchase sync can detect missing Apple app account tokens", () => {
+  assert.equal(normalizedAppleAppAccountToken(undefined), undefined);
+  assert.equal(normalizedAppleAppAccountToken("   "), undefined);
+});
+
 test("decodeAppleJwsPayload decodes payloads and rejects malformed input", () => {
   assert.deepEqual(
     decodeAppleJwsPayload<{ transactionId: string; productId: string }>(unsignedJws({

@@ -319,6 +319,8 @@ const routes = fs.readFileSync("server/routes.ts", "utf8");
 for (const expected of [
   "AppleIapOwnershipError",
   "AppleIapValidationError",
+  "normalizedAppleAppAccountToken(transaction.appAccountToken)",
+  "Apple transaction is missing account token",
   'return res.status(409).json({ error: error.message });',
   'action: "ownership_conflict"',
   'return res.status(400).json({ error: error.message });',

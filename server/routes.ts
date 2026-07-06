@@ -1442,6 +1442,9 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Apple transaction ID mismatch" });
       }
       validateAppleTransaction(transaction, requested.productId);
+      if (!normalizedAppleAppAccountToken(transaction.appAccountToken)) {
+        return res.status(400).json({ error: "Apple transaction is missing account token" });
+      }
       if (!appleAppAccountTokenMatchesUser(transaction.appAccountToken, userId)) {
         return res.status(400).json({ error: "Apple account token mismatch" });
       }
