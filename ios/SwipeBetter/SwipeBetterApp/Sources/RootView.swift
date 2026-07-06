@@ -467,9 +467,38 @@ struct AccountView: View {
           .foregroundStyle(.secondary)
       }
 
+      Section("Apple Billing") {
+        Button {
+          Task { await model.restorePurchases() }
+        } label: {
+          Label("Restore Purchases", systemImage: "arrow.clockwise.circle")
+        }
+
+        Button {
+          Task { await model.manageSubscriptions() }
+        } label: {
+          Label("Manage Subscription", systemImage: "creditcard")
+        }
+      }
+
       if let message = model.purchases.lastPurchaseMessage {
         Section {
           Text(message)
+        }
+      }
+
+      Section("Help") {
+        Link(destination: accountURL("/contact")) {
+          Label("Contact Support", systemImage: "questionmark.circle")
+        }
+        Link(destination: accountURL("/terms")) {
+          Label("Terms of Service", systemImage: "doc.text")
+        }
+        Link(destination: accountURL("/privacy")) {
+          Label("Privacy Policy", systemImage: "hand.raised")
+        }
+        Link(destination: accountURL("/refund-policy")) {
+          Label("Refund Policy", systemImage: "arrow.uturn.backward.circle")
         }
       }
 
@@ -499,6 +528,10 @@ struct AccountView: View {
     default:
       return fallback
     }
+  }
+
+  private func accountURL(_ path: String) -> URL {
+    URL(string: "https://swipebetter.ai\(path)")!
   }
 }
 
@@ -573,4 +606,3 @@ func loadImages(from items: [PhotosPickerItem], limit: Int) async -> [Data] {
   }
   return output
 }
-

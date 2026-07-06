@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import StoreKit
+import UIKit
 
 @MainActor
 @Observable
@@ -50,6 +51,22 @@ final class PurchaseStore {
       guard case .verified(let transaction) = entitlement else { continue }
       try? await sync(transaction: transaction, api: api)
     }
+  }
+
+  func restorePurchases(api: SwipeBetterAPI) async throws {
+    try await AppStore.sync()
+    await syncCurrentEntitlements(api: api)
+    lastPurchaseMessage = "Purchases restored."
+  }
+
+  func manageSubscriptions() async throws {
+    guard let scene = UIApplication.shared.connectedScenes
+      .compactMap({ $0 as? UIWindowScene })
+      .first(where: { $0.activationState == .foregroundActive }) else {
+      throw SwipeBetterAPIError.server(status: 400, message: "Could not open Apple subscription management.")
+    }
+
+    try await AppStore.showManageSubscriptions(in: scene)
   }
 
   private func sync(transaction: Transaction, api: SwipeBetterAPI) async throws {

@@ -169,6 +169,20 @@ final class AppModel {
     }
   }
 
+  func restorePurchases() async {
+    await runBusy {
+      try await purchases.restorePurchases(api: api)
+      await refreshAccount()
+    }
+  }
+
+  func manageSubscriptions() async {
+    await runBusy {
+      try await purchases.manageSubscriptions()
+      await refreshAccount()
+    }
+  }
+
   func loadSharedImport() {
     guard let payload = SharedImportStore.load() else { return }
     pendingImportText = payload.text ?? ""
