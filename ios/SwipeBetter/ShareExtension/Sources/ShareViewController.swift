@@ -18,6 +18,7 @@ final class ShareViewController: UIViewController {
     statusLabel.text = "Sending to SwipeBetter..."
     statusLabel.font = .preferredFont(forTextStyle: .headline)
     statusLabel.textAlignment = .center
+    statusLabel.accessibilityIdentifier = "share.statusLabel"
     statusLabel.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(statusLabel)
 
@@ -114,4 +115,3 @@ private extension String {
     return trimmed.isEmpty ? nil : trimmed
   }
 }
-

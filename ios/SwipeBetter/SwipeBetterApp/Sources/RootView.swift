@@ -48,6 +48,7 @@ struct RootView: View {
             .tabItem { AppTab.account.label }
             .tag(AppTab.account)
         }
+        .accessibilityIdentifier("root.tabView")
       } else {
         AuthView()
       }
@@ -166,14 +167,17 @@ struct AuthView: View {
               .keyboardType(.emailAddress)
               .textInputAutocapitalization(.never)
               .autocorrectionDisabled()
+              .accessibilityIdentifier("auth.emailField")
 
             SecureField("Password", text: $password)
               .textContentType(isSignup ? .newPassword : .password)
+              .accessibilityIdentifier("auth.passwordField")
 
             if isSignup {
               TextField("Promo code", text: $promoCode)
                 .textInputAutocapitalization(.characters)
                 .autocorrectionDisabled()
+                .accessibilityIdentifier("auth.promoCodeField")
             }
           }
           .textFieldStyle(.roundedBorder)
@@ -193,6 +197,7 @@ struct AuthView: View {
           .buttonStyle(.borderedProminent)
           .controlSize(.large)
           .disabled(email.isEmpty || password.count < 8)
+          .accessibilityIdentifier(isSignup ? "auth.createAccountButton" : "auth.loginButton")
 
           if !isSignup {
             Button("Forgot password?") {
@@ -215,6 +220,7 @@ struct AuthView: View {
           .signInWithAppleButtonStyle(.black)
           .frame(height: 50)
           .clipShape(RoundedRectangle(cornerRadius: 8))
+          .accessibilityIdentifier("auth.appleSignInButton")
 
           VStack(alignment: .leading, spacing: 8) {
             Label("iOS pricing includes Apple purchase fees.", systemImage: "info.circle")
@@ -326,6 +332,7 @@ struct ProfileAuditView: View {
         PhotosPicker(selection: $pickerItems, maxSelectionCount: 10, matching: .images) {
           Label(images.isEmpty ? "Add profile screenshots" : "\(images.count) screenshots selected", systemImage: "photo.on.rectangle.angled")
         }
+        .accessibilityIdentifier("audit.addScreenshotsButton")
         ScreenshotStrip(images: images, onRemove: removeImage)
         if !images.isEmpty {
           Button(role: .destructive) {
@@ -359,6 +366,7 @@ struct ProfileAuditView: View {
           Label("Run Profile Audit", systemImage: "wand.and.stars")
         }
         .disabled(model.isBusy || images.isEmpty)
+        .accessibilityIdentifier("audit.runButton")
       }
 
       if let analysis = result?.analysis {
@@ -452,6 +460,7 @@ struct ReplyAssistantView: View {
       Section("Conversation") {
         TextEditor(text: $conversation)
           .frame(minHeight: 160)
+          .accessibilityIdentifier("replies.conversationEditor")
           .overlay(alignment: .topLeading) {
             if conversation.isEmpty {
               Text("Paste the chat here.")
@@ -464,6 +473,7 @@ struct ReplyAssistantView: View {
         PhotosPicker(selection: $pickerItems, maxSelectionCount: 3, matching: .images) {
           Label(images.isEmpty ? "Add chat screenshots" : "\(images.count) screenshots selected", systemImage: "photo.badge.plus")
         }
+        .accessibilityIdentifier("replies.addScreenshotsButton")
         ScreenshotStrip(images: images, onRemove: removeImage)
         if !images.isEmpty {
           Button(role: .destructive) {
@@ -496,6 +506,7 @@ struct ReplyAssistantView: View {
           Label("Generate Replies", systemImage: "sparkles")
         }
         .disabled(model.isBusy || (conversation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && images.isEmpty))
+        .accessibilityIdentifier("replies.generateButton")
       }
 
       if let parsed = response?.parsed {
@@ -510,6 +521,7 @@ struct ReplyAssistantView: View {
                 Label("Copy reply \(index + 1)", systemImage: "doc.on.doc")
               }
               .buttonStyle(.bordered)
+              .accessibilityIdentifier("replies.copyButton.\(index + 1)")
             }
           }
         }
@@ -615,6 +627,7 @@ struct HistoryView: View {
       }
     }
     .navigationTitle("History")
+    .accessibilityIdentifier("history.list")
     .refreshable {
       await model.refreshHistory()
     }
@@ -681,6 +694,7 @@ struct AccountView: View {
               }
             }
             .disabled(model.isBusy || model.purchases.purchasingProductId != nil)
+            .accessibilityIdentifier("account.purchaseButton.\(product.id)")
           }
         }
 
@@ -702,12 +716,14 @@ struct AccountView: View {
           }
         }
         .disabled(model.isBusy || model.purchases.isRestoringPurchases)
+        .accessibilityIdentifier("account.restorePurchasesButton")
 
         Button {
           Task { await model.manageSubscriptions() }
         } label: {
           Label("Manage Subscription", systemImage: "creditcard")
         }
+        .accessibilityIdentifier("account.manageSubscriptionButton")
       }
 
       if let message = model.purchases.lastPurchaseMessage {
@@ -741,6 +757,7 @@ struct AccountView: View {
         } label: {
           Label("Delete Account", systemImage: "trash")
         }
+        .accessibilityIdentifier("account.deleteAccountButton")
       }
 
       Section {
@@ -749,6 +766,7 @@ struct AccountView: View {
         } label: {
           Label("Log Out", systemImage: "rectangle.portrait.and.arrow.right")
         }
+        .accessibilityIdentifier("account.logoutButton")
       }
     }
     .navigationTitle("Account")

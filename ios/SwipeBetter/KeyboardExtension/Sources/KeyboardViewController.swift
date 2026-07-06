@@ -36,11 +36,11 @@ final class KeyboardViewController: UIInputViewController {
     row.spacing = 8
     stack.addArrangedSubview(row)
 
-    let nextButton = button(title: "Next Keyboard", systemImage: "globe", action: #selector(switchToNextKeyboard))
+    let nextButton = button(title: "Next Keyboard", systemImage: "globe", accessibilityIdentifier: "keyboard.nextKeyboardButton", action: #selector(switchToNextKeyboard))
     nextButton.accessibilityLabel = "Next keyboard"
     nextKeyboardButton = nextButton
     row.addArrangedSubview(nextButton)
-    row.addArrangedSubview(button(title: "Coach Chat", systemImage: "sparkles", action: #selector(openCoach)))
+    row.addArrangedSubview(button(title: "Coach Chat", systemImage: "sparkles", accessibilityIdentifier: "keyboard.coachChatButton", action: #selector(openCoach)))
 
     let replyRow = UIStackView()
     replyRow.axis = .horizontal
@@ -48,8 +48,8 @@ final class KeyboardViewController: UIInputViewController {
     replyRow.spacing = 8
     stack.addArrangedSubview(replyRow)
 
-    replyRow.addArrangedSubview(button(title: "Warm Reply", action: #selector(insertWarmReply)))
-    replyRow.addArrangedSubview(button(title: "Ask Out", action: #selector(insertAskOutPrompt)))
+    replyRow.addArrangedSubview(button(title: "Warm Reply", accessibilityIdentifier: "keyboard.warmReplyButton", action: #selector(insertWarmReply)))
+    replyRow.addArrangedSubview(button(title: "Ask Out", accessibilityIdentifier: "keyboard.askOutButton", action: #selector(insertAskOutPrompt)))
 
     let reviveRow = UIStackView()
     reviveRow.axis = .horizontal
@@ -57,7 +57,7 @@ final class KeyboardViewController: UIInputViewController {
     reviveRow.spacing = 8
     stack.addArrangedSubview(reviveRow)
 
-    reviveRow.addArrangedSubview(button(title: "Revive Chat", action: #selector(insertRevivePrompt)))
+    reviveRow.addArrangedSubview(button(title: "Revive Chat", accessibilityIdentifier: "keyboard.reviveChatButton", action: #selector(insertRevivePrompt)))
 
     NSLayoutConstraint.activate([
       stack.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -67,7 +67,7 @@ final class KeyboardViewController: UIInputViewController {
     ])
   }
 
-  private func button(title: String, systemImage: String? = nil, action: Selector) -> UIButton {
+  private func button(title: String, systemImage: String? = nil, accessibilityIdentifier: String, action: Selector) -> UIButton {
     var configuration = UIButton.Configuration.filled()
     configuration.title = title
     if let systemImage {
@@ -77,6 +77,7 @@ final class KeyboardViewController: UIInputViewController {
     configuration.cornerStyle = .medium
     configuration.baseBackgroundColor = .systemBlue
     let button = UIButton(configuration: configuration)
+    button.accessibilityIdentifier = accessibilityIdentifier
     button.addTarget(self, action: action, for: .touchUpInside)
     return button
   }

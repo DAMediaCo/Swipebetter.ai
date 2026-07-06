@@ -275,6 +275,19 @@ assertIncludes(clearStateMatch[0], "stopPurchaseUpdates()", "purchase listener p
 
 const rootView = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/RootView.swift", "utf8");
 for (const expected of [
+  '"root.tabView"',
+  '"auth.emailField"',
+  '"auth.passwordField"',
+  '"auth.appleSignInButton"',
+  '"audit.addScreenshotsButton"',
+  '"audit.runButton"',
+  '"replies.conversationEditor"',
+  '"replies.generateButton"',
+  '"history.list"',
+  '"account.restorePurchasesButton"',
+  '"account.manageSubscriptionButton"',
+  '"account.deleteAccountButton"',
+  '"account.logoutButton"',
   "ProfileAuditView(isActive: selectedTab == .audit)",
   "ReplyAssistantView(isActive: selectedTab == .replies)",
   "SignInWithAppleButton(.continue)",
@@ -310,6 +323,7 @@ if (/checkout|stripe/i.test(rootView.replace("Web Stripe checkout is intentional
 
 const shareExtension = fs.readFileSync("ios/SwipeBetter/ShareExtension/Sources/ShareViewController.swift", "utf8");
 for (const expected of [
+  '"share.statusLabel"',
   "Array(images.prefix(10))",
   'statusLabel.text = "Opening SwipeBetter..."',
   'URL(string: "swipebetter://import")',
@@ -321,9 +335,13 @@ const keyboardExtension = fs.readFileSync("ios/SwipeBetter/KeyboardExtension/Sou
 for (const expected of [
   "private var nextKeyboardButton: UIButton?",
   "nextKeyboardButton?.isHidden = !needsInputModeSwitchKey",
-  'button(title: "Next Keyboard", systemImage: "globe", action: #selector(switchToNextKeyboard))',
+  'button(title: "Next Keyboard", systemImage: "globe", accessibilityIdentifier: "keyboard.nextKeyboardButton", action: #selector(switchToNextKeyboard))',
   "advanceToNextInputMode()",
-  'button(title: "Coach Chat", systemImage: "sparkles", action: #selector(openCoach))',
+  'button(title: "Coach Chat", systemImage: "sparkles", accessibilityIdentifier: "keyboard.coachChatButton", action: #selector(openCoach))',
+  '"keyboard.warmReplyButton"',
+  '"keyboard.askOutButton"',
+  '"keyboard.reviveChatButton"',
+  "button.accessibilityIdentifier = accessibilityIdentifier",
   'URL(string: "swipebetter://replies")',
   "URLQueryItem(name: \"text\", value: context)",
   "textDocumentProxy.documentContextBeforeInput",
