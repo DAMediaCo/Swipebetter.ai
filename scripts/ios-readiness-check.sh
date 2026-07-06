@@ -438,6 +438,7 @@ for (const expected of [
   "npm run test:ios-iap",
   "Run iOS readiness checks",
   "Run native iOS UI tests",
+  "github.event_name == 'pull_request' || github.ref == 'refs/heads/main'",
   "npm run test:ios-ui",
   "Run iOS simulator smoke",
 ]) {

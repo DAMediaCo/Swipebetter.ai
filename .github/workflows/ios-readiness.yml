@@ -36,10 +36,12 @@ jobs:
         run: scripts/ios-readiness-check.sh
 
       - name: Run native iOS UI tests
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
         timeout-minutes: 22
         run: npm run test:ios-ui
 
       - name: Run iOS simulator smoke
+        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
         timeout-minutes: 15
         env:
           IOS_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/swipebetter-ios-smoke
@@ -47,7 +49,7 @@ jobs:
         run: npm run smoke:ios-simulator
 
       - name: Upload iOS simulator smoke artifacts
-        if: always()
+        if: always() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
         uses: actions/upload-artifact@v4
         with:
           name: ios-simulator-smoke-${{ github.run_id }}-${{ github.run_attempt }}
