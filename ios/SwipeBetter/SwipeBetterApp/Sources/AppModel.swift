@@ -183,6 +183,19 @@ final class AppModel {
     }
   }
 
+  func deleteAccount() async {
+    await runBusy {
+      let _: EmptyResponse = try await api.delete("/api/account")
+      user = nil
+      me = nil
+      credits = nil
+      profileHistory = []
+      replyHistory = []
+      pendingImportText = ""
+      pendingImportImages = []
+    }
+  }
+
   func loadSharedImport() {
     guard let payload = SharedImportStore.load() else { return }
     pendingImportText = payload.text ?? ""

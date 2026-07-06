@@ -425,6 +425,7 @@ struct HistoryView: View {
 
 struct AccountView: View {
   @Environment(AppModel.self) private var model
+  @State private var showingDeleteConfirmation = false
 
   var body: some View {
     List {
@@ -502,6 +503,18 @@ struct AccountView: View {
         }
       }
 
+      Section("Delete Account") {
+        Text("This permanently removes your SwipeBetter account, saved audits, reply history, credits, and profile data. If you have an Apple subscription, manage or cancel it with Apple first.")
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+
+        Button(role: .destructive) {
+          showingDeleteConfirmation = true
+        } label: {
+          Label("Delete Account", systemImage: "trash")
+        }
+      }
+
       Section {
         Button(role: .destructive) {
           Task { await model.logout() }
@@ -514,6 +527,18 @@ struct AccountView: View {
     .refreshable {
       await model.refreshAccount()
       await model.purchases.loadProducts()
+    }
+    .confirmationDialog(
+      "Delete your SwipeBetter account?",
+      isPresented: $showingDeleteConfirmation,
+      titleVisibility: .visible
+    ) {
+      Button("Delete Account", role: .destructive) {
+        Task { await model.deleteAccount() }
+      }
+      Button("Cancel", role: .cancel) {}
+    } message: {
+      Text("This cannot be undone. Apple subscriptions must be managed through Apple billing.")
     }
   }
 

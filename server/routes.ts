@@ -302,6 +302,40 @@ export async function registerRoutes(
     });
   });
 
+  app.delete("/api/account", requireAuth, async (req: any, res) => {
+    const userId = req.session.userId;
+
+    try {
+      const subscription = await storage.getUserSubscription(userId);
+      const stripeSubscriptionId = subscription?.stripeSubscriptionId;
+      const shouldCancelStripe = !!stripeSubscriptionId
+        && ["active", "trialing", "past_due", "unpaid"].includes(subscription?.status || "");
+
+      if (shouldCancelStripe) {
+        const stripe = await getUncachableStripeClient();
+        await stripe.subscriptions.cancel(stripeSubscriptionId);
+      }
+
+      await db.delete(users).where(eq(users.id, userId));
+
+      req.session.destroy((err: Error | null) => {
+        if (err) {
+          console.error("Delete account session cleanup error:", err);
+          return res.status(500).json({ error: "Account deleted, but session cleanup failed" });
+        }
+
+        res.clearCookie("connect.sid");
+        res.json({
+          success: true,
+          stripeSubscriptionCanceled: shouldCancelStripe,
+        });
+      });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      res.status(500).json({ error: "Failed to delete account" });
+    }
+  });
+
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     const subscription = await storage.getUserSubscription(req.session.userId);
     const planTier = await storage.getPlanTier(req.session.userId);

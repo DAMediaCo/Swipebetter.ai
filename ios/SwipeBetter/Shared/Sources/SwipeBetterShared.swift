@@ -212,6 +212,13 @@ public final class SwipeBetterAPI: Sendable {
     return try await send(request)
   }
 
+  public func delete<Response: Decodable>(_ path: String, as type: Response.Type = Response.self) async throws -> Response {
+    var request = URLRequest(url: SwipeBetterConfig.apiBaseURL.appending(path: path))
+    request.httpMethod = "DELETE"
+    request.httpShouldHandleCookies = true
+    return try await send(request)
+  }
+
   private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
     let (data, response) = try await session.data(for: request)
     guard let http = response as? HTTPURLResponse else {
