@@ -177,6 +177,32 @@ function appleDate(value?: number): Date | null {
   return value ? new Date(Number(value)) : null;
 }
 
+async function resolveAppleNotificationUser(transaction: AppleTransactionPayload): Promise<{
+  userId?: string;
+  accountTokenMismatch: boolean;
+}> {
+  const storedUserId = await storage.getAppleTransactionUserId(
+    transaction.transactionId,
+    transaction.originalTransactionId || null
+  );
+  if (storedUserId) {
+    return {
+      userId: storedUserId,
+      accountTokenMismatch: !appleAppAccountTokenMatchesUser(transaction.appAccountToken, storedUserId),
+    };
+  }
+
+  const accountToken = normalizedAppleAppAccountToken(transaction.appAccountToken);
+  const accountTokenUser = accountToken
+    ? await storage.getUser(accountToken)
+    : undefined;
+
+  return {
+    userId: accountTokenUser?.id,
+    accountTokenMismatch: false,
+  };
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -1516,12 +1542,20 @@ export async function registerRoutes(
       const action = classifyAppleNotification(notification.notificationType, transaction);
 
       if (action === "expired") {
-        const accountToken = normalizedAppleAppAccountToken(transaction.appAccountToken);
-        const accountTokenUser = accountToken
-          ? await storage.getUser(accountToken)
-          : undefined;
+        const resolution = await resolveAppleNotificationUser(transaction);
+        if (resolution.accountTokenMismatch) {
+          return res.json({
+            success: true,
+            processed: false,
+            action: "account_token_mismatch",
+            notificationType: notification.notificationType || null,
+            subtype: notification.subtype || null,
+            notificationUUID: notification.notificationUUID || null,
+          });
+        }
+
         const result = await storage.expireAppleEntitlement({
-          userId: accountTokenUser?.id || null,
+          userId: resolution.userId || null,
           transactionId: transaction.transactionId,
           originalTransactionId: transaction.originalTransactionId || null,
           productId: transaction.productId,
@@ -1540,16 +1574,8 @@ export async function registerRoutes(
       }
 
       if (action === "renewed") {
-        let userId = await storage.getAppleTransactionUserId(
-          transaction.transactionId,
-          transaction.originalTransactionId || null
-        );
-
-        const accountToken = normalizedAppleAppAccountToken(transaction.appAccountToken);
-        if (!userId && accountToken) {
-          const accountTokenUser = await storage.getUser(accountToken);
-          userId = accountTokenUser?.id;
-        }
+        const resolution = await resolveAppleNotificationUser(transaction);
+        const userId = resolution.userId;
 
         if (!userId) {
           return res.json({
@@ -1557,6 +1583,17 @@ export async function registerRoutes(
             processed: false,
             action: "renewal_unmatched",
             notificationType: notification.notificationType || null,
+            notificationUUID: notification.notificationUUID || null,
+          });
+        }
+
+        if (resolution.accountTokenMismatch) {
+          return res.json({
+            success: true,
+            processed: false,
+            action: "account_token_mismatch",
+            notificationType: notification.notificationType || null,
+            subtype: notification.subtype || null,
             notificationUUID: notification.notificationUUID || null,
           });
         }
