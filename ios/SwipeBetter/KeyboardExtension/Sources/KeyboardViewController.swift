@@ -31,7 +31,7 @@ final class KeyboardViewController: UIInputViewController {
     stack.addArrangedSubview(row)
 
     row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))
-    row.addArrangedSubview(button(title: "Paste Context", action: #selector(pasteSavedContext)))
+    row.addArrangedSubview(button(title: "Warm Reply", action: #selector(insertWarmReply)))
 
     let replyRow = UIStackView()
     replyRow.axis = .horizontal
@@ -65,12 +65,8 @@ final class KeyboardViewController: UIInputViewController {
     extensionContext?.open(url)
   }
 
-  @objc private func pasteSavedContext() {
-    if let payload = SharedImportStore.load(), let text = payload.text, !text.isEmpty {
-      textDocumentProxy.insertText(text)
-    } else {
-      textDocumentProxy.insertText("I want to keep this playful and easy. What would make this week fun for you?")
-    }
+  @objc private func insertWarmReply() {
+    textDocumentProxy.insertText("I want to keep this playful and easy. What would make this week fun for you?")
   }
 
   @objc private func insertAskOutPrompt() {
@@ -81,4 +77,3 @@ final class KeyboardViewController: UIInputViewController {
     textDocumentProxy.insertText("I disappeared for a minute, but this conversation deserved a better comeback.")
   }
 }
-

@@ -62,7 +62,6 @@ targets:
     type: app-extension
     platform: iOS
     sources:
-      - path: Shared/Sources
       - path: KeyboardExtension/Sources
       - path: Shared/Resources/PrivacyInfo.xcprivacy
         buildPhase: resources

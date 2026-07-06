@@ -21,7 +21,6 @@
 		C6BCD8D5A6BF6F11D73BC674 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224C6A0979B8FD308802F0B /* ShareViewController.swift */; };
 		DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */; };
 		EBC57AFC074C49D9A09B4060 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
-		EF9E14CB172F156CC2EDBAB3 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -301,7 +300,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */,
-				EF9E14CB172F156CC2EDBAB3 /* SwipeBetterShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
