@@ -133,6 +133,24 @@ for (const expected of [
 const authSchema = fs.readFileSync("shared/models/auth.ts", "utf8");
 assertIncludes(authSchema, 'id: varchar("id").primaryKey().default(sql`gen_random_uuid()`)', "user ID UUID contract");
 
+const authRoutes = fs.readFileSync("server/auth.ts", "utf8");
+for (const expected of [
+  'process.env.APPLE_CLIENT_ID',
+  'process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app"',
+  '"ai.swipebetter.app"',
+]) {
+  assertIncludes(authRoutes, expected, "native Apple Sign In audience contract");
+}
+for (const disallowed of [
+  "host.exp.Exponent",
+  "com.swipebetter.app",
+  "app.replit.swipebetter",
+]) {
+  if (authRoutes.includes(disallowed)) {
+    throw new Error(`Native Apple Sign In must not accept dev audience: ${disallowed}`);
+  }
+}
+
 const purchaseStore = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/PurchaseStore.swift", "utf8");
 for (const expected of [
   "userId.flatMap(UUID.init(uuidString:))",

@@ -281,16 +281,12 @@ export function registerAuthRoutes(app: Express) {
 
       // Accept multiple valid audiences for Apple Sign In:
       // - Web client ID (APPLE_CLIENT_ID)
-      // - Expo Go development (host.exp.Exponent)
       // - Production mobile app bundle ID
-      const validAudiences = [
+      const validAudiences = Array.from(new Set([
         process.env.APPLE_CLIENT_ID,
-        process.env.APPLE_BUNDLE_ID,
+        process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app",
         "ai.swipebetter.app",
-        "host.exp.Exponent",
-        "com.swipebetter.app",
-        "app.replit.swipebetter",
-      ].filter(Boolean) as string[];
+      ].filter(Boolean))) as string[];
       
 
       let payload;
