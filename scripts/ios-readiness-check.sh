@@ -376,6 +376,9 @@ if (packageJson.scripts?.["check:ios-release"] !== "scripts/ios-release-prefligh
 if (packageJson.scripts?.["check:ios-entitlement-sync"] !== "tsx scripts/ios-entitlement-sync-preflight.ts") {
   throw new Error("package.json must expose scripts/ios-entitlement-sync-preflight.ts as check:ios-entitlement-sync");
 }
+if (packageJson.scripts?.["check:ios-submission"] !== "tsx scripts/ios-submission-preflight.ts") {
+  throw new Error("package.json must expose scripts/ios-submission-preflight.ts as check:ios-submission");
+}
 
 const entitlementSyncPreflight = fs.readFileSync("scripts/ios-entitlement-sync-preflight.ts", "utf8");
 for (const expected of [
@@ -393,6 +396,20 @@ for (const expected of [
   "Live iOS entitlement sync preflight passed.",
 ]) {
   assertIncludes(entitlementSyncPreflight, expected, "live iOS entitlement sync preflight contract");
+}
+
+const submissionPreflight = fs.readFileSync("scripts/ios-submission-preflight.ts", "utf8");
+for (const expected of [
+  "APPLE_DEVELOPMENT_TEAM",
+  "APPLE_APP_ID",
+  "APPLE_IAP_TEST_TRANSACTION_ID",
+  "SWIPEBETTER_SESSION_COOKIE",
+  "APP_REVIEW_ACCESS_NOTES",
+  "App Store metadata text limits",
+  "Live entitlement sync command",
+  "iOS submission preflight blocked",
+]) {
+  assertIncludes(submissionPreflight, expected, "final iOS submission preflight contract");
 }
 NODE
 
