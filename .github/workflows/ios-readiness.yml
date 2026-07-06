@@ -26,6 +26,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run TypeScript check
+        run: npm run check
+
+      - name: Run Apple IAP unit tests
+        run: npm run test:ios-iap
+
       - name: Run iOS readiness checks
         run: scripts/ios-readiness-check.sh
 

@@ -320,6 +320,18 @@ for (const expected of [
   assertIncludes(releaseScript, expected, "signed iOS release preflight contract");
 }
 
+const iosReadinessWorkflow = fs.readFileSync(".github/workflows/ios-readiness.yml", "utf8");
+for (const expected of [
+  "Run TypeScript check",
+  "npm run check",
+  "Run Apple IAP unit tests",
+  "npm run test:ios-iap",
+  "Run iOS readiness checks",
+  "Run iOS simulator smoke",
+]) {
+  assertIncludes(iosReadinessWorkflow, expected, "iOS CI gate contract");
+}
+
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 if (packageJson.scripts?.["check:ios-release"] !== "scripts/ios-release-preflight.sh") {
   throw new Error("package.json must expose scripts/ios-release-preflight.sh as check:ios-release");
