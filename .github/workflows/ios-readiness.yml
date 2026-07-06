@@ -30,4 +30,15 @@ jobs:
         run: scripts/ios-readiness-check.sh
 
       - name: Run iOS simulator smoke
+        env:
+          IOS_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/swipebetter-ios-smoke
         run: npm run smoke:ios-simulator
+
+      - name: Upload iOS simulator smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/swipebetter-ios-smoke
+          if-no-files-found: warn
+          retention-days: 14

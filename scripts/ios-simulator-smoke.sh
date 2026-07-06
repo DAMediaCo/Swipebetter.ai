@@ -10,6 +10,7 @@ SIMULATOR_NAME="${IOS_SMOKE_SIMULATOR_NAME:-iPhone SE (3rd generation)}"
 DERIVED_DATA="${IOS_SMOKE_DERIVED_DATA:-$(mktemp -d /tmp/swipebetter-ios-smoke-derived.XXXXXX)}"
 ARTIFACT_DIR="${IOS_SMOKE_ARTIFACT_DIR:-/tmp/swipebetter-ios-smoke}"
 SCREENSHOT_PATH="$ARTIFACT_DIR/swipebetter-ios-smoke-$(date +%Y%m%d%H%M%S).png"
+SUMMARY_PATH="$ARTIFACT_DIR/smoke-summary.txt"
 DEVICES_JSON="$(mktemp /tmp/swipebetter-ios-devices.XXXXXX.json)"
 
 cleanup() {
@@ -91,7 +92,32 @@ if [[ ! -s "$SCREENSHOT_PATH" ]]; then
   exit 1
 fi
 
+SCREENSHOT_BYTES="$(wc -c < "$SCREENSHOT_PATH" | tr -d ' ')"
+SCREENSHOT_WIDTH="$(sips -g pixelWidth "$SCREENSHOT_PATH" 2>/dev/null | awk '/pixelWidth/ { print $2 }')"
+SCREENSHOT_HEIGHT="$(sips -g pixelHeight "$SCREENSHOT_PATH" 2>/dev/null | awk '/pixelHeight/ { print $2 }')"
+
+if [[ "${SCREENSHOT_BYTES:-0}" -lt 10000 ]]; then
+  echo "Smoke screenshot is suspiciously small: ${SCREENSHOT_BYTES:-0} bytes." >&2
+  exit 1
+fi
+
+if [[ "${SCREENSHOT_WIDTH:-0}" -lt 300 || "${SCREENSHOT_HEIGHT:-0}" -lt 500 ]]; then
+  echo "Smoke screenshot dimensions look wrong: ${SCREENSHOT_WIDTH:-0}x${SCREENSHOT_HEIGHT:-0}." >&2
+  exit 1
+fi
+
 xcrun simctl terminate "$SIMULATOR_ID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+
+cat > "$SUMMARY_PATH" <<SUMMARY
+iOS simulator smoke passed.
+Simulator: $SIMULATOR_LABEL [$SIMULATOR_ID]
+Bundle ID: $BUNDLE_ID
+Screenshot: $SCREENSHOT_PATH
+Screenshot bytes: $SCREENSHOT_BYTES
+Screenshot dimensions: ${SCREENSHOT_WIDTH}x${SCREENSHOT_HEIGHT}
+SUMMARY
 
 echo "iOS simulator smoke passed."
 echo "Screenshot: $SCREENSHOT_PATH"
+echo "Screenshot dimensions: ${SCREENSHOT_WIDTH}x${SCREENSHOT_HEIGHT}"
+echo "Summary: $SUMMARY_PATH"
