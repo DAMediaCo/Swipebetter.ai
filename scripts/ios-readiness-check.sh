@@ -200,12 +200,15 @@ for (const expected of [
   "try? await purchases.syncCurrentEntitlements(api: api)",
   "try await purchases.restorePurchases(api: api)",
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
+  "func consumePendingImport()",
 ]) {
   assertIncludes(appModel, expected, "Apple restore sync contract");
 }
 
 const rootView = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/RootView.swift", "utf8");
 for (const expected of [
+  "ProfileAuditView(isActive: selectedTab == .audit)",
+  "ReplyAssistantView(isActive: selectedTab == .replies)",
   "SignInWithAppleButton(.continue)",
   'Link("Terms", destination: authURL("/terms"))',
   'Link("Privacy", destination: authURL("/privacy"))',
@@ -221,7 +224,10 @@ for (const expected of [
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
   "routeToPendingImportIfNeeded()",
   ".onChange(of: model.isSignedIn)",
+  ".onChange(of: isActive)",
   "guard model.isSignedIn else { return }",
+  "guard isActive else { return }",
+  "model.consumePendingImport()",
   "selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies",
 ]) {
   assertIncludes(rootView, expected, "iOS App Review UI contract");
@@ -246,6 +252,15 @@ for (const expected of [
   "textDocumentProxy.insertText",
 ]) {
   assertIncludes(keyboardExtension, expected, "keyboard extension privacy contract");
+}
+
+const smokeScript = fs.readFileSync("scripts/ios-simulator-smoke.sh", "utf8");
+for (const expected of [
+  'SETTLE_SECONDS="${IOS_SMOKE_SETTLE_SECONDS:-5}"',
+  'MIN_SCREENSHOT_BYTES="${IOS_SMOKE_MIN_SCREENSHOT_BYTES:-50000}"',
+  "Smoke screenshot attempt $attempt looked blank or incomplete",
+]) {
+  assertIncludes(smokeScript, expected, "iOS simulator smoke visual-readiness contract");
 }
 NODE
 

@@ -251,6 +251,11 @@ final class AppModel {
     SharedImportStore.clear(payload)
   }
 
+  func consumePendingImport() {
+    pendingImportText = ""
+    pendingImportImages = []
+  }
+
   private func pollProfile(jobId: String) async throws -> ProfileStatusResponse {
     for _ in 0..<30 {
       try Task.checkCancellation()

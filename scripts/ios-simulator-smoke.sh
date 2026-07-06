@@ -12,6 +12,8 @@ ARTIFACT_DIR="${IOS_SMOKE_ARTIFACT_DIR:-/tmp/swipebetter-ios-smoke}"
 SCREENSHOT_PATH="$ARTIFACT_DIR/swipebetter-ios-smoke-$(date +%Y%m%d%H%M%S).png"
 SUMMARY_PATH="$ARTIFACT_DIR/smoke-summary.txt"
 DEVICES_JSON="$(mktemp /tmp/swipebetter-ios-devices.XXXXXX.json)"
+SETTLE_SECONDS="${IOS_SMOKE_SETTLE_SECONDS:-5}"
+MIN_SCREENSHOT_BYTES="${IOS_SMOKE_MIN_SCREENSHOT_BYTES:-50000}"
 
 cleanup() {
   rm -f "$DEVICES_JSON"
@@ -83,20 +85,33 @@ if [[ "$LAUNCH_OUTPUT" != *"$BUNDLE_ID"* ]]; then
   exit 1
 fi
 
-sleep 2
-
 echo "Capturing smoke screenshot..."
-xcrun simctl io "$SIMULATOR_ID" screenshot "$SCREENSHOT_PATH"
-if [[ ! -s "$SCREENSHOT_PATH" ]]; then
-  echo "Smoke screenshot was not created." >&2
-  exit 1
-fi
+for attempt in 1 2 3; do
+  if [[ "$attempt" == "1" ]]; then
+    sleep "$SETTLE_SECONDS"
+  else
+    sleep 2
+  fi
+
+  xcrun simctl io "$SIMULATOR_ID" screenshot "$SCREENSHOT_PATH"
+  if [[ ! -s "$SCREENSHOT_PATH" ]]; then
+    echo "Smoke screenshot was not created on attempt $attempt." >&2
+    continue
+  fi
+
+  SCREENSHOT_BYTES="$(wc -c < "$SCREENSHOT_PATH" | tr -d ' ')"
+  if [[ "${SCREENSHOT_BYTES:-0}" -ge "$MIN_SCREENSHOT_BYTES" ]]; then
+    break
+  fi
+
+  echo "Smoke screenshot attempt $attempt looked blank or incomplete: ${SCREENSHOT_BYTES:-0} bytes." >&2
+done
 
 SCREENSHOT_BYTES="$(wc -c < "$SCREENSHOT_PATH" | tr -d ' ')"
 SCREENSHOT_WIDTH="$(sips -g pixelWidth "$SCREENSHOT_PATH" 2>/dev/null | awk '/pixelWidth/ { print $2 }')"
 SCREENSHOT_HEIGHT="$(sips -g pixelHeight "$SCREENSHOT_PATH" 2>/dev/null | awk '/pixelHeight/ { print $2 }')"
 
-if [[ "${SCREENSHOT_BYTES:-0}" -lt 10000 ]]; then
+if [[ "${SCREENSHOT_BYTES:-0}" -lt "$MIN_SCREENSHOT_BYTES" ]]; then
   echo "Smoke screenshot is suspiciously small: ${SCREENSHOT_BYTES:-0} bytes." >&2
   exit 1
 fi

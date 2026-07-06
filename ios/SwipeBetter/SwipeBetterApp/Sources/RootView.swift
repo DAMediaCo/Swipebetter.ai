@@ -32,11 +32,11 @@ struct RootView: View {
     Group {
       if model.isSignedIn {
         TabView(selection: $selectedTab) {
-          NavigationStack { ProfileAuditView() }
+          NavigationStack { ProfileAuditView(isActive: selectedTab == .audit) }
             .tabItem { AppTab.audit.label }
             .tag(AppTab.audit)
 
-          NavigationStack { ReplyAssistantView() }
+          NavigationStack { ReplyAssistantView(isActive: selectedTab == .replies) }
             .tabItem { AppTab.replies.label }
             .tag(AppTab.replies)
 
@@ -273,6 +273,7 @@ struct PasswordResetSheet: View {
 
 struct ProfileAuditView: View {
   @Environment(AppModel.self) private var model
+  let isActive: Bool
   @State private var platform = "Tinder"
   @State private var gender = "Man"
   @State private var intent = "Relationship"
@@ -366,17 +367,24 @@ struct ProfileAuditView: View {
     .onChange(of: model.importRevision) { _, _ in
       applyPendingImport()
     }
+    .onChange(of: isActive) { _, active in
+      if active {
+        applyPendingImport()
+      }
+    }
     .onAppear {
       applyPendingImport()
     }
   }
 
   private func applyPendingImport() {
+    guard isActive else { return }
     guard appliedImportRevision != model.importRevision else { return }
     appliedImportRevision = model.importRevision
-    if !model.pendingImportImages.isEmpty {
-      images = model.pendingImportImages
-    }
+    guard model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+    guard !model.pendingImportImages.isEmpty else { return }
+    images = model.pendingImportImages
+    model.consumePendingImport()
   }
 
   private func removeImage(at index: Int) {
@@ -388,6 +396,7 @@ struct ProfileAuditView: View {
 
 struct ReplyAssistantView: View {
   @Environment(AppModel.self) private var model
+  let isActive: Bool
   @State private var tone = "flirty"
   @State private var goal = "keep_going"
   @State private var enm = false
@@ -497,18 +506,32 @@ struct ReplyAssistantView: View {
     .onChange(of: model.importRevision) { _, _ in
       applyPendingImport()
     }
+    .onChange(of: isActive) { _, active in
+      if active {
+        applyPendingImport()
+      }
+    }
     .onAppear {
       applyPendingImport()
     }
   }
 
   private func applyPendingImport() {
+    guard isActive else { return }
     guard appliedImportRevision != model.importRevision else { return }
     appliedImportRevision = model.importRevision
+    var appliedImport = false
     if !model.pendingImportText.isEmpty {
       conversation = model.pendingImportText
+      appliedImport = true
     }
-    images = model.pendingImportImages
+    if !model.pendingImportImages.isEmpty {
+      images = model.pendingImportImages
+      appliedImport = true
+    }
+    if appliedImport {
+      model.consumePendingImport()
+    }
   }
 
   private func removeImage(at index: Int) {
