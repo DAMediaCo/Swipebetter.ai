@@ -116,6 +116,8 @@ for (const expected of [
   "clearAll()",
   "try? FileManager.default.removeItem(at: directoryURL)",
   "removeDirectoryIfEmpty(directoryURL)",
+  "let cleanText = text?.trimmingCharacters(in: .whitespacesAndNewlines)",
+  "guard cleanText?.isEmpty == false || !images.isEmpty else",
 ]) {
   assertIncludes(shared, expected, "shared import cleanup contract");
 }
@@ -143,6 +145,42 @@ for (const expected of [
   "SharedImportStore.clearAll()",
 ]) {
   assertIncludes(logoutMatch[0], expected, "logout privacy cleanup contract");
+}
+
+const rootView = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/RootView.swift", "utf8");
+for (const expected of [
+  "SignInWithAppleButton(.continue)",
+  'Link("Terms", destination: authURL("/terms"))',
+  'Link("Privacy", destination: authURL("/privacy"))',
+  'Link("Support", destination: authURL("/contact"))',
+  'Label("iOS pricing includes Apple purchase fees.", systemImage: "info.circle")',
+  'Text("Starter $3.99, Unlimited $16.99/month, Annual $104.99/year.")',
+  'Text("iOS purchases are billed by Apple. Web Stripe checkout is intentionally not shown inside the app.")',
+  'Label("Restore Purchases", systemImage: "arrow.clockwise.circle")',
+  'Label("Manage Subscription", systemImage: "creditcard")',
+]) {
+  assertIncludes(rootView, expected, "iOS App Review UI contract");
+}
+if (/checkout|stripe/i.test(rootView.replace("Web Stripe checkout is intentionally not shown inside the app.", ""))) {
+  throw new Error("iOS app UI must not expose web Stripe checkout paths");
+}
+
+const shareExtension = fs.readFileSync("ios/SwipeBetter/ShareExtension/Sources/ShareViewController.swift", "utf8");
+for (const expected of [
+  "Array(images.prefix(10))",
+  'statusLabel.text = "Opening SwipeBetter..."',
+  'URL(string: "swipebetter://import")',
+]) {
+  assertIncludes(shareExtension, expected, "share extension import contract");
+}
+
+const keyboardExtension = fs.readFileSync("ios/SwipeBetter/KeyboardExtension/Sources/KeyboardViewController.swift", "utf8");
+for (const expected of [
+  'row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))',
+  'URL(string: "swipebetter://import")',
+  "textDocumentProxy.insertText",
+]) {
+  assertIncludes(keyboardExtension, expected, "keyboard extension privacy contract");
 }
 NODE
 

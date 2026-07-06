@@ -277,6 +277,11 @@ public enum SharedImportStore {
       throw SwipeBetterAPIError.missingData
     }
 
+    let cleanText = text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard cleanText?.isEmpty == false || !images.isEmpty else {
+      throw SwipeBetterAPIError.missingData
+    }
+
     clearAll()
     try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
     let id = UUID().uuidString
@@ -285,7 +290,7 @@ public enum SharedImportStore {
       try data.write(to: directoryURL.appendingPathComponent(filename), options: .atomic)
       return filename
     }
-    let payload = SharedImportPayload(id: id, text: text, imageFilenames: filenames)
+    let payload = SharedImportPayload(id: id, text: cleanText?.isEmpty == false ? cleanText : nil, imageFilenames: filenames)
     defaults.set(try JSONEncoder().encode(payload), forKey: SwipeBetterConfig.importPayloadKey)
     defaults.synchronize()
     return payload
