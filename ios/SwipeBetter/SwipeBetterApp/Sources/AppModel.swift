@@ -19,10 +19,12 @@ final class AppModel {
 
   let api = SwipeBetterAPI.shared
   let purchases = PurchaseStore()
+  private var purchaseUpdatesTask: Task<Void, Never>?
 
   var isSignedIn: Bool { user != nil }
 
   func bootstrap() async {
+    startPurchaseUpdates()
     loadSharedImport()
     await refreshSession()
     await purchases.loadProducts()
@@ -31,6 +33,28 @@ final class AppModel {
       await refreshHistory()
       await purchases.syncCurrentEntitlements(api: api)
       await refreshAccount()
+    }
+  }
+
+  func startPurchaseUpdates() {
+    guard purchaseUpdatesTask == nil else { return }
+
+    purchaseUpdatesTask = Task { [weak self] in
+      for await verification in Transaction.updates {
+        guard let self else { return }
+        await self.handlePurchaseUpdate(verification)
+      }
+    }
+  }
+
+  private func handlePurchaseUpdate(_ verification: VerificationResult<Transaction>) async {
+    guard isSignedIn else { return }
+
+    do {
+      try await purchases.sync(verification: verification, api: api)
+      await refreshAccount()
+    } catch {
+      purchases.lastPurchaseMessage = error.localizedDescription
     }
   }
 

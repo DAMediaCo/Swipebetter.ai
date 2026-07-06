@@ -387,10 +387,18 @@ export function registerAuthRoutes(app: Express) {
       }
 
       const token = signToken({ userId: existingUser.id, email: existingUser.email });
-      
-      res.json({
-        token,
-        user: sanitizeUser(existingUser),
+
+      req.session.userId = existingUser.id;
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error after native Apple sign in:", err);
+          return res.status(500).json({ message: "Failed to save session" });
+        }
+
+        res.json({
+          token,
+          user: sanitizeUser(existingUser),
+        });
       });
     } catch (error) {
       console.error("Apple sign in error:", error);

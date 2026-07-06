@@ -33,10 +33,7 @@ final class PurchaseStore {
     }
     switch result {
     case .success(let verification):
-      let transaction = try checkVerified(verification)
-      try await sync(transaction: transaction, api: api)
-      await transaction.finish()
-      lastPurchaseMessage = "Purchase synced."
+      try await sync(verification: verification, api: api)
     case .pending:
       lastPurchaseMessage = "Purchase pending approval."
     case .userCancelled:
@@ -57,6 +54,13 @@ final class PurchaseStore {
     try await AppStore.sync()
     await syncCurrentEntitlements(api: api)
     lastPurchaseMessage = "Purchases restored."
+  }
+
+  func sync(verification: VerificationResult<Transaction>, api: SwipeBetterAPI) async throws {
+    let transaction = try checkVerified(verification)
+    try await sync(transaction: transaction, api: api)
+    await transaction.finish()
+    lastPurchaseMessage = "Purchase synced."
   }
 
   func manageSubscriptions() async throws {
