@@ -133,15 +133,7 @@ final class AppModel {
   func logout() async {
     await runBusy {
       let _: EmptyResponse = try await api.post("/api/auth/logout")
-      user = nil
-      me = nil
-      credits = nil
-      profileHistory = []
-      replyHistory = []
-      pendingImportText = ""
-      pendingImportImages = []
-      importRevision += 1
-      SharedImportStore.clearAll()
+      clearLocalAccountState()
     }
   }
 
@@ -233,15 +225,7 @@ final class AppModel {
   func deleteAccount() async {
     await runBusy {
       let _: EmptyResponse = try await api.delete("/api/account")
-      user = nil
-      me = nil
-      credits = nil
-      profileHistory = []
-      replyHistory = []
-      pendingImportText = ""
-      pendingImportImages = []
-      importRevision += 1
-      SharedImportStore.clearAll()
+      clearLocalAccountState()
     }
   }
 
@@ -340,6 +324,21 @@ final class AppModel {
     default:
       return "replies"
     }
+  }
+
+  private func clearLocalAccountState() {
+    user = nil
+    me = nil
+    credits = nil
+    profileHistory = []
+    replyHistory = []
+    pendingImportText = ""
+    pendingImportImages = []
+    requestedTabIdentifier = nil
+    purchases.resetTransientState()
+    importRevision += 1
+    deepLinkRevision += 1
+    SharedImportStore.clearAll()
   }
 }
 

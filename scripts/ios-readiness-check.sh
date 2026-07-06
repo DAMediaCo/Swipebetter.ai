@@ -190,13 +190,26 @@ const logoutMatch = appModel.match(/func logout\(\) async \{[\s\S]*?\n  \}/);
 if (!logoutMatch) {
   throw new Error("Could not find logout implementation");
 }
+assertIncludes(logoutMatch[0], "clearLocalAccountState()", "logout privacy cleanup contract");
+const deleteMatch = appModel.match(/func deleteAccount\(\) async \{[\s\S]*?\n  \}/);
+if (!deleteMatch) {
+  throw new Error("Could not find delete account implementation");
+}
+assertIncludes(deleteMatch[0], "clearLocalAccountState()", "delete account privacy cleanup contract");
+const clearStateMatch = appModel.match(/private func clearLocalAccountState\(\) \{[\s\S]*?\n  \}/);
+if (!clearStateMatch) {
+  throw new Error("Could not find local account state cleanup implementation");
+}
 for (const expected of [
   'pendingImportText = ""',
   "pendingImportImages = []",
+  "requestedTabIdentifier = nil",
+  "purchases.resetTransientState()",
   "importRevision += 1",
+  "deepLinkRevision += 1",
   "SharedImportStore.clearAll()",
 ]) {
-  assertIncludes(logoutMatch[0], expected, "logout privacy cleanup contract");
+  assertIncludes(clearStateMatch[0], expected, "local account privacy cleanup contract");
 }
 for (const expected of [
   "try? await purchases.syncCurrentEntitlements(api: api)",

@@ -107,6 +107,12 @@ final class PurchaseStore {
     try await AppStore.showManageSubscriptions(in: scene)
   }
 
+  func resetTransientState() {
+    lastPurchaseMessage = nil
+    purchasingProductId = nil
+    isRestoringPurchases = false
+  }
+
   private func sync(transaction: Transaction, api: SwipeBetterAPI) async throws {
     let _: IAPSyncResponse = try await api.post(
       "/api/ios/iap/transactions",
