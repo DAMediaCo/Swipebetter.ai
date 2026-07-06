@@ -64,6 +64,13 @@ export type AppleServerApiTokenConfig = {
   privateKey: string;
 };
 
+export class AppleIapValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AppleIapValidationError";
+  }
+}
+
 export function isAppleIapProduct(productId: string): productId is AppleIapProductId {
   return APPLE_IAP_PRODUCTS.has(productId);
 }
@@ -88,16 +95,16 @@ export function validateAppleTransaction(
   const now = options.now ?? Date.now();
 
   if (transaction.bundleId !== expectedBundleId) {
-    throw new Error("Apple transaction bundle mismatch");
+    throw new AppleIapValidationError("Apple transaction bundle mismatch");
   }
   if (requestedProductId && transaction.productId !== requestedProductId) {
-    throw new Error("Apple product mismatch");
+    throw new AppleIapValidationError("Apple product mismatch");
   }
   if (!isAppleIapProduct(transaction.productId)) {
-    throw new Error("Unsupported Apple product");
+    throw new AppleIapValidationError("Unsupported Apple product");
   }
   if (!options.allowExpired && transaction.expiresDate && Number(transaction.expiresDate) < now && isAppleSubscriptionProduct(transaction.productId)) {
-    throw new Error("Apple subscription transaction is expired");
+    throw new AppleIapValidationError("Apple subscription transaction is expired");
   }
 }
 

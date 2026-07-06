@@ -4,6 +4,7 @@ import test from "node:test";
 import jwt from "jsonwebtoken";
 import {
   APPLE_IAP_PRODUCT_CONFIG,
+  AppleIapValidationError,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
   createAppleServerApiToken,
@@ -58,11 +59,11 @@ test("validateAppleTransaction enforces bundle and product identity", () => {
   assert.doesNotThrow(() => validateAppleTransaction(transaction(), "ai.swipebetter.unlimited.monthly", { now }));
   assert.throws(
     () => validateAppleTransaction(transaction({ bundleId: "ai.other.app" }), "ai.swipebetter.unlimited.monthly", { now }),
-    /bundle mismatch/
+    (error) => error instanceof AppleIapValidationError && /bundle mismatch/.test(error.message)
   );
   assert.throws(
     () => validateAppleTransaction(transaction(), "ai.swipebetter.unlimited.annual", { now }),
-    /product mismatch/
+    (error) => error instanceof AppleIapValidationError && /product mismatch/.test(error.message)
   );
 });
 
@@ -70,7 +71,7 @@ test("validateAppleTransaction rejects expired subscriptions unless explicitly a
   const expired = transaction({ expiresDate: now - 60_000 });
   assert.throws(
     () => validateAppleTransaction(expired, "ai.swipebetter.unlimited.monthly", { now }),
-    /subscription transaction is expired/
+    (error) => error instanceof AppleIapValidationError && /subscription transaction is expired/.test(error.message)
   );
   assert.doesNotThrow(() => validateAppleTransaction(expired, "ai.swipebetter.unlimited.monthly", { now, allowExpired: true }));
 });

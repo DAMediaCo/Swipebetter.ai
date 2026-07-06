@@ -12,6 +12,7 @@ import { z } from "zod";
 import sharp from "sharp";
 import {
   APPLE_IAP_PRODUCT_IDS,
+  AppleIapValidationError,
   type AppleTransactionPayload,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
@@ -1465,6 +1466,9 @@ export async function registerRoutes(
       });
     } catch (error: any) {
       console.error("Apple IAP transaction sync error:", error);
+      if (error instanceof AppleIapValidationError) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: error?.message || "Failed to sync Apple purchase" });
     }
   });
@@ -1580,6 +1584,9 @@ export async function registerRoutes(
       });
     } catch (error: any) {
       console.error("Apple IAP notification error:", error);
+      if (error instanceof AppleIapValidationError) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: error?.message || "Failed to process Apple notification" });
     }
   });
