@@ -21,6 +21,13 @@ const blogPosts = [
   },
   {
     category: "Technical Guide",
+    title: "Why Am I Getting No Matches?",
+    description: "Diagnose the real reasons your dating profile is not getting matches and what to fix first.",
+    href: "/blog/why-am-i-getting-no-matches",
+    isNew: true,
+  },
+  {
+    category: "Technical Guide",
     title: "Am I Shadowbanned on Tinder? (2026 Test)",
     description: "Getting 0 matches might mean a shadowban. Here's how to check and what to do about it.",
     href: "/blog/tinder-shadowban-test-2026",

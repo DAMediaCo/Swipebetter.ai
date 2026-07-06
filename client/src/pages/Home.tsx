@@ -273,11 +273,11 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-3 opacity-50">
                     <Lock className="w-5 h-5 text-muted-foreground shrink-0" />
-                    <span className="text-sm text-muted-foreground">Detailed Feedback</span>
+                    <span className="text-sm text-foreground">Detailed Feedback</span>
                   </li>
                   <li className="flex items-center gap-3 opacity-50">
                     <Lock className="w-5 h-5 text-muted-foreground shrink-0" />
-                    <span className="text-sm text-muted-foreground">Bio Suggestions</span>
+                    <span className="text-sm text-foreground">Bio Suggestions</span>
                   </li>
                 </ul>
                 

@@ -1,6 +1,14 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, readFile } from "fs/promises";
+import { mkdir, rm, readFile, writeFile } from "fs/promises";
+import path from "path";
+import {
+  generateSitemapXml,
+  INDEXABLE_ROUTES,
+  NOINDEX_STATIC_ROUTES,
+  publicOutputPath,
+  renderSeoHtml,
+} from "../functions/seo-data.js";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -37,6 +45,7 @@ async function buildAll() {
 
   console.log("building client...");
   await viteBuild();
+  await generateSeoHtmlFiles();
 
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));
@@ -59,6 +68,22 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+}
+
+async function generateSeoHtmlFiles() {
+  console.log("generating SEO HTML...");
+  const publicDir = path.resolve("dist/public");
+  const indexPath = path.join(publicDir, "index.html");
+  const indexHtml = await readFile(indexPath, "utf-8");
+  const routes = [...INDEXABLE_ROUTES, ...NOINDEX_STATIC_ROUTES];
+
+  for (const route of routes) {
+    const outputPath = path.join(publicDir, publicOutputPath(route));
+    await mkdir(path.dirname(outputPath), { recursive: true });
+    await writeFile(outputPath, renderSeoHtml(indexHtml, route));
+  }
+
+  await writeFile(path.join(publicDir, "sitemap.xml"), generateSitemapXml());
 }
 
 buildAll().catch((err) => {

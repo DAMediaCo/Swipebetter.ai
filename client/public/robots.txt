@@ -1,6 +1,14 @@
 User-agent: *
 Allow: /
+Disallow: /account
+Disallow: /admin
+Disallow: /auth
+Disallow: /audit
+Disallow: /checkout
 Disallow: /dashboard
+Disallow: /forgot-password
+Disallow: /redeem
+Disallow: /reset-password
 Disallow: /api/
 
 Sitemap: https://swipebetter.ai/sitemap.xml

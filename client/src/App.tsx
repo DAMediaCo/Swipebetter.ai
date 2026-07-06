@@ -1,5 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect, useRef } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -7,52 +7,54 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { MobileNav } from "@/components/MobileNav";
 import { DesktopNav } from "@/components/DesktopNav";
 import { initGA, trackPageView } from "@/lib/analytics";
-import Home from "@/pages/Home";
-import Auth from "@/pages/Auth";
-import ProfileFix from "@/pages/ProfileFix";
-import ProfileResults from "@/pages/ProfileResults";
-import ProfileUpgrade from "@/pages/ProfileUpgrade";
-import ReplyFix from "@/pages/ReplyFix";
-import ReplyResults from "@/pages/ReplyResults";
-import ReplyUpgrade from "@/pages/ReplyUpgrade";
-import DashboardPage from "@/pages/DashboardPage";
-import Pricing from "@/pages/Pricing";
-import CheckoutSuccess from "@/pages/CheckoutSuccess";
-import TinderBioGuide from "@/pages/TinderBioGuide";
-import HingePromptsMen from "@/pages/HingePromptsMen";
-import HingePromptsWomen from "@/pages/HingePromptsWomen";
-import BumbleOpenerLines from "@/pages/BumbleOpenerLines";
-import DatingAppPhotos from "@/pages/DatingAppPhotos";
-import HingeProfileTips from "@/pages/HingeProfileTips";
-import BumbleBioExamples from "@/pages/BumbleBioExamples";
-import TinderPhotoOrder from "@/pages/TinderPhotoOrder";
-import WhatToTextAfterMatching from "@/pages/WhatToTextAfterMatching";
-import ReviveDeadConversation from "@/pages/ReviveDeadConversation";
-import AdminLogin from "@/pages/AdminLogin";
-import AdminDashboard from "@/pages/AdminDashboard";
-import AdminPromoCodes from "@/pages/AdminPromoCodes";
-import RedeemPromo from "@/pages/RedeemPromo";
-import TermsOfService from "@/pages/TermsOfService";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
-import CookiePolicy from "@/pages/CookiePolicy";
-import RefundPolicy from "@/pages/RefundPolicy";
-import Disclaimer from "@/pages/Disclaimer";
-import Contact from "@/pages/Contact";
-import AcceptableUse from "@/pages/AcceptableUse";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ResetPassword from "@/pages/ResetPassword";
-import Account from "@/pages/Account";
-import AuditView from "@/pages/AuditView";
-import ReplyAuditView from "@/pages/ReplyAuditView";
-import TinderBiosForEngineers from "@/pages/TinderBiosForEngineers";
-import HowToReplyToHeyOnBumble from "@/pages/HowToReplyToHeyOnBumble";
-import TinderShadowbanTest from "@/pages/TinderShadowbanTest";
-import Blog from "@/pages/Blog";
-import TinderBioGenerator from "@/pages/tools/TinderBioGenerator";
-import HingePromptWriter from "@/pages/tools/HingePromptWriter";
-import DatingPhotoAnalyzer from "@/pages/tools/DatingPhotoAnalyzer";
-import NotFound from "@/pages/not-found";
 import { LegalFooter } from "@/components/LegalFooter";
+
+const Home = lazy(() => import("@/pages/Home"));
+const Auth = lazy(() => import("@/pages/Auth"));
+const ProfileFix = lazy(() => import("@/pages/ProfileFix"));
+const ProfileResults = lazy(() => import("@/pages/ProfileResults"));
+const ProfileUpgrade = lazy(() => import("@/pages/ProfileUpgrade"));
+const ReplyFix = lazy(() => import("@/pages/ReplyFix"));
+const ReplyResults = lazy(() => import("@/pages/ReplyResults"));
+const ReplyUpgrade = lazy(() => import("@/pages/ReplyUpgrade"));
+const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
+const Pricing = lazy(() => import("@/pages/Pricing"));
+const CheckoutSuccess = lazy(() => import("@/pages/CheckoutSuccess"));
+const TinderBioGuide = lazy(() => import("@/pages/TinderBioGuide"));
+const HingePromptsMen = lazy(() => import("@/pages/HingePromptsMen"));
+const HingePromptsWomen = lazy(() => import("@/pages/HingePromptsWomen"));
+const BumbleOpenerLines = lazy(() => import("@/pages/BumbleOpenerLines"));
+const DatingAppPhotos = lazy(() => import("@/pages/DatingAppPhotos"));
+const HingeProfileTips = lazy(() => import("@/pages/HingeProfileTips"));
+const BumbleBioExamples = lazy(() => import("@/pages/BumbleBioExamples"));
+const TinderPhotoOrder = lazy(() => import("@/pages/TinderPhotoOrder"));
+const WhatToTextAfterMatching = lazy(() => import("@/pages/WhatToTextAfterMatching"));
+const ReviveDeadConversation = lazy(() => import("@/pages/ReviveDeadConversation"));
+const AdminLogin = lazy(() => import("@/pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
+const AdminPromoCodes = lazy(() => import("@/pages/AdminPromoCodes"));
+const RedeemPromo = lazy(() => import("@/pages/RedeemPromo"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("@/pages/CookiePolicy"));
+const RefundPolicy = lazy(() => import("@/pages/RefundPolicy"));
+const Disclaimer = lazy(() => import("@/pages/Disclaimer"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const AcceptableUse = lazy(() => import("@/pages/AcceptableUse"));
+const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const Account = lazy(() => import("@/pages/Account"));
+const AuditView = lazy(() => import("@/pages/AuditView"));
+const ReplyAuditView = lazy(() => import("@/pages/ReplyAuditView"));
+const TinderBiosForEngineers = lazy(() => import("@/pages/TinderBiosForEngineers"));
+const HowToReplyToHeyOnBumble = lazy(() => import("@/pages/HowToReplyToHeyOnBumble"));
+const TinderShadowbanTest = lazy(() => import("@/pages/TinderShadowbanTest"));
+const Blog = lazy(() => import("@/pages/Blog"));
+const WhyNoMatches = lazy(() => import("@/pages/WhyNoMatches"));
+const TinderBioGenerator = lazy(() => import("@/pages/tools/TinderBioGenerator"));
+const HingePromptWriter = lazy(() => import("@/pages/tools/HingePromptWriter"));
+const DatingPhotoAnalyzer = lazy(() => import("@/pages/tools/DatingPhotoAnalyzer"));
+const NotFound = lazy(() => import("@/pages/not-found"));
 
 function Router() {
   return (
@@ -95,6 +97,7 @@ function Router() {
       <Route path="/audit/:id" component={AuditView} />
       <Route path="/audit/reply/:id" component={ReplyAuditView} />
       <Route path="/blog" component={Blog} />
+      <Route path="/blog/why-am-i-getting-no-matches" component={WhyNoMatches} />
       <Route path="/blog/best-tinder-bios-for-engineers-and-nerds" component={TinderBiosForEngineers} />
       <Route path="/blog/how-to-reply-to-hey-on-bumble" component={HowToReplyToHeyOnBumble} />
       <Route path="/blog/tinder-shadowban-test-2026" component={TinderShadowbanTest} />
@@ -145,7 +148,9 @@ function App() {
         <PageViewTracker />
         <DesktopNav />
         <main className="pb-16 md:pb-0">
-          <Router />
+          <Suspense fallback={<div className="min-h-screen" />}>
+            <Router />
+          </Suspense>
         </main>
         <LegalFooter />
         <MobileNav />
