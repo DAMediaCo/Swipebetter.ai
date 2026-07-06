@@ -63,6 +63,8 @@ final class AppModel {
     do {
       let response: AuthUserResponse = try await api.get("/api/auth/user")
       user = response.user
+    } catch SwipeBetterAPIError.server(let status, _) where status == 401 {
+      user = nil
     } catch {
       lastError = error.localizedDescription
       user = nil
@@ -73,8 +75,7 @@ final class AppModel {
     await runBusy {
       let response: AuthUserResponse = try await api.post("/api/auth/login", body: LoginRequest(email: email, password: password))
       user = response.user
-      await refreshAccount()
-      await refreshHistory()
+      await refreshAfterAuth()
     }
   }
 
@@ -89,8 +90,7 @@ final class AppModel {
       )
       let response: AuthUserResponse = try await api.post("/api/auth/signup", body: request)
       user = response.user
-      await refreshAccount()
-      await refreshHistory()
+      await refreshAfterAuth()
     }
   }
 
@@ -124,8 +124,7 @@ final class AppModel {
         body: AppleAuthRequest(identityToken: identityToken, user: appleUser)
       )
       user = response.user
-      await refreshAccount()
-      await refreshHistory()
+      await refreshAfterAuth()
     }
   }
 
@@ -158,6 +157,13 @@ final class AppModel {
     } catch {
       lastError = error.localizedDescription
     }
+  }
+
+  private func refreshAfterAuth() async {
+    await refreshAccount()
+    await refreshHistory()
+    await purchases.syncCurrentEntitlements(api: api)
+    await refreshAccount()
   }
 
   func startProfileAudit(platform: String, gender: String, intent: String, enm: Bool, images: [Data]) async -> ProfileStatusResponse? {
