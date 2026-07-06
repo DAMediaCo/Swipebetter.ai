@@ -518,6 +518,9 @@ for (const expected of [
   "SWIPEBETTER_SESSION_COOKIE",
   "APP_REVIEW_ACCESS_NOTES",
   "App Store metadata text limits",
+  "App Store screenshot manifest",
+  "Run npm run capture:ios-screenshots before submission",
+  "minimumScreenshotWidth",
   "Live entitlement sync command",
   "iOS submission preflight blocked",
 ]) {

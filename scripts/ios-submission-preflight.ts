@@ -6,6 +6,34 @@ type Check = {
   detail: string;
 };
 
+type AppStoreMetadata = {
+  appName?: string;
+  subtitle?: string;
+  promotionalText?: string;
+  description?: string;
+  keywords?: string;
+  supportUrl?: string;
+  privacyUrl?: string;
+  marketingUrl?: string;
+  termsUrl?: string;
+  refundPolicyUrl?: string;
+  reviewNotes?: string;
+  inAppPurchases?: Array<{ productId?: string; price?: string }>;
+  screenshots?: string[];
+};
+
+type ScreenshotManifest = {
+  bundleId?: string;
+  screenshots?: Array<{
+    file?: string;
+    title?: string;
+    status?: string;
+    bytes?: number;
+    width?: number;
+    height?: number;
+  }>;
+};
+
 const requiredEnv = [
   "APPLE_DEVELOPMENT_TEAM",
   "APPLE_APP_ID",
@@ -24,6 +52,11 @@ const expectedProducts = new Map([
   ["ai.swipebetter.unlimited.monthly", "$16.99"],
   ["ai.swipebetter.unlimited.annual", "$104.99"],
 ]);
+const screenshotManifestPath = "artifacts/ios-app-store-screenshots/manifest.json";
+const expectedBundleId = "ai.swipebetter.app";
+const minimumScreenshotBytes = 50_000;
+const minimumScreenshotWidth = 1_000;
+const minimumScreenshotHeight = 2_000;
 
 function present(name: string): boolean {
   return Boolean(process.env[name]?.trim());
@@ -38,21 +71,7 @@ function charCount(value: string): number {
 }
 
 function metadataChecks(): Check[] {
-  const metadata = readJson<{
-    appName?: string;
-    subtitle?: string;
-    promotionalText?: string;
-    description?: string;
-    keywords?: string;
-    supportUrl?: string;
-    privacyUrl?: string;
-    marketingUrl?: string;
-    termsUrl?: string;
-    refundPolicyUrl?: string;
-    reviewNotes?: string;
-    inAppPurchases?: Array<{ productId?: string; price?: string }>;
-    screenshots?: string[];
-  }>("ios/SwipeBetter/AppStoreMetadata.json");
+  const metadata = readJson<AppStoreMetadata>("ios/SwipeBetter/AppStoreMetadata.json");
 
   const products = new Map((metadata.inAppPurchases || []).map((item) => [item.productId, item.price]));
   const urls = [metadata.supportUrl, metadata.privacyUrl, metadata.marketingUrl, metadata.termsUrl, metadata.refundPolicyUrl].filter(Boolean);
@@ -88,6 +107,48 @@ function metadataChecks(): Check[] {
       label: "Screenshot plan",
       ok: Array.isArray(metadata.screenshots) && metadata.screenshots.length >= 5,
       detail: "At least five App Store screenshot targets must be planned.",
+    },
+  ];
+}
+
+function screenshotManifestChecks(): Check[] {
+  const metadata = readJson<AppStoreMetadata>("ios/SwipeBetter/AppStoreMetadata.json");
+  const expectedTitles = metadata.screenshots || [];
+
+  if (!fs.existsSync(screenshotManifestPath)) {
+    return [{
+      label: "Captured App Store screenshots",
+      ok: false,
+      detail: `Run npm run capture:ios-screenshots before submission. Missing ${screenshotManifestPath}.`,
+    }];
+  }
+
+  const manifest = readJson<ScreenshotManifest>(screenshotManifestPath);
+  const screenshots = manifest.screenshots || [];
+  const titles = new Set(screenshots.map((item) => item.title));
+  const missingTitles = expectedTitles.filter((title) => !titles.has(title));
+  const invalidFiles = screenshots.filter((item) => {
+    if (!item.file || item.status !== "captured") {
+      return true;
+    }
+
+    const path = `artifacts/ios-app-store-screenshots/${item.file}`;
+    return !fs.existsSync(path)
+      || (item.bytes || 0) < minimumScreenshotBytes
+      || (item.width || 0) < minimumScreenshotWidth
+      || (item.height || 0) < minimumScreenshotHeight;
+  });
+
+  return [
+    {
+      label: "App Store screenshot manifest",
+      ok: manifest.bundleId === expectedBundleId
+        && screenshots.length >= 5
+        && missingTitles.length === 0
+        && invalidFiles.length === 0,
+      detail: missingTitles.length
+        ? `Missing captured screenshot titles: ${missingTitles.join(", ")}`
+        : "Every metadata screenshot target must be captured as a real high-resolution PNG.",
     },
   ];
 }
@@ -166,6 +227,7 @@ function artifactChecks(): Check[] {
 async function main() {
   const checks = [
     ...metadataChecks(),
+    ...screenshotManifestChecks(),
     ...(await livePublicUrlChecks()),
     ...envChecks(),
     ...artifactChecks(),
