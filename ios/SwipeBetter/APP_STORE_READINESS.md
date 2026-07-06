@@ -43,6 +43,8 @@ Run from the repo root:
 scripts/ios-readiness-check.sh
 ```
 
+The same gate runs in GitHub Actions through `.github/workflows/ios-readiness.yml`.
+
 The script verifies:
 
 - iOS plist and privacy manifest syntax.

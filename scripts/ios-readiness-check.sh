@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 PROJECT="ios/SwipeBetter/SwipeBetter.xcodeproj"
 SCHEME="SwipeBetter"
-DESTINATION="${IOS_DESTINATION:-platform=iOS Simulator,name=iPhone 17 Pro,OS=26.4.1}"
+DESTINATION="${IOS_DESTINATION:-generic/platform=iOS Simulator}"
 STOREKIT="ios/SwipeBetter/Configuration.storekit"
 PRIVACY="ios/SwipeBetter/Shared/Resources/PrivacyInfo.xcprivacy"
 KEYBOARD_PLIST="ios/SwipeBetter/KeyboardExtension/Info.plist"
@@ -63,6 +63,7 @@ echo "Running production build..."
 npm run build
 
 echo "Building iOS app and extensions..."
+echo "Using simulator destination: $DESTINATION"
 xcodebuild \
   -project "$PROJECT" \
   -scheme "$SCHEME" \
