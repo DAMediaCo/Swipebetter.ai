@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import {
+  createAppStoreConnectApiToken,
   createAppleServerApiToken,
   decodeAppleJwsPayload,
   validateAppleTransaction,
@@ -170,19 +171,19 @@ async function main() {
     throw new Error(`APPLE_BUNDLE_ID must be ${expectedBundleId}; got ${bundleId}`);
   }
 
-  const token = createAppleServerApiToken({ issuerId, keyId, bundleId, privateKey });
-  const decoded = jwt.decode(token, { complete: true }) as {
+  const serverApiToken = createAppleServerApiToken({ issuerId, keyId, bundleId, privateKey });
+  const decodedServerApiToken = jwt.decode(serverApiToken, { complete: true }) as {
     header?: { alg?: string; kid?: string };
     payload?: { aud?: string; bid?: string; iss?: string };
   } | null;
 
-  if (decoded?.header?.alg !== "ES256" || decoded.header.kid !== keyId) {
+  if (decodedServerApiToken?.header?.alg !== "ES256" || decodedServerApiToken.header.kid !== keyId) {
     throw new Error("Apple server API token header is invalid");
   }
   if (
-    decoded.payload?.aud !== "appstoreconnect-v1"
-    || decoded.payload.bid !== bundleId
-    || decoded.payload.iss !== issuerId
+    decodedServerApiToken.payload?.aud !== "appstoreconnect-v1"
+    || decodedServerApiToken.payload.bid !== bundleId
+    || decodedServerApiToken.payload.iss !== issuerId
   ) {
     throw new Error("Apple server API token payload is invalid");
   }
@@ -195,7 +196,24 @@ async function main() {
   if (!appId) {
     console.log("No APPLE_APP_ID set; skipped App Store Connect product lookup.");
   } else {
-    await verifyAppStoreConnectProducts(token, appId, bundleId);
+    const appStoreConnectToken = createAppStoreConnectApiToken({ issuerId, keyId, privateKey });
+    const decodedAppStoreConnectToken = jwt.decode(appStoreConnectToken, { complete: true }) as {
+      header?: { alg?: string; kid?: string };
+      payload?: { aud?: string; bid?: string; iss?: string };
+    } | null;
+
+    if (decodedAppStoreConnectToken?.header?.alg !== "ES256" || decodedAppStoreConnectToken.header.kid !== keyId) {
+      throw new Error("App Store Connect API token header is invalid");
+    }
+    if (
+      decodedAppStoreConnectToken.payload?.aud !== "appstoreconnect-v1"
+      || decodedAppStoreConnectToken.payload.iss !== issuerId
+      || decodedAppStoreConnectToken.payload.bid
+    ) {
+      throw new Error("App Store Connect API token payload is invalid");
+    }
+
+    await verifyAppStoreConnectProducts(appStoreConnectToken, appId, bundleId);
   }
 
   const transactionId = process.env.APPLE_IAP_TEST_TRANSACTION_ID?.trim();
@@ -204,7 +222,7 @@ async function main() {
     return;
   }
 
-  const result = await fetchAppleTransaction(transactionId, token, bundleId);
+  const result = await fetchAppleTransaction(transactionId, serverApiToken, bundleId);
   console.log(`Apple transaction probe passed in ${result.environment}.`);
   console.log(`Product ID: ${result.transaction.productId}`);
   console.log(`Transaction ID: ${result.transaction.transactionId}`);

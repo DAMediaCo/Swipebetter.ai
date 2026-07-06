@@ -399,6 +399,8 @@ for (const expected of [
 const appleIap = fs.readFileSync("server/appleIap.ts", "utf8");
 for (const expected of [
   "AppleIapOwnershipError",
+  "createAppStoreConnectApiToken",
+  "export type AppStoreConnectApiTokenConfig",
   "isAppleSubscriptionProduct(transaction.productId) && !transaction.expiresDate",
   "Apple subscription transaction is missing an expiration date",
   "Apple subscription transaction is expired",
@@ -432,7 +434,10 @@ if (validationCatchCount < 2) {
 const appleIapPreflight = fs.readFileSync("scripts/apple-iap-preflight.ts", "utf8");
 for (const expected of [
   "APPLE_APP_ID",
-  "verifyAppStoreConnectProducts(token, appId, bundleId)",
+  "createAppStoreConnectApiToken({ issuerId, keyId, privateKey })",
+  "decodedAppStoreConnectToken.payload.bid",
+  "serverApiToken",
+  "verifyAppStoreConnectProducts(appStoreConnectToken, appId, bundleId)",
   "https://api.appstoreconnect.apple.com",
   "/v1/apps/${appId}/inAppPurchasesV2?limit=200",
   "/v1/apps/${appId}/subscriptionGroups?limit=200",

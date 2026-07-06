@@ -64,6 +64,12 @@ export type AppleServerApiTokenConfig = {
   privateKey: string;
 };
 
+export type AppStoreConnectApiTokenConfig = {
+  issuerId: string;
+  keyId: string;
+  privateKey: string;
+};
+
 export class AppleIapValidationError extends Error {
   constructor(message: string) {
     super(message);
@@ -154,6 +160,20 @@ export function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string
 export function createAppleServerApiToken(config: AppleServerApiTokenConfig): string {
   return jwt.sign(
     { bid: config.bundleId },
+    config.privateKey,
+    {
+      algorithm: "ES256",
+      audience: "appstoreconnect-v1",
+      issuer: config.issuerId,
+      keyid: config.keyId,
+      expiresIn: "5m",
+    }
+  );
+}
+
+export function createAppStoreConnectApiToken(config: AppStoreConnectApiTokenConfig): string {
+  return jwt.sign(
+    {},
     config.privateKey,
     {
       algorithm: "ES256",

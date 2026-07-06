@@ -8,6 +8,7 @@ import {
   AppleIapValidationError,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
+  createAppStoreConnectApiToken,
   createAppleServerApiToken,
   decodeAppleJwsPayload,
   getAppleIapProductConfig,
@@ -165,6 +166,25 @@ test("createAppleServerApiToken creates the App Store Server API claims", () => 
   assert.equal(decoded?.payload?.aud, "appstoreconnect-v1");
   assert.equal(decoded?.payload?.bid, "ai.swipebetter.app");
   assert.equal(decoded?.payload?.iss, "00000000-0000-0000-0000-000000000000");
+});
+
+test("createAppStoreConnectApiToken omits App Store Server API bundle claim", () => {
+  const { privateKey } = generateKeyPairSync("ec", { namedCurve: "P-256" });
+  const token = createAppStoreConnectApiToken({
+    issuerId: "00000000-0000-0000-0000-000000000000",
+    keyId: "ABC123DEFG",
+    privateKey: privateKey.export({ type: "pkcs8", format: "pem" }).toString(),
+  });
+  const decoded = jwt.decode(token, { complete: true }) as {
+    header?: { alg?: string; kid?: string };
+    payload?: { aud?: string; bid?: string; iss?: string };
+  } | null;
+
+  assert.equal(decoded?.header?.alg, "ES256");
+  assert.equal(decoded?.header?.kid, "ABC123DEFG");
+  assert.equal(decoded?.payload?.aud, "appstoreconnect-v1");
+  assert.equal(decoded?.payload?.iss, "00000000-0000-0000-0000-000000000000");
+  assert.equal(decoded?.payload?.bid, undefined);
 });
 
 test("shouldExpireAppleTransaction only expires from Apple-fetched facts", () => {
