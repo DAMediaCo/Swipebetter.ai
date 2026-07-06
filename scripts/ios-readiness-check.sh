@@ -298,6 +298,25 @@ for (const expected of [
 ]) {
   assertIncludes(smokeScript, expected, "iOS simulator smoke visual-readiness contract");
 }
+
+const releaseScript = fs.readFileSync("scripts/ios-release-preflight.sh", "utf8");
+for (const expected of [
+  "require_env APPLE_DEVELOPMENT_TEAM",
+  "require_env APPLE_APP_ID",
+  "npm run check:apple-iap-config",
+  "DEVELOPMENT_TEAM=\"$APPLE_DEVELOPMENT_TEAM\"",
+  "CODE_SIGN_STYLE=Automatic",
+  "-allowProvisioningUpdates",
+  "xcodebuild \\",
+  "-exportArchive",
+]) {
+  assertIncludes(releaseScript, expected, "signed iOS release preflight contract");
+}
+
+const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+if (packageJson.scripts?.["check:ios-release"] !== "scripts/ios-release-preflight.sh") {
+  throw new Error("package.json must expose scripts/ios-release-preflight.sh as check:ios-release");
+}
 NODE
 
 echo "Checking StoreKit product IDs and iOS prices..."
