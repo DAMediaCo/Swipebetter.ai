@@ -36,7 +36,7 @@ jobs:
         run: scripts/ios-readiness-check.sh
 
       - name: Run native iOS UI tests
-        timeout-minutes: 15
+        timeout-minutes: 22
         run: npm run test:ios-ui
 
       - name: Run iOS simulator smoke

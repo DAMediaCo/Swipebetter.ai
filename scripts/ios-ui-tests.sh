@@ -8,11 +8,42 @@ SCHEME="SwipeBetter"
 SIMULATOR_NAME="${IOS_TEST_SIMULATOR_NAME:-iPhone 17 Pro}"
 DERIVED_DATA="${IOS_TEST_DERIVED_DATA:-$(mktemp -d /tmp/swipebetter-ios-ui-tests.XXXXXX)}"
 DEVICES_JSON="$(mktemp /tmp/swipebetter-ios-ui-test-devices.XXXXXX.json)"
+BOOT_TIMEOUT_SECONDS="${IOS_TEST_BOOT_TIMEOUT_SECONDS:-360}"
+SIMCTL_TIMEOUT_SECONDS="${IOS_TEST_SIMCTL_TIMEOUT_SECONDS:-120}"
+TEST_TIMEOUT_SECONDS="${IOS_TEST_TIMEOUT_SECONDS:-1200}"
 
 cleanup() {
   rm -f "$DEVICES_JSON"
 }
 trap cleanup EXIT
+
+with_timeout() {
+  local timeout_seconds="$1"
+  shift
+
+  perl -e '
+    my $timeout = shift @ARGV;
+    my $pid = fork();
+    die "fork failed\n" unless defined $pid;
+
+    if ($pid == 0) {
+      exec @ARGV or die "exec failed: $!\n";
+    }
+
+    local $SIG{ALRM} = sub {
+      kill "TERM", $pid;
+      sleep 2;
+      kill "KILL", $pid;
+      waitpid($pid, 0);
+      exit 124;
+    };
+
+    alarm $timeout;
+    waitpid($pid, 0);
+    my $status = $?;
+    exit($status == -1 ? 1 : ($status >> 8));
+  ' "$timeout_seconds" "$@"
+}
 
 if [[ -n "${IOS_TEST_DESTINATION:-}" ]]; then
   DESTINATION="$IOS_TEST_DESTINATION"
@@ -46,18 +77,28 @@ else
   SIMULATOR_LABEL="${SIMULATOR_SELECTION#*$'\t'}"
   DESTINATION="platform=iOS Simulator,id=$SIMULATOR_ID"
   echo "Using simulator: $SIMULATOR_LABEL [$SIMULATOR_ID]"
+
+  echo "Booting simulator for UI tests..."
+  with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl boot "$SIMULATOR_ID" >/dev/null 2>&1 || true
+  if ! with_timeout "$BOOT_TIMEOUT_SECONDS" xcrun simctl bootstatus "$SIMULATOR_ID" -b; then
+    echo "Simulator did not finish booting for UI tests within ${BOOT_TIMEOUT_SECONDS}s." >&2
+    exit 1
+  fi
 fi
 
 echo "Running native iOS UI tests..."
 echo "Using simulator destination: $DESTINATION"
 
-xcodebuild \
+if ! with_timeout "$TEST_TIMEOUT_SECONDS" xcodebuild \
   -project "$PROJECT" \
   -scheme "$SCHEME" \
   -destination "$DESTINATION" \
   -configuration Debug \
   -derivedDataPath "$DERIVED_DATA" \
   CODE_SIGNING_ALLOWED=NO \
-  test
+  test; then
+  echo "Native iOS UI tests failed or timed out after ${TEST_TIMEOUT_SECONDS}s." >&2
+  exit 1
+fi
 
 echo "Native iOS UI tests passed."
