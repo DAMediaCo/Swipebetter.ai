@@ -112,6 +112,13 @@ for (const expected of [
 ]) {
   assertIncludes(shared, expected, "Swift shared configuration");
 }
+for (const expected of [
+  "clearAll()",
+  "try? FileManager.default.removeItem(at: directoryURL)",
+  "removeDirectoryIfEmpty(directoryURL)",
+]) {
+  assertIncludes(shared, expected, "shared import cleanup contract");
+}
 
 const authSchema = fs.readFileSync("shared/models/auth.ts", "utf8");
 assertIncludes(authSchema, 'id: varchar("id").primaryKey().default(sql`gen_random_uuid()`)', "user ID UUID contract");

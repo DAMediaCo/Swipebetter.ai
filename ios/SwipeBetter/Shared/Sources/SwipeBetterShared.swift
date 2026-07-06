@@ -277,6 +277,7 @@ public enum SharedImportStore {
       throw SwipeBetterAPIError.missingData
     }
 
+    clearAll()
     try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
     let id = UUID().uuidString
     let filenames = try images.enumerated().map { index, data in
@@ -310,6 +311,21 @@ public enum SharedImportStore {
     for filename in payload.imageFilenames {
       try? FileManager.default.removeItem(at: directoryURL.appendingPathComponent(filename))
     }
+    removeDirectoryIfEmpty(directoryURL)
+  }
+
+  public static func clearAll() {
+    defaults?.removeObject(forKey: SwipeBetterConfig.importPayloadKey)
+    guard let directoryURL else { return }
+    try? FileManager.default.removeItem(at: directoryURL)
+  }
+
+  private static func removeDirectoryIfEmpty(_ directoryURL: URL) {
+    guard let contents = try? FileManager.default.contentsOfDirectory(atPath: directoryURL.path),
+          contents.isEmpty else {
+      return
+    }
+    try? FileManager.default.removeItem(at: directoryURL)
   }
 }
 

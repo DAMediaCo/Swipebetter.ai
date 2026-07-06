@@ -235,6 +235,7 @@ final class AppModel {
       pendingImportText = ""
       pendingImportImages = []
       importRevision += 1
+      SharedImportStore.clearAll()
     }
   }
 
