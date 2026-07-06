@@ -1,4 +1,4 @@
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc, or } from "drizzle-orm";
 import { db } from "./db";
 import {
   users,
@@ -73,6 +73,7 @@ export interface IStorage {
   unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }>;
   getUnlockedReports(userId: string): Promise<string[]>;
   claimCheckoutSession(userId: string, sessionId: string): Promise<boolean>;
+  getAppleTransactionUserId(transactionId: string, originalTransactionId?: string | null): Promise<string | undefined>;
   applyAppleEntitlement(data: {
     userId: string;
     transactionId: string;
@@ -82,6 +83,14 @@ export interface IStorage {
     purchaseDate?: Date | null;
     expiresDate?: Date | null;
   }): Promise<{ processed: boolean; planTier: 'free' | 'starter' | 'unlimited'; credits: number }>;
+  expireAppleEntitlement(data: {
+    userId?: string | null;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    expiresDate?: Date | null;
+    reason: string;
+  }): Promise<{ processed: boolean; userId?: string; planTier?: 'free' | 'starter' | 'unlimited'; credits?: number }>;
   
   // Super User (admin-granted free access)
   isSuperUser(userId: string): Promise<boolean>;
@@ -544,6 +553,20 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount !== null && result.rowCount > 0;
   }
 
+  async getAppleTransactionUserId(transactionId: string, originalTransactionId?: string | null): Promise<string | undefined> {
+    const conditions = [eq(iosTransactions.transactionId, transactionId)];
+    if (originalTransactionId) {
+      conditions.push(eq(iosTransactions.originalTransactionId, originalTransactionId));
+    }
+
+    const [transaction] = await db.select({ userId: iosTransactions.userId })
+      .from(iosTransactions)
+      .where(or(...conditions))
+      .limit(1);
+
+    return transaction?.userId;
+  }
+
   async applyAppleEntitlement(data: {
     userId: string;
     transactionId: string;
@@ -628,6 +651,54 @@ export class DatabaseStorage implements IStorage {
         processed: true,
         planTier: ((updated as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
         credits: (updated as any)?.credits || 0,
+      };
+    });
+  }
+
+  async expireAppleEntitlement(data: {
+    userId?: string | null;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    expiresDate?: Date | null;
+    reason: string;
+  }): Promise<{ processed: boolean; userId?: string; planTier?: 'free' | 'starter' | 'unlimited'; credits?: number }> {
+    const userId = data.userId || await this.getAppleTransactionUserId(data.transactionId, data.originalTransactionId);
+    if (!userId) {
+      return { processed: false };
+    }
+
+    return db.transaction(async (tx) => {
+      const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, userId));
+      if (!existing) {
+        return { processed: false, userId };
+      }
+
+      const currentCredits = (existing as any).credits || 0;
+      const currentOneTimeCredits = (existing as any).oneTimeCredits || 0;
+      const shouldRemoveStarterCredit = data.productId === "ai.swipebetter.starter"
+        && (data.reason === "refund" || data.reason === "revoked");
+      const nextCredits = shouldRemoveStarterCredit ? Math.max(currentCredits - 1, 0) : currentCredits;
+      const nextOneTimeCredits = shouldRemoveStarterCredit ? Math.max(currentOneTimeCredits - 1, 0) : currentOneTimeCredits;
+      const credits = Math.max(nextCredits, nextOneTimeCredits);
+      const nextTier: 'free' | 'starter' = credits > 0 ? 'starter' : 'free';
+      await tx.update(userSubscriptions)
+        .set({
+          planTier: nextTier,
+          status: data.reason === "refund" || data.reason === "revoked" ? "canceled" : "inactive",
+          plan: data.productId.startsWith("ai.swipebetter.unlimited") ? "ios_unlimited" : (existing as any).plan,
+          credits: nextCredits,
+          oneTimeCredits: nextOneTimeCredits,
+          currentPeriodEnd: data.expiresDate || (existing as any).currentPeriodEnd || null,
+          updatedAt: new Date(),
+        } as any)
+        .where(eq(userSubscriptions.userId, userId));
+
+      return {
+        processed: true,
+        userId,
+        planTier: nextTier,
+        credits,
       };
     });
   }

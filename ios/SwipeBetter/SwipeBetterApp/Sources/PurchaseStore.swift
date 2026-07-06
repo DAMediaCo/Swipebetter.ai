@@ -23,8 +23,13 @@ final class PurchaseStore {
     }
   }
 
-  func purchase(_ product: Product, api: SwipeBetterAPI) async throws {
-    let result = try await product.purchase()
+  func purchase(_ product: Product, api: SwipeBetterAPI, userId: String?) async throws {
+    let accountToken = userId.flatMap(UUID.init(uuidString:))
+    let result = if let accountToken {
+      try await product.purchase(options: [.appAccountToken(accountToken)])
+    } else {
+      try await product.purchase()
+    }
     switch result {
     case .success(let verification):
       let transaction = try checkVerified(verification)
@@ -72,4 +77,3 @@ final class PurchaseStore {
     }
   }
 }
-

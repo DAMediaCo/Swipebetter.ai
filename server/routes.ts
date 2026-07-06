@@ -103,8 +103,17 @@ const iosIapSchema = z.object({
   ]),
 });
 
+const iosServerNotificationSchema = z.object({
+  signedPayload: z.string().min(20),
+});
+
 const APPLE_IAP_PRODUCTS = new Set([
   "ai.swipebetter.starter",
+  "ai.swipebetter.unlimited.monthly",
+  "ai.swipebetter.unlimited.annual",
+]);
+
+const APPLE_SUBSCRIPTION_PRODUCTS = new Set([
   "ai.swipebetter.unlimited.monthly",
   "ai.swipebetter.unlimited.annual",
 ]);
@@ -142,7 +151,31 @@ function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string): T {
   return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as T;
 }
 
-async function fetchAppleTransaction(transactionId: string) {
+type AppleTransactionPayload = {
+  transactionId: string;
+  originalTransactionId?: string;
+  productId: string;
+  bundleId: string;
+  purchaseDate?: number;
+  expiresDate?: number;
+  revocationDate?: number;
+  appAccountToken?: string;
+  environment?: string;
+};
+
+type AppleServerNotificationPayload = {
+  notificationType?: string;
+  subtype?: string;
+  notificationUUID?: string;
+  data?: {
+    bundleId?: string;
+    environment?: string;
+    signedTransactionInfo?: string;
+    signedRenewalInfo?: string;
+  };
+};
+
+async function fetchAppleTransaction(transactionId: string): Promise<AppleTransactionPayload> {
   const token = createAppleServerApiToken();
   const endpoints = [
     { environment: "Production", url: `https://api.storekit.itunes.apple.com/inApps/v1/transactions/${transactionId}` },
@@ -159,16 +192,7 @@ async function fetchAppleTransaction(transactionId: string) {
       if (!body.signedTransactionInfo) {
         throw new Error("Apple transaction response missing signedTransactionInfo");
       }
-      const transaction = decodeAppleJwsPayload<{
-        transactionId: string;
-        originalTransactionId?: string;
-        productId: string;
-        bundleId: string;
-        purchaseDate?: number;
-        expiresDate?: number;
-        revocationDate?: number;
-        environment?: string;
-      }>(body.signedTransactionInfo);
+      const transaction = decodeAppleJwsPayload<AppleTransactionPayload>(body.signedTransactionInfo);
       return {
         ...transaction,
         environment: transaction.environment || endpoint.environment,
@@ -179,6 +203,41 @@ async function fetchAppleTransaction(transactionId: string) {
   }
 
   throw new Error(`Apple transaction verification failed: ${lastError}`);
+}
+
+function validateAppleTransaction(transaction: AppleTransactionPayload, requestedProductId?: string, options: { allowExpired?: boolean } = {}) {
+  const expectedBundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
+
+  if (transaction.bundleId !== expectedBundleId) {
+    throw new Error("Apple transaction bundle mismatch");
+  }
+  if (requestedProductId && transaction.productId !== requestedProductId) {
+    throw new Error("Apple product mismatch");
+  }
+  if (!APPLE_IAP_PRODUCTS.has(transaction.productId)) {
+    throw new Error("Unsupported Apple product");
+  }
+  if (!options.allowExpired && transaction.expiresDate && Number(transaction.expiresDate) < Date.now() && APPLE_SUBSCRIPTION_PRODUCTS.has(transaction.productId)) {
+    throw new Error("Apple subscription transaction is expired");
+  }
+}
+
+function appleDate(value?: number): Date | null {
+  return value ? new Date(Number(value)) : null;
+}
+
+function isTerminalAppleNotification(type?: string, subtype?: string): boolean {
+  return type === "EXPIRED"
+    || type === "REFUND"
+    || type === "REVOKE"
+    || type === "GRACE_PERIOD_EXPIRED";
+}
+
+function isRenewingAppleNotification(type?: string): boolean {
+  return type === "SUBSCRIBED"
+    || type === "DID_RENEW"
+    || type === "DID_RECOVER"
+    || type === "OFFER_REDEEMED";
 }
 
 export async function registerRoutes(
@@ -1407,22 +1466,16 @@ export async function registerRoutes(
       const userId = req.session.userId;
       const requested = parseResult.data;
       const transaction = await fetchAppleTransaction(requested.transactionId);
-      const expectedBundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
 
-      if (transaction.bundleId !== expectedBundleId) {
-        return res.status(400).json({ error: "Apple transaction bundle mismatch" });
-      }
       if (transaction.transactionId !== requested.transactionId) {
         return res.status(400).json({ error: "Apple transaction ID mismatch" });
       }
-      if (transaction.productId !== requested.productId || !APPLE_IAP_PRODUCTS.has(transaction.productId)) {
-        return res.status(400).json({ error: "Apple product mismatch" });
+      validateAppleTransaction(transaction, requested.productId);
+      if (transaction.appAccountToken && transaction.appAccountToken.toLowerCase() !== userId.toLowerCase()) {
+        return res.status(400).json({ error: "Apple account token mismatch" });
       }
       if (transaction.revocationDate) {
         return res.status(400).json({ error: "Apple transaction has been revoked" });
-      }
-      if (transaction.expiresDate && Number(transaction.expiresDate) < Date.now()) {
-        return res.status(400).json({ error: "Apple subscription transaction is expired" });
       }
 
       const result = await storage.applyAppleEntitlement({
@@ -1431,8 +1484,8 @@ export async function registerRoutes(
         originalTransactionId: transaction.originalTransactionId || null,
         productId: transaction.productId,
         environment: transaction.environment || "Unknown",
-        purchaseDate: transaction.purchaseDate ? new Date(Number(transaction.purchaseDate)) : null,
-        expiresDate: transaction.expiresDate ? new Date(Number(transaction.expiresDate)) : null,
+        purchaseDate: appleDate(transaction.purchaseDate),
+        expiresDate: appleDate(transaction.expiresDate),
       });
 
       res.json({
@@ -1444,6 +1497,121 @@ export async function registerRoutes(
     } catch (error: any) {
       console.error("Apple IAP transaction sync error:", error);
       res.status(500).json({ error: error?.message || "Failed to sync Apple purchase" });
+    }
+  });
+
+  app.post("/api/ios/iap/notifications", async (req: any, res) => {
+    try {
+      const parseResult = iosServerNotificationSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          error: "Invalid Apple notification",
+          details: parseResult.error.flatten(),
+        });
+      }
+
+      const notification = decodeAppleJwsPayload<AppleServerNotificationPayload>(parseResult.data.signedPayload);
+      const signedTransactionInfo = notification.data?.signedTransactionInfo;
+      if (!signedTransactionInfo) {
+        return res.json({
+          success: true,
+          ignored: true,
+          reason: "missing_signed_transaction_info",
+          notificationType: notification.notificationType || null,
+        });
+      }
+
+      const unverifiedTransaction = decodeAppleJwsPayload<AppleTransactionPayload>(signedTransactionInfo);
+      if (!unverifiedTransaction.transactionId) {
+        return res.json({
+          success: true,
+          ignored: true,
+          reason: "missing_transaction_id",
+          notificationType: notification.notificationType || null,
+        });
+      }
+
+      const transaction = await fetchAppleTransaction(unverifiedTransaction.transactionId);
+      const transactionExpired = transaction.expiresDate ? Number(transaction.expiresDate) < Date.now() : false;
+      const terminal = isTerminalAppleNotification(notification.notificationType, notification.subtype)
+        || (notification.notificationType === "DID_FAIL_TO_RENEW" && transactionExpired);
+      validateAppleTransaction(transaction, undefined, { allowExpired: true });
+
+      if (terminal || transaction.revocationDate) {
+        const accountTokenUser = transaction.appAccountToken
+          ? await storage.getUser(transaction.appAccountToken.toLowerCase())
+          : undefined;
+        const result = await storage.expireAppleEntitlement({
+          userId: accountTokenUser?.id || null,
+          transactionId: transaction.transactionId,
+          originalTransactionId: transaction.originalTransactionId || null,
+          productId: transaction.productId,
+          expiresDate: appleDate(transaction.expiresDate),
+          reason: transaction.revocationDate ? "revoked" : (notification.notificationType || "expired").toLowerCase(),
+        });
+
+        return res.json({
+          success: true,
+          processed: result.processed,
+          action: "expired",
+          notificationType: notification.notificationType || null,
+          subtype: notification.subtype || null,
+          notificationUUID: notification.notificationUUID || null,
+        });
+      }
+
+      if (isRenewingAppleNotification(notification.notificationType)) {
+        let userId = await storage.getAppleTransactionUserId(
+          transaction.transactionId,
+          transaction.originalTransactionId || null
+        );
+
+        if (!userId && transaction.appAccountToken) {
+          const accountTokenUser = await storage.getUser(transaction.appAccountToken.toLowerCase());
+          userId = accountTokenUser?.id;
+        }
+
+        if (!userId) {
+          return res.json({
+            success: true,
+            processed: false,
+            action: "renewal_unmatched",
+            notificationType: notification.notificationType || null,
+            notificationUUID: notification.notificationUUID || null,
+          });
+        }
+
+        const result = await storage.applyAppleEntitlement({
+          userId,
+          transactionId: transaction.transactionId,
+          originalTransactionId: transaction.originalTransactionId || null,
+          productId: transaction.productId,
+          environment: transaction.environment || notification.data?.environment || "Unknown",
+          purchaseDate: appleDate(transaction.purchaseDate),
+          expiresDate: appleDate(transaction.expiresDate),
+        });
+
+        return res.json({
+          success: true,
+          processed: result.processed,
+          action: "renewed",
+          notificationType: notification.notificationType || null,
+          subtype: notification.subtype || null,
+          notificationUUID: notification.notificationUUID || null,
+        });
+      }
+
+      res.json({
+        success: true,
+        processed: false,
+        action: "acknowledged",
+        notificationType: notification.notificationType || null,
+        subtype: notification.subtype || null,
+        notificationUUID: notification.notificationUUID || null,
+      });
+    } catch (error: any) {
+      console.error("Apple IAP notification error:", error);
+      res.status(500).json({ error: error?.message || "Failed to process Apple notification" });
     }
   });
 

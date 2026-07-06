@@ -164,7 +164,7 @@ final class AppModel {
 
   func purchase(_ product: Product) async {
     await runBusy {
-      try await purchases.purchase(product, api: api)
+      try await purchases.purchase(product, api: api, userId: user?.id)
       await refreshAccount()
     }
   }
@@ -226,4 +226,3 @@ extension String {
     return trimmed.isEmpty ? nil : trimmed
   }
 }
-
