@@ -75,6 +75,9 @@ struct RootView: View {
         }
       }
     }
+    .onChange(of: model.importRevision) { _, _ in
+      selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies
+    }
   }
 }
 
@@ -186,6 +189,7 @@ struct ProfileAuditView: View {
   @State private var pickerItems: [PhotosPickerItem] = []
   @State private var images: [Data] = []
   @State private var result: ProfileStatusResponse?
+  @State private var appliedImportRevision = -1
 
   private let platforms = ["Tinder", "Hinge", "Bumble", "Grindr", "Coffee Meets Bagel", "Other"]
   private let genders = ["Man", "Woman", "Non-binary"]
@@ -243,9 +247,7 @@ struct ProfileAuditView: View {
     .toolbar {
       Button {
         model.loadSharedImport()
-        if !model.pendingImportImages.isEmpty {
-          images = model.pendingImportImages
-        }
+        applyPendingImport()
       } label: {
         Image(systemName: "square.and.arrow.down")
       }
@@ -254,10 +256,19 @@ struct ProfileAuditView: View {
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 10) }
     }
+    .onChange(of: model.importRevision) { _, _ in
+      applyPendingImport()
+    }
     .onAppear {
-      if !model.pendingImportImages.isEmpty {
-        images = model.pendingImportImages
-      }
+      applyPendingImport()
+    }
+  }
+
+  private func applyPendingImport() {
+    guard appliedImportRevision != model.importRevision else { return }
+    appliedImportRevision = model.importRevision
+    if !model.pendingImportImages.isEmpty {
+      images = model.pendingImportImages
     }
   }
 }
@@ -271,6 +282,7 @@ struct ReplyAssistantView: View {
   @State private var pickerItems: [PhotosPickerItem] = []
   @State private var images: [Data] = []
   @State private var response: ReplyAnalysisResponse?
+  @State private var appliedImportRevision = -1
 
   private let tones = ["flirty", "witty", "confident", "thoughtful"]
   private let goals = [
@@ -344,8 +356,7 @@ struct ReplyAssistantView: View {
     .toolbar {
       Button {
         model.loadSharedImport()
-        conversation = model.pendingImportText.isEmpty ? conversation : model.pendingImportText
-        images = model.pendingImportImages
+        applyPendingImport()
       } label: {
         Image(systemName: "square.and.arrow.down")
       }
@@ -354,14 +365,21 @@ struct ReplyAssistantView: View {
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 3) }
     }
-    .onAppear {
-      if !model.pendingImportText.isEmpty {
-        conversation = model.pendingImportText
-      }
-      if !model.pendingImportImages.isEmpty {
-        images = model.pendingImportImages
-      }
+    .onChange(of: model.importRevision) { _, _ in
+      applyPendingImport()
     }
+    .onAppear {
+      applyPendingImport()
+    }
+  }
+
+  private func applyPendingImport() {
+    guard appliedImportRevision != model.importRevision else { return }
+    appliedImportRevision = model.importRevision
+    if !model.pendingImportText.isEmpty {
+      conversation = model.pendingImportText
+    }
+    images = model.pendingImportImages
   }
 }
 

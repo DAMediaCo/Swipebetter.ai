@@ -14,6 +14,7 @@ final class AppModel {
   var replyHistory: [ReplyAnalysis] = []
   var pendingImportText = ""
   var pendingImportImages: [Data] = []
+  var importRevision = 0
   var lastError: String?
   var isBusy = false
 
@@ -217,6 +218,7 @@ final class AppModel {
       replyHistory = []
       pendingImportText = ""
       pendingImportImages = []
+      importRevision += 1
     }
   }
 
@@ -224,6 +226,7 @@ final class AppModel {
     guard let payload = SharedImportStore.load() else { return }
     pendingImportText = payload.text ?? ""
     pendingImportImages = SharedImportStore.imageData(for: payload)
+    importRevision += 1
     SharedImportStore.clear(payload)
   }
 
