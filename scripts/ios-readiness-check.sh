@@ -386,6 +386,26 @@ for (const expected of [
   assertIncludes(smokeScript, expected, "iOS simulator smoke visual-readiness contract");
 }
 
+const screenshotScript = fs.readFileSync("scripts/ios-app-store-screenshots.sh", "utf8");
+for (const expected of [
+  'OUTPUT_DIR="${IOS_SCREENSHOT_OUTPUT_DIR:-artifacts/ios-app-store-screenshots}"',
+  'xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID" -SWIPEBETTER_UI_TESTING',
+  "01-auth-login.png",
+  "manifest.json",
+  "Sign in with Apple and email login",
+  "Profile Audit screenshot picker and credit status",
+  "Profile Audit result with score and first fix",
+  "Reply Coach input and generated replies",
+  "Account screen with Apple billing controls",
+]) {
+  assertIncludes(screenshotScript, expected, "App Store screenshot capture contract");
+}
+
+const gitignore = fs.readFileSync(".gitignore", "utf8");
+if (!/^artifacts\/?$/m.test(gitignore)) {
+  throw new Error(".gitignore must exclude generated App Store screenshot artifacts");
+}
+
 const releaseScript = fs.readFileSync("scripts/ios-release-preflight.sh", "utf8");
 for (const expected of [
   "require_env APPLE_DEVELOPMENT_TEAM",
@@ -426,6 +446,9 @@ if (packageJson.scripts?.["check:ios-entitlement-sync"] !== "tsx scripts/ios-ent
 }
 if (packageJson.scripts?.["check:ios-submission"] !== "tsx scripts/ios-submission-preflight.ts") {
   throw new Error("package.json must expose scripts/ios-submission-preflight.ts as check:ios-submission");
+}
+if (packageJson.scripts?.["capture:ios-screenshots"] !== "scripts/ios-app-store-screenshots.sh") {
+  throw new Error("package.json must expose scripts/ios-app-store-screenshots.sh as capture:ios-screenshots");
 }
 
 const entitlementSyncPreflight = fs.readFileSync("scripts/ios-entitlement-sync-preflight.ts", "utf8");

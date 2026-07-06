@@ -14,6 +14,7 @@
     "check:ios-release": "scripts/ios-release-preflight.sh",
     "check:ios-entitlement-sync": "tsx scripts/ios-entitlement-sync-preflight.ts",
     "check:ios-submission": "tsx scripts/ios-submission-preflight.ts",
+    "capture:ios-screenshots": "scripts/ios-app-store-screenshots.sh",
     "smoke:ios-simulator": "scripts/ios-simulator-smoke.sh",
     "db:push": "drizzle-kit push"
   },
