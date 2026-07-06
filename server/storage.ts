@@ -676,6 +676,28 @@ export class DatabaseStorage implements IStorage {
 
       const currentCredits = (existing as any).credits || 0;
       const currentOneTimeCredits = (existing as any).oneTimeCredits || 0;
+      const isAppleSubscription = data.productId.startsWith("ai.swipebetter.unlimited");
+      if (isAppleSubscription) {
+        const activeAppleSubscriptions = await tx.select({ id: iosTransactions.id })
+          .from(iosTransactions)
+          .where(sql`
+            ${iosTransactions.userId} = ${userId}
+            AND ${iosTransactions.transactionId} != ${data.transactionId}
+            AND ${iosTransactions.productId} LIKE 'ai.swipebetter.unlimited%'
+            AND ${iosTransactions.expiresDate} > NOW()
+          `)
+          .limit(1);
+
+        if (activeAppleSubscriptions.length > 0) {
+          return {
+            processed: false,
+            userId,
+            planTier: ((existing as any).planTier || "free") as 'free' | 'starter' | 'unlimited',
+            credits: Math.max(currentCredits, currentOneTimeCredits),
+          };
+        }
+      }
+
       const shouldRemoveStarterCredit = data.productId === "ai.swipebetter.starter"
         && (data.reason === "refund" || data.reason === "revoked");
       const nextCredits = shouldRemoveStarterCredit ? Math.max(currentCredits - 1, 0) : currentCredits;
@@ -686,7 +708,7 @@ export class DatabaseStorage implements IStorage {
         .set({
           planTier: nextTier,
           status: data.reason === "refund" || data.reason === "revoked" ? "canceled" : "inactive",
-          plan: data.productId.startsWith("ai.swipebetter.unlimited") ? "ios_unlimited" : (existing as any).plan,
+          plan: isAppleSubscription ? "ios_unlimited" : (existing as any).plan,
           credits: nextCredits,
           oneTimeCredits: nextOneTimeCredits,
           currentPeriodEnd: data.expiresDate || (existing as any).currentPeriodEnd || null,

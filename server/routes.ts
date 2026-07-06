@@ -226,11 +226,12 @@ function appleDate(value?: number): Date | null {
   return value ? new Date(Number(value)) : null;
 }
 
-function isTerminalAppleNotification(type?: string, subtype?: string): boolean {
-  return type === "EXPIRED"
-    || type === "REFUND"
-    || type === "REVOKE"
-    || type === "GRACE_PERIOD_EXPIRED";
+function shouldExpireAppleTransaction(type: string | undefined, transaction: AppleTransactionPayload): boolean {
+  if (transaction.revocationDate) return true;
+
+  const transactionExpired = transaction.expiresDate ? Number(transaction.expiresDate) < Date.now() : false;
+  return (type === "EXPIRED" || type === "GRACE_PERIOD_EXPIRED" || type === "DID_FAIL_TO_RENEW")
+    && transactionExpired;
 }
 
 function isRenewingAppleNotification(type?: string): boolean {
@@ -1566,12 +1567,9 @@ export async function registerRoutes(
       }
 
       const transaction = await fetchAppleTransaction(unverifiedTransaction.transactionId);
-      const transactionExpired = transaction.expiresDate ? Number(transaction.expiresDate) < Date.now() : false;
-      const terminal = isTerminalAppleNotification(notification.notificationType, notification.subtype)
-        || (notification.notificationType === "DID_FAIL_TO_RENEW" && transactionExpired);
       validateAppleTransaction(transaction, undefined, { allowExpired: true });
 
-      if (terminal || transaction.revocationDate) {
+      if (shouldExpireAppleTransaction(notification.notificationType, transaction)) {
         const accountTokenUser = transaction.appAccountToken
           ? await storage.getUser(transaction.appAccountToken.toLowerCase())
           : undefined;
