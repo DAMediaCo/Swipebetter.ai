@@ -46,6 +46,23 @@ function assertIncludes(haystack, needle, label) {
   }
 }
 
+function pngInfo(path) {
+  const buffer = fs.readFileSync(path);
+  const signature = buffer.subarray(0, 8).toString("hex");
+  if (signature !== "89504e470d0a1a0a") {
+    throw new Error(`${path} is not a PNG`);
+  }
+  return {
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+    colorType: buffer.readUInt8(25),
+  };
+}
+
+function pointsToPixels(size, scale) {
+  return Math.round(Number.parseFloat(size.split("x")[0]) * Number.parseInt(scale, 10));
+}
+
 const project = fs.readFileSync("ios/SwipeBetter/project.yml", "utf8");
 for (const bundleId of [
   "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app",
@@ -68,6 +85,26 @@ assertEqual(appInfo.UIRequiresFullScreen, true, "main app full-screen posture");
 const urlScheme = appInfo.CFBundleURLTypes?.[0]?.CFBundleURLSchemes?.[0];
 assertEqual(urlScheme, "swipebetter", "main app URL scheme");
 assertEqual(appInfo.NSPhotoLibraryUsageDescription, "SwipeBetter uses selected screenshots to analyze dating profiles and chats.", "photo library purpose string");
+
+const appIconSetPath = "ios/SwipeBetter/SwipeBetterApp/Resources/Assets.xcassets/AppIcon.appiconset";
+const appIconSet = JSON.parse(fs.readFileSync(`${appIconSetPath}/Contents.json`, "utf8"));
+const iconEntries = appIconSet.images || [];
+if (!iconEntries.some((entry) => entry.idiom === "ios-marketing" && entry.size === "1024x1024" && entry.scale === "1x")) {
+  throw new Error("App icon set must include a 1024x1024 ios-marketing icon");
+}
+for (const entry of iconEntries) {
+  if (!entry.filename) {
+    throw new Error(`App icon set has an entry without a filename: ${JSON.stringify(entry)}`);
+  }
+  const path = `${appIconSetPath}/${entry.filename}`;
+  const info = pngInfo(path);
+  const expectedPixels = pointsToPixels(entry.size, entry.scale);
+  assertEqual(info.width, expectedPixels, `${entry.filename} width`);
+  assertEqual(info.height, expectedPixels, `${entry.filename} height`);
+  if (info.colorType === 4 || info.colorType === 6) {
+    throw new Error(`${entry.filename} must not include an alpha channel`);
+  }
+}
 
 const shareInfo = readPlist("ios/SwipeBetter/ShareExtension/Info.plist");
 assertEqual(shareInfo.NSExtension?.NSExtensionPointIdentifier, "com.apple.share-services", "share extension point");
