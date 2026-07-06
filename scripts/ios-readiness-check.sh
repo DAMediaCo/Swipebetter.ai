@@ -129,8 +129,12 @@ const purchaseStore = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/Pu
 for (const expected of [
   "userId.flatMap(UUID.init(uuidString:))",
   ".appAccountToken(accountToken)",
+  "var isLoadingProducts = false",
+  "var purchasingProductId: String?",
+  "var isRestoringPurchases = false",
+  "Some App Store products are unavailable. Try again shortly.",
 ]) {
-  assertIncludes(purchaseStore, expected, "Apple app account token contract");
+  assertIncludes(purchaseStore, expected, "Apple purchase UX contract");
 }
 
 const appModel = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/AppModel.swift", "utf8");
@@ -156,7 +160,10 @@ for (const expected of [
   'Label("iOS pricing includes Apple purchase fees.", systemImage: "info.circle")',
   'Text("Starter $3.99, Unlimited $16.99/month, Annual $104.99/year.")',
   'Text("iOS purchases are billed by Apple. Web Stripe checkout is intentionally not shown inside the app.")',
+  'Label("Reload Plans", systemImage: "arrow.clockwise")',
+  "model.purchases.purchasingProductId == product.id",
   'Label("Restore Purchases", systemImage: "arrow.clockwise.circle")',
+  "model.purchases.isRestoringPurchases",
   'Label("Manage Subscription", systemImage: "creditcard")',
 ]) {
   assertIncludes(rootView, expected, "iOS App Review UI contract");

@@ -574,10 +574,25 @@ struct AccountView: View {
 
       Section("iOS Plans") {
         if model.purchases.products.isEmpty {
-          VStack(alignment: .leading, spacing: 8) {
-            ProgressView()
-            Text("Loading App Store products.")
-              .foregroundStyle(.secondary)
+          if model.purchases.isLoadingProducts {
+            VStack(alignment: .leading, spacing: 8) {
+              ProgressView()
+              Text("Loading App Store products.")
+                .foregroundStyle(.secondary)
+            }
+          } else {
+            VStack(alignment: .leading, spacing: 10) {
+              Text("App Store plans are not available right now.")
+                .font(.subheadline.weight(.semibold))
+              Text("Check your connection and try again.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+              Button {
+                Task { await model.purchases.loadProducts() }
+              } label: {
+                Label("Reload Plans", systemImage: "arrow.clockwise")
+              }
+            }
           }
         } else {
           ForEach(model.purchases.products, id: \.id) { product in
@@ -593,10 +608,15 @@ struct AccountView: View {
                     .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text(product.displayPrice)
-                  .font(.headline)
+                if model.purchases.purchasingProductId == product.id {
+                  ProgressView()
+                } else {
+                  Text(product.displayPrice)
+                    .font(.headline)
+                }
               }
             }
+            .disabled(model.isBusy || model.purchases.purchasingProductId != nil)
           }
         }
 
@@ -609,8 +629,15 @@ struct AccountView: View {
         Button {
           Task { await model.restorePurchases() }
         } label: {
-          Label("Restore Purchases", systemImage: "arrow.clockwise.circle")
+          HStack {
+            Label("Restore Purchases", systemImage: "arrow.clockwise.circle")
+            if model.purchases.isRestoringPurchases {
+              Spacer()
+              ProgressView()
+            }
+          }
         }
+        .disabled(model.isBusy || model.purchases.isRestoringPurchases)
 
         Button {
           Task { await model.manageSubscriptions() }

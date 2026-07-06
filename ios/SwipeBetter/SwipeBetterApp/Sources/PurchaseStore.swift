@@ -14,17 +14,32 @@ final class PurchaseStore {
 
   var products: [Product] = []
   var lastPurchaseMessage: String?
+  var isLoadingProducts = false
+  var purchasingProductId: String?
+  var isRestoringPurchases = false
 
   func loadProducts() async {
+    isLoadingProducts = true
+    defer { isLoadingProducts = false }
+
     do {
       products = try await Product.products(for: productIds)
         .sorted { productRank($0.id) < productRank($1.id) }
+      let loadedProductIds = Set(products.map(\.id))
+      let missingProductIds = productIds.filter { !loadedProductIds.contains($0) }
+      lastPurchaseMessage = missingProductIds.isEmpty ? nil : "Some App Store products are unavailable. Try again shortly."
     } catch {
+      products = []
       lastPurchaseMessage = "Could not load App Store products yet."
     }
   }
 
   func purchase(_ product: Product, api: SwipeBetterAPI, userId: String?) async throws {
+    guard purchasingProductId == nil else { return }
+    purchasingProductId = product.id
+    lastPurchaseMessage = nil
+    defer { purchasingProductId = nil }
+
     let accountToken = userId.flatMap(UUID.init(uuidString:))
     let result = if let accountToken {
       try await product.purchase(options: [.appAccountToken(accountToken)])
@@ -51,6 +66,9 @@ final class PurchaseStore {
   }
 
   func restorePurchases(api: SwipeBetterAPI) async throws {
+    isRestoringPurchases = true
+    defer { isRestoringPurchases = false }
+
     try await AppStore.sync()
     await syncCurrentEntitlements(api: api)
     lastPurchaseMessage = "Purchases restored."
