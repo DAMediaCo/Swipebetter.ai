@@ -213,6 +213,18 @@ for (const expected of [
 ]) {
   assertIncludes(storage, expected, "iOS transaction storage contract");
 }
+
+const routes = fs.readFileSync("server/routes.ts", "utf8");
+for (const expected of [
+  "AppleIapValidationError",
+  'return res.status(400).json({ error: error.message });',
+]) {
+  assertIncludes(routes, expected, "iOS Apple validation route contract");
+}
+const validationCatchCount = (routes.match(/error instanceof AppleIapValidationError/g) || []).length;
+if (validationCatchCount < 2) {
+  throw new Error("Both iOS IAP transaction and notification routes must catch AppleIapValidationError");
+}
 NODE
 
 echo "Checking App Store metadata package..."
