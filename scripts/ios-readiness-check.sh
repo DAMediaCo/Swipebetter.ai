@@ -59,6 +59,9 @@ NODE
 echo "Running TypeScript check..."
 npm run check
 
+echo "Running Apple IAP regression tests..."
+npm run test:ios-iap
+
 echo "Running production build..."
 npm run build
 

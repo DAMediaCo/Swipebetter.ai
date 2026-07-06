@@ -11,6 +11,12 @@ import OpenAI from "openai";
 import { z } from "zod";
 import sharp from "sharp";
 import jwt from "jsonwebtoken";
+import {
+  APPLE_IAP_PRODUCT_IDS,
+  type AppleTransactionPayload,
+  shouldExpireAppleTransaction,
+  validateAppleTransaction,
+} from "./appleIap";
 
 const analysisLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -96,27 +102,12 @@ const checkoutSchema = z.object({
 
 const iosIapSchema = z.object({
   transactionId: z.string().min(5).max(128),
-  productId: z.enum([
-    "ai.swipebetter.starter",
-    "ai.swipebetter.unlimited.monthly",
-    "ai.swipebetter.unlimited.annual",
-  ]),
+  productId: z.enum(APPLE_IAP_PRODUCT_IDS),
 });
 
 const iosServerNotificationSchema = z.object({
   signedPayload: z.string().min(20),
 });
-
-const APPLE_IAP_PRODUCTS = new Set([
-  "ai.swipebetter.starter",
-  "ai.swipebetter.unlimited.monthly",
-  "ai.swipebetter.unlimited.annual",
-]);
-
-const APPLE_SUBSCRIPTION_PRODUCTS = new Set([
-  "ai.swipebetter.unlimited.monthly",
-  "ai.swipebetter.unlimited.annual",
-]);
 
 function applePrivateKey(): string {
   return (process.env.APPLE_IAP_PRIVATE_KEY || "").replace(/\\n/g, "\n");
@@ -150,18 +141,6 @@ function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string): T {
   if (!payload) throw new Error("Invalid Apple transaction response");
   return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as T;
 }
-
-type AppleTransactionPayload = {
-  transactionId: string;
-  originalTransactionId?: string;
-  productId: string;
-  bundleId: string;
-  purchaseDate?: number;
-  expiresDate?: number;
-  revocationDate?: number;
-  appAccountToken?: string;
-  environment?: string;
-};
 
 type AppleServerNotificationPayload = {
   notificationType?: string;
@@ -205,33 +184,8 @@ async function fetchAppleTransaction(transactionId: string): Promise<AppleTransa
   throw new Error(`Apple transaction verification failed: ${lastError}`);
 }
 
-function validateAppleTransaction(transaction: AppleTransactionPayload, requestedProductId?: string, options: { allowExpired?: boolean } = {}) {
-  const expectedBundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
-
-  if (transaction.bundleId !== expectedBundleId) {
-    throw new Error("Apple transaction bundle mismatch");
-  }
-  if (requestedProductId && transaction.productId !== requestedProductId) {
-    throw new Error("Apple product mismatch");
-  }
-  if (!APPLE_IAP_PRODUCTS.has(transaction.productId)) {
-    throw new Error("Unsupported Apple product");
-  }
-  if (!options.allowExpired && transaction.expiresDate && Number(transaction.expiresDate) < Date.now() && APPLE_SUBSCRIPTION_PRODUCTS.has(transaction.productId)) {
-    throw new Error("Apple subscription transaction is expired");
-  }
-}
-
 function appleDate(value?: number): Date | null {
   return value ? new Date(Number(value)) : null;
-}
-
-function shouldExpireAppleTransaction(type: string | undefined, transaction: AppleTransactionPayload): boolean {
-  if (transaction.revocationDate) return true;
-
-  const transactionExpired = transaction.expiresDate ? Number(transaction.expiresDate) < Date.now() : false;
-  return (type === "EXPIRED" || type === "GRACE_PERIOD_EXPIRED" || type === "DID_FAIL_TO_RENEW")
-    && transactionExpired;
 }
 
 function isRenewingAppleNotification(type?: string): boolean {

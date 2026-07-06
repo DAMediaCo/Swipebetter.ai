@@ -19,6 +19,10 @@ import {
   type InsertPromoCode,
   type PromoRedemption,
 } from "@shared/schema";
+import {
+  getAppleIapProductConfig,
+  isAppleSubscriptionProduct,
+} from "./appleIap";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -576,15 +580,7 @@ export class DatabaseStorage implements IStorage {
     purchaseDate?: Date | null;
     expiresDate?: Date | null;
   }): Promise<{ processed: boolean; planTier: 'free' | 'starter' | 'unlimited'; credits: number }> {
-    const productConfig: Record<string, { tier: 'starter' | 'unlimited'; credits: number; planType: string; priceCents: number }> = {
-      "ai.swipebetter.starter": { tier: "starter", credits: 1, planType: "starter", priceCents: 399 },
-      "ai.swipebetter.unlimited.monthly": { tier: "unlimited", credits: 0, planType: "monthly", priceCents: 1699 },
-      "ai.swipebetter.unlimited.annual": { tier: "unlimited", credits: 0, planType: "annual", priceCents: 10499 },
-    };
-    const config = productConfig[data.productId];
-    if (!config) {
-      throw new Error(`Unsupported Apple product ID: ${data.productId}`);
-    }
+    const config = getAppleIapProductConfig(data.productId);
 
     return db.transaction(async (tx) => {
       const [inserted] = await tx.insert(iosTransactions).values({
@@ -676,7 +672,7 @@ export class DatabaseStorage implements IStorage {
 
       const currentCredits = (existing as any).credits || 0;
       const currentOneTimeCredits = (existing as any).oneTimeCredits || 0;
-      const isAppleSubscription = data.productId.startsWith("ai.swipebetter.unlimited");
+      const isAppleSubscription = isAppleSubscriptionProduct(data.productId);
       if (isAppleSubscription) {
         const activeAppleSubscriptions = await tx.select({ id: iosTransactions.id })
           .from(iosTransactions)

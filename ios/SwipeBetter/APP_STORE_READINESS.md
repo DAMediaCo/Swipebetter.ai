@@ -50,6 +50,7 @@ The script verifies:
 - iOS plist and privacy manifest syntax.
 - Keyboard `RequestsOpenAccess=false`.
 - StoreKit product IDs and iOS prices.
+- Apple IAP backend product/expiration regression tests.
 - TypeScript compile.
 - Production web/server build.
 - iOS simulator build for the app plus both extensions.
