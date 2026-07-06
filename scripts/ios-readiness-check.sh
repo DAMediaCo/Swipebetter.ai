@@ -136,6 +136,8 @@ assertIncludes(authSchema, 'id: varchar("id").primaryKey().default(sql`gen_rando
 const purchaseStore = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/PurchaseStore.swift", "utf8");
 for (const expected of [
   "userId.flatMap(UUID.init(uuidString:))",
+  "guard let accountToken = userId.flatMap(UUID.init(uuidString:)) else",
+  "Sign in again before buying an App Store plan.",
   ".appAccountToken(accountToken)",
   "var isLoadingProducts = false",
   "var purchasingProductId: String?",

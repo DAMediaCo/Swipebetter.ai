@@ -40,12 +40,13 @@ final class PurchaseStore {
     lastPurchaseMessage = nil
     defer { purchasingProductId = nil }
 
-    let accountToken = userId.flatMap(UUID.init(uuidString:))
-    let result = if let accountToken {
-      try await product.purchase(options: [.appAccountToken(accountToken)])
-    } else {
-      try await product.purchase()
+    guard let accountToken = userId.flatMap(UUID.init(uuidString:)) else {
+      let message = "Sign in again before buying an App Store plan."
+      lastPurchaseMessage = message
+      throw SwipeBetterAPIError.server(status: 401, message: message)
     }
+
+    let result = try await product.purchase(options: [.appAccountToken(accountToken)])
     switch result {
     case .success(let verification):
       try await sync(verification: verification, api: api)
