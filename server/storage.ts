@@ -20,6 +20,7 @@ import {
   type PromoRedemption,
 } from "@shared/schema";
 import {
+  AppleIapOwnershipError,
   getAppleIapProductConfig,
   isAppleSubscriptionProduct,
 } from "./appleIap";
@@ -583,6 +584,41 @@ export class DatabaseStorage implements IStorage {
     const config = getAppleIapProductConfig(data.productId);
 
     return db.transaction(async (tx) => {
+      const currentSubscriptionState = async () => {
+        const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+        return {
+          processed: false,
+          planTier: ((existing as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
+          credits: (existing as any)?.credits || 0,
+        };
+      };
+
+      const [existingTransaction] = await tx.select({ userId: iosTransactions.userId })
+        .from(iosTransactions)
+        .where(eq(iosTransactions.transactionId, data.transactionId))
+        .limit(1);
+
+      if (existingTransaction) {
+        if (existingTransaction.userId !== data.userId) {
+          throw new AppleIapOwnershipError("Apple transaction is already linked to another account");
+        }
+        return currentSubscriptionState();
+      }
+
+      if (data.originalTransactionId) {
+        const [conflictingOriginalTransaction] = await tx.select({ userId: iosTransactions.userId })
+          .from(iosTransactions)
+          .where(sql`
+            ${iosTransactions.originalTransactionId} = ${data.originalTransactionId}
+            AND ${iosTransactions.userId} != ${data.userId}
+          `)
+          .limit(1);
+
+        if (conflictingOriginalTransaction) {
+          throw new AppleIapOwnershipError("Apple subscription is already linked to another account");
+        }
+      }
+
       const [inserted] = await tx.insert(iosTransactions).values({
         userId: data.userId,
         transactionId: data.transactionId,
@@ -594,12 +630,15 @@ export class DatabaseStorage implements IStorage {
       }).onConflictDoNothing({ target: iosTransactions.transactionId }).returning();
 
       if (!inserted) {
-        const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
-        return {
-          processed: false,
-          planTier: ((existing as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
-          credits: (existing as any)?.credits || 0,
-        };
+        const [conflictingTransaction] = await tx.select({ userId: iosTransactions.userId })
+          .from(iosTransactions)
+          .where(eq(iosTransactions.transactionId, data.transactionId))
+          .limit(1);
+
+        if (conflictingTransaction && conflictingTransaction.userId !== data.userId) {
+          throw new AppleIapOwnershipError("Apple transaction is already linked to another account");
+        }
+        return currentSubscriptionState();
       }
 
       const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));

@@ -4,6 +4,7 @@ import test from "node:test";
 import jwt from "jsonwebtoken";
 import {
   APPLE_IAP_PRODUCT_CONFIG,
+  AppleIapOwnershipError,
   AppleIapValidationError,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
@@ -46,6 +47,12 @@ test("Apple IAP product config matches shipped iOS pricing", () => {
   });
   assert.equal(APPLE_IAP_PRODUCT_CONFIG["ai.swipebetter.unlimited.monthly"].priceCents, 1699);
   assert.equal(APPLE_IAP_PRODUCT_CONFIG["ai.swipebetter.unlimited.annual"].priceCents, 10499);
+});
+
+test("Apple ownership conflicts use a dedicated error", () => {
+  const error = new AppleIapOwnershipError("Apple transaction is already linked to another account");
+  assert.equal(error.name, "AppleIapOwnershipError");
+  assert.equal(error.message, "Apple transaction is already linked to another account");
 });
 
 test("Apple IAP product helpers reject unknown product IDs", () => {

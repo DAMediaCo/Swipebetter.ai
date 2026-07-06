@@ -71,6 +71,13 @@ export class AppleIapValidationError extends Error {
   }
 }
 
+export class AppleIapOwnershipError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AppleIapOwnershipError";
+  }
+}
+
 export function isAppleIapProduct(productId: string): productId is AppleIapProductId {
   return APPLE_IAP_PRODUCTS.has(productId);
 }

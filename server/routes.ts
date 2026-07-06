@@ -12,6 +12,7 @@ import { z } from "zod";
 import sharp from "sharp";
 import {
   APPLE_IAP_PRODUCT_IDS,
+  AppleIapOwnershipError,
   AppleIapValidationError,
   type AppleTransactionPayload,
   appleAppAccountTokenMatchesUser,
@@ -1466,6 +1467,9 @@ export async function registerRoutes(
       });
     } catch (error: any) {
       console.error("Apple IAP transaction sync error:", error);
+      if (error instanceof AppleIapOwnershipError) {
+        return res.status(409).json({ error: error.message });
+      }
       if (error instanceof AppleIapValidationError) {
         return res.status(400).json({ error: error.message });
       }
@@ -1584,6 +1588,14 @@ export async function registerRoutes(
       });
     } catch (error: any) {
       console.error("Apple IAP notification error:", error);
+      if (error instanceof AppleIapOwnershipError) {
+        return res.json({
+          success: true,
+          processed: false,
+          action: "ownership_conflict",
+          error: error.message,
+        });
+      }
       if (error instanceof AppleIapValidationError) {
         return res.status(400).json({ error: error.message });
       }

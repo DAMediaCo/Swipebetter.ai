@@ -290,10 +290,15 @@ for (const expected of [
 
 const storage = fs.readFileSync("server/storage.ts", "utf8");
 for (const expected of [
+  "AppleIapOwnershipError",
   "getAppleTransactionUserId(transactionId: string, originalTransactionId?: string | null)",
   "eq(iosTransactions.transactionId, transactionId)",
   "eq(iosTransactions.originalTransactionId, originalTransactionId)",
   ".onConflictDoNothing({ target: iosTransactions.transactionId })",
+  "Apple transaction is already linked to another account",
+  "Apple subscription is already linked to another account",
+  "${iosTransactions.originalTransactionId} = ${data.originalTransactionId}",
+  "AND ${iosTransactions.userId} != ${data.userId}",
   "isAppleSubscriptionProduct(data.productId)",
   "AND ${iosTransactions.productId} LIKE 'ai.swipebetter.unlimited%'",
 ]) {
@@ -302,6 +307,7 @@ for (const expected of [
 
 const appleIap = fs.readFileSync("server/appleIap.ts", "utf8");
 for (const expected of [
+  "AppleIapOwnershipError",
   "isAppleSubscriptionProduct(transaction.productId) && !transaction.expiresDate",
   "Apple subscription transaction is missing an expiration date",
   "Apple subscription transaction is expired",
@@ -311,7 +317,10 @@ for (const expected of [
 
 const routes = fs.readFileSync("server/routes.ts", "utf8");
 for (const expected of [
+  "AppleIapOwnershipError",
   "AppleIapValidationError",
+  'return res.status(409).json({ error: error.message });',
+  'action: "ownership_conflict"',
   'return res.status(400).json({ error: error.message });',
 ]) {
   assertIncludes(routes, expected, "iOS Apple validation route contract");
