@@ -102,6 +102,19 @@ export function appleAppAccountTokenMatchesUser(token: string | undefined | null
   return !normalizedToken || normalizedToken === userId.toLowerCase();
 }
 
+export function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string): T {
+  const parts = jws.split(".");
+  if (parts.length < 2 || !parts[1]) {
+    throw new Error("Invalid Apple signed payload");
+  }
+
+  try {
+    return JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8")) as T;
+  } catch {
+    throw new Error("Invalid Apple signed payload");
+  }
+}
+
 export function shouldExpireAppleTransaction(
   type: string | undefined,
   transaction: AppleTransactionPayload,

@@ -4,6 +4,7 @@ import {
   APPLE_IAP_PRODUCT_CONFIG,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
+  decodeAppleJwsPayload,
   getAppleIapProductConfig,
   isAppleIapProduct,
   isAppleSubscriptionProduct,
@@ -24,6 +25,12 @@ function transaction(overrides: Partial<AppleTransactionPayload> = {}): AppleTra
     expiresDate: now + 60_000,
     ...overrides,
   };
+}
+
+function unsignedJws(payload: Record<string, unknown>): string {
+  const encodedHeader = Buffer.from(JSON.stringify({ alg: "none" })).toString("base64url");
+  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  return `${encodedHeader}.${encodedPayload}.`;
 }
 
 test("Apple IAP product config matches shipped iOS pricing", () => {
@@ -76,6 +83,21 @@ test("Apple app account tokens are normalized before user matching", () => {
   assert.equal(appleAppAccountTokenMatchesUser("", userId), true);
   assert.equal(appleAppAccountTokenMatchesUser("a2c13a6c-882e-4c22-8788-0d44559f8418", userId), true);
   assert.equal(appleAppAccountTokenMatchesUser("d0c13a6c-882e-4c22-8788-0d44559f8418", userId), false);
+});
+
+test("decodeAppleJwsPayload decodes payloads and rejects malformed input", () => {
+  assert.deepEqual(
+    decodeAppleJwsPayload<{ transactionId: string; productId: string }>(unsignedJws({
+      transactionId: "1000000000000001",
+      productId: "ai.swipebetter.starter",
+    })),
+    {
+      transactionId: "1000000000000001",
+      productId: "ai.swipebetter.starter",
+    }
+  );
+  assert.throws(() => decodeAppleJwsPayload("not-a-jws"), /Invalid Apple signed payload/);
+  assert.throws(() => decodeAppleJwsPayload("header.%%%%.signature"), /Invalid Apple signed payload/);
 });
 
 test("shouldExpireAppleTransaction only expires from Apple-fetched facts", () => {

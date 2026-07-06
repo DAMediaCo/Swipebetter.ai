@@ -16,6 +16,7 @@ import {
   type AppleTransactionPayload,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
+  decodeAppleJwsPayload,
   normalizedAppleAppAccountToken,
   validateAppleTransaction,
 } from "./appleIap";
@@ -136,12 +137,6 @@ function createAppleServerApiToken(): string {
       expiresIn: "5m",
     }
   );
-}
-
-function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string): T {
-  const payload = jws.split(".")[1];
-  if (!payload) throw new Error("Invalid Apple transaction response");
-  return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as T;
 }
 
 type AppleServerNotificationPayload = {
