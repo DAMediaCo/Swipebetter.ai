@@ -521,6 +521,10 @@ for (const expected of [
   "App Store screenshot manifest",
   "Run npm run capture:ios-screenshots before submission",
   "minimumScreenshotWidth",
+  "Environment shape: APPLE_DEVELOPMENT_TEAM",
+  "Environment shape: APPLE_IAP_PRIVATE_KEY",
+  "Environment shape: SWIPEBETTER_SESSION_COOKIE",
+  "placeholderPattern",
   "Live entitlement sync command",
   "iOS submission preflight blocked",
 ]) {

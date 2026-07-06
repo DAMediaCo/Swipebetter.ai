@@ -57,9 +57,18 @@ const expectedBundleId = "ai.swipebetter.app";
 const minimumScreenshotBytes = 50_000;
 const minimumScreenshotWidth = 1_000;
 const minimumScreenshotHeight = 2_000;
+const placeholderPattern = /placeholder|example|dummy|changeme|replace_me|replace-me|test-value|^test$|^key$|^issuer$|^tx$|^teamid$/i;
 
 function present(name: string): boolean {
   return Boolean(process.env[name]?.trim());
+}
+
+function envValue(name: string): string {
+  return process.env[name]?.trim() || "";
+}
+
+function isPlaceholder(value: string): boolean {
+  return placeholderPattern.test(value) || value === "1234567890";
 }
 
 function readJson<T>(path: string): T {
@@ -202,11 +211,74 @@ async function livePublicUrlChecks(): Promise<Check[]> {
 }
 
 function envChecks(): Check[] {
-  return requiredEnv.map((name) => ({
+  const checks = requiredEnv.map((name) => ({
     label: `Environment: ${name}`,
     ok: present(name),
     detail: `${name} must be set in the shell running the final submission preflight.`,
   }));
+
+  const applePrivateKey = envValue("APPLE_IAP_PRIVATE_KEY").replace(/\\n/g, "\n");
+  checks.push(
+    {
+      label: "Environment shape: APPLE_DEVELOPMENT_TEAM",
+      ok: /^[A-Z0-9]{10}$/.test(envValue("APPLE_DEVELOPMENT_TEAM")) && !isPlaceholder(envValue("APPLE_DEVELOPMENT_TEAM")),
+      detail: "APPLE_DEVELOPMENT_TEAM must be the real 10-character Apple Developer Team ID, not a placeholder.",
+    },
+    {
+      label: "Environment shape: APPLE_APP_ID",
+      ok: /^\d{9,12}$/.test(envValue("APPLE_APP_ID")) && !isPlaceholder(envValue("APPLE_APP_ID")),
+      detail: "APPLE_APP_ID must be the real numeric App Store Connect app ID, not a placeholder.",
+    },
+    {
+      label: "Environment shape: APPLE_BUNDLE_ID",
+      ok: envValue("APPLE_BUNDLE_ID") === expectedBundleId,
+      detail: `APPLE_BUNDLE_ID must be ${expectedBundleId}.`,
+    },
+    {
+      label: "Environment shape: APPLE_IAP_ISSUER_ID",
+      ok: /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(envValue("APPLE_IAP_ISSUER_ID"))
+        && !isPlaceholder(envValue("APPLE_IAP_ISSUER_ID")),
+      detail: "APPLE_IAP_ISSUER_ID must be the real App Store Connect issuer UUID.",
+    },
+    {
+      label: "Environment shape: APPLE_IAP_KEY_ID",
+      ok: /^[A-Z0-9]{10}$/.test(envValue("APPLE_IAP_KEY_ID")) && !isPlaceholder(envValue("APPLE_IAP_KEY_ID")),
+      detail: "APPLE_IAP_KEY_ID must be the real 10-character App Store Connect API key ID.",
+    },
+    {
+      label: "Environment shape: APPLE_IAP_PRIVATE_KEY",
+      ok: applePrivateKey.includes("-----BEGIN PRIVATE KEY-----")
+        && applePrivateKey.includes("-----END PRIVATE KEY-----")
+        && applePrivateKey.length > 200
+        && !isPlaceholder(applePrivateKey),
+      detail: "APPLE_IAP_PRIVATE_KEY must be the real App Store Connect private key PEM.",
+    },
+    {
+      label: "Environment shape: APPLE_IAP_TEST_PRODUCT_ID",
+      ok: expectedProducts.has(envValue("APPLE_IAP_TEST_PRODUCT_ID")),
+      detail: `APPLE_IAP_TEST_PRODUCT_ID must be one of: ${Array.from(expectedProducts.keys()).join(", ")}.`,
+    },
+    {
+      label: "Environment shape: APPLE_IAP_TEST_TRANSACTION_ID",
+      ok: /^\d{8,}$/.test(envValue("APPLE_IAP_TEST_TRANSACTION_ID")) && !isPlaceholder(envValue("APPLE_IAP_TEST_TRANSACTION_ID")),
+      detail: "APPLE_IAP_TEST_TRANSACTION_ID must be a real numeric sandbox transaction ID.",
+    },
+    {
+      label: "Environment shape: SWIPEBETTER_SESSION_COOKIE",
+      ok: /^connect\.sid=.{20,}/.test(envValue("SWIPEBETTER_SESSION_COOKIE")) && !isPlaceholder(envValue("SWIPEBETTER_SESSION_COOKIE")),
+      detail: "SWIPEBETTER_SESSION_COOKIE must include the real signed connect.sid cookie for the sandbox test user.",
+    },
+    {
+      label: "Environment shape: APP_REVIEW_ACCESS_NOTES",
+      ok: envValue("APP_REVIEW_ACCESS_NOTES").length >= 80
+        && /sandbox Apple ID/i.test(envValue("APP_REVIEW_ACCESS_NOTES"))
+        && /does not overlay/i.test(envValue("APP_REVIEW_ACCESS_NOTES"))
+        && !isPlaceholder(envValue("APP_REVIEW_ACCESS_NOTES")),
+      detail: "APP_REVIEW_ACCESS_NOTES must include real review instructions, sandbox purchase guidance, and the no-overlay privacy note.",
+    },
+  );
+
+  return checks;
 }
 
 function artifactChecks(): Check[] {
