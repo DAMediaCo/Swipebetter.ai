@@ -58,11 +58,26 @@ final class PurchaseStore {
     }
   }
 
-  func syncCurrentEntitlements(api: SwipeBetterAPI) async {
+  @discardableResult
+  func syncCurrentEntitlements(api: SwipeBetterAPI, reportingFailures: Bool = false) async throws -> Int {
+    var syncedCount = 0
+    var firstSyncError: Error?
+
     for await entitlement in Transaction.currentEntitlements {
       guard case .verified(let transaction) = entitlement else { continue }
-      try? await sync(transaction: transaction, api: api)
+      do {
+        try await sync(transaction: transaction, api: api)
+        syncedCount += 1
+      } catch {
+        firstSyncError = firstSyncError ?? error
+      }
     }
+
+    if reportingFailures, let firstSyncError {
+      throw firstSyncError
+    }
+
+    return syncedCount
   }
 
   func restorePurchases(api: SwipeBetterAPI) async throws {
@@ -70,8 +85,8 @@ final class PurchaseStore {
     defer { isRestoringPurchases = false }
 
     try await AppStore.sync()
-    await syncCurrentEntitlements(api: api)
-    lastPurchaseMessage = "Purchases restored."
+    let syncedCount = try await syncCurrentEntitlements(api: api, reportingFailures: true)
+    lastPurchaseMessage = syncedCount == 0 ? "No active App Store purchases found." : "Purchases restored."
   }
 
   func sync(verification: VerificationResult<Transaction>, api: SwipeBetterAPI) async throws {

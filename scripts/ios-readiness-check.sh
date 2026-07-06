@@ -133,6 +133,10 @@ for (const expected of [
   "var purchasingProductId: String?",
   "var isRestoringPurchases = false",
   "Some App Store products are unavailable. Try again shortly.",
+  "syncCurrentEntitlements(api: SwipeBetterAPI, reportingFailures: Bool = false) async throws -> Int",
+  "firstSyncError = firstSyncError ?? error",
+  "No active App Store purchases found.",
+  "try await syncCurrentEntitlements(api: api, reportingFailures: true)",
 ]) {
   assertIncludes(purchaseStore, expected, "Apple purchase UX contract");
 }
@@ -149,6 +153,12 @@ for (const expected of [
   "SharedImportStore.clearAll()",
 ]) {
   assertIncludes(logoutMatch[0], expected, "logout privacy cleanup contract");
+}
+for (const expected of [
+  "try? await purchases.syncCurrentEntitlements(api: api)",
+  "try await purchases.restorePurchases(api: api)",
+]) {
+  assertIncludes(appModel, expected, "Apple restore sync contract");
 }
 
 const rootView = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/RootView.swift", "utf8");

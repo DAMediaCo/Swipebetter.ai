@@ -32,7 +32,7 @@ final class AppModel {
     if isSignedIn {
       await refreshAccount()
       await refreshHistory()
-      await purchases.syncCurrentEntitlements(api: api)
+      _ = try? await purchases.syncCurrentEntitlements(api: api)
       await refreshAccount()
     }
   }
@@ -166,7 +166,7 @@ final class AppModel {
   private func refreshAfterAuth() async {
     await refreshAccount()
     await refreshHistory()
-    await purchases.syncCurrentEntitlements(api: api)
+    _ = try? await purchases.syncCurrentEntitlements(api: api)
     await refreshAccount()
   }
 
