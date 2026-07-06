@@ -2,6 +2,7 @@ name: iOS App Store Readiness
 
 on:
   pull_request:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -43,7 +44,7 @@ jobs:
         run: npm run test:ios-ui
 
       - name: Run iOS simulator smoke
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         timeout-minutes: 15
         env:
           IOS_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/swipebetter-ios-smoke
@@ -51,7 +52,7 @@ jobs:
         run: npm run smoke:ios-simulator
 
       - name: Upload iOS simulator smoke artifacts
-        if: always() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
+        if: always() && (github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch')
         uses: actions/upload-artifact@v4
         with:
           name: ios-simulator-smoke-${{ github.run_id }}-${{ github.run_attempt }}

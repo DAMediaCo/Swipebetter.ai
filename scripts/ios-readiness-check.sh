@@ -471,6 +471,7 @@ for (const expected of [
   "github.event_name == 'pull_request' || github.ref == 'refs/heads/main'",
   "npm run test:ios-ui",
   "Run iOS simulator smoke",
+  "github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'",
 ]) {
   assertIncludes(iosReadinessWorkflow, expected, "iOS CI gate contract");
 }
