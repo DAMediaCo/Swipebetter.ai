@@ -285,6 +285,8 @@ export function registerAuthRoutes(app: Express) {
       // - Production mobile app bundle ID
       const validAudiences = [
         process.env.APPLE_CLIENT_ID,
+        process.env.APPLE_BUNDLE_ID,
+        "ai.swipebetter.app",
         "host.exp.Exponent",
         "com.swipebetter.app",
         "app.replit.swipebetter",

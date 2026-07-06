@@ -7,6 +7,7 @@ import {
   userSubscriptions,
   promoCodes,
   promoRedemptions,
+  iosTransactions,
   type User,
   type ProfileAnalysis,
   type InsertProfileAnalysis,
@@ -72,6 +73,15 @@ export interface IStorage {
   unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }>;
   getUnlockedReports(userId: string): Promise<string[]>;
   claimCheckoutSession(userId: string, sessionId: string): Promise<boolean>;
+  applyAppleEntitlement(data: {
+    userId: string;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    environment: string;
+    purchaseDate?: Date | null;
+    expiresDate?: Date | null;
+  }): Promise<{ processed: boolean; planTier: 'free' | 'starter' | 'unlimited'; credits: number }>;
   
   // Super User (admin-granted free access)
   isSuperUser(userId: string): Promise<boolean>;
@@ -521,6 +531,92 @@ export class DatabaseStorage implements IStorage {
     );
     
     return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  async applyAppleEntitlement(data: {
+    userId: string;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    environment: string;
+    purchaseDate?: Date | null;
+    expiresDate?: Date | null;
+  }): Promise<{ processed: boolean; planTier: 'free' | 'starter' | 'unlimited'; credits: number }> {
+    const productConfig: Record<string, { tier: 'starter' | 'unlimited'; credits: number; planType: string; priceCents: number }> = {
+      "ai.swipebetter.starter": { tier: "starter", credits: 1, planType: "starter", priceCents: 399 },
+      "ai.swipebetter.unlimited.monthly": { tier: "unlimited", credits: 0, planType: "monthly", priceCents: 1699 },
+      "ai.swipebetter.unlimited.annual": { tier: "unlimited", credits: 0, planType: "annual", priceCents: 10499 },
+    };
+    const config = productConfig[data.productId];
+    if (!config) {
+      throw new Error(`Unsupported Apple product ID: ${data.productId}`);
+    }
+
+    return db.transaction(async (tx) => {
+      const [inserted] = await tx.insert(iosTransactions).values({
+        userId: data.userId,
+        transactionId: data.transactionId,
+        originalTransactionId: data.originalTransactionId || null,
+        productId: data.productId,
+        environment: data.environment,
+        purchaseDate: data.purchaseDate || null,
+        expiresDate: data.expiresDate || null,
+      }).onConflictDoNothing({ target: iosTransactions.transactionId }).returning();
+
+      if (!inserted) {
+        const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+        return {
+          processed: false,
+          planTier: ((existing as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
+          credits: (existing as any)?.credits || 0,
+        };
+      }
+
+      const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+      const currentCredits = (existing as any)?.credits || 0;
+      const currentSpend = (existing as any)?.lifetimeSpendCents || 0;
+      const patch = config.tier === "unlimited"
+        ? {
+            planTier: "unlimited",
+            plan: "ios_unlimited",
+            planType: config.planType,
+            status: "active",
+            creditsSource: "purchased",
+            lifetimeSpendCents: currentSpend + config.priceCents,
+            lastPaymentAt: data.purchaseDate || new Date(),
+            currentPeriodEnd: data.expiresDate || null,
+            updatedAt: new Date(),
+          }
+        : {
+            planTier: "starter",
+            plan: "ios_starter",
+            planType: "starter",
+            status: "active",
+            credits: currentCredits + config.credits,
+            creditsSource: "purchased",
+            lifetimeSpendCents: currentSpend + config.priceCents,
+            lastPaymentAt: data.purchaseDate || new Date(),
+            updatedAt: new Date(),
+          };
+
+      if (existing) {
+        await tx.update(userSubscriptions)
+          .set(patch as any)
+          .where(eq(userSubscriptions.userId, data.userId));
+      } else {
+        await tx.insert(userSubscriptions).values({
+          userId: data.userId,
+          ...(patch as any),
+        });
+      }
+
+      const [updated] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+      return {
+        processed: true,
+        planTier: ((updated as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
+        credits: (updated as any)?.credits || 0,
+      };
+    });
   }
 
   async isSuperUser(userId: string): Promise<boolean> {

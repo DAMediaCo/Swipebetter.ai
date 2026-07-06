@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 import sharp from "sharp";
+import jwt from "jsonwebtoken";
 
 const analysisLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -92,6 +93,93 @@ const checkoutSchema = z.object({
   priceId: z.string().startsWith("price_"),
   returnTo: z.string().optional(),
 });
+
+const iosIapSchema = z.object({
+  transactionId: z.string().min(5).max(128),
+  productId: z.enum([
+    "ai.swipebetter.starter",
+    "ai.swipebetter.unlimited.monthly",
+    "ai.swipebetter.unlimited.annual",
+  ]),
+});
+
+const APPLE_IAP_PRODUCTS = new Set([
+  "ai.swipebetter.starter",
+  "ai.swipebetter.unlimited.monthly",
+  "ai.swipebetter.unlimited.annual",
+]);
+
+function applePrivateKey(): string {
+  return (process.env.APPLE_IAP_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+}
+
+function createAppleServerApiToken(): string {
+  const issuerId = process.env.APPLE_IAP_ISSUER_ID;
+  const keyId = process.env.APPLE_IAP_KEY_ID;
+  const bundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
+  const privateKey = applePrivateKey();
+
+  if (!issuerId || !keyId || !privateKey) {
+    throw new Error("Apple IAP verification is not configured");
+  }
+
+  return jwt.sign(
+    { bid: bundleId },
+    privateKey,
+    {
+      algorithm: "ES256",
+      audience: "appstoreconnect-v1",
+      issuer: issuerId,
+      keyid: keyId,
+      expiresIn: "5m",
+    }
+  );
+}
+
+function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string): T {
+  const payload = jws.split(".")[1];
+  if (!payload) throw new Error("Invalid Apple transaction response");
+  return JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as T;
+}
+
+async function fetchAppleTransaction(transactionId: string) {
+  const token = createAppleServerApiToken();
+  const endpoints = [
+    { environment: "Production", url: `https://api.storekit.itunes.apple.com/inApps/v1/transactions/${transactionId}` },
+    { environment: "Sandbox", url: `https://api.storekit-sandbox.itunes.apple.com/inApps/v1/transactions/${transactionId}` },
+  ];
+
+  let lastError = "";
+  for (const endpoint of endpoints) {
+    const response = await fetch(endpoint.url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) {
+      const body = await response.json() as { signedTransactionInfo?: string };
+      if (!body.signedTransactionInfo) {
+        throw new Error("Apple transaction response missing signedTransactionInfo");
+      }
+      const transaction = decodeAppleJwsPayload<{
+        transactionId: string;
+        originalTransactionId?: string;
+        productId: string;
+        bundleId: string;
+        purchaseDate?: number;
+        expiresDate?: number;
+        revocationDate?: number;
+        environment?: string;
+      }>(body.signedTransactionInfo);
+      return {
+        ...transaction,
+        environment: transaction.environment || endpoint.environment,
+      };
+    }
+    lastError = `${response.status} ${await response.text()}`;
+    if (![401, 403, 404].includes(response.status)) break;
+  }
+
+  throw new Error(`Apple transaction verification failed: ${lastError}`);
+}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -1286,6 +1374,59 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Verify checkout error:", error);
       res.status(500).json({ error: "Failed to verify checkout" });
+    }
+  });
+
+  app.post("/api/ios/iap/transactions", requireAuth, async (req: any, res) => {
+    try {
+      const parseResult = iosIapSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          error: "Invalid input",
+          details: parseResult.error.flatten(),
+        });
+      }
+
+      const userId = req.session.userId;
+      const requested = parseResult.data;
+      const transaction = await fetchAppleTransaction(requested.transactionId);
+      const expectedBundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
+
+      if (transaction.bundleId !== expectedBundleId) {
+        return res.status(400).json({ error: "Apple transaction bundle mismatch" });
+      }
+      if (transaction.transactionId !== requested.transactionId) {
+        return res.status(400).json({ error: "Apple transaction ID mismatch" });
+      }
+      if (transaction.productId !== requested.productId || !APPLE_IAP_PRODUCTS.has(transaction.productId)) {
+        return res.status(400).json({ error: "Apple product mismatch" });
+      }
+      if (transaction.revocationDate) {
+        return res.status(400).json({ error: "Apple transaction has been revoked" });
+      }
+      if (transaction.expiresDate && Number(transaction.expiresDate) < Date.now()) {
+        return res.status(400).json({ error: "Apple subscription transaction is expired" });
+      }
+
+      const result = await storage.applyAppleEntitlement({
+        userId,
+        transactionId: transaction.transactionId,
+        originalTransactionId: transaction.originalTransactionId || null,
+        productId: transaction.productId,
+        environment: transaction.environment || "Unknown",
+        purchaseDate: transaction.purchaseDate ? new Date(Number(transaction.purchaseDate)) : null,
+        expiresDate: transaction.expiresDate ? new Date(Number(transaction.expiresDate)) : null,
+      });
+
+      res.json({
+        success: true,
+        processed: result.processed,
+        planTier: result.planTier,
+        credits: result.credits,
+      });
+    } catch (error: any) {
+      console.error("Apple IAP transaction sync error:", error);
+      res.status(500).json({ error: error?.message || "Failed to sync Apple purchase" });
     }
   });
 

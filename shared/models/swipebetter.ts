@@ -115,6 +115,20 @@ export const promoRedemptions = pgTable("promo_redemptions", {
   redeemedAt: timestamp("redeemed_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
+export const iosTransactions = pgTable("ios_transactions", {
+  id: serial("id").primaryKey(),
+  transactionId: varchar("transaction_id", { length: 128 }).notNull().unique(),
+  originalTransactionId: varchar("original_transaction_id", { length: 128 }),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: varchar("product_id", { length: 128 }).notNull(),
+  environment: varchar("environment", { length: 32 }).notNull(),
+  purchaseDate: timestamp("purchase_date"),
+  expiresDate: timestamp("expires_date"),
+  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export type IosTransaction = typeof iosTransactions.$inferSelect;
+
 export const insertPromoCodeSchema = createInsertSchema(promoCodes).omit({
   id: true,
   currentRedemptions: true,
