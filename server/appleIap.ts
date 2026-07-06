@@ -1,3 +1,5 @@
+import jwt from "jsonwebtoken";
+
 export const APPLE_IAP_PRODUCT_IDS = [
   "ai.swipebetter.starter",
   "ai.swipebetter.unlimited.monthly",
@@ -54,6 +56,13 @@ export type AppleTransactionPayload = {
 };
 
 export type AppleIapNotificationAction = "expired" | "renewed" | "acknowledged";
+
+export type AppleServerApiTokenConfig = {
+  issuerId: string;
+  keyId: string;
+  bundleId: string;
+  privateKey: string;
+};
 
 export function isAppleIapProduct(productId: string): productId is AppleIapProductId {
   return APPLE_IAP_PRODUCTS.has(productId);
@@ -113,6 +122,20 @@ export function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string
   } catch {
     throw new Error("Invalid Apple signed payload");
   }
+}
+
+export function createAppleServerApiToken(config: AppleServerApiTokenConfig): string {
+  return jwt.sign(
+    { bid: config.bundleId },
+    config.privateKey,
+    {
+      algorithm: "ES256",
+      audience: "appstoreconnect-v1",
+      issuer: config.issuerId,
+      keyid: config.keyId,
+      expiresIn: "5m",
+    }
+  );
 }
 
 export function shouldExpireAppleTransaction(

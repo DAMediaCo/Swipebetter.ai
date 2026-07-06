@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import {
+  createAppleServerApiToken,
   decodeAppleJwsPayload,
   validateAppleTransaction,
   type AppleTransactionPayload,
@@ -17,25 +18,6 @@ function requireEnv(name: string): string {
 
 function applePrivateKey(): string {
   return requireEnv("APPLE_IAP_PRIVATE_KEY").replace(/\\n/g, "\n");
-}
-
-function createAppleServerApiToken(config: {
-  issuerId: string;
-  keyId: string;
-  bundleId: string;
-  privateKey: string;
-}): string {
-  return jwt.sign(
-    { bid: config.bundleId },
-    config.privateKey,
-    {
-      algorithm: "ES256",
-      audience: "appstoreconnect-v1",
-      issuer: config.issuerId,
-      keyid: config.keyId,
-      expiresIn: "5m",
-    }
-  );
 }
 
 async function fetchAppleTransaction(

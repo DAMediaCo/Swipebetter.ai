@@ -10,12 +10,12 @@ import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 import sharp from "sharp";
-import jwt from "jsonwebtoken";
 import {
   APPLE_IAP_PRODUCT_IDS,
   type AppleTransactionPayload,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
+  createAppleServerApiToken,
   decodeAppleJwsPayload,
   normalizedAppleAppAccountToken,
   validateAppleTransaction,
@@ -116,7 +116,7 @@ function applePrivateKey(): string {
   return (process.env.APPLE_IAP_PRIVATE_KEY || "").replace(/\\n/g, "\n");
 }
 
-function createAppleServerApiToken(): string {
+function createConfiguredAppleServerApiToken(): string {
   const issuerId = process.env.APPLE_IAP_ISSUER_ID;
   const keyId = process.env.APPLE_IAP_KEY_ID;
   const bundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
@@ -126,17 +126,7 @@ function createAppleServerApiToken(): string {
     throw new Error("Apple IAP verification is not configured");
   }
 
-  return jwt.sign(
-    { bid: bundleId },
-    privateKey,
-    {
-      algorithm: "ES256",
-      audience: "appstoreconnect-v1",
-      issuer: issuerId,
-      keyid: keyId,
-      expiresIn: "5m",
-    }
-  );
+  return createAppleServerApiToken({ issuerId, keyId, bundleId, privateKey });
 }
 
 type AppleServerNotificationPayload = {
@@ -152,7 +142,7 @@ type AppleServerNotificationPayload = {
 };
 
 async function fetchAppleTransaction(transactionId: string): Promise<AppleTransactionPayload> {
-  const token = createAppleServerApiToken();
+  const token = createConfiguredAppleServerApiToken();
   const endpoints = [
     { environment: "Production", url: `https://api.storekit.itunes.apple.com/inApps/v1/transactions/${transactionId}` },
     { environment: "Sandbox", url: `https://api.storekit-sandbox.itunes.apple.com/inApps/v1/transactions/${transactionId}` },

@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
+import { generateKeyPairSync } from "node:crypto";
 import test from "node:test";
+import jwt from "jsonwebtoken";
 import {
   APPLE_IAP_PRODUCT_CONFIG,
   appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
+  createAppleServerApiToken,
   decodeAppleJwsPayload,
   getAppleIapProductConfig,
   isAppleIapProduct,
@@ -98,6 +101,26 @@ test("decodeAppleJwsPayload decodes payloads and rejects malformed input", () =>
   );
   assert.throws(() => decodeAppleJwsPayload("not-a-jws"), /Invalid Apple signed payload/);
   assert.throws(() => decodeAppleJwsPayload("header.%%%%.signature"), /Invalid Apple signed payload/);
+});
+
+test("createAppleServerApiToken creates the App Store Server API claims", () => {
+  const { privateKey } = generateKeyPairSync("ec", { namedCurve: "P-256" });
+  const token = createAppleServerApiToken({
+    issuerId: "00000000-0000-0000-0000-000000000000",
+    keyId: "ABC123DEFG",
+    bundleId: "ai.swipebetter.app",
+    privateKey: privateKey.export({ type: "pkcs8", format: "pem" }).toString(),
+  });
+  const decoded = jwt.decode(token, { complete: true }) as {
+    header?: { alg?: string; kid?: string };
+    payload?: { aud?: string; bid?: string; iss?: string };
+  } | null;
+
+  assert.equal(decoded?.header?.alg, "ES256");
+  assert.equal(decoded?.header?.kid, "ABC123DEFG");
+  assert.equal(decoded?.payload?.aud, "appstoreconnect-v1");
+  assert.equal(decoded?.payload?.bid, "ai.swipebetter.app");
+  assert.equal(decoded?.payload?.iss, "00000000-0000-0000-0000-000000000000");
 });
 
 test("shouldExpireAppleTransaction only expires from Apple-fetched facts", () => {
