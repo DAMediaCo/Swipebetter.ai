@@ -187,6 +187,10 @@ for (const expected of [
   "model.purchases.isRestoringPurchases",
   'Label("Manage Subscription", systemImage: "creditcard")',
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
+  "routeToPendingImportIfNeeded()",
+  ".onChange(of: model.isSignedIn)",
+  "guard model.isSignedIn else { return }",
+  "selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies",
 ]) {
   assertIncludes(rootView, expected, "iOS App Review UI contract");
 }

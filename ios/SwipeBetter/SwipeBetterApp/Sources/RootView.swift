@@ -76,8 +76,24 @@ struct RootView: View {
       }
     }
     .onChange(of: model.importRevision) { _, _ in
-      selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies
+      routeToPendingImportIfNeeded()
     }
+    .onChange(of: model.isSignedIn) { _, signedIn in
+      if signedIn {
+        routeToPendingImportIfNeeded()
+      }
+    }
+    .onAppear {
+      routeToPendingImportIfNeeded()
+    }
+  }
+
+  private func routeToPendingImportIfNeeded() {
+    guard model.isSignedIn else { return }
+    guard !model.pendingImportImages.isEmpty || !model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+      return
+    }
+    selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies
   }
 }
 
