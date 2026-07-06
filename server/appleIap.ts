@@ -134,6 +134,19 @@ export function appleAppAccountTokenMatchesUser(token: string | undefined | null
   return !normalizedToken || normalizedToken === userId.toLowerCase();
 }
 
+export function appleAppAccountTokensMatch(
+  transactionToken: string | undefined | null,
+  requestedToken: string | undefined | null
+): boolean {
+  const normalizedTransactionToken = normalizedAppleAppAccountToken(transactionToken);
+  const normalizedRequestedToken = normalizedAppleAppAccountToken(requestedToken);
+  return Boolean(
+    normalizedTransactionToken
+      && normalizedRequestedToken
+      && normalizedTransactionToken === normalizedRequestedToken
+  );
+}
+
 export function stripeSubscriptionPreservesAccess(subscription: {
   stripeSubscriptionId?: string | null;
   status?: string | null;

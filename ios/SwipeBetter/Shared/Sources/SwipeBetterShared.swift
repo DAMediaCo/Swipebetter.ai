@@ -174,6 +174,7 @@ public struct ReplyAnalysis: Codable, Identifiable, Equatable {
 public struct IAPSyncRequest: Encodable {
   public let transactionId: String
   public let productId: String
+  public let appAccountToken: String?
 }
 
 public struct IAPSyncResponse: Decodable {

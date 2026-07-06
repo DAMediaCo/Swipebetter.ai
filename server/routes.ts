@@ -16,6 +16,7 @@ import {
   AppleIapValidationError,
   type AppleTransactionPayload,
   appleAppAccountTokenMatchesUser,
+  appleAppAccountTokensMatch,
   classifyAppleNotification,
   createAppleServerApiToken,
   decodeAppleJwsPayload,
@@ -108,6 +109,7 @@ const checkoutSchema = z.object({
 const iosIapSchema = z.object({
   transactionId: z.string().min(5).max(128),
   productId: z.enum(APPLE_IAP_PRODUCT_IDS),
+  appAccountToken: z.string().uuid().optional(),
 });
 
 const iosServerNotificationSchema = z.object({
@@ -1472,6 +1474,15 @@ export async function registerRoutes(
       validateAppleTransaction(transaction, requested.productId);
       if (!normalizedAppleAppAccountToken(transaction.appAccountToken)) {
         return res.status(400).json({ error: "Apple transaction is missing account token" });
+      }
+      if (requested.appAccountToken && !appleAppAccountTokenMatchesUser(requested.appAccountToken, userId)) {
+        return res.status(400).json({ error: "Requested Apple account token does not match session user" });
+      }
+      if (
+        requested.appAccountToken
+        && !appleAppAccountTokensMatch(transaction.appAccountToken, requested.appAccountToken)
+      ) {
+        return res.status(400).json({ error: "Apple account token request mismatch" });
       }
       if (!appleAppAccountTokenMatchesUser(transaction.appAccountToken, userId)) {
         return res.status(400).json({ error: "Apple account token mismatch" });

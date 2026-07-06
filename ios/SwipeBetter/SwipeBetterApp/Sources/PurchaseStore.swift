@@ -116,7 +116,11 @@ final class PurchaseStore {
   private func sync(transaction: Transaction, api: SwipeBetterAPI) async throws {
     let _: IAPSyncResponse = try await api.post(
       "/api/ios/iap/transactions",
-      body: IAPSyncRequest(transactionId: String(transaction.id), productId: transaction.productID)
+      body: IAPSyncRequest(
+        transactionId: String(transaction.id),
+        productId: transaction.productID,
+        appAccountToken: transaction.appAccountToken?.uuidString
+      )
     )
   }
 

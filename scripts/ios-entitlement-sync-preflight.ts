@@ -22,6 +22,30 @@ async function readBody(response: Response): Promise<string> {
   return body.length > 1000 ? `${body.slice(0, 1000)}...` : body;
 }
 
+async function currentUserId(sessionCookie: string): Promise<string> {
+  const response = await fetch(appUrl("/api/auth/user"), {
+    headers: {
+      Cookie: sessionCookie,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not read authenticated user for entitlement sync: HTTP ${response.status} ${await readBody(response)}`);
+  }
+
+  const result = await response.json() as {
+    user?: {
+      id?: string;
+    } | null;
+  };
+
+  if (!result.user?.id) {
+    throw new Error("Authenticated session did not return a user ID for Apple appAccountToken verification.");
+  }
+
+  return result.user.id;
+}
+
 async function main() {
   const transactionId = requireEnv("APPLE_IAP_TEST_TRANSACTION_ID");
   const productId = requireEnv("APPLE_IAP_TEST_PRODUCT_ID");
@@ -32,13 +56,15 @@ async function main() {
     throw new Error(`APPLE_IAP_TEST_PRODUCT_ID must be one of: ${Array.from(expectedProductIds).join(", ")}`);
   }
 
+  const appAccountToken = await currentUserId(sessionCookie);
+
   const response = await fetch(appUrl("/api/ios/iap/transactions"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Cookie: sessionCookie,
     },
-    body: JSON.stringify({ transactionId, productId }),
+    body: JSON.stringify({ transactionId, productId, appAccountToken }),
   });
 
   if (!response.ok) {
@@ -68,6 +94,7 @@ async function main() {
   console.log("Live iOS entitlement sync preflight passed.");
   console.log(`Product ID: ${productId}`);
   console.log(`Transaction ID: ${transactionId}`);
+  console.log("App account token: matched authenticated user.");
   console.log(`Processed: ${result.processed}`);
   console.log(`Plan tier: ${result.planTier || "unknown"}`);
   console.log(`Credits: ${typeof result.credits === "number" ? result.credits : "unknown"}`);

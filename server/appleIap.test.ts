@@ -7,6 +7,7 @@ import {
   AppleIapOwnershipError,
   AppleIapValidationError,
   appleAppAccountTokenMatchesUser,
+  appleAppAccountTokensMatch,
   classifyAppleNotification,
   createAppStoreConnectApiToken,
   createAppleServerApiToken,
@@ -107,6 +108,16 @@ test("Apple app account tokens are normalized before user matching", () => {
   assert.equal(appleAppAccountTokenMatchesUser("", userId), true);
   assert.equal(appleAppAccountTokenMatchesUser("a2c13a6c-882e-4c22-8788-0d44559f8418", userId), true);
   assert.equal(appleAppAccountTokenMatchesUser("d0c13a6c-882e-4c22-8788-0d44559f8418", userId), false);
+});
+
+test("Apple app account token request matching requires both tokens and exact normalized equality", () => {
+  const token = "A2C13A6C-882E-4C22-8788-0D44559F8418";
+
+  assert.equal(appleAppAccountTokensMatch(token, "a2c13a6c-882e-4c22-8788-0d44559f8418"), true);
+  assert.equal(appleAppAccountTokensMatch(` ${token} `, token), true);
+  assert.equal(appleAppAccountTokensMatch(token, "d0c13a6c-882e-4c22-8788-0d44559f8418"), false);
+  assert.equal(appleAppAccountTokensMatch(token, undefined), false);
+  assert.equal(appleAppAccountTokensMatch(undefined, token), false);
 });
 
 test("active Stripe subscriptions preserve access during Apple expiry handling", () => {
