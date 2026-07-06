@@ -14,11 +14,62 @@ SUMMARY_PATH="$ARTIFACT_DIR/smoke-summary.txt"
 DEVICES_JSON="$(mktemp /tmp/swipebetter-ios-devices.XXXXXX.json)"
 SETTLE_SECONDS="${IOS_SMOKE_SETTLE_SECONDS:-5}"
 MIN_SCREENSHOT_BYTES="${IOS_SMOKE_MIN_SCREENSHOT_BYTES:-50000}"
+BOOT_TIMEOUT_SECONDS="${IOS_SMOKE_BOOT_TIMEOUT_SECONDS:-120}"
+BUILD_TIMEOUT_SECONDS="${IOS_SMOKE_BUILD_TIMEOUT_SECONDS:-420}"
+SIMCTL_TIMEOUT_SECONDS="${IOS_SMOKE_SIMCTL_TIMEOUT_SECONDS:-120}"
 
 cleanup() {
   rm -f "$DEVICES_JSON"
 }
 trap cleanup EXIT
+
+diagnose_failure() {
+  local status="$?"
+  local line="${BASH_LINENO[0]:-unknown}"
+  echo "iOS simulator smoke failed at line $line with exit $status." >&2
+
+  if [[ -n "${SIMULATOR_ID:-}" ]]; then
+    echo "Simulator state at failure:" >&2
+    xcrun simctl list devices "$SIMULATOR_ID" >&2 || true
+
+    echo "Recent app logs:" >&2
+    xcrun simctl spawn "$SIMULATOR_ID" log show \
+      --style compact \
+      --last 2m \
+      --predicate "process == \"SwipeBetter\"" >&2 || true
+  fi
+
+  exit "$status"
+}
+trap diagnose_failure ERR
+
+with_timeout() {
+  local timeout_seconds="$1"
+  shift
+
+  perl -e '
+    my $timeout = shift @ARGV;
+    my $pid = fork();
+    die "fork failed\n" unless defined $pid;
+
+    if ($pid == 0) {
+      exec @ARGV or die "exec failed: $!\n";
+    }
+
+    local $SIG{ALRM} = sub {
+      kill "TERM", $pid;
+      sleep 2;
+      kill "KILL", $pid;
+      waitpid($pid, 0);
+      exit 124;
+    };
+
+    alarm $timeout;
+    waitpid($pid, 0);
+    my $status = $?;
+    exit($status == -1 ? 1 : ($status >> 8));
+  ' "$timeout_seconds" "$@"
+}
 
 mkdir -p "$ARTIFACT_DIR"
 
@@ -54,11 +105,11 @@ SIMULATOR_LABEL="${SIMULATOR_SELECTION#*$'\t'}"
 echo "Using simulator: $SIMULATOR_LABEL [$SIMULATOR_ID]"
 
 echo "Booting simulator..."
-xcrun simctl boot "$SIMULATOR_ID" >/dev/null 2>&1 || true
-xcrun simctl bootstatus "$SIMULATOR_ID" -b
+with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl boot "$SIMULATOR_ID" >/dev/null 2>&1 || true
+with_timeout "$BOOT_TIMEOUT_SECONDS" xcrun simctl bootstatus "$SIMULATOR_ID" -b
 
 echo "Building simulator app..."
-xcodebuild \
+with_timeout "$BUILD_TIMEOUT_SECONDS" xcodebuild \
   -project "$PROJECT" \
   -scheme "$SCHEME" \
   -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
@@ -74,11 +125,11 @@ if [[ ! -d "$APP_PATH" ]]; then
 fi
 
 echo "Installing app..."
-xcrun simctl uninstall "$SIMULATOR_ID" "$BUNDLE_ID" >/dev/null 2>&1 || true
-xcrun simctl install "$SIMULATOR_ID" "$APP_PATH"
+with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl uninstall "$SIMULATOR_ID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl install "$SIMULATOR_ID" "$APP_PATH"
 
 echo "Launching app..."
-LAUNCH_OUTPUT="$(xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID")"
+LAUNCH_OUTPUT="$(with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID")"
 echo "$LAUNCH_OUTPUT"
 if [[ "$LAUNCH_OUTPUT" != *"$BUNDLE_ID"* ]]; then
   echo "Launch output did not include $BUNDLE_ID" >&2
@@ -93,7 +144,7 @@ for attempt in 1 2 3; do
     sleep 2
   fi
 
-  xcrun simctl io "$SIMULATOR_ID" screenshot "$SCREENSHOT_PATH"
+  with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl io "$SIMULATOR_ID" screenshot "$SCREENSHOT_PATH"
   if [[ ! -s "$SCREENSHOT_PATH" ]]; then
     echo "Smoke screenshot was not created on attempt $attempt." >&2
     continue
