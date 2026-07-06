@@ -269,6 +269,10 @@ for (const expected of [
 
 const keyboardExtension = fs.readFileSync("ios/SwipeBetter/KeyboardExtension/Sources/KeyboardViewController.swift", "utf8");
 for (const expected of [
+  "private var nextKeyboardButton: UIButton?",
+  "nextKeyboardButton?.isHidden = !needsInputModeSwitchKey",
+  'button(title: "Next Keyboard", systemImage: "globe", action: #selector(switchToNextKeyboard))',
+  "advanceToNextInputMode()",
   'row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))',
   'URL(string: "swipebetter://replies")',
   "textDocumentProxy.insertText",

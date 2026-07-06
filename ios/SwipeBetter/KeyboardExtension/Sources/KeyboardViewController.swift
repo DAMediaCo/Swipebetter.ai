@@ -2,10 +2,16 @@ import UIKit
 
 final class KeyboardViewController: UIInputViewController {
   private let stack = UIStackView()
+  private var nextKeyboardButton: UIButton?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     buildKeyboard()
+  }
+
+  override func viewWillLayoutSubviews() {
+    super.viewWillLayoutSubviews()
+    nextKeyboardButton?.isHidden = !needsInputModeSwitchKey
   }
 
   private func buildKeyboard() {
@@ -30,8 +36,11 @@ final class KeyboardViewController: UIInputViewController {
     row.spacing = 8
     stack.addArrangedSubview(row)
 
+    let nextButton = button(title: "Next Keyboard", systemImage: "globe", action: #selector(switchToNextKeyboard))
+    nextButton.accessibilityLabel = "Next keyboard"
+    nextKeyboardButton = nextButton
+    row.addArrangedSubview(nextButton)
     row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))
-    row.addArrangedSubview(button(title: "Warm Reply", action: #selector(insertWarmReply)))
 
     let replyRow = UIStackView()
     replyRow.axis = .horizontal
@@ -39,8 +48,16 @@ final class KeyboardViewController: UIInputViewController {
     replyRow.spacing = 8
     stack.addArrangedSubview(replyRow)
 
+    replyRow.addArrangedSubview(button(title: "Warm Reply", action: #selector(insertWarmReply)))
     replyRow.addArrangedSubview(button(title: "Ask Out", action: #selector(insertAskOutPrompt)))
-    replyRow.addArrangedSubview(button(title: "Revive Chat", action: #selector(insertRevivePrompt)))
+
+    let reviveRow = UIStackView()
+    reviveRow.axis = .horizontal
+    reviveRow.distribution = .fillEqually
+    reviveRow.spacing = 8
+    stack.addArrangedSubview(reviveRow)
+
+    reviveRow.addArrangedSubview(button(title: "Revive Chat", action: #selector(insertRevivePrompt)))
 
     NSLayoutConstraint.activate([
       stack.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -50,14 +67,22 @@ final class KeyboardViewController: UIInputViewController {
     ])
   }
 
-  private func button(title: String, action: Selector) -> UIButton {
+  private func button(title: String, systemImage: String? = nil, action: Selector) -> UIButton {
     var configuration = UIButton.Configuration.filled()
     configuration.title = title
+    if let systemImage {
+      configuration.image = UIImage(systemName: systemImage)
+      configuration.imagePadding = 6
+    }
     configuration.cornerStyle = .medium
     configuration.baseBackgroundColor = .systemBlue
     let button = UIButton(configuration: configuration)
     button.addTarget(self, action: action, for: .touchUpInside)
     return button
+  }
+
+  @objc private func switchToNextKeyboard() {
+    advanceToNextInputMode()
   }
 
   @objc private func openApp() {
