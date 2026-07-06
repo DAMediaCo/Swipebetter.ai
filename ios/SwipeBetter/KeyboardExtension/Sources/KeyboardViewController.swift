@@ -40,7 +40,7 @@ final class KeyboardViewController: UIInputViewController {
     nextButton.accessibilityLabel = "Next keyboard"
     nextKeyboardButton = nextButton
     row.addArrangedSubview(nextButton)
-    row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))
+    row.addArrangedSubview(button(title: "Coach Chat", systemImage: "sparkles", action: #selector(openCoach)))
 
     let replyRow = UIStackView()
     replyRow.axis = .horizontal
@@ -85,9 +85,36 @@ final class KeyboardViewController: UIInputViewController {
     advanceToNextInputMode()
   }
 
-  @objc private func openApp() {
-    guard let url = URL(string: "swipebetter://replies") else { return }
+  @objc private func openCoach() {
+    guard let url = coachURL() else { return }
     extensionContext?.open(url)
+  }
+
+  private func coachURL() -> URL? {
+    guard let context = keyboardContext else {
+      return URL(string: "swipebetter://replies")
+    }
+
+    var components = URLComponents()
+    components.scheme = "swipebetter"
+    components.host = "replies"
+    components.queryItems = [
+      URLQueryItem(name: "text", value: context),
+    ]
+    return components.url
+  }
+
+  private var keyboardContext: String? {
+    let before = textDocumentProxy.documentContextBeforeInput ?? ""
+    let after = textDocumentProxy.documentContextAfterInput ?? ""
+    let combined = [before, after]
+      .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+      .filter { !$0.isEmpty }
+      .joined(separator: "\n")
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    guard !combined.isEmpty else { return nil }
+    return String(combined.suffix(1200))
   }
 
   @objc private func insertWarmReply() {

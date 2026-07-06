@@ -222,6 +222,8 @@ for (const expected of [
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
   "func consumePendingImport()",
   "func handleDeepLink(_ url: URL)",
+  'first(where: { $0.name == "text" })',
+  "pendingImportText = String(deepLinkText.prefix(5000))",
   'requestedTabIdentifier = tabIdentifierForPendingImport(defaultingTo: "replies")',
   "deepLinkRevision += 1",
 ]) {
@@ -284,8 +286,12 @@ for (const expected of [
   "nextKeyboardButton?.isHidden = !needsInputModeSwitchKey",
   'button(title: "Next Keyboard", systemImage: "globe", action: #selector(switchToNextKeyboard))',
   "advanceToNextInputMode()",
-  'row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))',
+  'button(title: "Coach Chat", systemImage: "sparkles", action: #selector(openCoach))',
   'URL(string: "swipebetter://replies")',
+  "URLQueryItem(name: \"text\", value: context)",
+  "textDocumentProxy.documentContextBeforeInput",
+  "textDocumentProxy.documentContextAfterInput",
+  "String(combined.suffix(1200))",
   "textDocumentProxy.insertText",
 ]) {
   assertIncludes(keyboardExtension, expected, "keyboard extension privacy contract");

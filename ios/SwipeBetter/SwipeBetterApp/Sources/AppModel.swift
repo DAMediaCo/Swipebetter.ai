@@ -254,6 +254,20 @@ final class AppModel {
     let target = [url.host, url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
       .compactMap { $0?.lowercased() }
       .first { !$0.isEmpty } ?? "import"
+    let deepLinkText = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+      .queryItems?
+      .first(where: { $0.name == "text" })?
+      .value?
+      .trimmingCharacters(in: .whitespacesAndNewlines)
+
+    if let deepLinkText, !deepLinkText.isEmpty {
+      pendingImportText = String(deepLinkText.prefix(5000))
+      pendingImportImages = []
+      importRevision += 1
+      requestedTabIdentifier = "replies"
+      deepLinkRevision += 1
+      return
+    }
 
     if target == "import" {
       loadSharedImport()
