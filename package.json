@@ -9,6 +9,7 @@
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "test:ios-iap": "node --import tsx --test server/appleIap.test.ts",
+    "check:apple-iap-config": "tsx scripts/apple-iap-preflight.ts",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
