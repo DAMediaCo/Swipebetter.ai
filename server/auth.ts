@@ -757,10 +757,34 @@ export function registerAuthRoutes(app: Express) {
 
 // Middleware to require authentication
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  if (!req.session.userId) {
+  const userId = req.session.userId;
+  if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  next();
+
+  try {
+    const [user] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!user) {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Stale session cleanup error:", err);
+        }
+        res.clearCookie("connect.sid");
+        res.status(401).json({ message: "Unauthorized" });
+      });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    console.error("Session verification error:", error);
+    res.status(500).json({ message: "Failed to verify session" });
+  }
 };
 
 // Helper to get current user ID from session

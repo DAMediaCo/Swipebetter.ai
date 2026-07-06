@@ -147,6 +147,14 @@ for (const expected of [
 ]) {
   assertIncludes(authRoutes, expected, "native Apple Sign In audience contract");
 }
+for (const expected of [
+  ".select({ id: users.id })",
+  ".where(eq(users.id, userId))",
+  'res.clearCookie("connect.sid")',
+  'res.status(401).json({ message: "Unauthorized" })',
+]) {
+  assertIncludes(authRoutes, expected, "deleted account stale session contract");
+}
 for (const disallowed of [
   "host.exp.Exponent",
   "com.swipebetter.app",
