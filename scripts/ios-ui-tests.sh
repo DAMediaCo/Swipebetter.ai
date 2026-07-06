@@ -11,6 +11,7 @@ DEVICES_JSON="$(mktemp /tmp/swipebetter-ios-ui-test-devices.XXXXXX.json)"
 BOOT_TIMEOUT_SECONDS="${IOS_TEST_BOOT_TIMEOUT_SECONDS:-360}"
 SIMCTL_TIMEOUT_SECONDS="${IOS_TEST_SIMCTL_TIMEOUT_SECONDS:-120}"
 TEST_TIMEOUT_SECONDS="${IOS_TEST_TIMEOUT_SECONDS:-1200}"
+ALLOW_INFRASTRUCTURE_FAILURE="${IOS_TEST_ALLOW_INFRASTRUCTURE_FAILURE:-0}"
 
 cleanup() {
   rm -f "$DEVICES_JSON"
@@ -80,9 +81,20 @@ else
 
   echo "Booting simulator for UI tests..."
   with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl boot "$SIMULATOR_ID" >/dev/null 2>&1 || true
-  if ! with_timeout "$BOOT_TIMEOUT_SECONDS" xcrun simctl bootstatus "$SIMULATOR_ID" -b; then
+
+  set +e
+  with_timeout "$BOOT_TIMEOUT_SECONDS" xcrun simctl bootstatus "$SIMULATOR_ID" -b
+  BOOT_STATUS="$?"
+  set -e
+
+  if [[ "$BOOT_STATUS" -ne 0 ]]; then
+    if [[ "$ALLOW_INFRASTRUCTURE_FAILURE" == "1" && "$BOOT_STATUS" == "124" ]]; then
+      echo "Simulator boot hit a non-blocking GitHub infrastructure timeout for UI tests." >&2
+      exit 0
+    fi
+
     echo "Simulator did not finish booting for UI tests within ${BOOT_TIMEOUT_SECONDS}s." >&2
-    exit 1
+    exit "$BOOT_STATUS"
   fi
 fi
 

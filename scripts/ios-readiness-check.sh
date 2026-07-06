@@ -350,7 +350,9 @@ const uiTestScript = fs.readFileSync("scripts/ios-ui-tests.sh", "utf8");
 for (const expected of [
   'BOOT_TIMEOUT_SECONDS="${IOS_TEST_BOOT_TIMEOUT_SECONDS:-360}"',
   'TEST_TIMEOUT_SECONDS="${IOS_TEST_TIMEOUT_SECONDS:-1200}"',
+  'ALLOW_INFRASTRUCTURE_FAILURE="${IOS_TEST_ALLOW_INFRASTRUCTURE_FAILURE:-0}"',
   'xcrun simctl bootstatus "$SIMULATOR_ID" -b',
+  "Simulator boot hit a non-blocking GitHub infrastructure timeout for UI tests.",
   'with_timeout "$TEST_TIMEOUT_SECONDS" xcodebuild',
 ]) {
   assertIncludes(uiTestScript, expected, "native UI test runner timeout contract");
