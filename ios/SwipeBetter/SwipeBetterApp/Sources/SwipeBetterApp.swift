@@ -12,11 +12,8 @@ struct SwipeBetterApp: App {
           await model.bootstrap()
         }
         .onOpenURL { url in
-          if url.scheme == "swipebetter" {
-            model.loadSharedImport()
-          }
+          model.handleDeepLink(url)
         }
     }
   }
 }
-

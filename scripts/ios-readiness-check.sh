@@ -203,6 +203,9 @@ for (const expected of [
   "try await purchases.restorePurchases(api: api)",
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
   "func consumePendingImport()",
+  "func handleDeepLink(_ url: URL)",
+  'requestedTabIdentifier = tabIdentifierForPendingImport(defaultingTo: "replies")',
+  "deepLinkRevision += 1",
 ]) {
   assertIncludes(appModel, expected, "Apple restore sync contract");
 }
@@ -225,6 +228,8 @@ for (const expected of [
   'Label("Manage Subscription", systemImage: "creditcard")',
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
   "routeToPendingImportIfNeeded()",
+  "routeToRequestedTabIfNeeded()",
+  ".onChange(of: model.deepLinkRevision)",
   ".onChange(of: model.isSignedIn)",
   ".onChange(of: isActive)",
   "guard model.isSignedIn else { return }",
@@ -252,7 +257,7 @@ for (const expected of [
 const keyboardExtension = fs.readFileSync("ios/SwipeBetter/KeyboardExtension/Sources/KeyboardViewController.swift", "utf8");
 for (const expected of [
   'row.addArrangedSubview(button(title: "Open App", action: #selector(openApp)))',
-  'URL(string: "swipebetter://import")',
+  'URL(string: "swipebetter://replies")',
   "textDocumentProxy.insertText",
 ]) {
   assertIncludes(keyboardExtension, expected, "keyboard extension privacy contract");

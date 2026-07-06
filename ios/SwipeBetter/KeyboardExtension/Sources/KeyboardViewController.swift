@@ -61,7 +61,7 @@ final class KeyboardViewController: UIInputViewController {
   }
 
   @objc private func openApp() {
-    guard let url = URL(string: "swipebetter://import") else { return }
+    guard let url = URL(string: "swipebetter://replies") else { return }
     extensionContext?.open(url)
   }
 

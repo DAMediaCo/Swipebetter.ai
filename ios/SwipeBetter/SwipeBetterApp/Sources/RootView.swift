@@ -78,14 +78,39 @@ struct RootView: View {
     .onChange(of: model.importRevision) { _, _ in
       routeToPendingImportIfNeeded()
     }
+    .onChange(of: model.deepLinkRevision) { _, _ in
+      routeToRequestedTabIfNeeded()
+    }
     .onChange(of: model.isSignedIn) { _, signedIn in
       if signedIn {
+        routeToRequestedTabIfNeeded()
         routeToPendingImportIfNeeded()
       }
     }
     .onAppear {
+      routeToRequestedTabIfNeeded()
       routeToPendingImportIfNeeded()
     }
+  }
+
+  private func routeToRequestedTabIfNeeded() {
+    guard model.isSignedIn else { return }
+    guard let requested = model.requestedTabIdentifier else { return }
+
+    switch requested {
+    case "audit":
+      selectedTab = .audit
+    case "replies":
+      selectedTab = .replies
+    case "history":
+      selectedTab = .history
+    case "account":
+      selectedTab = .account
+    default:
+      selectedTab = .replies
+    }
+
+    model.requestedTabIdentifier = nil
   }
 
   private func routeToPendingImportIfNeeded() {

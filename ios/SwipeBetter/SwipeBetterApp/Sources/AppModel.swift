@@ -15,6 +15,8 @@ final class AppModel {
   var pendingImportText = ""
   var pendingImportImages: [Data] = []
   var importRevision = 0
+  var requestedTabIdentifier: String?
+  var deepLinkRevision = 0
   var lastError: String?
   var isBusy = false
 
@@ -256,6 +258,23 @@ final class AppModel {
     pendingImportImages = []
   }
 
+  func handleDeepLink(_ url: URL) {
+    guard url.scheme == "swipebetter" else { return }
+
+    let target = [url.host, url.path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))]
+      .compactMap { $0?.lowercased() }
+      .first { !$0.isEmpty } ?? "import"
+
+    if target == "import" {
+      loadSharedImport()
+      requestedTabIdentifier = tabIdentifierForPendingImport(defaultingTo: "replies")
+    } else {
+      requestedTabIdentifier = tabIdentifier(for: target)
+    }
+
+    deepLinkRevision += 1
+  }
+
   private func pollProfile(jobId: String) async throws -> ProfileStatusResponse {
     for _ in 0..<30 {
       try Task.checkCancellation()
@@ -296,6 +315,31 @@ final class AppModel {
   static func jpegDataURL(from data: Data) -> String? {
     let jpeg = SwipeBetterImageProcessor.normalizedJPEGData(from: data) ?? data
     return "data:image/jpeg;base64,\(jpeg.base64EncodedString())"
+  }
+
+  private func tabIdentifierForPendingImport(defaultingTo fallback: String) -> String {
+    if !pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+      return "replies"
+    }
+    if !pendingImportImages.isEmpty {
+      return "audit"
+    }
+    return fallback
+  }
+
+  private func tabIdentifier(for target: String) -> String {
+    switch target {
+    case "audit", "profile", "profiles":
+      return "audit"
+    case "reply", "replies", "chat", "keyboard":
+      return "replies"
+    case "history":
+      return "history"
+    case "account", "billing", "plans", "subscription":
+      return "account"
+    default:
+      return "replies"
+    }
   }
 }
 
