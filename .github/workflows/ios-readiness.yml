@@ -28,3 +28,6 @@ jobs:
 
       - name: Run iOS readiness checks
         run: scripts/ios-readiness-check.sh
+
+      - name: Run iOS simulator smoke
+        run: npm run smoke:ios-simulator
