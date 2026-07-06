@@ -136,6 +136,10 @@ final class AppModel {
       credits = nil
       profileHistory = []
       replyHistory = []
+      pendingImportText = ""
+      pendingImportImages = []
+      importRevision += 1
+      SharedImportStore.clearAll()
     }
   }
 

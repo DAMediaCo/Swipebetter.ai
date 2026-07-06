@@ -130,6 +130,20 @@ for (const expected of [
 ]) {
   assertIncludes(purchaseStore, expected, "Apple app account token contract");
 }
+
+const appModel = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/AppModel.swift", "utf8");
+const logoutMatch = appModel.match(/func logout\(\) async \{[\s\S]*?\n  \}/);
+if (!logoutMatch) {
+  throw new Error("Could not find logout implementation");
+}
+for (const expected of [
+  'pendingImportText = ""',
+  "pendingImportImages = []",
+  "importRevision += 1",
+  "SharedImportStore.clearAll()",
+]) {
+  assertIncludes(logoutMatch[0], expected, "logout privacy cleanup contract");
+}
 NODE
 
 echo "Checking StoreKit product IDs and iOS prices..."
