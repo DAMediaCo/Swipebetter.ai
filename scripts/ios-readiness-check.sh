@@ -146,6 +146,64 @@ if (expected.size) {
 }
 NODE
 
+echo "Checking iOS transaction database contract..."
+node <<'NODE'
+const fs = require("fs");
+
+function assertIncludes(haystack, needle, label) {
+  if (!haystack.includes(needle)) {
+    throw new Error(`${label} missing ${needle}`);
+  }
+}
+
+const migrationPath = "scripts/sql/2026-07-05-add-ios-transactions.sql";
+const migration = fs.readFileSync(migrationPath, "utf8").replace(/\s+/g, " ").trim();
+for (const expected of [
+  "CREATE TABLE IF NOT EXISTS ios_transactions",
+  "id serial PRIMARY KEY",
+  "transaction_id varchar(128) NOT NULL UNIQUE",
+  "original_transaction_id varchar(128)",
+  "user_id varchar NOT NULL REFERENCES users(id) ON DELETE CASCADE",
+  "product_id varchar(128) NOT NULL",
+  "environment varchar(32) NOT NULL",
+  "purchase_date timestamp",
+  "expires_date timestamp",
+  "created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP",
+  "CREATE INDEX IF NOT EXISTS idx_ios_transactions_user_id ON ios_transactions(user_id)",
+  "CREATE INDEX IF NOT EXISTS idx_ios_transactions_original_transaction_id ON ios_transactions(original_transaction_id)",
+]) {
+  assertIncludes(migration, expected, "iOS transaction migration");
+}
+
+const schema = fs.readFileSync("shared/models/swipebetter.ts", "utf8");
+for (const expected of [
+  'iosTransactions = pgTable("ios_transactions"',
+  'transactionId: varchar("transaction_id", { length: 128 }).notNull().unique()',
+  'originalTransactionId: varchar("original_transaction_id", { length: 128 })',
+  'userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" })',
+  'productId: varchar("product_id", { length: 128 }).notNull()',
+  'environment: varchar("environment", { length: 32 }).notNull()',
+  'purchaseDate: timestamp("purchase_date")',
+  'expiresDate: timestamp("expires_date")',
+  'createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull()',
+  "export type IosTransaction = typeof iosTransactions.$inferSelect",
+]) {
+  assertIncludes(schema, expected, "shared iOS transaction schema");
+}
+
+const storage = fs.readFileSync("server/storage.ts", "utf8");
+for (const expected of [
+  "getAppleTransactionUserId(transactionId: string, originalTransactionId?: string | null)",
+  "eq(iosTransactions.transactionId, transactionId)",
+  "eq(iosTransactions.originalTransactionId, originalTransactionId)",
+  ".onConflictDoNothing({ target: iosTransactions.transactionId })",
+  "isAppleSubscriptionProduct(data.productId)",
+  "AND ${iosTransactions.productId} LIKE 'ai.swipebetter.unlimited%'",
+]) {
+  assertIncludes(storage, expected, "iOS transaction storage contract");
+}
+NODE
+
 echo "Checking App Store metadata package..."
 node <<'NODE'
 const fs = require("fs");
