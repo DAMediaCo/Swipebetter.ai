@@ -28,6 +28,8 @@ targets:
       - path: SwipeBetterApp/Sources
       - path: Shared/Resources/PrivacyInfo.xcprivacy
         buildPhase: resources
+      - path: SwipeBetterApp/Resources/Assets.xcassets
+        buildPhase: resources
     resources:
       - path: SwipeBetterApp/Resources
         optional: true
@@ -36,6 +38,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app
         INFOPLIST_FILE: SwipeBetterApp/Info.plist
         CODE_SIGN_ENTITLEMENTS: SwipeBetterApp/SwipeBetter.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     dependencies:
       - target: SwipeBetterShare
         embed: true
