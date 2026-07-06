@@ -71,4 +71,16 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO \
   build
 
+echo "Archiving Release iOS build without signing..."
+ARCHIVE_PATH="/tmp/SwipeBetter-iOS-readiness.xcarchive"
+rm -rf "$ARCHIVE_PATH"
+xcodebuild \
+  -project "$PROJECT" \
+  -scheme "$SCHEME" \
+  -configuration Release \
+  -destination "generic/platform=iOS" \
+  CODE_SIGNING_ALLOWED=NO \
+  archive \
+  -archivePath "$ARCHIVE_PATH"
+
 echo "iOS readiness checks passed."
