@@ -580,6 +580,8 @@ const requiredStrings = [
   "supportUrl",
   "privacyUrl",
   "marketingUrl",
+  "termsUrl",
+  "refundPolicyUrl",
   "reviewNotes",
 ];
 
@@ -608,7 +610,7 @@ if (/,\s/.test(metadata.keywords)) {
   throw new Error("keywords should be comma-separated without spaces");
 }
 
-for (const field of ["supportUrl", "privacyUrl", "marketingUrl"]) {
+for (const field of ["supportUrl", "privacyUrl", "marketingUrl", "termsUrl", "refundPolicyUrl"]) {
   if (!/^https:\/\//.test(metadata[field])) {
     throw new Error(`${field} must be a full https URL`);
   }

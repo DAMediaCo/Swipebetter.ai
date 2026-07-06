@@ -8,6 +8,8 @@
   "supportUrl": "https://swipebetter.ai/contact",
   "privacyUrl": "https://swipebetter.ai/privacy",
   "marketingUrl": "https://swipebetter.ai",
+  "termsUrl": "https://swipebetter.ai/terms",
+  "refundPolicyUrl": "https://swipebetter.ai/refund-policy",
   "copyright": "2026 SwipeBetter",
   "reviewNotes": "Use a sandbox Apple ID for purchases. The app supports email login and Sign in with Apple. Apple in-app purchases are Starter Pack, Unlimited Monthly, and Unlimited Annual. The app uses a Share Extension and Keyboard Extension as the App Store-safe workflow for importing screenshots and drafting replies; it does not overlay, scrape, or control other apps.",
   "inAppPurchases": [

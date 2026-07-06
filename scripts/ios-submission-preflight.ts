@@ -47,13 +47,15 @@ function metadataChecks(): Check[] {
     supportUrl?: string;
     privacyUrl?: string;
     marketingUrl?: string;
+    termsUrl?: string;
+    refundPolicyUrl?: string;
     reviewNotes?: string;
     inAppPurchases?: Array<{ productId?: string; price?: string }>;
     screenshots?: string[];
   }>("ios/SwipeBetter/AppStoreMetadata.json");
 
   const products = new Map((metadata.inAppPurchases || []).map((item) => [item.productId, item.price]));
-  const urls = [metadata.supportUrl, metadata.privacyUrl, metadata.marketingUrl].filter(Boolean);
+  const urls = [metadata.supportUrl, metadata.privacyUrl, metadata.marketingUrl, metadata.termsUrl, metadata.refundPolicyUrl].filter(Boolean);
 
   return [
     {
@@ -69,8 +71,8 @@ function metadataChecks(): Check[] {
     },
     {
       label: "App Store public URLs",
-      ok: urls.length === 3 && urls.every((url) => /^https:\/\/swipebetter\.ai\//.test(url || "") || url === "https://swipebetter.ai"),
-      detail: "Support, privacy, and marketing URLs must be live SwipeBetter HTTPS URLs.",
+      ok: urls.length === 5 && urls.every((url) => /^https:\/\/swipebetter\.ai(?:\/|$)/.test(url || "")),
+      detail: "Support, privacy, marketing, terms, and refund URLs must be SwipeBetter HTTPS URLs.",
     },
     {
       label: "App Store review notes",
@@ -88,6 +90,54 @@ function metadataChecks(): Check[] {
       detail: "At least five App Store screenshot targets must be planned.",
     },
   ];
+}
+
+async function livePublicUrlChecks(): Promise<Check[]> {
+  const metadata = readJson<{
+    supportUrl?: string;
+    privacyUrl?: string;
+    marketingUrl?: string;
+    termsUrl?: string;
+    refundPolicyUrl?: string;
+  }>("ios/SwipeBetter/AppStoreMetadata.json");
+
+  const urls: Array<[string, string | undefined]> = [
+    ["Marketing URL", metadata.marketingUrl],
+    ["Support URL", metadata.supportUrl],
+    ["Privacy URL", metadata.privacyUrl],
+    ["Terms URL", metadata.termsUrl],
+    ["Refund policy URL", metadata.refundPolicyUrl],
+  ];
+  const checks: Check[] = [];
+
+  for (const [label, url] of urls) {
+    if (!url || !/^https:\/\/swipebetter\.ai(?:\/|$)/.test(url)) {
+      checks.push({
+        label: `Live ${label}`,
+        ok: false,
+        detail: `${label} must be a SwipeBetter HTTPS URL.`,
+      });
+      continue;
+    }
+
+    try {
+      const response = await fetch(url, { redirect: "follow" });
+      checks.push({
+        label: `Live ${label}`,
+        ok: response.ok,
+        detail: `${url} returned HTTP ${response.status}.`,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      checks.push({
+        label: `Live ${label}`,
+        ok: false,
+        detail: `${url} could not be reached: ${message}`,
+      });
+    }
+  }
+
+  return checks;
 }
 
 function envChecks(): Check[] {
@@ -113,9 +163,10 @@ function artifactChecks(): Check[] {
   ];
 }
 
-function main() {
+async function main() {
   const checks = [
     ...metadataChecks(),
+    ...(await livePublicUrlChecks()),
     ...envChecks(),
     ...artifactChecks(),
   ];
@@ -137,4 +188,8 @@ function main() {
   console.log("iOS submission preflight passed.");
 }
 
-main();
+main().catch((error) => {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`iOS submission preflight errored: ${message}`);
+  process.exit(1);
+});
