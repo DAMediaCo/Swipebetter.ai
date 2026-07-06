@@ -23,6 +23,7 @@ import {
   AppleIapOwnershipError,
   getAppleIapProductConfig,
   isAppleSubscriptionProduct,
+  stripeSubscriptionPreservesAccess,
 } from "./appleIap";
 
 export interface IStorage {
@@ -712,7 +713,17 @@ export class DatabaseStorage implements IStorage {
       const currentCredits = (existing as any).credits || 0;
       const currentOneTimeCredits = (existing as any).oneTimeCredits || 0;
       const isAppleSubscription = isAppleSubscriptionProduct(data.productId);
+      const hasActiveStripeSubscription = stripeSubscriptionPreservesAccess(existing as any);
       if (isAppleSubscription) {
+        if (hasActiveStripeSubscription) {
+          return {
+            processed: false,
+            userId,
+            planTier: "unlimited",
+            credits: Math.max(currentCredits, currentOneTimeCredits),
+          };
+        }
+
         const activeAppleSubscriptions = await tx.select({ id: iosTransactions.id })
           .from(iosTransactions)
           .where(sql`
@@ -739,14 +750,21 @@ export class DatabaseStorage implements IStorage {
       const nextOneTimeCredits = shouldRemoveStarterCredit ? Math.max(currentOneTimeCredits - 1, 0) : currentOneTimeCredits;
       const credits = Math.max(nextCredits, nextOneTimeCredits);
       const nextTier: 'free' | 'starter' = credits > 0 ? 'starter' : 'free';
+      const nextPlanTier = hasActiveStripeSubscription ? 'unlimited' : nextTier;
       await tx.update(userSubscriptions)
         .set({
-          planTier: nextTier,
-          status: data.reason === "refund" || data.reason === "revoked" ? "canceled" : "inactive",
-          plan: isAppleSubscription ? "ios_unlimited" : (existing as any).plan,
+          planTier: nextPlanTier,
+          status: hasActiveStripeSubscription
+            ? (existing as any).status
+            : (data.reason === "refund" || data.reason === "revoked" ? "canceled" : "inactive"),
+          plan: hasActiveStripeSubscription
+            ? (existing as any).plan
+            : (isAppleSubscription ? "ios_unlimited" : (existing as any).plan),
           credits: nextCredits,
           oneTimeCredits: nextOneTimeCredits,
-          currentPeriodEnd: data.expiresDate || (existing as any).currentPeriodEnd || null,
+          currentPeriodEnd: hasActiveStripeSubscription
+            ? (existing as any).currentPeriodEnd || null
+            : (data.expiresDate || (existing as any).currentPeriodEnd || null),
           updatedAt: new Date(),
         } as any)
         .where(eq(userSubscriptions.userId, userId));
@@ -754,7 +772,7 @@ export class DatabaseStorage implements IStorage {
       return {
         processed: true,
         userId,
-        planTier: nextTier,
+        planTier: nextPlanTier,
         credits,
       };
     });

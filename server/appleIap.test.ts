@@ -16,6 +16,7 @@ import {
   isRenewingAppleNotification,
   normalizedAppleAppAccountToken,
   shouldExpireAppleTransaction,
+  stripeSubscriptionPreservesAccess,
   validateAppleTransaction,
   type AppleTransactionPayload,
 } from "./appleIap";
@@ -105,6 +106,25 @@ test("Apple app account tokens are normalized before user matching", () => {
   assert.equal(appleAppAccountTokenMatchesUser("", userId), true);
   assert.equal(appleAppAccountTokenMatchesUser("a2c13a6c-882e-4c22-8788-0d44559f8418", userId), true);
   assert.equal(appleAppAccountTokenMatchesUser("d0c13a6c-882e-4c22-8788-0d44559f8418", userId), false);
+});
+
+test("active Stripe subscriptions preserve access during Apple expiry handling", () => {
+  assert.equal(stripeSubscriptionPreservesAccess({
+    stripeSubscriptionId: "sub_active",
+    status: "active",
+  }), true);
+  assert.equal(stripeSubscriptionPreservesAccess({
+    stripeSubscriptionId: "sub_trial",
+    status: "trialing",
+  }), true);
+  assert.equal(stripeSubscriptionPreservesAccess({
+    stripeSubscriptionId: "sub_canceled",
+    status: "canceled",
+  }), false);
+  assert.equal(stripeSubscriptionPreservesAccess({
+    stripeSubscriptionId: null,
+    status: "active",
+  }), false);
 });
 
 test("authenticated purchase sync can detect missing Apple app account tokens", () => {

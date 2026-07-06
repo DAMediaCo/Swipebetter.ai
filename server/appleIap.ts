@@ -128,6 +128,16 @@ export function appleAppAccountTokenMatchesUser(token: string | undefined | null
   return !normalizedToken || normalizedToken === userId.toLowerCase();
 }
 
+export function stripeSubscriptionPreservesAccess(subscription: {
+  stripeSubscriptionId?: string | null;
+  status?: string | null;
+}): boolean {
+  return Boolean(
+    subscription.stripeSubscriptionId
+      && (subscription.status === "active" || subscription.status === "trialing")
+  );
+}
+
 export function decodeAppleJwsPayload<T extends Record<string, any>>(jws: string): T {
   const parts = jws.split(".");
   if (parts.length < 2 || !parts[1]) {

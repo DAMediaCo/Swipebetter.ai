@@ -319,6 +319,8 @@ for (const expected of [
   "eq(iosTransactions.transactionId, transactionId)",
   "eq(iosTransactions.originalTransactionId, originalTransactionId)",
   ".onConflictDoNothing({ target: iosTransactions.transactionId })",
+  "stripeSubscriptionPreservesAccess(existing as any)",
+  'planTier: "unlimited"',
   "Apple transaction is already linked to another account",
   "Apple subscription is already linked to another account",
   "${iosTransactions.originalTransactionId} = ${data.originalTransactionId}",
@@ -335,6 +337,7 @@ for (const expected of [
   "isAppleSubscriptionProduct(transaction.productId) && !transaction.expiresDate",
   "Apple subscription transaction is missing an expiration date",
   "Apple subscription transaction is expired",
+  "stripeSubscriptionPreservesAccess",
 ]) {
   assertIncludes(appleIap, expected, "iOS Apple transaction validation contract");
 }
