@@ -25,6 +25,95 @@ if [[ "$REQUESTS_OPEN_ACCESS" != "false" ]]; then
   exit 1
 fi
 
+echo "Checking native identifiers, app groups, and privacy contract..."
+node <<'NODE'
+const fs = require("fs");
+const { execFileSync } = require("child_process");
+
+function readPlist(path) {
+  return JSON.parse(execFileSync("plutil", ["-convert", "json", "-o", "-", path], { encoding: "utf8" }));
+}
+
+function assertEqual(actual, expected, label) {
+  if (actual !== expected) {
+    throw new Error(`${label} drifted: expected ${expected}, got ${actual}`);
+  }
+}
+
+function assertIncludes(haystack, needle, label) {
+  if (!haystack.includes(needle)) {
+    throw new Error(`${label} missing ${needle}`);
+  }
+}
+
+const project = fs.readFileSync("ios/SwipeBetter/project.yml", "utf8");
+for (const bundleId of [
+  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app",
+  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.share",
+  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.keyboard",
+]) {
+  assertIncludes(project, bundleId, "project.yml bundle ID contract");
+}
+assertIncludes(project, "IPHONEOS_DEPLOYMENT_TARGET: \"17.0\"", "iOS deployment target");
+
+const appInfo = readPlist("ios/SwipeBetter/SwipeBetterApp/Info.plist");
+assertEqual(appInfo.CFBundleDisplayName, "SwipeBetter", "main app display name");
+assertEqual(appInfo.UIRequiresFullScreen, true, "main app full-screen posture");
+const urlScheme = appInfo.CFBundleURLTypes?.[0]?.CFBundleURLSchemes?.[0];
+assertEqual(urlScheme, "swipebetter", "main app URL scheme");
+assertEqual(appInfo.NSPhotoLibraryUsageDescription, "SwipeBetter uses selected screenshots to analyze dating profiles and chats.", "photo library purpose string");
+
+const shareInfo = readPlist("ios/SwipeBetter/ShareExtension/Info.plist");
+assertEqual(shareInfo.NSExtension?.NSExtensionPointIdentifier, "com.apple.share-services", "share extension point");
+const shareActivationRule = shareInfo.NSExtension?.NSExtensionAttributes?.NSExtensionActivationRule;
+assertEqual(shareActivationRule?.NSExtensionActivationSupportsText, true, "share text support");
+assertEqual(shareActivationRule?.NSExtensionActivationSupportsImageWithMaxCount, 10, "share image max count");
+
+const keyboardInfo = readPlist("ios/SwipeBetter/KeyboardExtension/Info.plist");
+assertEqual(keyboardInfo.NSExtension?.NSExtensionPointIdentifier, "com.apple.keyboard-service", "keyboard extension point");
+assertEqual(keyboardInfo.NSExtension?.NSExtensionAttributes?.RequestsOpenAccess, false, "keyboard open access");
+
+const appEntitlements = readPlist("ios/SwipeBetter/SwipeBetterApp/SwipeBetter.entitlements");
+assertIncludes(appEntitlements["com.apple.developer.applesignin"] || [], "Default", "Sign in with Apple entitlement");
+assertIncludes(appEntitlements["com.apple.security.application-groups"] || [], "group.ai.swipebetter.shared", "main app app group");
+
+const shareEntitlements = readPlist("ios/SwipeBetter/ShareExtension/SwipeBetterShare.entitlements");
+assertIncludes(shareEntitlements["com.apple.security.application-groups"] || [], "group.ai.swipebetter.shared", "share extension app group");
+
+const keyboardEntitlements = readPlist("ios/SwipeBetter/KeyboardExtension/SwipeBetterKeyboard.entitlements");
+if (Object.keys(keyboardEntitlements).length !== 0) {
+  throw new Error("Keyboard extension entitlements must stay empty while RequestsOpenAccess is false");
+}
+
+const privacy = readPlist("ios/SwipeBetter/Shared/Resources/PrivacyInfo.xcprivacy");
+assertEqual(privacy.NSPrivacyTracking, false, "privacy manifest tracking flag");
+if ((privacy.NSPrivacyTrackingDomains || []).length !== 0) {
+  throw new Error("Privacy manifest tracking domains must stay empty");
+}
+const collectedTypes = new Set((privacy.NSPrivacyCollectedDataTypes || []).map((item) => item.NSPrivacyCollectedDataType));
+for (const type of [
+  "NSPrivacyCollectedDataTypeEmailAddress",
+  "NSPrivacyCollectedDataTypeUserID",
+  "NSPrivacyCollectedDataTypePhotosorVideos",
+  "NSPrivacyCollectedDataTypeOtherUserContent",
+]) {
+  if (!collectedTypes.has(type)) {
+    throw new Error(`Privacy manifest missing collected data type: ${type}`);
+  }
+}
+
+const shared = fs.readFileSync("ios/SwipeBetter/Shared/Sources/SwipeBetterShared.swift", "utf8");
+for (const expected of [
+  'apiBaseURL = URL(string: "https://swipebetter.ai")!',
+  'appGroupId = "group.ai.swipebetter.shared"',
+  'starterProductId = "ai.swipebetter.starter"',
+  'monthlyProductId = "ai.swipebetter.unlimited.monthly"',
+  'annualProductId = "ai.swipebetter.unlimited.annual"',
+]) {
+  assertIncludes(shared, expected, "Swift shared configuration");
+}
+NODE
+
 echo "Checking StoreKit product IDs and iOS prices..."
 node <<'NODE'
 const fs = require("fs");
