@@ -16,6 +16,10 @@ SIMCTL_TIMEOUT_SECONDS="${IOS_SCREENSHOT_SIMCTL_TIMEOUT_SECONDS:-120}"
 BUILD_TIMEOUT_SECONDS="${IOS_SCREENSHOT_BUILD_TIMEOUT_SECONDS:-600}"
 BOOT_TIMEOUT_SECONDS="${IOS_SCREENSHOT_BOOT_TIMEOUT_SECONDS:-360}"
 AUTH_SCREENSHOT="$OUTPUT_DIR/01-auth-login.png"
+PROFILE_PICKER_SCREENSHOT="$OUTPUT_DIR/02-profile-audit-picker.png"
+PROFILE_RESULT_SCREENSHOT="$OUTPUT_DIR/03-profile-audit-result.png"
+REPLY_COACH_SCREENSHOT="$OUTPUT_DIR/04-reply-coach.png"
+ACCOUNT_BILLING_SCREENSHOT="$OUTPUT_DIR/05-account-billing.png"
 MANIFEST_PATH="$OUTPUT_DIR/manifest.json"
 
 cleanup() {
@@ -60,6 +64,48 @@ run_required() {
     echo "$label failed or timed out after ${timeout_seconds}s." >&2
     exit 1
   fi
+}
+
+validate_screenshot() {
+  local file="$1"
+  local screenshot_bytes
+  local screenshot_width
+  local screenshot_height
+
+  screenshot_bytes="$(wc -c < "$file" | tr -d ' ')"
+  screenshot_width="$(sips -g pixelWidth "$file" 2>/dev/null | awk '/pixelWidth/ { print $2 }')"
+  screenshot_height="$(sips -g pixelHeight "$file" 2>/dev/null | awk '/pixelHeight/ { print $2 }')"
+
+  if [[ "${screenshot_bytes:-0}" -lt "$MIN_SCREENSHOT_BYTES" ]]; then
+    echo "$file is suspiciously small: ${screenshot_bytes:-0} bytes." >&2
+    exit 1
+  fi
+
+  if [[ "${screenshot_width:-0}" -lt 1000 || "${screenshot_height:-0}" -lt 2000 ]]; then
+    echo "$file dimensions look too small: ${screenshot_width:-0}x${screenshot_height:-0}." >&2
+    exit 1
+  fi
+}
+
+capture_launched_screen() {
+  local label="$1"
+  local file="$2"
+  shift 2
+
+  echo "Launching $label..."
+  xcrun simctl terminate "$SIMULATOR_ID" "$BUNDLE_ID" >/dev/null 2>&1 || true
+  LAUNCH_OUTPUT="$(with_timeout "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID" "$@")"
+  echo "$LAUNCH_OUTPUT"
+  if [[ "$LAUNCH_OUTPUT" != *"$BUNDLE_ID"* ]]; then
+    echo "Launch output did not include $BUNDLE_ID" >&2
+    exit 1
+  fi
+
+  sleep "$SETTLE_SECONDS"
+
+  echo "Capturing $(basename "$file")..."
+  run_required "Capturing $label screenshot" "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl io "$SIMULATOR_ID" screenshot "$file"
+  validate_screenshot "$file"
 }
 
 mkdir -p "$OUTPUT_DIR"
@@ -134,27 +180,27 @@ sleep "$SETTLE_SECONDS"
 
 echo "Capturing 01-auth-login.png..."
 run_required "Capturing auth screenshot" "$SIMCTL_TIMEOUT_SECONDS" xcrun simctl io "$SIMULATOR_ID" screenshot "$AUTH_SCREENSHOT"
+validate_screenshot "$AUTH_SCREENSHOT"
 
-SCREENSHOT_BYTES="$(wc -c < "$AUTH_SCREENSHOT" | tr -d ' ')"
-SCREENSHOT_WIDTH="$(sips -g pixelWidth "$AUTH_SCREENSHOT" 2>/dev/null | awk '/pixelWidth/ { print $2 }')"
-SCREENSHOT_HEIGHT="$(sips -g pixelHeight "$AUTH_SCREENSHOT" 2>/dev/null | awk '/pixelHeight/ { print $2 }')"
+capture_launched_screen "profile audit picker" "$PROFILE_PICKER_SCREENSHOT" \
+  -SWIPEBETTER_APP_STORE_SCREENSHOTS \
+  -SWIPEBETTER_SCREENSHOT_TAB audit
 
-if [[ "${SCREENSHOT_BYTES:-0}" -lt "$MIN_SCREENSHOT_BYTES" ]]; then
-  echo "App Store screenshot is suspiciously small: ${SCREENSHOT_BYTES:-0} bytes." >&2
-  exit 1
-fi
+capture_launched_screen "profile audit result" "$PROFILE_RESULT_SCREENSHOT" \
+  -SWIPEBETTER_APP_STORE_SCREENSHOTS \
+  -SWIPEBETTER_SCREENSHOT_TAB auditResult
 
-if [[ "${SCREENSHOT_WIDTH:-0}" -lt 1000 || "${SCREENSHOT_HEIGHT:-0}" -lt 2000 ]]; then
-  echo "App Store screenshot dimensions look too small: ${SCREENSHOT_WIDTH:-0}x${SCREENSHOT_HEIGHT:-0}." >&2
-  exit 1
-fi
+capture_launched_screen "reply coach" "$REPLY_COACH_SCREENSHOT" \
+  -SWIPEBETTER_APP_STORE_SCREENSHOTS \
+  -SWIPEBETTER_SCREENSHOT_TAB replies
+
+capture_launched_screen "account billing" "$ACCOUNT_BILLING_SCREENSHOT" \
+  -SWIPEBETTER_APP_STORE_SCREENSHOTS \
+  -SWIPEBETTER_SCREENSHOT_TAB account
 
 xcrun simctl terminate "$SIMULATOR_ID" "$BUNDLE_ID" >/dev/null 2>&1 || true
 
 SCREENSHOT_OUTPUT_DIR="$OUTPUT_DIR" \
-AUTH_SCREENSHOT_BYTES="$SCREENSHOT_BYTES" \
-AUTH_SCREENSHOT_WIDTH="$SCREENSHOT_WIDTH" \
-AUTH_SCREENSHOT_HEIGHT="$SCREENSHOT_HEIGHT" \
 SIMULATOR_ID="$SIMULATOR_ID" \
 SIMULATOR_LABEL="$SIMULATOR_LABEL" \
 BUNDLE_ID="$BUNDLE_ID" \
@@ -164,40 +210,33 @@ const path = require("path");
 
 const outputDir = process.env.SCREENSHOT_OUTPUT_DIR;
 const manifestPath = path.join(outputDir, "manifest.json");
-const screenshots = [
-  {
-    file: "01-auth-login.png",
-    title: "Sign in with Apple and email login",
-    status: "captured",
-    bytes: Number(process.env.AUTH_SCREENSHOT_BYTES),
-    width: Number(process.env.AUTH_SCREENSHOT_WIDTH),
-    height: Number(process.env.AUTH_SCREENSHOT_HEIGHT),
-  },
-  {
-    file: "02-profile-audit-picker.png",
-    title: "Profile Audit screenshot picker and credit status",
-    status: "planned",
-    requiredLater: true,
-  },
-  {
-    file: "03-profile-audit-result.png",
-    title: "Profile Audit result with score and first fix",
-    status: "planned",
-    requiredLater: true,
-  },
-  {
-    file: "04-reply-coach.png",
-    title: "Reply Coach input and generated replies",
-    status: "planned",
-    requiredLater: true,
-  },
-  {
-    file: "05-account-billing.png",
-    title: "Account screen with Apple billing controls",
-    status: "planned",
-    requiredLater: true,
-  },
+const screenshotPlan = [
+  ["01-auth-login.png", "Sign in with Apple and email login"],
+  ["02-profile-audit-picker.png", "Profile Audit screenshot picker and credit status"],
+  ["03-profile-audit-result.png", "Profile Audit result with score and first fix"],
+  ["04-reply-coach.png", "Reply Coach input and generated replies"],
+  ["05-account-billing.png", "Account screen with Apple billing controls"],
 ];
+
+function pngInfo(file) {
+  const buffer = fs.readFileSync(path.join(outputDir, file));
+  const signature = buffer.subarray(0, 8).toString("hex");
+  if (signature !== "89504e470d0a1a0a") {
+    throw new Error(`${file} is not a PNG`);
+  }
+  return {
+    bytes: buffer.byteLength,
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+  };
+}
+
+const screenshots = screenshotPlan.map(([file, title]) => ({
+  file,
+  title,
+  status: "captured",
+  ...pngInfo(file),
+}));
 
 fs.writeFileSync(manifestPath, JSON.stringify({
   capturedAt: new Date().toISOString(),

@@ -327,6 +327,8 @@ if (/checkout|stripe/i.test(rootView.replace("Web Stripe checkout is intentional
 const appEntry = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/SwipeBetterApp.swift", "utf8");
 for (const expected of [
   '"-SWIPEBETTER_UI_TESTING"',
+  '"-SWIPEBETTER_APP_STORE_SCREENSHOTS"',
+  "configureForAppStoreScreenshots()",
   "await model.bootstrap()",
 ]) {
   assertIncludes(appEntry, expected, "native UI testing launch contract");
@@ -336,12 +338,16 @@ const uiTests = fs.readFileSync("ios/SwipeBetter/SwipeBetterUITests/Sources/Swip
 for (const expected of [
   "XCUIApplication()",
   'app.launchArguments.append("-SWIPEBETTER_UI_TESTING")',
+  'app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")',
+  'app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")',
   '"auth.emailField"',
   '"auth.passwordField"',
   '"auth.loginButton"',
   '"auth.appleSignInButton"',
   '"auth.createAccountButton"',
   '"auth.promoCodeField"',
+  '"account.restorePurchasesButton"',
+  '"account.manageSubscriptionButton"',
 ]) {
   assertIncludes(uiTests, expected, "native UI smoke test contract");
 }
@@ -402,8 +408,18 @@ const screenshotScript = fs.readFileSync("scripts/ios-app-store-screenshots.sh",
 for (const expected of [
   'OUTPUT_DIR="${IOS_SCREENSHOT_OUTPUT_DIR:-artifacts/ios-app-store-screenshots}"',
   'xcrun simctl launch "$SIMULATOR_ID" "$BUNDLE_ID" -SWIPEBETTER_UI_TESTING',
+  "-SWIPEBETTER_APP_STORE_SCREENSHOTS",
+  "-SWIPEBETTER_SCREENSHOT_TAB audit",
+  "-SWIPEBETTER_SCREENSHOT_TAB auditResult",
+  "-SWIPEBETTER_SCREENSHOT_TAB replies",
+  "-SWIPEBETTER_SCREENSHOT_TAB account",
   "01-auth-login.png",
+  "02-profile-audit-picker.png",
+  "03-profile-audit-result.png",
+  "04-reply-coach.png",
+  "05-account-billing.png",
   "manifest.json",
+  'status: "captured"',
   "Sign in with Apple and email login",
   "Profile Audit screenshot picker and credit status",
   "Profile Audit result with score and first fix",
@@ -411,6 +427,18 @@ for (const expected of [
   "Account screen with Apple billing controls",
 ]) {
   assertIncludes(screenshotScript, expected, "App Store screenshot capture contract");
+}
+if (screenshotScript.includes("requiredLater")) {
+  throw new Error("App Store screenshot capture must not leave required screenshots as placeholders");
+}
+
+for (const expected of [
+  "SwipeBetterScreenshotFixtures",
+  "Lead with the lake photo",
+  "Want to grab tacos Thursday?",
+  "demo@swipebetter.ai",
+]) {
+  assertIncludes(rootView + appModel, expected, "deterministic App Store screenshot fixture contract");
 }
 
 const gitignore = fs.readFileSync(".gitignore", "utf8");

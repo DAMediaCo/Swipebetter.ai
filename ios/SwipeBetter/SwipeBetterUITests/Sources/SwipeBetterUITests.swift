@@ -22,4 +22,15 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.buttons["auth.createAccountButton"].waitForExistence(timeout: 2))
     XCTAssertTrue(app.textFields["auth.promoCodeField"].exists)
   }
+
+  func testAppStoreScreenshotModeShowsSignedInAccountSurface() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("account")
+    app.launch()
+
+    XCTAssertTrue(app.buttons["account.restorePurchasesButton"].waitForExistence(timeout: 8))
+    XCTAssertTrue(app.buttons["account.manageSubscriptionButton"].waitForExistence(timeout: 2))
+  }
 }

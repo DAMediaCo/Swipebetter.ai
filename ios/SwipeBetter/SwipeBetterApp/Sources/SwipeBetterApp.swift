@@ -6,10 +6,15 @@ struct SwipeBetterApp: App {
 
   var body: some Scene {
     WindowGroup {
-      RootView()
+      RootView(initialTab: AppTab.screenshotInitialTab(from: ProcessInfo.processInfo.arguments))
         .environment(model)
         .task {
-          guard !ProcessInfo.processInfo.arguments.contains("-SWIPEBETTER_UI_TESTING") else { return }
+          let arguments = ProcessInfo.processInfo.arguments
+          if arguments.contains("-SWIPEBETTER_APP_STORE_SCREENSHOTS") {
+            model.configureForAppStoreScreenshots()
+            return
+          }
+          guard !arguments.contains("-SWIPEBETTER_UI_TESTING") else { return }
           await model.bootstrap()
         }
         .onOpenURL { url in

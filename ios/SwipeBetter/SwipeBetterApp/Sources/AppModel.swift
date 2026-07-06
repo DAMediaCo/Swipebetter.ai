@@ -39,6 +39,49 @@ final class AppModel {
     }
   }
 
+  func configureForAppStoreScreenshots() {
+    guard let demoUser: AuthUser = SwipeBetterScreenshotFixtures.decode("""
+      {
+        "id": "app-store-demo",
+        "email": "demo@swipebetter.ai",
+        "firstName": "Alex",
+        "lastName": "Demo"
+      }
+      """) else {
+      return
+    }
+
+    user = demoUser
+    me = SwipeBetterScreenshotFixtures.decode("""
+      {
+        "user": {
+          "id": "app-store-demo",
+          "email": "demo@swipebetter.ai",
+          "firstName": "Alex",
+          "lastName": "Demo"
+        },
+        "isPro": true,
+        "proActive": true,
+        "planType": "unlimited",
+        "subscriptionStatus": "active",
+        "oneTimeCredits": 12
+      }
+      """)
+    credits = SwipeBetterScreenshotFixtures.decode("""
+      {
+        "planTier": "unlimited",
+        "credits": 12,
+        "hasAccess": true,
+        "isUnlimited": true,
+        "isSuperUser": false
+      }
+      """)
+    profileHistory = SwipeBetterScreenshotFixtures.profileStatus?.analysis.map { [$0] } ?? []
+    replyHistory = SwipeBetterScreenshotFixtures.replyResponse?.analysis.map { [$0] } ?? []
+    lastError = nil
+    isBusy = false
+  }
+
   func startPurchaseUpdates() {
     guard purchaseUpdatesTask == nil else { return }
 

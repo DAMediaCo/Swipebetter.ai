@@ -22,11 +22,28 @@ enum AppTab: Hashable, CaseIterable {
       Label("Account", systemImage: "person.circle")
     }
   }
+
+  static func screenshotInitialTab(from arguments: [String]) -> AppTab {
+    switch SwipeBetterScreenshotFixtures.tabArgument(from: arguments) {
+    case "replies":
+      return .replies
+    case "history":
+      return .history
+    case "account":
+      return .account
+    default:
+      return .audit
+    }
+  }
 }
 
 struct RootView: View {
   @Environment(AppModel.self) private var model
   @State private var selectedTab: AppTab = .audit
+
+  init(initialTab: AppTab = .audit) {
+    _selectedTab = State(initialValue: initialTab)
+  }
 
   var body: some View {
     Group {
@@ -402,11 +419,23 @@ struct ProfileAuditView: View {
     }
     .onChange(of: isActive) { _, active in
       if active {
+        applyScreenshotFixturesIfNeeded()
         applyPendingImport()
       }
     }
     .onAppear {
+      applyScreenshotFixturesIfNeeded()
       applyPendingImport()
+    }
+  }
+
+  private func applyScreenshotFixturesIfNeeded() {
+    guard isActive, SwipeBetterScreenshotFixtures.isEnabled else { return }
+    if images.isEmpty {
+      images = [SwipeBetterScreenshotFixtures.profileScreenshotData]
+    }
+    if SwipeBetterScreenshotFixtures.tab == "auditResult", result == nil {
+      result = SwipeBetterScreenshotFixtures.profileStatus
     }
   }
 
@@ -545,11 +574,26 @@ struct ReplyAssistantView: View {
     }
     .onChange(of: isActive) { _, active in
       if active {
+        applyScreenshotFixturesIfNeeded()
         applyPendingImport()
       }
     }
     .onAppear {
+      applyScreenshotFixturesIfNeeded()
       applyPendingImport()
+    }
+  }
+
+  private func applyScreenshotFixturesIfNeeded() {
+    guard isActive, SwipeBetterScreenshotFixtures.isEnabled else { return }
+    if conversation.isEmpty {
+      conversation = "Matched after a hiking prompt. They said they love last-minute tacos but have a busy week."
+    }
+    if images.isEmpty {
+      images = [SwipeBetterScreenshotFixtures.chatScreenshotData]
+    }
+    if response == nil {
+      response = SwipeBetterScreenshotFixtures.replyResponse
     }
   }
 
@@ -947,4 +991,130 @@ func loadImages(from items: [PhotosPickerItem], limit: Int) async -> [Data] {
     }
   }
   return output
+}
+
+enum SwipeBetterScreenshotFixtures {
+  static let screenshotArgument = "-SWIPEBETTER_APP_STORE_SCREENSHOTS"
+  static let tabArgumentName = "-SWIPEBETTER_SCREENSHOT_TAB"
+
+  static var isEnabled: Bool {
+    ProcessInfo.processInfo.arguments.contains(screenshotArgument)
+  }
+
+  static var tab: String? {
+    tabArgument(from: ProcessInfo.processInfo.arguments)
+  }
+
+  static var profileStatus: ProfileStatusResponse? {
+    decode("""
+      {
+        "jobId": "demo-profile-audit",
+        "status": "completed",
+        "message": "Demo profile audit complete.",
+        "error": null,
+        "isPaidUser": true,
+        "analysis": {
+          "id": 9001,
+          "platform": "Hinge",
+          "gender": "Man",
+          "intent": "Relationship",
+          "bioSuggestions": "Lead with a specific weekend plan, then keep one playful line that gives matches an easy question to answer.",
+          "photoFeedback": "Lead with the lake photo, keep the candid dinner shot, and replace the mirror selfie with a clear full-body photo.",
+          "overallScore": 86,
+          "improvements": "Swap photo order, remove the generic travel line, and add one prompt that shows confidence without sounding rehearsed.",
+          "analysisStatus": "completed",
+          "createdAt": "2026-07-06T12:00:00Z",
+          "firstTip": "Move the smiling outdoor photo to slot one so the profile feels warmer in the first second."
+        }
+      }
+      """)
+  }
+
+  static var replyResponse: ReplyAnalysisResponse? {
+    decode("""
+      {
+        "analysis": {
+          "id": 9101,
+          "tone": "confident",
+          "suggestedReplies": [
+            "Tacos and a busy week is a dangerous combo. Want to grab tacos Thursday?",
+            "I respect the packed calendar. Give me one free night and I’ll make it worth leaving the couch.",
+            "You pick the taco spot, I’ll bring the questionable hot sauce confidence."
+          ],
+          "conversationContext": "The match is interested, playful, and waiting for a concrete plan.",
+          "createdAt": "2026-07-06T12:05:00Z"
+        },
+        "parsed": {
+          "conversationContext": "They gave a positive opening and an easy path to ask for a date.",
+          "suggestedReplies": [
+            "Tacos and a busy week is a dangerous combo. Want to grab tacos Thursday?",
+            "I respect the packed calendar. Give me one free night and I’ll make it worth leaving the couch.",
+            "You pick the taco spot, I’ll bring the questionable hot sauce confidence."
+          ]
+        }
+      }
+      """)
+  }
+
+  static var profileScreenshotData: Data {
+    demoScreenshotData(
+      title: "Hinge Profile",
+      subtitle: "Six photos selected for a sharper audit.",
+      accent: UIColor.systemGreen
+    )
+  }
+
+  static var chatScreenshotData: Data {
+    demoScreenshotData(
+      title: "Chat Screenshot",
+      subtitle: "A warm match, one stalled reply, and an easy ask-out window.",
+      accent: UIColor.systemBlue
+    )
+  }
+
+  static func tabArgument(from arguments: [String]) -> String? {
+    guard let index = arguments.firstIndex(of: tabArgumentName),
+          arguments.indices.contains(index + 1) else {
+      return nil
+    }
+    return arguments[index + 1]
+  }
+
+  static func decode<T: Decodable>(_ json: String) -> T? {
+    try? JSONDecoder().decode(T.self, from: Data(json.utf8))
+  }
+
+  private static func demoScreenshotData(title: String, subtitle: String, accent: UIColor) -> Data {
+    let size = CGSize(width: 430, height: 932)
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = 2
+    let renderer = UIGraphicsImageRenderer(size: size, format: format)
+    let image = renderer.image { context in
+      UIColor.systemBackground.setFill()
+      context.fill(CGRect(origin: .zero, size: size))
+
+      accent.setFill()
+      UIBezierPath(roundedRect: CGRect(x: 28, y: 66, width: 374, height: 600), cornerRadius: 34).fill()
+
+      UIColor.white.withAlphaComponent(0.22).setFill()
+      UIBezierPath(ovalIn: CGRect(x: 74, y: 112, width: 282, height: 282)).fill()
+
+      UIColor.white.setFill()
+      UIBezierPath(roundedRect: CGRect(x: 68, y: 444, width: 294, height: 28), cornerRadius: 14).fill()
+      UIBezierPath(roundedRect: CGRect(x: 68, y: 494, width: 228, height: 22), cornerRadius: 11).fill()
+      UIBezierPath(roundedRect: CGRect(x: 68, y: 536, width: 262, height: 22), cornerRadius: 11).fill()
+
+      let titleAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 34, weight: .bold),
+        .foregroundColor: UIColor.label,
+      ]
+      let subtitleAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 20, weight: .medium),
+        .foregroundColor: UIColor.secondaryLabel,
+      ]
+      title.draw(in: CGRect(x: 28, y: 706, width: 374, height: 44), withAttributes: titleAttributes)
+      subtitle.draw(in: CGRect(x: 28, y: 760, width: 374, height: 90), withAttributes: subtitleAttributes)
+    }
+    return image.jpegData(compressionQuality: 0.88) ?? Data()
+  }
 }
