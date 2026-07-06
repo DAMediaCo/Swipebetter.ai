@@ -7,6 +7,28 @@ import {
 } from "../server/appleIap";
 
 const expectedBundleId = "ai.swipebetter.app";
+const expectedProductIds = [
+  "ai.swipebetter.starter",
+  "ai.swipebetter.unlimited.monthly",
+  "ai.swipebetter.unlimited.annual",
+];
+
+type AppStoreConnectResource<TAttributes extends Record<string, unknown> = Record<string, unknown>> = {
+  id: string;
+  type: string;
+  attributes?: TAttributes;
+};
+
+type AppStoreConnectList<TAttributes extends Record<string, unknown> = Record<string, unknown>> = {
+  data?: AppStoreConnectResource<TAttributes>[];
+  links?: {
+    next?: string;
+  };
+};
+
+type AppStoreConnectSingle<TAttributes extends Record<string, unknown> = Record<string, unknown>> = {
+  data?: AppStoreConnectResource<TAttributes>;
+};
 
 function requireEnv(name: string): string {
   const value = process.env[name]?.trim();
@@ -18,6 +40,80 @@ function requireEnv(name: string): string {
 
 function applePrivateKey(): string {
   return requireEnv("APPLE_IAP_PRIVATE_KEY").replace(/\\n/g, "\n");
+}
+
+async function fetchAppStoreConnect<T>(token: string, pathOrUrl: string): Promise<T> {
+  const url = pathOrUrl.startsWith("https://")
+    ? pathOrUrl
+    : `https://api.appstoreconnect.apple.com${pathOrUrl}`;
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    throw new Error(`App Store Connect request failed: HTTP ${response.status} ${await response.text()}`);
+  }
+
+  return response.json() as Promise<T>;
+}
+
+async function fetchAllAppStoreConnectResources<TAttributes extends Record<string, unknown>>(
+  token: string,
+  path: string
+): Promise<AppStoreConnectResource<TAttributes>[]> {
+  let next: string | undefined = path;
+  const resources: AppStoreConnectResource<TAttributes>[] = [];
+
+  while (next) {
+    const page = await fetchAppStoreConnect<AppStoreConnectList<TAttributes>>(token, next);
+    resources.push(...(page.data || []));
+    next = page.links?.next;
+  }
+
+  return resources;
+}
+
+async function verifyAppStoreConnectProducts(token: string, appId: string, bundleId: string) {
+  const app = await fetchAppStoreConnect<AppStoreConnectSingle<{ bundleId?: string; name?: string }>>(
+    token,
+    `/v1/apps/${appId}`
+  );
+
+  if (app.data?.attributes?.bundleId !== bundleId) {
+    throw new Error(`App Store Connect app bundle mismatch: expected ${bundleId}, got ${app.data?.attributes?.bundleId || "unknown"}`);
+  }
+
+  const products = new Set<string>();
+  const oneTimePurchases = await fetchAllAppStoreConnectResources<{ productId?: string }>(
+    token,
+    `/v1/apps/${appId}/inAppPurchasesV2?limit=200`
+  );
+  for (const purchase of oneTimePurchases) {
+    if (purchase.attributes?.productId) {
+      products.add(purchase.attributes.productId);
+    }
+  }
+
+  const subscriptionGroups = await fetchAllAppStoreConnectResources(token, `/v1/apps/${appId}/subscriptionGroups?limit=200`);
+  for (const group of subscriptionGroups) {
+    const subscriptions = await fetchAllAppStoreConnectResources<{ productId?: string }>(
+      token,
+      `/v1/subscriptionGroups/${group.id}/subscriptions?limit=200`
+    );
+    for (const subscription of subscriptions) {
+      if (subscription.attributes?.productId) {
+        products.add(subscription.attributes.productId);
+      }
+    }
+  }
+
+  const missing = expectedProductIds.filter((productId) => !products.has(productId));
+  if (missing.length) {
+    throw new Error(`Missing App Store Connect products: ${missing.join(", ")}`);
+  }
+
+  console.log(`App Store Connect app matched bundle ID ${bundleId}.`);
+  console.log(`App Store Connect products found: ${expectedProductIds.join(", ")}`);
 }
 
 async function fetchAppleTransaction(
@@ -94,6 +190,13 @@ async function main() {
   console.log("Apple IAP key can sign an App Store Server API token.");
   console.log(`Bundle ID: ${bundleId}`);
   console.log(`Key ID: ${keyId}`);
+
+  const appId = process.env.APPLE_APP_ID?.trim();
+  if (!appId) {
+    console.log("No APPLE_APP_ID set; skipped App Store Connect product lookup.");
+  } else {
+    await verifyAppStoreConnectProducts(token, appId, bundleId);
+  }
 
   const transactionId = process.env.APPLE_IAP_TEST_TRANSACTION_ID?.trim();
   if (!transactionId) {

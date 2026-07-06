@@ -428,6 +428,19 @@ const validationCatchCount = (routes.match(/error instanceof AppleIapValidationE
 if (validationCatchCount < 2) {
   throw new Error("Both iOS IAP transaction and notification routes must catch AppleIapValidationError");
 }
+
+const appleIapPreflight = fs.readFileSync("scripts/apple-iap-preflight.ts", "utf8");
+for (const expected of [
+  "APPLE_APP_ID",
+  "verifyAppStoreConnectProducts(token, appId, bundleId)",
+  "https://api.appstoreconnect.apple.com",
+  "/v1/apps/${appId}/inAppPurchasesV2?limit=200",
+  "/v1/apps/${appId}/subscriptionGroups?limit=200",
+  "/v1/subscriptionGroups/${group.id}/subscriptions?limit=200",
+  "Missing App Store Connect products",
+]) {
+  assertIncludes(appleIapPreflight, expected, "Apple IAP preflight App Store Connect contract");
+}
 NODE
 
 echo "Checking App Store metadata package..."
