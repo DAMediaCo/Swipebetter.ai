@@ -30,6 +30,7 @@ jobs:
         run: scripts/ios-readiness-check.sh
 
       - name: Run iOS simulator smoke
+        timeout-minutes: 15
         env:
           IOS_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/swipebetter-ios-smoke
         run: npm run smoke:ios-simulator

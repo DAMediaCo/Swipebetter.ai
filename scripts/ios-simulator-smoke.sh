@@ -59,7 +59,7 @@ echo "Building simulator app..."
 xcodebuild \
   -project "$PROJECT" \
   -scheme "$SCHEME" \
-  -destination "id=$SIMULATOR_ID" \
+  -destination "platform=iOS Simulator,id=$SIMULATOR_ID" \
   -configuration Debug \
   -derivedDataPath "$DERIVED_DATA" \
   -quiet \
