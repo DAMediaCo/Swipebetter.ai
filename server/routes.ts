@@ -14,7 +14,7 @@ import jwt from "jsonwebtoken";
 import {
   APPLE_IAP_PRODUCT_IDS,
   type AppleTransactionPayload,
-  shouldExpireAppleTransaction,
+  classifyAppleNotification,
   validateAppleTransaction,
 } from "./appleIap";
 
@@ -186,13 +186,6 @@ async function fetchAppleTransaction(transactionId: string): Promise<AppleTransa
 
 function appleDate(value?: number): Date | null {
   return value ? new Date(Number(value)) : null;
-}
-
-function isRenewingAppleNotification(type?: string): boolean {
-  return type === "SUBSCRIBED"
-    || type === "DID_RENEW"
-    || type === "DID_RECOVER"
-    || type === "OFFER_REDEEMED";
 }
 
 export async function registerRoutes(
@@ -1522,8 +1515,9 @@ export async function registerRoutes(
 
       const transaction = await fetchAppleTransaction(unverifiedTransaction.transactionId);
       validateAppleTransaction(transaction, undefined, { allowExpired: true });
+      const action = classifyAppleNotification(notification.notificationType, transaction);
 
-      if (shouldExpireAppleTransaction(notification.notificationType, transaction)) {
+      if (action === "expired") {
         const accountTokenUser = transaction.appAccountToken
           ? await storage.getUser(transaction.appAccountToken.toLowerCase())
           : undefined;
@@ -1546,7 +1540,7 @@ export async function registerRoutes(
         });
       }
 
-      if (isRenewingAppleNotification(notification.notificationType)) {
+      if (action === "renewed") {
         let userId = await storage.getAppleTransactionUserId(
           transaction.transactionId,
           transaction.originalTransactionId || null

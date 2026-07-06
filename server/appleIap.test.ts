@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   APPLE_IAP_PRODUCT_CONFIG,
+  classifyAppleNotification,
   getAppleIapProductConfig,
   isAppleIapProduct,
   isAppleSubscriptionProduct,
+  isRenewingAppleNotification,
   shouldExpireAppleTransaction,
   validateAppleTransaction,
   type AppleTransactionPayload,
@@ -66,4 +68,22 @@ test("shouldExpireAppleTransaction only expires from Apple-fetched facts", () =>
   assert.equal(shouldExpireAppleTransaction("DID_FAIL_TO_RENEW", transaction({ expiresDate: now - 60_000 }), now), true);
   assert.equal(shouldExpireAppleTransaction("REFUND", transaction({ expiresDate: now + 60_000 }), now), false);
   assert.equal(shouldExpireAppleTransaction("REFUND", transaction({ revocationDate: now - 1 }), now), true);
+});
+
+test("isRenewingAppleNotification recognizes entitlement-granting notifications", () => {
+  assert.equal(isRenewingAppleNotification("SUBSCRIBED"), true);
+  assert.equal(isRenewingAppleNotification("DID_RENEW"), true);
+  assert.equal(isRenewingAppleNotification("DID_RECOVER"), true);
+  assert.equal(isRenewingAppleNotification("OFFER_REDEEMED"), true);
+  assert.equal(isRenewingAppleNotification("DID_CHANGE_RENEWAL_STATUS"), false);
+  assert.equal(isRenewingAppleNotification(undefined), false);
+});
+
+test("classifyAppleNotification prioritizes expiration before renewal", () => {
+  assert.equal(classifyAppleNotification("DID_RENEW", transaction(), now), "renewed");
+  assert.equal(classifyAppleNotification("SUBSCRIBED", transaction(), now), "renewed");
+  assert.equal(classifyAppleNotification("EXPIRED", transaction({ expiresDate: now - 60_000 }), now), "expired");
+  assert.equal(classifyAppleNotification("DID_RENEW", transaction({ revocationDate: now - 1 }), now), "expired");
+  assert.equal(classifyAppleNotification("DID_CHANGE_RENEWAL_STATUS", transaction(), now), "acknowledged");
+  assert.equal(classifyAppleNotification(undefined, transaction(), now), "acknowledged");
 });

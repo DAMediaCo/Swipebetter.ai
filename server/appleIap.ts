@@ -53,6 +53,8 @@ export type AppleTransactionPayload = {
   environment?: string;
 };
 
+export type AppleIapNotificationAction = "expired" | "renewed" | "acknowledged";
+
 export function isAppleIapProduct(productId: string): productId is AppleIapProductId {
   return APPLE_IAP_PRODUCTS.has(productId);
 }
@@ -100,4 +102,27 @@ export function shouldExpireAppleTransaction(
   const transactionExpired = transaction.expiresDate ? Number(transaction.expiresDate) < now : false;
   return (type === "EXPIRED" || type === "GRACE_PERIOD_EXPIRED" || type === "DID_FAIL_TO_RENEW")
     && transactionExpired;
+}
+
+export function isRenewingAppleNotification(type?: string): boolean {
+  return type === "SUBSCRIBED"
+    || type === "DID_RENEW"
+    || type === "DID_RECOVER"
+    || type === "OFFER_REDEEMED";
+}
+
+export function classifyAppleNotification(
+  type: string | undefined,
+  transaction: AppleTransactionPayload,
+  now = Date.now()
+): AppleIapNotificationAction {
+  if (shouldExpireAppleTransaction(type, transaction, now)) {
+    return "expired";
+  }
+
+  if (isRenewingAppleNotification(type)) {
+    return "renewed";
+  }
+
+  return "acknowledged";
 }
