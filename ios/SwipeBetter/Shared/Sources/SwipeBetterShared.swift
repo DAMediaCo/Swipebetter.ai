@@ -310,7 +310,7 @@ public enum SharedImportStore {
     }
 
     clearAll()
-    try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+    try prepareImportDirectory(directoryURL)
     let id = UUID().uuidString
     let normalizedImages = images.compactMap(SwipeBetterImageProcessor.normalizedJPEGData(from:))
     guard cleanText?.isEmpty == false || !normalizedImages.isEmpty else {
@@ -319,7 +319,7 @@ public enum SharedImportStore {
 
     let filenames = try normalizedImages.enumerated().map { index, data in
       let filename = "\(id)-\(index).jpg"
-      try data.write(to: directoryURL.appendingPathComponent(filename), options: .atomic)
+      try data.write(to: directoryURL.appendingPathComponent(filename), options: [.atomic, .completeFileProtection])
       return filename
     }
     let payload = SharedImportPayload(id: id, text: cleanText?.isEmpty == false ? cleanText : nil, imageFilenames: filenames)
@@ -355,6 +355,15 @@ public enum SharedImportStore {
     defaults?.removeObject(forKey: SwipeBetterConfig.importPayloadKey)
     guard let directoryURL else { return }
     try? FileManager.default.removeItem(at: directoryURL)
+  }
+
+  private static func prepareImportDirectory(_ directoryURL: URL) throws {
+    try FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+    try FileManager.default.setAttributes([.protectionKey: FileProtectionType.complete], ofItemAtPath: directoryURL.path)
+    var resourceValues = URLResourceValues()
+    resourceValues.isExcludedFromBackup = true
+    var mutableDirectoryURL = directoryURL
+    try mutableDirectoryURL.setResourceValues(resourceValues)
   }
 
   private static func removeDirectoryIfEmpty(_ directoryURL: URL) {

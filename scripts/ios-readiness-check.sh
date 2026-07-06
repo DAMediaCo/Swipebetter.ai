@@ -122,6 +122,10 @@ for (const expected of [
   "maxPixelDimension: CGFloat = 1800",
   "normalizedJPEGData(from data: Data)",
   "let normalizedImages = images.compactMap(SwipeBetterImageProcessor.normalizedJPEGData(from:))",
+  "try prepareImportDirectory(directoryURL)",
+  "options: [.atomic, .completeFileProtection]",
+  "resourceValues.isExcludedFromBackup = true",
+  ".protectionKey: FileProtectionType.complete",
 ]) {
   assertIncludes(shared, expected, "shared import cleanup contract");
 }
