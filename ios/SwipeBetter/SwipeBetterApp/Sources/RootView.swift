@@ -802,10 +802,13 @@ struct UsageStatusRow: View {
   }
 
   private var isUnlimited: Bool {
+    if model.credits?.isUnlimited == true || model.credits?.hasAccess == true && model.credits?.planTier?.lowercased() == "unlimited" {
+      return true
+    }
     if model.credits?.planTier?.lowercased() == "unlimited" {
       return true
     }
-    return model.me?.planType?.lowercased() == "unlimited"
+    return model.me?.proActive == true
   }
 
   private var statusColor: Color {

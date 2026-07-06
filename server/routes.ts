@@ -487,13 +487,15 @@ export async function registerRoutes(
       const credits = await storage.getCredits(userId);
       const reportsUnlocked = await storage.getUnlockedReports(userId);
       const isSuperUser = await storage.isSuperUser(userId);
+      const isUnlimited = planTier === 'unlimited' || isSuperUser;
 
 
       res.json({
         planTier,
         credits,
         reportsUnlocked,
-        isUnlimited: planTier === 'unlimited',
+        hasAccess: isUnlimited || credits > 0,
+        isUnlimited,
         isSuperUser
       });
     } catch (error) {

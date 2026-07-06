@@ -115,6 +115,8 @@ for (const expected of [
   'starterProductId = "ai.swipebetter.starter"',
   'monthlyProductId = "ai.swipebetter.unlimited.monthly"',
   'annualProductId = "ai.swipebetter.unlimited.annual"',
+  "public let hasAccess: Bool?",
+  "public let isUnlimited: Bool?",
 ]) {
   assertIncludes(shared, expected, "Swift shared configuration");
 }
@@ -228,6 +230,8 @@ for (const expected of [
   "guard model.isSignedIn else { return }",
   "guard isActive else { return }",
   "model.consumePendingImport()",
+  "model.credits?.isUnlimited == true",
+  "model.me?.proActive == true",
   "selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies",
 ]) {
   assertIncludes(rootView, expected, "iOS App Review UI contract");
@@ -383,6 +387,8 @@ for (const expected of [
   'return res.status(409).json({ error: error.message });',
   'action: "ownership_conflict"',
   'return res.status(400).json({ error: error.message });',
+  "hasAccess: isUnlimited || credits > 0",
+  "isUnlimited",
 ]) {
   assertIncludes(routes, expected, "iOS Apple validation route contract");
 }

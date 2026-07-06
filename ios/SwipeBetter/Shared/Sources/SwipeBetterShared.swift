@@ -93,6 +93,7 @@ public struct CreditsResponse: Codable {
   public let planTier: String?
   public let credits: Int?
   public let hasAccess: Bool?
+  public let isUnlimited: Bool?
   public let isSuperUser: Bool?
 }
 
