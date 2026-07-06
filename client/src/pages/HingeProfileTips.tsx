@@ -6,15 +6,15 @@ import { Sparkles, Camera, ArrowLeft, CheckCircle, XCircle, ArrowRight } from "l
 
 export default function HingeProfileTips() {
   useEffect(() => {
-    document.title = "Hinge Profile Tips to Get More Matches";
+    document.title = "Hinge Profile Tips for Better Photos, Prompts & Replies";
     
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Complete Hinge profile tips guide with advice on photos, prompts, and settings to maximize your matches.');
+      metaDescription.setAttribute('content', 'Improve your Hinge profile with practical tips for photos, prompts, profile details, settings, and conversation-friendly signals.');
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = 'Complete Hinge profile tips guide with advice on photos, prompts, and settings to maximize your matches.';
+      meta.content = 'Improve your Hinge profile with practical tips for photos, prompts, profile details, settings, and conversation-friendly signals.';
       document.head.appendChild(meta);
     }
   }, []);
@@ -32,7 +32,7 @@ export default function HingeProfileTips() {
 
         <header className="mb-12">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-            Hinge Profile Tips: Everything You Need to Get More Matches
+            Hinge Profile Tips for Better Photos, Prompts & Replies
           </h1>
           <p className="text-lg text-muted-foreground">
             A complete guide to building a Hinge profile that stands out and starts real conversations.

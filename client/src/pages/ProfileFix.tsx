@@ -42,7 +42,7 @@ export default function ProfileFix() {
   const user = authData?.user;
 
   useEffect(() => {
-    document.title = "Fix Your Profile | SwipeBetter";
+    document.title = "AI Dating Profile Analyzer | SwipeBetter";
   }, []);
 
   const [showDashboard, setShowDashboard] = useState(false);
@@ -145,11 +145,11 @@ export default function ProfileFix() {
         <div className="max-w-4xl mx-auto px-4 pt-4 pb-8 space-y-12">
           <section className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              Fix Your Dating Profile.<br />
-              <span className="text-primary">Get More Matches.</span>
+              AI Dating Profile Analyzer<br />
+              <span className="text-primary">for Tinder, Hinge & Bumble.</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Upload screenshots. Get a score, photo feedback, and a better bio in minutes.
+              Upload screenshots of your profile and get a private AI audit with a 0-100 score, photo feedback, bio rewrites, and prompt fixes.
             </p>
             
             <div 
@@ -159,7 +159,7 @@ export default function ProfileFix() {
             >
               <div className="flex flex-col items-center gap-3">
                 <CloudUpload className="w-12 h-12 text-muted-foreground group-hover:text-primary transition-colors" />
-                <p className="text-lg font-medium">Drag & drop screenshots here</p>
+                <p className="text-lg font-medium">Upload profile screenshots</p>
                 <p className="text-sm text-muted-foreground">or click to browse</p>
               </div>
             </div>
@@ -223,7 +223,7 @@ export default function ProfileFix() {
                 className="bg-card text-foreground shadow-md hover:shadow-lg transition-shadow border border-border"
                 data-testid="link-fix-reply-cross"
               >
-                Try Fix My Reply
+                Generate Better Replies
               </Button>
             </Link>
           </section>
@@ -236,8 +236,8 @@ export default function ProfileFix() {
     <div className="min-h-screen pb-24 md:pb-8">
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div className="text-center mb-2">
-          <h1 className="text-2xl font-bold">Fix Your Profile</h1>
-          <p className="text-sm text-muted-foreground">Tell us about yourself and upload your screenshots</p>
+          <h1 className="text-2xl font-bold">Analyze Your Dating Profile</h1>
+          <p className="text-sm text-muted-foreground">Tell us your app, goal, and upload screenshots for a private audit.</p>
         </div>
 
         {!subscriptionData?.canAnalyze && (

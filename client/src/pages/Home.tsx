@@ -20,7 +20,7 @@ export default function Home() {
   const [location] = useLocation();
 
   useEffect(() => {
-    document.title = "AI Dating Profile Audit | SwipeBetter.ai";
+    document.title = "AI Dating Profile Audit for Tinder, Hinge & Bumble";
   }, []);
 
   const handleToolClick = (toolType: "profile" | "reply") => {
@@ -45,7 +45,7 @@ export default function Home() {
       answer: "No account is required to use SwipeBetter."
     },
     {
-      question: "Does this guarantee more matches?",
+      question: "Does this promise more matches?",
       answer: "No. Results vary, but we aim to improve your odds with clear, actionable suggestions."
     }
   ];
@@ -73,12 +73,12 @@ export default function Home() {
               </div>
               
               <h1 className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.15]">
-                Is Your Profile{" "}
-                <span className="text-primary">Holding You Back?</span>
+                AI Dating Profile Audit for{" "}
+                <span className="text-primary">Tinder, Hinge & Bumble</span>
               </h1>
               
               <p className="text-lg md:text-xl text-muted-foreground max-w-xl leading-relaxed">
-                Stop guessing. Start dating. Get a professional AI audit with a 0-100 score and actionable improvements.
+                Upload your dating profile screenshots and see what is costing you matches. Get a 0-100 score, photo feedback, bio rewrites, prompt fixes, and reply help.
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
@@ -86,7 +86,7 @@ export default function Home() {
                   <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                     <Button size="lg" className="text-lg px-8 py-6 touch-target shadow-lg shadow-primary/25" data-testid="button-fix-profile-hero">
                       <Sparkles className="w-5 h-5 mr-2" />
-                      Get My Free Score
+                      Analyze My Profile Free
                     </Button>
                   </Link>
                   <span className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
@@ -169,7 +169,7 @@ export default function Home() {
           <div className="text-center mb-10 space-y-3">
             <h2 className="text-2xl md:text-3xl font-bold">Your Dating Toolkit</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Four AI-powered tools to transform your dating game
+              Practical AI tools for the parts of your dating profile that actually decide the swipe.
             </p>
           </div>
           
@@ -181,9 +181,9 @@ export default function Home() {
                     <Search className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-1">The Deep Dive Audit</h3>
+                    <h3 className="font-semibold text-lg mb-1">AI Dating Profile Audit</h3>
                     <p className="text-sm text-muted-foreground">
-                      Our AI scans your profile for red flags. Get a precise 0-100 score and objective feedback.
+                      Find weak photos, generic bios, unclear prompts, and trust gaps with a clear 0-100 profile score.
                     </p>
                   </div>
                 </div>
@@ -197,9 +197,9 @@ export default function Home() {
                     <Pencil className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-1">The Bio Architect</h3>
+                    <h3 className="font-semibold text-lg mb-1">Tinder Bio Generator</h3>
                     <p className="text-sm text-muted-foreground">
-                      Writer's block is over. Generate 5 custom, witty bios tailored to your specific vibe in seconds.
+                      Turn flat "I love travel" bios into specific, natural lines that give matches something to answer.
                     </p>
                   </div>
                 </div>
@@ -213,9 +213,9 @@ export default function Home() {
                     <Eye className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-1">Vibe Check (Photo Analysis)</h3>
+                    <h3 className="font-semibold text-lg mb-1">Dating Photo Analyzer</h3>
                     <p className="text-sm text-muted-foreground">
-                      Data-driven photo scoring. See exactly how your photos rate on 'Trust,' 'Attractiveness,' and 'Intelligence.'
+                      Review lighting, expression, first-photo strength, variety, and photo order before you upload.
                     </p>
                   </div>
                 </div>
@@ -229,9 +229,9 @@ export default function Home() {
                     <MessageCircle className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-1">The Rizz Assistant</h3>
+                    <h3 className="font-semibold text-lg mb-1">Dating Reply Assistant</h3>
                     <p className="text-sm text-muted-foreground">
-                      Never send a boring text again. Upload a screenshot and let AI craft the perfect reply.
+                      Paste a chat or upload a screenshot and get replies that sound playful, confident, or thoughtful.
                     </p>
                   </div>
                 </div>
@@ -244,9 +244,9 @@ export default function Home() {
       <section id="pricing" className="py-12 md:py-16 px-4 bg-card/50 border-y border-border">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10 space-y-3">
-            <h2 className="text-2xl md:text-3xl font-bold">Simple, Transparent Pricing</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">Start With a Free Profile Score</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Start for free. Pay only for what you need.
+              See the biggest issues first. Upgrade only when you want the full audit, rewrites, and deeper feedback.
             </p>
           </div>
           
@@ -254,8 +254,8 @@ export default function Home() {
             <Card className="border-border">
               <CardContent className="pt-6 pb-6 px-6">
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold mb-1">The Scan</h3>
-                  <p className="text-sm text-muted-foreground mb-4">See where you stand.</p>
+                  <h3 className="text-xl font-bold mb-1">Free Score</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Find your biggest profile weakness.</p>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-4xl font-bold">$0</span>
                     <span className="text-muted-foreground">Free</span>
@@ -283,7 +283,7 @@ export default function Home() {
                 
                 <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                   <Button variant="outline" className="w-full border-primary/30" data-testid="button-pricing-free">
-                    Get My Free Score
+                    Analyze My Profile Free
                   </Button>
                 </Link>
               </CardContent>
@@ -297,8 +297,8 @@ export default function Home() {
               </div>
               <CardContent className="pt-8 pb-6 px-6">
                 <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold mb-1">Starter Fix</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Perfect for a quick profile refresh.</p>
+                  <h3 className="text-xl font-bold mb-1">Starter Audit</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Unlock the full report and fixes.</p>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-4xl font-bold text-primary">$3</span>
                     <span className="text-muted-foreground">one-time</span>
@@ -312,21 +312,21 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="text-sm">See the 'Why' behind your score</span>
+                    <span className="text-sm">See what is hurting your matches</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="text-sm">5 AI-Generated Custom Bios</span>
+                    <span className="text-sm">Custom bio and prompt rewrites</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="text-sm">Photo Analysis for 1 Profile</span>
+                    <span className="text-sm">Photo feedback for 1 profile</span>
                   </li>
                 </ul>
                 
                 <Link href="/pricing">
                   <Button className="w-full" data-testid="button-pricing-starter">
-                    Fix My Profile ($3)
+                    Unlock My Audit ($3)
                   </Button>
                 </Link>
               </CardContent>
@@ -336,7 +336,7 @@ export default function Home() {
               <CardContent className="pt-6 pb-6 px-6">
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-bold mb-1">Unlimited</h3>
-                  <p className="text-sm text-muted-foreground mb-4">For serious daters who want results fast.</p>
+                  <p className="text-sm text-muted-foreground mb-4">For testing profiles, photos, bios, and replies.</p>
                   <div className="space-y-2">
                     <div className="flex items-baseline justify-center gap-1">
                       <span className="text-4xl font-bold">$13</span>
@@ -366,7 +366,7 @@ export default function Home() {
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
-                    <span className="text-sm">Deep Dive Photo Analytics</span>
+                    <span className="text-sm">Detailed photo feedback</span>
                   </li>
                   <li className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-500 shrink-0" />
@@ -388,9 +388,9 @@ export default function Home() {
       <section id="example-feedback" className="py-10 md:py-14 px-4 bg-card/50 border-y border-border scroll-mt-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-6 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold">Example AI Analysis</h2>
+              <h2 className="text-2xl md:text-3xl font-bold">Example Dating Profile Audit</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              See what kind of actionable insights you will get
+              See the kind of specific feedback SwipeBetter gives before you rewrite your profile.
             </p>
           </div>
           
@@ -417,7 +417,7 @@ export default function Home() {
                   <div className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Suggested Fix</span>
                 </div>
-                <p className="text-base">Move your clearest solo photo to #1 and shorten your bio to 2 punchy lines.</p>
+                <p className="text-base">Move your clearest solo photo into the first slot and shorten your bio to 2 punchy lines.</p>
               </div>
             </div>
           </div>
@@ -427,9 +427,9 @@ export default function Home() {
       <section className="py-10 md:py-14 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold">Two Powerful Tools</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">Fix Your Profile and Your Replies</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Everything you need to optimize your dating app success
+              Most dating app problems come down to weak first impressions or dead conversations. SwipeBetter helps with both.
             </p>
           </div>
           
@@ -440,7 +440,7 @@ export default function Home() {
                   <Camera className="w-12 h-12 text-primary mb-4" aria-label="Icon for profile audit" />
                   <h3 className="text-xl font-bold mb-2">Profile Audit</h3>
                   <p className="text-muted-foreground mb-6">
-                    Get AI-powered analysis of your bio, photos, and overall profile appeal with a 0-100 score.
+                    Get AI feedback on your photos, bio, prompts, and overall first impression with a 0-100 score.
                   </p>
                   <ul className="space-y-2 text-sm mb-6">
                     <li className="flex items-center gap-2">
@@ -449,7 +449,7 @@ export default function Home() {
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary" />
-                      Bio optimization suggestions
+                      Bio and prompt rewrite suggestions
                     </li>
                     <li className="flex items-center gap-2">
                       <Check className="w-4 h-4 text-primary" />
@@ -458,7 +458,7 @@ export default function Home() {
                   </ul>
                   <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                     <Button className="w-full" data-testid="button-try-profile-fix">
-                      Get My Score
+                      Analyze My Profile
                     </Button>
                   </Link>
                 </div>
@@ -471,7 +471,7 @@ export default function Home() {
                   <MessageSquare className="w-12 h-12 text-primary mb-4" aria-label="Icon for reply assistant" />
                   <h3 className="text-xl font-bold mb-2">Reply Assistant</h3>
                   <p className="text-muted-foreground mb-6">
-                    Get perfect reply suggestions based on your conversation context.
+                    Get reply suggestions based on the actual conversation, not random pickup lines.
                   </p>
                   <ul className="space-y-2 text-sm mb-6">
                     <li className="flex items-center gap-2">
@@ -502,9 +502,9 @@ export default function Home() {
       <section className="py-10 md:py-14 px-4 bg-card/50 border-y border-border">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8 space-y-2">
-            <h2 className="text-2xl md:text-3xl font-bold">How It Works</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">How the AI Dating Profile Audit Works</h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Three simple steps to optimize your dating profile
+              Upload screenshots, get the diagnosis, then make the fixes that matter first.
             </p>
           </div>
           
@@ -528,7 +528,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold">2. Get AI Analysis</h3>
                 <p className="text-sm text-muted-foreground">
-                  Our AI analyzes your profile and provides a professional score with specific, actionable feedback.
+                  SwipeBetter reviews photos, bio, prompts, and first impression signals, then gives you a clear score.
                 </p>
               </CardContent>
             </Card>
@@ -540,7 +540,7 @@ export default function Home() {
                 </div>
                 <h3 className="text-lg font-semibold">3. Optimize Your Profile</h3>
                 <p className="text-sm text-muted-foreground">
-                  Apply the suggestions to strengthen your profile and improve your match rate.
+                  Apply the photo order, bio, prompt, and messaging suggestions to make your profile easier to swipe right on.
                 </p>
               </CardContent>
             </Card>
@@ -558,17 +558,17 @@ export default function Home() {
       <section className="py-10 md:py-14 px-4 bg-gradient-to-br from-primary/10 via-background to-primary/5 border-y border-border">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-2xl md:text-3xl font-bold">
-            Ready to see your profile score?
+            Ready to see what is costing you matches?
           </h2>
           <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-            Get a professional AI audit in under a minute. See your 0-100 score and exactly what to improve.
+            Run a private AI dating profile audit and get a 0-100 score, photo feedback, bio rewrites, and next-step fixes.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <div className="flex flex-col items-center">
               <Link href="/fix-profile" onClick={() => handleToolClick("profile")}>
                 <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" data-testid="button-start-profile">
                   <Sparkles className="w-5 h-5 mr-2" />
-                  Get My Free Score
+                  Analyze My Profile Free
                 </Button>
               </Link>
               <span className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">

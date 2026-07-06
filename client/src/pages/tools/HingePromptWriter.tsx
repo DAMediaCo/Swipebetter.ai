@@ -30,11 +30,11 @@ function updateMetaTag(selector: string, attribute: string, content: string) {
 
 export default function HingePromptWriter() {
   useEffect(() => {
-    document.title = "Hinge Prompt Answer Generator | Funny & Witty AI";
+    document.title = "AI Hinge Prompt Writer | Answer Generator";
     
-    updateMetaTag('meta[name="description"]', 'content', 'Generate witty, original Hinge prompt answers with AI. Perfect responses for "Dating me is like...", "Two truths and a lie", and more.');
-    updateMetaTag('meta[property="og:title"]', 'content', 'Hinge Prompt Answer Generator | Funny & Witty AI');
-    updateMetaTag('meta[property="og:description"]', 'content', 'Generate witty, original Hinge prompt answers with AI. Perfect responses for Dating me is like, Two truths and a lie, and more.');
+    updateMetaTag('meta[name="description"]', 'content', 'Write Hinge prompt answers that sound specific, natural, and easy to comment on. Generate ideas for Dating me is like, Two truths, and more.');
+    updateMetaTag('meta[property="og:title"]', 'content', 'AI Hinge Prompt Writer | Answer Generator');
+    updateMetaTag('meta[property="og:description"]', 'content', 'Write Hinge prompt answers that sound specific, natural, and easy to comment on. Generate ideas for Dating me is like, Two truths, and more.');
     updateMetaTag('meta[property="og:url"]', 'content', 'https://swipebetter.ai/tools/hinge-prompt-writer');
   }, []);
 
@@ -77,10 +77,10 @@ export default function HingePromptWriter() {
         </Badge>
         
         <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-foreground">
-          Stuck on Hinge? Generate Witty Prompt Answers Instantly.
+          AI Hinge Prompt Writer for Answers That Get Replies
         </h1>
         <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-          Our AI writes Hinge prompts that actually get comments and likes, not eye rolls.
+          Turn generic Hinge answers into specific, natural prompts with a clear conversation hook.
         </p>
       </header>
 
@@ -113,7 +113,7 @@ export default function HingePromptWriter() {
       </section>
 
       <section className="mb-16">
-        <h2 className="text-2xl font-bold mb-6 text-center text-foreground">Why Generic Prompts Don't Work</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-foreground">Why Generic Hinge Prompts Don't Work</h2>
         
         <Card>
           <CardContent className="pt-6">
@@ -156,7 +156,7 @@ export default function HingePromptWriter() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary">+</span>
-                    Genuine interests, not clichés
+                    Genuine interests, not cliches
                   </li>
                 </ul>
               </div>
@@ -169,9 +169,9 @@ export default function HingePromptWriter() {
         <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30">
           <CardContent className="py-10">
             <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-3 text-foreground">Get Custom Hinge Prompts</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">Get Custom Hinge Prompt Answers</h2>
             <p className="text-foreground/80 mb-6 max-w-md mx-auto">
-              Upload your profile and get AI-written prompts tailored to your personality.
+              Upload your profile and get Hinge prompt ideas tailored to your personality, intent, and voice.
             </p>
             <Link href="/fix-profile">
               <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" data-testid="button-write-prompts">

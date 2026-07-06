@@ -30,11 +30,11 @@ function updateMetaTag(selector: string, attribute: string, content: string) {
 
 export default function TinderBioGenerator() {
   useEffect(() => {
-    document.title = "Best Free Tinder Bio Generator 2026 | SwipeBetter AI";
+    document.title = "AI Tinder Bio Generator | Dating Bio Writer";
     
-    updateMetaTag('meta[name="description"]', 'content', 'Generate the perfect Tinder bio with our free AI tool. Get 5 custom bio options tailored to your personality in seconds.');
-    updateMetaTag('meta[property="og:title"]', 'content', 'Best Free Tinder Bio Generator 2026 | SwipeBetter AI');
-    updateMetaTag('meta[property="og:description"]', 'content', 'Generate the perfect Tinder bio with our free AI tool. Get 5 custom bio options tailored to your personality in seconds.');
+    updateMetaTag('meta[name="description"]', 'content', 'Generate Tinder bio ideas that sound specific, natural, and easy to reply to. Get custom dating bio options for Tinder, Hinge, and Bumble.');
+    updateMetaTag('meta[property="og:title"]', 'content', 'AI Tinder Bio Generator | Dating Bio Writer');
+    updateMetaTag('meta[property="og:description"]', 'content', 'Generate Tinder bio ideas that sound specific, natural, and easy to reply to. Get custom dating bio options for Tinder, Hinge, and Bumble.');
     updateMetaTag('meta[property="og:url"]', 'content', 'https://swipebetter.ai/tools/tinder-bio-generator');
   }, []);
 
@@ -62,15 +62,15 @@ export default function TinderBioGenerator() {
         </Badge>
         
         <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-foreground">
-          The #1 AI Tinder Bio Generator
+          AI Tinder Bio Generator That Sounds Like You
         </h1>
         <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-          Stop staring at a blank bio. Our AI creates personalized, swipe-worthy bios in seconds.
+          Stop staring at a blank bio. Turn your interests, personality, and dating goal into specific bio options matches can actually respond to.
         </p>
       </header>
 
       <section className="mb-16">
-        <h2 className="text-2xl font-bold mb-6 text-center text-foreground">Before vs After: Real Bio Transformation</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-foreground">Before vs After: Stronger Tinder Bio Copy</h2>
         
         <div className="grid md:grid-cols-2 gap-6">
           <Card className="border-destructive/30 bg-destructive/5">
@@ -102,7 +102,7 @@ export default function TinderBioGenerator() {
                 </p>
               </div>
               <p className="text-sm text-foreground/70 mt-3">
-                Specific details, humor, clear interests. Easy to start a conversation.
+                Specific details, natural humor, clear interests, and an easy conversation hook.
               </p>
             </CardContent>
           </Card>
@@ -130,9 +130,9 @@ export default function TinderBioGenerator() {
               <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-xl font-bold text-primary">2</span>
               </div>
-              <h3 className="font-semibold mb-2 text-foreground">AI Analyzes Your Style</h3>
+              <h3 className="font-semibold mb-2 text-foreground">AI Finds Better Angles</h3>
               <p className="text-sm text-foreground/80">
-                Our AI identifies your personality traits and optimal bio approach.
+                SwipeBetter looks for concrete details, conversation hooks, and lines that avoid dating-app cliches.
               </p>
             </CardContent>
           </Card>
@@ -155,9 +155,9 @@ export default function TinderBioGenerator() {
         <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/30">
           <CardContent className="py-10">
             <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-3 text-foreground">Ready to Transform Your Bio?</h2>
+            <h2 className="text-2xl font-bold mb-3 text-foreground">Ready to Write a Better Tinder Bio?</h2>
             <p className="text-foreground/80 mb-6 max-w-md mx-auto">
-              Get 5 custom-written Tinder bios based on your personality and goals.
+              Get custom Tinder bio options based on your personality, dating goal, and the kind of match you want.
             </p>
             <Link href="/fix-profile">
               <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" data-testid="button-generate-bios">

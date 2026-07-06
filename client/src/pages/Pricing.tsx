@@ -49,7 +49,7 @@ export default function Pricing() {
   const returnTo = urlParams.get('returnTo') || undefined;
 
   useEffect(() => {
-    document.title = "Pricing | SwipeBetter";
+    document.title = "SwipeBetter Pricing | AI Dating Profile Audit Plans";
   }, []);
 
   const { data: productsData, isLoading: productsLoading } = useQuery<{ data: Product[] }>({
@@ -110,13 +110,13 @@ export default function Pricing() {
             SwipeBetter Pro
           </Badge>
           <h1 className="text-3xl md:text-4xl font-bold">
-            Unlock Your Full Results
+            Unlock Your Full Dating Profile Audit
           </h1>
           <p className="text-muted-foreground max-w-md mx-auto">
-            Choose the plan that works best for you.
+            Get the detailed photo feedback, bio rewrites, prompt fixes, and reply suggestions behind your score.
           </p>
           <p className="text-sm text-muted-foreground">
-            Most users upgrade to Unlimited after their first fix.
+            Start with one audit or go unlimited for profiles, photos, bios, and replies.
           </p>
         </div>
 
@@ -145,8 +145,8 @@ export default function Pricing() {
             <Card className="flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
               <CardHeader className="text-center pb-2">
                 <div className="h-6" />
-                <CardTitle className="text-xl">Starter Fix</CardTitle>
-                <p className="text-sm text-muted-foreground">One-time purchase</p>
+                <CardTitle className="text-xl">Starter Audit</CardTitle>
+                <p className="text-sm text-muted-foreground">One-time profile or reply fix</p>
               </CardHeader>
               <CardContent className="flex flex-col flex-1 text-center pt-4">
                 <div className="mb-3">
@@ -170,7 +170,7 @@ export default function Pricing() {
                   disabled={checkoutMutation.isPending || !oneTimePrice}
                   data-testid="button-checkout-onetime"
                 >
-                  {checkoutMutation.isPending ? "Loading..." : "Get Starter Fix"}
+                  {checkoutMutation.isPending ? "Loading..." : "Get Starter Audit"}
                 </Button>
               </CardContent>
             </Card>
@@ -224,7 +224,7 @@ export default function Pricing() {
                   <span className="text-4xl font-bold">$79</span>
                   <span className="text-muted-foreground">/year</span>
                   <p className="text-sm text-primary font-medium mt-1">
-                    Save 49% – $6.58/mo billed annually
+                    Save 49% - $6.58/mo billed annually
                   </p>
                 </div>
                 <ul className="text-sm space-y-1 text-left flex-1">
@@ -298,7 +298,7 @@ export default function Pricing() {
                 </div>
                 <h4 className="font-semibold">What if I'm not happy?</h4>
                 <p className="text-sm text-muted-foreground">
-                  We offer a 100% money-back guarantee if you don't see results.
+                  If something looks wrong with your report, contact support and we will review it.
                 </p>
               </div>
               <div className="text-center space-y-2">

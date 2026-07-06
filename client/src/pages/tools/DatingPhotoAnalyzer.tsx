@@ -30,22 +30,22 @@ function updateMetaTag(selector: string, attribute: string, content: string) {
 
 export default function DatingPhotoAnalyzer() {
   useEffect(() => {
-    document.title = "AI Dating Photo Scorer | Rate My Tinder Pics";
+    document.title = "AI Dating Photo Analyzer | Rate Tinder & Hinge Photos";
     
-    updateMetaTag('meta[name="description"]', 'content', 'Get a data-driven analysis of your dating profile photos. AI rates lighting, trust signals, and photo order to maximize your matches.');
-    updateMetaTag('meta[property="og:title"]', 'content', 'AI Dating Photo Scorer | Rate My Tinder Pics');
-    updateMetaTag('meta[property="og:description"]', 'content', 'Get a data-driven analysis of your dating profile photos. AI rates lighting, trust signals, and photo order to maximize your matches.');
+    updateMetaTag('meta[name="description"]', 'content', 'Analyze dating profile photos for lighting, expression, trust signals, variety, and photo order before you upload to Tinder, Hinge, or Bumble.');
+    updateMetaTag('meta[property="og:title"]', 'content', 'AI Dating Photo Analyzer | Rate Tinder & Hinge Photos');
+    updateMetaTag('meta[property="og:description"]', 'content', 'Analyze dating profile photos for lighting, expression, trust signals, variety, and photo order before you upload to Tinder, Hinge, or Bumble.');
     updateMetaTag('meta[property="og:url"]', 'content', 'https://swipebetter.ai/tools/dating-photo-analyzer');
   }, []);
 
   const faqItems = [
     {
       question: "What is a 'Trust Score' for dating photos?",
-      answer: "Trust Score measures how authentic and approachable your photos appear. Factors include natural lighting, genuine smiles, relaxed posture, and avoiding heavily filtered or staged shots. Higher trust = more right swipes."
+      answer: "Trust Score measures how authentic and approachable your photos appear. Factors include natural lighting, genuine smiles, relaxed posture, and avoiding heavily filtered or staged shots."
     },
     {
       question: "What photo should be first on my dating profile?",
-      answer: "Your first photo should be a clear headshot with good lighting where you're smiling. Avoid sunglasses, group photos, or distant shots. This photo gets 70%+ of profile views, so make it count."
+      answer: "Your first photo should be a clear headshot with good lighting where your face is easy to see. Avoid sunglasses, group photos, distant shots, and photos where the strongest image is buried later."
     },
     {
       question: "How many photos should I have on my dating profile?",
@@ -57,21 +57,21 @@ export default function DatingPhotoAnalyzer() {
     {
       icon: Sun,
       title: "Lighting Quality",
-      description: "Natural light beats flash. Photos with soft, even lighting score 40% higher on perceived attractiveness.",
+      description: "Natural light usually reads better than flash. Soft, even lighting makes your face clearer and your profile feel more approachable.",
       good: "Outdoor golden hour, window light",
       bad: "Bathroom selfies, harsh flash"
     },
     {
       icon: Eye,
       title: "Eye Contact & Expression",
-      description: "Direct eye contact with a genuine smile creates connection. Fake smiles and looking away reduce matches.",
+      description: "Direct eye contact and a genuine expression create a stronger first impression than stiff poses or unclear expressions.",
       good: "Natural smile, relaxed eyes",
       bad: "Duck face, intense stare, no smile"
     },
     {
       icon: Users,
       title: "The Trust Gap",
-      description: "Photos that feel authentic get 3x more right swipes than overly curated Instagram-style shots.",
+      description: "Photos that feel authentic usually build more trust than heavily filtered or overly staged Instagram-style shots.",
       good: "Candid moments, real activities",
       bad: "Heavily filtered, staged poses"
     }
@@ -86,10 +86,10 @@ export default function DatingPhotoAnalyzer() {
         </Badge>
         
         <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-foreground">
-          Data-Driven Photo Analysis
+          AI Dating Photo Analyzer for Tinder, Hinge & Bumble
         </h1>
         <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-          Your photos make the first impression. Our AI scores lighting, trust signals, and composition to help you get more matches.
+          Your first photo decides whether most people keep looking. Get feedback on lighting, expression, trust signals, variety, and photo order.
         </p>
       </header>
 

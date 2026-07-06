@@ -67,7 +67,7 @@ export default function ReplyFix() {
   const isLoadingAccess = creditsLoading || subscriptionLoading;
 
   useEffect(() => {
-    document.title = "Fix Your Reply | SwipeBetter";
+    document.title = "AI Dating Reply Generator | SwipeBetter";
   }, []);
 
   const [step, setStep] = useState(0);
@@ -226,11 +226,11 @@ export default function ReplyFix() {
         <div className="max-w-4xl mx-auto px-4 pt-8 pb-8 space-y-12">
           <section className="text-center space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              Fix Your Reply.<br />
-              <span className="text-primary">Keep the Conversation Going.</span>
+              AI Dating Reply Generator<br />
+              <span className="text-primary">for Tinder, Hinge & Bumble.</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Paste the chat. Pick a tone. Get 3 replies that sound like you.
+              Paste the chat, choose a tone, and get reply options that move the conversation forward without sounding generic.
             </p>
             
             <div className="max-w-2xl mx-auto space-y-4">

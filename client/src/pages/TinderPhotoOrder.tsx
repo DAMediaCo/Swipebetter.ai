@@ -6,15 +6,15 @@ import { Sparkles, Camera, ArrowLeft, CheckCircle, XCircle, ArrowRight } from "l
 
 export default function TinderPhotoOrder() {
   useEffect(() => {
-    document.title = "Best Tinder Photo Order for More Matches";
+    document.title = "Best Tinder Photo Order | Which Picture Goes First";
     
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
-      metaDescription.setAttribute('content', 'Learn the best Tinder photo order to maximize your matches. First impressions matter more than you think.');
+      metaDescription.setAttribute('content', 'Learn which Tinder photo should go first, which photos to move or remove, and how to order your dating profile pictures.');
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = 'Learn the best Tinder photo order to maximize your matches. First impressions matter more than you think.';
+      meta.content = 'Learn which Tinder photo should go first, which photos to move or remove, and how to order your dating profile pictures.';
       document.head.appendChild(meta);
     }
   }, []);
@@ -32,7 +32,7 @@ export default function TinderPhotoOrder() {
 
         <header className="mb-12">
           <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-            The Best Tinder Photo Order to Maximize Your Matches
+            Best Tinder Photo Order: Which Picture Goes First?
           </h1>
           <p className="text-lg text-muted-foreground">
             How to arrange your photos so people actually swipe right.
