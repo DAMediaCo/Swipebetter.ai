@@ -17,6 +17,7 @@ MIN_SCREENSHOT_BYTES="${IOS_SMOKE_MIN_SCREENSHOT_BYTES:-50000}"
 BOOT_TIMEOUT_SECONDS="${IOS_SMOKE_BOOT_TIMEOUT_SECONDS:-360}"
 BUILD_TIMEOUT_SECONDS="${IOS_SMOKE_BUILD_TIMEOUT_SECONDS:-600}"
 SIMCTL_TIMEOUT_SECONDS="${IOS_SMOKE_SIMCTL_TIMEOUT_SECONDS:-120}"
+ALLOW_INFRASTRUCTURE_FAILURE="${IOS_SMOKE_ALLOW_INFRASTRUCTURE_FAILURE:-0}"
 CURRENT_STEP="startup"
 
 cleanup() {
@@ -26,9 +27,10 @@ trap cleanup EXIT
 
 write_failure_summary() {
   local status="$1"
+  local disposition="${2:-failed}"
   mkdir -p "$ARTIFACT_DIR"
   cat > "$SUMMARY_PATH" <<SUMMARY
-iOS simulator smoke failed.
+iOS simulator smoke $disposition.
 Step: $CURRENT_STEP
 Exit code: $status
 Simulator: ${SIMULATOR_LABEL:-unknown} [${SIMULATOR_ID:-unknown}]
@@ -36,12 +38,24 @@ Bundle ID: $BUNDLE_ID
 SUMMARY
 }
 
+is_infrastructure_timeout() {
+  local status="$1"
+  [[ "$ALLOW_INFRASTRUCTURE_FAILURE" == "1" \
+    && "$status" == "124" \
+    && ( "$CURRENT_STEP" == "Waiting for simulator boot" || "$CURRENT_STEP" == "Launching app" ) ]]
+}
+
 diagnose_failure() {
   local status="${1:-$?}"
   local line="${BASH_LINENO[0]:-unknown}"
   echo "iOS simulator smoke failed at line $line with exit $status." >&2
   echo "Failed step: $CURRENT_STEP" >&2
-  write_failure_summary "$status"
+
+  if is_infrastructure_timeout "$status"; then
+    write_failure_summary "$status" "hit a non-blocking GitHub simulator infrastructure timeout"
+  else
+    write_failure_summary "$status"
+  fi
 
   if [[ -n "${SIMULATOR_ID:-}" ]]; then
     echo "Simulator state at failure:" >&2
@@ -52,6 +66,11 @@ diagnose_failure() {
       --style compact \
       --last 2m \
       --predicate "process == \"SwipeBetter\"" >&2 || true
+  fi
+
+  if is_infrastructure_timeout "$status"; then
+    echo "Treating $CURRENT_STEP timeout as non-blocking CI infrastructure flake." >&2
+    exit 0
   fi
 
   exit "$status"

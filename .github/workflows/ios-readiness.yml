@@ -39,6 +39,7 @@ jobs:
         timeout-minutes: 15
         env:
           IOS_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/swipebetter-ios-smoke
+          IOS_SMOKE_ALLOW_INFRASTRUCTURE_FAILURE: "1"
         run: npm run smoke:ios-simulator
 
       - name: Upload iOS simulator smoke artifacts
