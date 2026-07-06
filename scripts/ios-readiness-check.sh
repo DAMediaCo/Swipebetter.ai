@@ -214,6 +214,10 @@ for (const expected of [
 for (const expected of [
   "try? await purchases.syncCurrentEntitlements(api: api)",
   "try await purchases.restorePurchases(api: api)",
+  "func startPurchaseUpdates()",
+  "func stopPurchaseUpdates()",
+  "purchaseUpdatesTask?.cancel()",
+  "purchaseUpdatesTask = nil",
   "SwipeBetterImageProcessor.normalizedJPEGData(from: data)",
   "func consumePendingImport()",
   "func handleDeepLink(_ url: URL)",
@@ -222,6 +226,12 @@ for (const expected of [
 ]) {
   assertIncludes(appModel, expected, "Apple restore sync contract");
 }
+const refreshAfterAuthMatch = appModel.match(/private func refreshAfterAuth\(\) async \{[\s\S]*?\n  \}/);
+if (!refreshAfterAuthMatch) {
+  throw new Error("Could not find refreshAfterAuth implementation");
+}
+assertIncludes(refreshAfterAuthMatch[0], "startPurchaseUpdates()", "purchase listener restart after auth contract");
+assertIncludes(clearStateMatch[0], "stopPurchaseUpdates()", "purchase listener privacy cleanup contract");
 
 const rootView = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/RootView.swift", "utf8");
 for (const expected of [

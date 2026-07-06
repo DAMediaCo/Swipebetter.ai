@@ -50,6 +50,11 @@ final class AppModel {
     }
   }
 
+  func stopPurchaseUpdates() {
+    purchaseUpdatesTask?.cancel()
+    purchaseUpdatesTask = nil
+  }
+
   private func handlePurchaseUpdate(_ verification: VerificationResult<Transaction>) async {
     guard isSignedIn else { return }
 
@@ -158,6 +163,7 @@ final class AppModel {
   }
 
   private func refreshAfterAuth() async {
+    startPurchaseUpdates()
     await refreshAccount()
     await refreshHistory()
     _ = try? await purchases.syncCurrentEntitlements(api: api)
@@ -335,6 +341,7 @@ final class AppModel {
     pendingImportText = ""
     pendingImportImages = []
     requestedTabIdentifier = nil
+    stopPurchaseUpdates()
     purchases.resetTransientState()
     importRevision += 1
     deepLinkRevision += 1
