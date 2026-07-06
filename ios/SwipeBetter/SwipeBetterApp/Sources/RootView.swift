@@ -272,11 +272,27 @@ struct ProfileAuditView: View {
 
   var body: some View {
     Form {
+      Section {
+        UsageStatusRow(
+          title: "Profile audits use one credit",
+          detail: "Unlimited members can run audits without spending starter credits.",
+          systemImage: "person.crop.rectangle.stack"
+        )
+      }
+
       Section("Screenshots") {
         PhotosPicker(selection: $pickerItems, maxSelectionCount: 10, matching: .images) {
           Label(images.isEmpty ? "Add profile screenshots" : "\(images.count) screenshots selected", systemImage: "photo.on.rectangle.angled")
         }
-        ScreenshotStrip(images: images)
+        ScreenshotStrip(images: images, onRemove: removeImage)
+        if !images.isEmpty {
+          Button(role: .destructive) {
+            pickerItems = []
+            images = []
+          } label: {
+            Label("Clear screenshots", systemImage: "xmark.circle")
+          }
+        }
       }
 
       Section("Profile") {
@@ -300,7 +316,7 @@ struct ProfileAuditView: View {
         } label: {
           Label("Run Profile Audit", systemImage: "wand.and.stars")
         }
-        .disabled(images.isEmpty)
+        .disabled(model.isBusy || images.isEmpty)
       }
 
       if let analysis = result?.analysis {
@@ -346,6 +362,12 @@ struct ProfileAuditView: View {
       images = model.pendingImportImages
     }
   }
+
+  private func removeImage(at index: Int) {
+    guard images.indices.contains(index) else { return }
+    images.remove(at: index)
+    pickerItems = []
+  }
 }
 
 struct ReplyAssistantView: View {
@@ -369,6 +391,14 @@ struct ReplyAssistantView: View {
 
   var body: some View {
     Form {
+      Section {
+        UsageStatusRow(
+          title: "Reply coaching uses one credit",
+          detail: "Paste text, share a screenshot, or use the keyboard extension to bring chat context here.",
+          systemImage: "message.badge.waveform"
+        )
+      }
+
       Section("Conversation") {
         TextEditor(text: $conversation)
           .frame(minHeight: 160)
@@ -384,7 +414,15 @@ struct ReplyAssistantView: View {
         PhotosPicker(selection: $pickerItems, maxSelectionCount: 3, matching: .images) {
           Label(images.isEmpty ? "Add chat screenshots" : "\(images.count) screenshots selected", systemImage: "photo.badge.plus")
         }
-        ScreenshotStrip(images: images)
+        ScreenshotStrip(images: images, onRemove: removeImage)
+        if !images.isEmpty {
+          Button(role: .destructive) {
+            pickerItems = []
+            images = []
+          } label: {
+            Label("Clear screenshots", systemImage: "xmark.circle")
+          }
+        }
       }
 
       Section("Style") {
@@ -407,7 +445,7 @@ struct ReplyAssistantView: View {
         } label: {
           Label("Generate Replies", systemImage: "sparkles")
         }
-        .disabled(conversation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && images.isEmpty)
+        .disabled(model.isBusy || (conversation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && images.isEmpty))
       }
 
       if let parsed = response?.parsed {
@@ -455,6 +493,12 @@ struct ReplyAssistantView: View {
       conversation = model.pendingImportText
     }
     images = model.pendingImportImages
+  }
+
+  private func removeImage(at index: Int) {
+    guard images.indices.contains(index) else { return }
+    images.remove(at: index)
+    pickerItems = []
   }
 }
 
@@ -653,20 +697,87 @@ struct AccountView: View {
   }
 }
 
+struct UsageStatusRow: View {
+  @Environment(AppModel.self) private var model
+
+  let title: String
+  let detail: String
+  let systemImage: String
+
+  var body: some View {
+    Label {
+      VStack(alignment: .leading, spacing: 4) {
+        HStack {
+          Text(title)
+            .font(.headline)
+          Spacer(minLength: 12)
+          Text(statusText)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(statusColor)
+        }
+        Text(detail)
+          .font(.footnote)
+          .foregroundStyle(.secondary)
+      }
+    } icon: {
+      Image(systemName: systemImage)
+        .foregroundStyle(statusColor)
+    }
+    .accessibilityElement(children: .combine)
+  }
+
+  private var statusText: String {
+    if isUnlimited {
+      return "Unlimited"
+    }
+
+    let credits = model.credits?.credits ?? model.me?.oneTimeCredits ?? 0
+    return credits == 1 ? "1 credit" : "\(credits) credits"
+  }
+
+  private var isUnlimited: Bool {
+    if model.credits?.planTier?.lowercased() == "unlimited" {
+      return true
+    }
+    return model.me?.planType?.lowercased() == "unlimited"
+  }
+
+  private var statusColor: Color {
+    isUnlimited || (model.credits?.credits ?? model.me?.oneTimeCredits ?? 0) > 0 ? .green : .orange
+  }
+}
+
 struct ScreenshotStrip: View {
   let images: [Data]
+  var onRemove: ((Int) -> Void)?
 
   var body: some View {
     if !images.isEmpty {
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: 10) {
-          ForEach(Array(images.enumerated()), id: \.offset) { _, data in
+          ForEach(Array(images.enumerated()), id: \.offset) { index, data in
             if let image = UIImage(data: data) {
               Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
                 .frame(width: 78, height: 112)
                 .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(alignment: .topTrailing) {
+                  if let onRemove {
+                    Button {
+                      onRemove(index)
+                    } label: {
+                      Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white, .black.opacity(0.55))
+                    }
+                    .buttonStyle(.plain)
+                    .padding(5)
+                    .accessibilityLabel("Remove screenshot \(index + 1)")
+                  }
+                }
+                .accessibilityLabel("Selected screenshot \(index + 1)")
             }
           }
         }
