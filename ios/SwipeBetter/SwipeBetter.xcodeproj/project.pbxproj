@@ -15,6 +15,7 @@
 		51D1A8D73AC20B5D1E243D99 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
 		6A733AE70ED1A4E238DD0C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F846A09D1251E63BBECD73F /* Assets.xcassets */; };
 		6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
+		A176B0E7DC729545C6264E4C /* SwipeBetterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */; };
 		B18277A49A55449421BC6542 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
 		C00CA427102EBC6FA72E33E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
 		C53B40A58E51DAE9F0146CAB /* PurchaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */; };
@@ -30,6 +31,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A3613D2309F73F5DB76F1AAA;
 			remoteInfo = SwipeBetterKeyboard;
+		};
+		9575CD7AEFFB0503063CADEA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 17617D30C60E8CB53CB2C171 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEA223383DD85CF66BE67F9C;
+			remoteInfo = SwipeBetter;
 		};
 		D66637D891F49743775EF53D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -58,6 +66,7 @@
 /* Begin PBXFileReference section */
 		0619175018F158E01D1872EF /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterShared.swift; sourceTree = "<group>"; };
+		376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SwipeBetterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F846A09D1251E63BBECD73F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4224C6A0979B8FD308802F0B /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		45DD039E271ABCBEDB33ABD3 /* SwipeBetter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwipeBetter.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -69,9 +78,19 @@
 		B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
 		D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SwipeBetterShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterApp.swift; sourceTree = "<group>"; };
+		EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		01633E4BC02130945AAF3463 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */,
+			);
+			name = Sources;
+			path = SwipeBetterUITests/Sources;
+			sourceTree = "<group>";
+		};
 		4492890FEB68719EBD993946 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
@@ -121,6 +140,7 @@
 				559FA54B66DF9905E794170F /* Sources */,
 				BCF19E68754922959EBAA1DA /* Sources */,
 				AF01B70F7C413CCF0F5CB6FD /* Sources */,
+				01633E4BC02130945AAF3463 /* Sources */,
 				EDF663E5D17EC54849E89EF2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -140,6 +160,7 @@
 				45DD039E271ABCBEDB33ABD3 /* SwipeBetter.app */,
 				914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */,
 				D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */,
+				376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -156,6 +177,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1028A256E16712828E033050 /* SwipeBetterUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27FE01246F91BA79D3A67774 /* Build configuration list for PBXNativeTarget "SwipeBetterUITests" */;
+			buildPhases = (
+				7AA5DB14474DB3A6B13C4155 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B58A336AF9DBD9E4D9B793B6 /* PBXTargetDependency */,
+			);
+			name = SwipeBetterUITests;
+			packageProductDependencies = (
+			);
+			productName = SwipeBetterUITests;
+			productReference = 376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A3613D2309F73F5DB76F1AAA /* SwipeBetterKeyboard */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 51916579B29F137EE630BD1F /* Build configuration list for PBXNativeTarget "SwipeBetterKeyboard" */;
@@ -222,6 +261,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					1028A256E16712828E033050 = {
+						TestTargetID = AEA223383DD85CF66BE67F9C;
+					};
 				};
 			};
 			buildConfigurationList = 745007879EFCB028FBBE4B17 /* Build configuration list for PBXProject "SwipeBetter" */;
@@ -241,6 +283,7 @@
 				AEA223383DD85CF66BE67F9C /* SwipeBetter */,
 				A3613D2309F73F5DB76F1AAA /* SwipeBetterKeyboard */,
 				D85F2700B119F85D8D224C35 /* SwipeBetterShare */,
+				1028A256E16712828E033050 /* SwipeBetterUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -286,6 +329,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7AA5DB14474DB3A6B13C4155 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A176B0E7DC729545C6264E4C /* SwipeBetterUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7E2851D7824BA578F7DFF887 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -310,6 +361,11 @@
 			isa = PBXTargetDependency;
 			target = D85F2700B119F85D8D224C35 /* SwipeBetterShare */;
 			targetProxy = D66637D891F49743775EF53D /* PBXContainerItemProxy */;
+		};
+		B58A336AF9DBD9E4D9B793B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AEA223383DD85CF66BE67F9C /* SwipeBetter */;
+			targetProxy = 9575CD7AEFFB0503063CADEA /* PBXContainerItemProxy */;
 		};
 		EBFEFA560D8D4040305DACAF /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -381,6 +437,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.10;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -434,6 +491,23 @@
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
+		};
+		714A6D5B6C36B84AE4B770C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = SwipeBetter;
+			};
+			name = Release;
 		};
 		7708CBE92864B5791FC332CD /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -507,6 +581,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.10;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -544,6 +619,23 @@
 			};
 			name = Debug;
 		};
+		DB359D669105174CA45C9A4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = SwipeBetter;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -552,6 +644,15 @@
 			buildConfigurations = (
 				B8F7ABC1C707E3DAFD550FF6 /* Debug */,
 				483408B4F38BB5181CA4CA3E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		27FE01246F91BA79D3A67774 /* Build configuration list for PBXNativeTarget "SwipeBetterUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB359D669105174CA45C9A4E /* Debug */,
+				714A6D5B6C36B84AE4B770C2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

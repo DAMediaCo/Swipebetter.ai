@@ -68,11 +68,14 @@ for (const bundleId of [
   "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app",
   "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.share",
   "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.keyboard",
+  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.uitests",
 ]) {
   assertIncludes(project, bundleId, "project.yml bundle ID contract");
 }
 assertIncludes(project, "IPHONEOS_DEPLOYMENT_TARGET: \"17.0\"", "iOS deployment target");
 assertIncludes(project, "TARGETED_DEVICE_FAMILY: \"1\"", "iPhone-only target family");
+assertIncludes(project, "SwipeBetterUITests:", "native UI test target");
+assertIncludes(project, "type: bundle.ui-testing", "native UI test target");
 
 const pbxproj = fs.readFileSync("ios/SwipeBetter/SwipeBetter.xcodeproj/project.pbxproj", "utf8");
 if (pbxproj.includes('TARGETED_DEVICE_FAMILY = "1,2"')) {
@@ -321,6 +324,28 @@ if (/checkout|stripe/i.test(rootView.replace("Web Stripe checkout is intentional
   throw new Error("iOS app UI must not expose web Stripe checkout paths");
 }
 
+const appEntry = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/SwipeBetterApp.swift", "utf8");
+for (const expected of [
+  '"-SWIPEBETTER_UI_TESTING"',
+  "await model.bootstrap()",
+]) {
+  assertIncludes(appEntry, expected, "native UI testing launch contract");
+}
+
+const uiTests = fs.readFileSync("ios/SwipeBetter/SwipeBetterUITests/Sources/SwipeBetterUITests.swift", "utf8");
+for (const expected of [
+  "XCUIApplication()",
+  'app.launchArguments.append("-SWIPEBETTER_UI_TESTING")',
+  '"auth.emailField"',
+  '"auth.passwordField"',
+  '"auth.loginButton"',
+  '"auth.appleSignInButton"',
+  '"auth.createAccountButton"',
+  '"auth.promoCodeField"',
+]) {
+  assertIncludes(uiTests, expected, "native UI smoke test contract");
+}
+
 const shareExtension = fs.readFileSync("ios/SwipeBetter/ShareExtension/Sources/ShareViewController.swift", "utf8");
 for (const expected of [
   '"share.statusLabel"',
@@ -382,12 +407,17 @@ for (const expected of [
   "Run Apple IAP unit tests",
   "npm run test:ios-iap",
   "Run iOS readiness checks",
+  "Run native iOS UI tests",
+  "npm run test:ios-ui",
   "Run iOS simulator smoke",
 ]) {
   assertIncludes(iosReadinessWorkflow, expected, "iOS CI gate contract");
 }
 
 const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
+if (packageJson.scripts?.["test:ios-ui"] !== "scripts/ios-ui-tests.sh") {
+  throw new Error("package.json must expose scripts/ios-ui-tests.sh as test:ios-ui");
+}
 if (packageJson.scripts?.["check:ios-release"] !== "scripts/ios-release-preflight.sh") {
   throw new Error("package.json must expose scripts/ios-release-preflight.sh as check:ios-release");
 }

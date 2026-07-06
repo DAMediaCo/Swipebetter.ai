@@ -9,6 +9,7 @@ struct SwipeBetterApp: App {
       RootView()
         .environment(model)
         .task {
+          guard !ProcessInfo.processInfo.arguments.contains("-SWIPEBETTER_UI_TESTING") else { return }
           await model.bootstrap()
         }
         .onOpenURL { url in
