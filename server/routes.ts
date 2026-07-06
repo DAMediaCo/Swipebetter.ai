@@ -14,7 +14,9 @@ import jwt from "jsonwebtoken";
 import {
   APPLE_IAP_PRODUCT_IDS,
   type AppleTransactionPayload,
+  appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
+  normalizedAppleAppAccountToken,
   validateAppleTransaction,
 } from "./appleIap";
 
@@ -1453,7 +1455,7 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Apple transaction ID mismatch" });
       }
       validateAppleTransaction(transaction, requested.productId);
-      if (transaction.appAccountToken && transaction.appAccountToken.toLowerCase() !== userId.toLowerCase()) {
+      if (!appleAppAccountTokenMatchesUser(transaction.appAccountToken, userId)) {
         return res.status(400).json({ error: "Apple account token mismatch" });
       }
       if (transaction.revocationDate) {
@@ -1518,8 +1520,9 @@ export async function registerRoutes(
       const action = classifyAppleNotification(notification.notificationType, transaction);
 
       if (action === "expired") {
-        const accountTokenUser = transaction.appAccountToken
-          ? await storage.getUser(transaction.appAccountToken.toLowerCase())
+        const accountToken = normalizedAppleAppAccountToken(transaction.appAccountToken);
+        const accountTokenUser = accountToken
+          ? await storage.getUser(accountToken)
           : undefined;
         const result = await storage.expireAppleEntitlement({
           userId: accountTokenUser?.id || null,
@@ -1546,8 +1549,9 @@ export async function registerRoutes(
           transaction.originalTransactionId || null
         );
 
-        if (!userId && transaction.appAccountToken) {
-          const accountTokenUser = await storage.getUser(transaction.appAccountToken.toLowerCase());
+        const accountToken = normalizedAppleAppAccountToken(transaction.appAccountToken);
+        if (!userId && accountToken) {
+          const accountTokenUser = await storage.getUser(accountToken);
           userId = accountTokenUser?.id;
         }
 

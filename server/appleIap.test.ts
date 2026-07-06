@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   APPLE_IAP_PRODUCT_CONFIG,
+  appleAppAccountTokenMatchesUser,
   classifyAppleNotification,
   getAppleIapProductConfig,
   isAppleIapProduct,
   isAppleSubscriptionProduct,
   isRenewingAppleNotification,
+  normalizedAppleAppAccountToken,
   shouldExpireAppleTransaction,
   validateAppleTransaction,
   type AppleTransactionPayload,
@@ -61,6 +63,19 @@ test("validateAppleTransaction rejects expired subscriptions unless explicitly a
     /subscription transaction is expired/
   );
   assert.doesNotThrow(() => validateAppleTransaction(expired, "ai.swipebetter.unlimited.monthly", { now, allowExpired: true }));
+});
+
+test("Apple app account tokens are normalized before user matching", () => {
+  const userId = "A2C13A6C-882E-4C22-8788-0D44559F8418";
+
+  assert.equal(
+    normalizedAppleAppAccountToken("  A2C13A6C-882E-4C22-8788-0D44559F8418  "),
+    "a2c13a6c-882e-4c22-8788-0d44559f8418"
+  );
+  assert.equal(appleAppAccountTokenMatchesUser(undefined, userId), true);
+  assert.equal(appleAppAccountTokenMatchesUser("", userId), true);
+  assert.equal(appleAppAccountTokenMatchesUser("a2c13a6c-882e-4c22-8788-0d44559f8418", userId), true);
+  assert.equal(appleAppAccountTokenMatchesUser("d0c13a6c-882e-4c22-8788-0d44559f8418", userId), false);
 });
 
 test("shouldExpireAppleTransaction only expires from Apple-fetched facts", () => {

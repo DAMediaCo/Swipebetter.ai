@@ -112,6 +112,17 @@ for (const expected of [
 ]) {
   assertIncludes(shared, expected, "Swift shared configuration");
 }
+
+const authSchema = fs.readFileSync("shared/models/auth.ts", "utf8");
+assertIncludes(authSchema, 'id: varchar("id").primaryKey().default(sql`gen_random_uuid()`)', "user ID UUID contract");
+
+const purchaseStore = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/PurchaseStore.swift", "utf8");
+for (const expected of [
+  "userId.flatMap(UUID.init(uuidString:))",
+  ".appAccountToken(accountToken)",
+]) {
+  assertIncludes(purchaseStore, expected, "Apple app account token contract");
+}
 NODE
 
 echo "Checking StoreKit product IDs and iOS prices..."

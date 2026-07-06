@@ -92,6 +92,16 @@ export function validateAppleTransaction(
   }
 }
 
+export function normalizedAppleAppAccountToken(token?: string | null): string | undefined {
+  const normalized = token?.trim().toLowerCase();
+  return normalized || undefined;
+}
+
+export function appleAppAccountTokenMatchesUser(token: string | undefined | null, userId: string): boolean {
+  const normalizedToken = normalizedAppleAppAccountToken(token);
+  return !normalizedToken || normalizedToken === userId.toLowerCase();
+}
+
 export function shouldExpireAppleTransaction(
   type: string | undefined,
   transaction: AppleTransactionPayload,
