@@ -280,6 +280,15 @@ for (const expected of [
   assertIncludes(storage, expected, "iOS transaction storage contract");
 }
 
+const appleIap = fs.readFileSync("server/appleIap.ts", "utf8");
+for (const expected of [
+  "isAppleSubscriptionProduct(transaction.productId) && !transaction.expiresDate",
+  "Apple subscription transaction is missing an expiration date",
+  "Apple subscription transaction is expired",
+]) {
+  assertIncludes(appleIap, expected, "iOS Apple transaction validation contract");
+}
+
 const routes = fs.readFileSync("server/routes.ts", "utf8");
 for (const expected of [
   "AppleIapValidationError",

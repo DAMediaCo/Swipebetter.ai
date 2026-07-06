@@ -76,6 +76,17 @@ test("validateAppleTransaction rejects expired subscriptions unless explicitly a
   assert.doesNotThrow(() => validateAppleTransaction(expired, "ai.swipebetter.unlimited.monthly", { now, allowExpired: true }));
 });
 
+test("validateAppleTransaction requires subscription expiration dates", () => {
+  assert.throws(
+    () => validateAppleTransaction(transaction({ expiresDate: undefined }), "ai.swipebetter.unlimited.monthly", { now }),
+    (error) => error instanceof AppleIapValidationError && /missing an expiration date/.test(error.message)
+  );
+  assert.doesNotThrow(() => validateAppleTransaction(transaction({
+    productId: "ai.swipebetter.starter",
+    expiresDate: undefined,
+  }), "ai.swipebetter.starter", { now }));
+});
+
 test("Apple app account tokens are normalized before user matching", () => {
   const userId = "A2C13A6C-882E-4C22-8788-0D44559F8418";
 

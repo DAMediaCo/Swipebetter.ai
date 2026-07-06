@@ -103,6 +103,9 @@ export function validateAppleTransaction(
   if (!isAppleIapProduct(transaction.productId)) {
     throw new AppleIapValidationError("Unsupported Apple product");
   }
+  if (isAppleSubscriptionProduct(transaction.productId) && !transaction.expiresDate) {
+    throw new AppleIapValidationError("Apple subscription transaction is missing an expiration date");
+  }
   if (!options.allowExpired && transaction.expiresDate && Number(transaction.expiresDate) < now && isAppleSubscriptionProduct(transaction.productId)) {
     throw new AppleIapValidationError("Apple subscription transaction is expired");
   }
