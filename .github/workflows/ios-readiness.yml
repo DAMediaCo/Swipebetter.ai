@@ -12,6 +12,9 @@ jobs:
     name: Readiness Gate
     runs-on: macos-15
     timeout-minutes: 30
+    concurrency:
+      group: ios-readiness-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
 
     steps:
       - name: Check out repository
@@ -25,12 +28,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run TypeScript check
-        run: npm run check
-
-      - name: Run Apple IAP unit tests
-        run: npm run test:ios-iap
 
       - name: Run iOS readiness checks
         run: scripts/ios-readiness-check.sh

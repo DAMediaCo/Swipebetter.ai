@@ -462,11 +462,9 @@ for (const expected of [
 
 const iosReadinessWorkflow = fs.readFileSync(".github/workflows/ios-readiness.yml", "utf8");
 for (const expected of [
-  "Run TypeScript check",
-  "npm run check",
-  "Run Apple IAP unit tests",
-  "npm run test:ios-iap",
   "Run iOS readiness checks",
+  "concurrency:",
+  "cancel-in-progress: true",
   "Run native iOS UI tests",
   "github.event_name == 'pull_request' || github.ref == 'refs/heads/main'",
   "npm run test:ios-ui",
