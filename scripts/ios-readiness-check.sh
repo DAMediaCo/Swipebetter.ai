@@ -317,6 +317,24 @@ const packageJson = JSON.parse(fs.readFileSync("package.json", "utf8"));
 if (packageJson.scripts?.["check:ios-release"] !== "scripts/ios-release-preflight.sh") {
   throw new Error("package.json must expose scripts/ios-release-preflight.sh as check:ios-release");
 }
+if (packageJson.scripts?.["check:ios-entitlement-sync"] !== "tsx scripts/ios-entitlement-sync-preflight.ts") {
+  throw new Error("package.json must expose scripts/ios-entitlement-sync-preflight.ts as check:ios-entitlement-sync");
+}
+
+const entitlementSyncPreflight = fs.readFileSync("scripts/ios-entitlement-sync-preflight.ts", "utf8");
+for (const expected of [
+  "APPLE_IAP_TEST_TRANSACTION_ID",
+  "APPLE_IAP_TEST_PRODUCT_ID",
+  "SWIPEBETTER_SESSION_COOKIE",
+  "IOS_ENTITLEMENT_ALLOW_ALREADY_PROCESSED",
+  "/api/ios/iap/transactions",
+  "Entitlement sync returned processed=false",
+  "Unlimited product did not grant unlimited planTier",
+  "Starter product did not return numeric credits",
+  "Live iOS entitlement sync preflight passed.",
+]) {
+  assertIncludes(entitlementSyncPreflight, expected, "live iOS entitlement sync preflight contract");
+}
 NODE
 
 echo "Checking StoreKit product IDs and iOS prices..."

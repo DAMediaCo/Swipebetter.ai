@@ -11,6 +11,7 @@
     "test:ios-iap": "node --import tsx --test server/appleIap.test.ts",
     "check:apple-iap-config": "tsx scripts/apple-iap-preflight.ts",
     "check:ios-release": "scripts/ios-release-preflight.sh",
+    "check:ios-entitlement-sync": "tsx scripts/ios-entitlement-sync-preflight.ts",
     "smoke:ios-simulator": "scripts/ios-simulator-smoke.sh",
     "db:push": "drizzle-kit push"
   },
