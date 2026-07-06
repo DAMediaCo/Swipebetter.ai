@@ -10,7 +10,6 @@ STOREKIT="ios/SwipeBetter/Configuration.storekit"
 PRIVACY="ios/SwipeBetter/Shared/Resources/PrivacyInfo.xcprivacy"
 KEYBOARD_PLIST="ios/SwipeBetter/KeyboardExtension/Info.plist"
 METADATA="ios/SwipeBetter/AppStoreMetadata.json"
-SKIP_XCODE_BUILDS="${IOS_READINESS_SKIP_XCODE_BUILDS:-0}"
 
 echo "Checking plist files..."
 plutil -lint \
@@ -464,11 +463,10 @@ for (const expected of [
 const iosReadinessWorkflow = fs.readFileSync(".github/workflows/ios-readiness.yml", "utf8");
 for (const expected of [
   "Run iOS readiness checks",
-  "IOS_READINESS_SKIP_XCODE_BUILDS",
   "concurrency:",
   "cancel-in-progress: true",
   "Run native iOS UI tests",
-  "github.event_name == 'pull_request' || github.ref == 'refs/heads/main'",
+  "github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'",
   "npm run test:ios-ui",
   "Run iOS simulator smoke",
   "github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'",
@@ -779,12 +777,6 @@ npm run test:ios-iap
 
 echo "Running production build..."
 npm run build
-
-if [[ "$SKIP_XCODE_BUILDS" == "1" ]]; then
-  echo "Skipping iOS build/archive because IOS_READINESS_SKIP_XCODE_BUILDS=1."
-  echo "iOS readiness checks passed."
-  exit 0
-fi
 
 echo "Building iOS app and extensions..."
 echo "Using simulator destination: $DESTINATION"

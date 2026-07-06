@@ -30,12 +30,10 @@ jobs:
         run: npm ci
 
       - name: Run iOS readiness checks
-        env:
-          IOS_READINESS_SKIP_XCODE_BUILDS: ${{ github.event_name == 'pull_request' && '1' || '0' }}
         run: scripts/ios-readiness-check.sh
 
       - name: Run native iOS UI tests
-        if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         timeout-minutes: 22
         env:
           IOS_TEST_ALLOW_INFRASTRUCTURE_FAILURE: "1"
