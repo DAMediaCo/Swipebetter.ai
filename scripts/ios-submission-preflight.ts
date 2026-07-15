@@ -178,36 +178,34 @@ async function livePublicUrlChecks(): Promise<Check[]> {
     ["Terms URL", metadata.termsUrl],
     ["Refund policy URL", metadata.refundPolicyUrl],
   ];
-  const checks: Check[] = [];
-
-  for (const [label, url] of urls) {
+  return Promise.all(urls.map(async ([label, url]): Promise<Check> => {
     if (!url || !/^https:\/\/swipebetter\.ai(?:\/|$)/.test(url)) {
-      checks.push({
+      return {
         label: `Live ${label}`,
         ok: false,
         detail: `${label} must be a SwipeBetter HTTPS URL.`,
-      });
-      continue;
+      };
     }
 
     try {
-      const response = await fetch(url, { redirect: "follow" });
-      checks.push({
+      const response = await fetch(url, {
+        redirect: "follow",
+        signal: AbortSignal.timeout(10_000),
+      });
+      return {
         label: `Live ${label}`,
         ok: response.ok,
         detail: `${url} returned HTTP ${response.status}.`,
-      });
+      };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      checks.push({
+      return {
         label: `Live ${label}`,
         ok: false,
         detail: `${url} could not be reached: ${message}`,
-      });
+      };
     }
-  }
-
-  return checks;
+  }));
 }
 
 function envChecks(): Check[] {
