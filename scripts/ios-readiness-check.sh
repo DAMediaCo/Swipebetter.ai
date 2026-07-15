@@ -20,8 +20,8 @@ plutil -lint \
 
 echo "Checking keyboard privacy posture..."
 REQUESTS_OPEN_ACCESS="$(/usr/libexec/PlistBuddy -c 'Print :NSExtension:NSExtensionAttributes:RequestsOpenAccess' "$KEYBOARD_PLIST")"
-if [[ "$REQUESTS_OPEN_ACCESS" != "false" ]]; then
-  echo "Keyboard RequestsOpenAccess must stay false for App Review/privacy." >&2
+if [[ "$REQUESTS_OPEN_ACCESS" != "true" ]]; then
+  echo "Keyboard RequestsOpenAccess must stay true so iOS offers the Full Access control." >&2
   exit 1
 fi
 
@@ -118,7 +118,7 @@ assertEqual(shareActivationRule?.NSExtensionActivationSupportsImageWithMaxCount,
 
 const keyboardInfo = readPlist("ios/SwipeBetter/KeyboardExtension/Info.plist");
 assertEqual(keyboardInfo.NSExtension?.NSExtensionPointIdentifier, "com.apple.keyboard-service", "keyboard extension point");
-assertEqual(keyboardInfo.NSExtension?.NSExtensionAttributes?.RequestsOpenAccess, false, "keyboard open access");
+assertEqual(keyboardInfo.NSExtension?.NSExtensionAttributes?.RequestsOpenAccess, true, "keyboard open access");
 
 const appEntitlements = readPlist("ios/SwipeBetter/SwipeBetterApp/SwipeBetter.entitlements");
 assertIncludes(appEntitlements["com.apple.developer.applesignin"] || [], "Default", "Sign in with Apple entitlement");
@@ -129,7 +129,7 @@ assertIncludes(shareEntitlements["com.apple.security.application-groups"] || [],
 
 const keyboardEntitlements = readPlist("ios/SwipeBetter/KeyboardExtension/SwipeBetterKeyboard.entitlements");
 if (Object.keys(keyboardEntitlements).length !== 0) {
-  throw new Error("Keyboard extension entitlements must stay empty while RequestsOpenAccess is false");
+  throw new Error("Keyboard extension entitlements must stay empty until it requires shared-container access");
 }
 
 const privacy = readPlist("ios/SwipeBetter/Shared/Resources/PrivacyInfo.xcprivacy");
