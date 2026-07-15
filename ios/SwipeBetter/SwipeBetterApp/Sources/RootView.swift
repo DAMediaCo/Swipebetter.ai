@@ -43,31 +43,33 @@ struct RootView: View {
 
   init(initialTab: AppTab = .audit) {
     _selectedTab = State(initialValue: initialTab)
+    SBAppearance.configure()
   }
 
   var body: some View {
     Group {
       if model.isSignedIn {
         TabView(selection: $selectedTab) {
-          NavigationStack { ProfileAuditView(isActive: selectedTab == .audit) }
+          NavigationStack { PremiumProfileAuditView(isActive: selectedTab == .audit) }
             .tabItem { AppTab.audit.label }
             .tag(AppTab.audit)
 
-          NavigationStack { ReplyAssistantView(isActive: selectedTab == .replies) }
+          NavigationStack { PremiumReplyAssistantView(isActive: selectedTab == .replies) }
             .tabItem { AppTab.replies.label }
             .tag(AppTab.replies)
 
-          NavigationStack { HistoryView() }
+          NavigationStack { PremiumHistoryView() }
             .tabItem { AppTab.history.label }
             .tag(AppTab.history)
 
-          NavigationStack { AccountView() }
+          NavigationStack { PremiumAccountView() }
             .tabItem { AppTab.account.label }
             .tag(AppTab.account)
         }
+        .tint(SBTheme.accent)
         .accessibilityIdentifier("root.tabView")
       } else {
-        AuthView()
+        PremiumAuthView()
       }
     }
     .overlay(alignment: .bottom) {

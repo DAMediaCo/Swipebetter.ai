@@ -8,7 +8,7 @@ settings:
     SWIFT_VERSION: "5.10"
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "9"
+    CURRENT_PROJECT_VERSION: "10"
     TARGETED_DEVICE_FAMILY: "1"
 fileGroups:
   - Configuration.storekit
@@ -20,6 +20,7 @@ schemes:
         SwipeBetterUITests: [test]
     test:
       targets:
+        - SwipeBetterTests
         - SwipeBetterUITests
     run:
       config: Debug
@@ -78,6 +79,17 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: app.replit.swipebetter.keyboard
         INFOPLIST_FILE: KeyboardExtension/Info.plist
         CODE_SIGN_ENTITLEMENTS: KeyboardExtension/SwipeBetterKeyboard.entitlements
+        TARGETED_DEVICE_FAMILY: "1"
+  SwipeBetterTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: KeyboardExtension/Sources/KeyboardReplyComposer.swift
+      - path: SwipeBetterTests/Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.replit.swipebetter.tests
+        GENERATE_INFOPLIST_FILE: "YES"
         TARGETED_DEVICE_FAMILY: "1"
   SwipeBetterUITests:
     type: bundle.ui-testing

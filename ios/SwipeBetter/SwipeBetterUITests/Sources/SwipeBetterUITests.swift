@@ -14,7 +14,7 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.secureTextFields["auth.passwordField"].exists)
     XCTAssertTrue(app.buttons["auth.loginButton"].exists)
     XCTAssertTrue(app.buttons["auth.appleSignInButton"].exists)
-    XCTAssertTrue(app.staticTexts["Profile audits and reply coaching for dating apps."].exists)
+    XCTAssertTrue(app.staticTexts["Turn profile screenshots and awkward chat moments into specific, useful next moves."].exists)
     XCTAssertTrue(app.staticTexts["iOS pricing includes Apple purchase fees."].exists)
 
     app.buttons["Create account"].tap()

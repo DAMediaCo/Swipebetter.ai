@@ -376,24 +376,35 @@ for (const expected of [
 }
 
 const keyboardExtension = fs.readFileSync("ios/SwipeBetter/KeyboardExtension/Sources/KeyboardViewController.swift", "utf8");
+const keyboardReplyComposer = fs.readFileSync("ios/SwipeBetter/KeyboardExtension/Sources/KeyboardReplyComposer.swift", "utf8");
 for (const expected of [
   "private var nextKeyboardButton: UIButton?",
   "nextKeyboardButton?.isHidden = !needsInputModeSwitchKey",
-  'button(title: "Next Keyboard", systemImage: "globe", accessibilityIdentifier: "keyboard.nextKeyboardButton", action: #selector(switchToNextKeyboard))',
+  'next.accessibilityIdentifier = "keyboard.nextKeyboardButton"',
   "advanceToNextInputMode()",
-  'button(title: "Coach Chat", systemImage: "sparkles", accessibilityIdentifier: "keyboard.coachChatButton", action: #selector(openCoach))',
-  '"keyboard.warmReplyButton"',
-  '"keyboard.askOutButton"',
-  '"keyboard.reviveChatButton"',
-  "button.accessibilityIdentifier = accessibilityIdentifier",
-  'URL(string: "swipebetter://replies")',
-  "URLQueryItem(name: \"text\", value: context)",
+  'coach.accessibilityIdentifier = "keyboard.coachChatButton"',
+  'paste.accessibilityIdentifier = "keyboard.pasteChatButton"',
+  "guard hasFullAccess else",
+  "UIPasteboard.general.string",
+  "KeyboardReplyComposer.reply",
+  'components.scheme = "swipebetter"',
+  'components.host = "replies"',
+  'URLQueryItem(name: "text", value: context)',
   "textDocumentProxy.documentContextBeforeInput",
   "textDocumentProxy.documentContextAfterInput",
-  "String(combined.suffix(1200))",
+  "String(combined.suffix(1600))",
   "textDocumentProxy.insertText",
 ]) {
   assertIncludes(keyboardExtension, expected, "keyboard extension privacy contract");
+}
+for (const expected of [
+  '"keyboard.warmReplyButton"',
+  '"keyboard.confidentReplyButton"',
+  '"keyboard.askOutReplyButton"',
+  "if text.contains(\"taco\")",
+  "if text.contains(\"busy\")",
+]) {
+  assertIncludes(keyboardReplyComposer, expected, "context-aware keyboard reply contract");
 }
 
 const smokeScript = fs.readFileSync("scripts/ios-simulator-smoke.sh", "utf8");
