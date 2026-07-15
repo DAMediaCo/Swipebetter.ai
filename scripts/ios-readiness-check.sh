@@ -65,10 +65,10 @@ function pointsToPixels(size, scale) {
 
 const project = fs.readFileSync("ios/SwipeBetter/project.yml", "utf8");
 for (const bundleId of [
-  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app",
-  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.share",
-  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.keyboard",
-  "PRODUCT_BUNDLE_IDENTIFIER: ai.swipebetter.app.uitests",
+  "PRODUCT_BUNDLE_IDENTIFIER: app.replit.swipebetter",
+  "PRODUCT_BUNDLE_IDENTIFIER: app.replit.swipebetter.share",
+  "PRODUCT_BUNDLE_IDENTIFIER: app.replit.swipebetter.keyboard",
+  "PRODUCT_BUNDLE_IDENTIFIER: app.replit.swipebetter.uitests",
 ]) {
   assertIncludes(project, bundleId, "project.yml bundle ID contract");
 }
@@ -184,8 +184,8 @@ assertIncludes(authSchema, 'id: varchar("id").primaryKey().default(sql`gen_rando
 const authRoutes = fs.readFileSync("server/auth.ts", "utf8");
 for (const expected of [
   'process.env.APPLE_CLIENT_ID',
-  'process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app"',
-  '"ai.swipebetter.app"',
+  'process.env.APPLE_BUNDLE_ID || "app.replit.swipebetter"',
+  '"app.replit.swipebetter"',
 ]) {
   assertIncludes(authRoutes, expected, "native Apple Sign In audience contract");
 }
@@ -200,7 +200,7 @@ for (const expected of [
 for (const disallowed of [
   "host.exp.Exponent",
   "com.swipebetter.app",
-  "app.replit.swipebetter",
+  "ai.swipebetter.app",
 ]) {
   if (authRoutes.includes(disallowed)) {
     throw new Error(`Native Apple Sign In must not accept dev audience: ${disallowed}`);

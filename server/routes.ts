@@ -123,7 +123,7 @@ function applePrivateKey(): string {
 function createConfiguredAppleServerApiToken(): string {
   const issuerId = process.env.APPLE_IAP_ISSUER_ID;
   const keyId = process.env.APPLE_IAP_KEY_ID;
-  const bundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
+  const bundleId = process.env.APPLE_BUNDLE_ID || "app.replit.swipebetter";
   const privateKey = applePrivateKey();
 
   if (!issuerId || !keyId || !privateKey) {

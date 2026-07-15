@@ -53,7 +53,7 @@ const expectedProducts = new Map([
   ["ai.swipebetter.unlimited.annual", "$104.99"],
 ]);
 const screenshotManifestPath = "artifacts/ios-app-store-screenshots/manifest.json";
-const expectedBundleId = "ai.swipebetter.app";
+const expectedBundleId = "app.replit.swipebetter";
 const minimumScreenshotBytes = 50_000;
 const minimumScreenshotWidth = 1_000;
 const minimumScreenshotHeight = 2_000;
