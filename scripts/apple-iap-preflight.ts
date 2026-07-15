@@ -7,7 +7,7 @@ import {
   type AppleTransactionPayload,
 } from "../server/appleIap";
 
-const expectedBundleId = "ai.swipebetter.app";
+const expectedBundleId = "app.replit.swipebetter";
 const expectedProductIds = [
   "ai.swipebetter.starter",
   "ai.swipebetter.unlimited.monthly",

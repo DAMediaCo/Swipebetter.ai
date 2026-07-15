@@ -104,7 +104,7 @@ export function validateAppleTransaction(
   requestedProductId?: string,
   options: { allowExpired?: boolean; expectedBundleId?: string; now?: number } = {}
 ) {
-  const expectedBundleId = options.expectedBundleId || process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
+  const expectedBundleId = options.expectedBundleId || process.env.APPLE_BUNDLE_ID || "app.replit.swipebetter";
   const now = options.now ?? Date.now();
 
   if (transaction.bundleId !== expectedBundleId) {

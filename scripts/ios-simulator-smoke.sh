@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 PROJECT="ios/SwipeBetter/SwipeBetter.xcodeproj"
 SCHEME="SwipeBetter"
-BUNDLE_ID="ai.swipebetter.app"
+BUNDLE_ID="app.replit.swipebetter"
 SIMULATOR_NAME="${IOS_SMOKE_SIMULATOR_NAME:-iPhone SE (3rd generation)}"
 DERIVED_DATA="${IOS_SMOKE_DERIVED_DATA:-$(mktemp -d /tmp/swipebetter-ios-smoke-derived.XXXXXX)}"
 ARTIFACT_DIR="${IOS_SMOKE_ARTIFACT_DIR:-/tmp/swipebetter-ios-smoke}"

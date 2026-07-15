@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 PROJECT="ios/SwipeBetter/SwipeBetter.xcodeproj"
 SCHEME="SwipeBetter"
-BUNDLE_ID="ai.swipebetter.app"
+BUNDLE_ID="app.replit.swipebetter"
 SIMULATOR_NAME="${IOS_SCREENSHOT_SIMULATOR_NAME:-iPhone 17 Pro Max}"
 DERIVED_DATA="${IOS_SCREENSHOT_DERIVED_DATA:-$(mktemp -d /tmp/swipebetter-ios-screenshots.XXXXXX)}"
 OUTPUT_DIR="${IOS_SCREENSHOT_OUTPUT_DIR:-artifacts/ios-app-store-screenshots}"
