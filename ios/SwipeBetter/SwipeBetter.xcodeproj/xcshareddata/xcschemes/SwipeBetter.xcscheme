@@ -58,6 +58,17 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "BB0874E72E5EBF7384D34E7E"
+               BuildableName = "SwipeBetterTests.xctest"
+               BlueprintName = "SwipeBetterTests"
+               ReferencedContainer = "container:SwipeBetter.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "1028A256E16712828E033050"
                BuildableName = "SwipeBetterUITests.xctest"
                BlueprintName = "SwipeBetterUITests"
