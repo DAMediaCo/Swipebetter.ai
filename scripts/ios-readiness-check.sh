@@ -84,6 +84,7 @@ if (pbxproj.includes('TARGETED_DEVICE_FAMILY = "1,2"')) {
 
 const appInfo = readPlist("ios/SwipeBetter/SwipeBetterApp/Info.plist");
 assertEqual(appInfo.CFBundleDisplayName, "SwipeBetter", "main app display name");
+assertEqual(appInfo.ITSAppUsesNonExemptEncryption, false, "export compliance declaration");
 assertEqual(appInfo.UIRequiresFullScreen, true, "main app full-screen posture");
 const urlScheme = appInfo.CFBundleURLTypes?.[0]?.CFBundleURLSchemes?.[0];
 assertEqual(urlScheme, "swipebetter", "main app URL scheme");
