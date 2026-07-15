@@ -1,0 +1,690 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E71FE0ED8CAD6E103DA6F29 /* SwipeBetterKeyboard.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		138CA7EF110C30AE3B6EA68E /* SwipeBetterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */; };
+		235495C3F75031A3CC97C7ED /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BAC957192BE2A009D79F187 /* RootView.swift */; };
+		403EA46B4518C091852EF78D /* SwipeBetterShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		51BA230D3389EFA59887666B /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0619175018F158E01D1872EF /* AppModel.swift */; };
+		51D1A8D73AC20B5D1E243D99 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
+		6A733AE70ED1A4E238DD0C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F846A09D1251E63BBECD73F /* Assets.xcassets */; };
+		6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
+		A176B0E7DC729545C6264E4C /* SwipeBetterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */; };
+		B18277A49A55449421BC6542 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
+		C00CA427102EBC6FA72E33E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
+		C53B40A58E51DAE9F0146CAB /* PurchaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */; };
+		C6BCD8D5A6BF6F11D73BC674 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224C6A0979B8FD308802F0B /* ShareViewController.swift */; };
+		DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */; };
+		EBC57AFC074C49D9A09B4060 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		37E3C0927F5D86F8C92B5377 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 17617D30C60E8CB53CB2C171 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A3613D2309F73F5DB76F1AAA;
+			remoteInfo = SwipeBetterKeyboard;
+		};
+		9575CD7AEFFB0503063CADEA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 17617D30C60E8CB53CB2C171 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AEA223383DD85CF66BE67F9C;
+			remoteInfo = SwipeBetter;
+		};
+		D66637D891F49743775EF53D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 17617D30C60E8CB53CB2C171 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D85F2700B119F85D8D224C35;
+			remoteInfo = SwipeBetterShare;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		128F9EB7B39FFFE55E672173 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				403EA46B4518C091852EF78D /* SwipeBetterShare.appex in Embed Foundation Extensions */,
+				0E71FE0ED8CAD6E103DA6F29 /* SwipeBetterKeyboard.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0619175018F158E01D1872EF /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterShared.swift; sourceTree = "<group>"; };
+		376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SwipeBetterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F846A09D1251E63BBECD73F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4224C6A0979B8FD308802F0B /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		45DD039E271ABCBEDB33ABD3 /* SwipeBetter.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwipeBetter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseStore.swift; sourceTree = "<group>"; };
+		6E0CE9D34D18BAD25929CC49 /* Configuration.storekit */ = {isa = PBXFileReference; path = Configuration.storekit; sourceTree = "<group>"; };
+		7BAC957192BE2A009D79F187 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SwipeBetterKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
+		D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SwipeBetterShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterApp.swift; sourceTree = "<group>"; };
+		EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterUITests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		01633E4BC02130945AAF3463 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */,
+			);
+			name = Sources;
+			path = SwipeBetterUITests/Sources;
+			sourceTree = "<group>";
+		};
+		4492890FEB68719EBD993946 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */,
+			);
+			name = Sources;
+			path = KeyboardExtension/Sources;
+			sourceTree = "<group>";
+		};
+		559FA54B66DF9905E794170F /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */,
+			);
+			name = Sources;
+			path = Shared/Sources;
+			sourceTree = "<group>";
+		};
+		9609AD7BDBE31A5CA5E3C9B0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				3F846A09D1251E63BBECD73F /* Assets.xcassets */,
+			);
+			name = Resources;
+			path = SwipeBetterApp/Resources;
+			sourceTree = "<group>";
+		};
+		AF01B70F7C413CCF0F5CB6FD /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				0619175018F158E01D1872EF /* AppModel.swift */,
+				65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */,
+				7BAC957192BE2A009D79F187 /* RootView.swift */,
+				E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */,
+			);
+			name = Sources;
+			path = SwipeBetterApp/Sources;
+			sourceTree = "<group>";
+		};
+		BB511B678F3D85E5496F4831 = {
+			isa = PBXGroup;
+			children = (
+				6E0CE9D34D18BAD25929CC49 /* Configuration.storekit */,
+				F2273D0FD61E7E7339F8205F /* Resources */,
+				9609AD7BDBE31A5CA5E3C9B0 /* Resources */,
+				4492890FEB68719EBD993946 /* Sources */,
+				559FA54B66DF9905E794170F /* Sources */,
+				BCF19E68754922959EBAA1DA /* Sources */,
+				AF01B70F7C413CCF0F5CB6FD /* Sources */,
+				01633E4BC02130945AAF3463 /* Sources */,
+				EDF663E5D17EC54849E89EF2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BCF19E68754922959EBAA1DA /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				4224C6A0979B8FD308802F0B /* ShareViewController.swift */,
+			);
+			name = Sources;
+			path = ShareExtension/Sources;
+			sourceTree = "<group>";
+		};
+		EDF663E5D17EC54849E89EF2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				45DD039E271ABCBEDB33ABD3 /* SwipeBetter.app */,
+				914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */,
+				D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */,
+				376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F2273D0FD61E7E7339F8205F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */,
+			);
+			name = Resources;
+			path = Shared/Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1028A256E16712828E033050 /* SwipeBetterUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 27FE01246F91BA79D3A67774 /* Build configuration list for PBXNativeTarget "SwipeBetterUITests" */;
+			buildPhases = (
+				7AA5DB14474DB3A6B13C4155 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B58A336AF9DBD9E4D9B793B6 /* PBXTargetDependency */,
+			);
+			name = SwipeBetterUITests;
+			packageProductDependencies = (
+			);
+			productName = SwipeBetterUITests;
+			productReference = 376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		A3613D2309F73F5DB76F1AAA /* SwipeBetterKeyboard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 51916579B29F137EE630BD1F /* Build configuration list for PBXNativeTarget "SwipeBetterKeyboard" */;
+			buildPhases = (
+				986296AAEBCE162F417884AC /* Sources */,
+				9423419160D99048D921F06A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwipeBetterKeyboard;
+			packageProductDependencies = (
+			);
+			productName = SwipeBetterKeyboard;
+			productReference = 914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		AEA223383DD85CF66BE67F9C /* SwipeBetter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = ABBBF2C55DCCC519811C7E2F /* Build configuration list for PBXNativeTarget "SwipeBetter" */;
+			buildPhases = (
+				6AED08E983EB18BB0469E2E2 /* Sources */,
+				1FF2077A6B7397B602380A89 /* Resources */,
+				128F9EB7B39FFFE55E672173 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				49B50524A22C6D1586C925A2 /* PBXTargetDependency */,
+				EBFEFA560D8D4040305DACAF /* PBXTargetDependency */,
+			);
+			name = SwipeBetter;
+			packageProductDependencies = (
+			);
+			productName = SwipeBetter;
+			productReference = 45DD039E271ABCBEDB33ABD3 /* SwipeBetter.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D85F2700B119F85D8D224C35 /* SwipeBetterShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 21B68B6391D2C25C4BD67A1D /* Build configuration list for PBXNativeTarget "SwipeBetterShare" */;
+			buildPhases = (
+				7E2851D7824BA578F7DFF887 /* Sources */,
+				3C583FF6614D5E5352A2CB52 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwipeBetterShare;
+			packageProductDependencies = (
+			);
+			productName = SwipeBetterShare;
+			productReference = D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		17617D30C60E8CB53CB2C171 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					1028A256E16712828E033050 = {
+						TestTargetID = AEA223383DD85CF66BE67F9C;
+					};
+				};
+			};
+			buildConfigurationList = 745007879EFCB028FBBE4B17 /* Build configuration list for PBXProject "SwipeBetter" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = BB511B678F3D85E5496F4831;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = EDF663E5D17EC54849E89EF2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AEA223383DD85CF66BE67F9C /* SwipeBetter */,
+				A3613D2309F73F5DB76F1AAA /* SwipeBetterKeyboard */,
+				D85F2700B119F85D8D224C35 /* SwipeBetterShare */,
+				1028A256E16712828E033050 /* SwipeBetterUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1FF2077A6B7397B602380A89 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A733AE70ED1A4E238DD0C5D /* Assets.xcassets in Resources */,
+				C00CA427102EBC6FA72E33E2 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3C583FF6614D5E5352A2CB52 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9423419160D99048D921F06A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B18277A49A55449421BC6542 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6AED08E983EB18BB0469E2E2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				51BA230D3389EFA59887666B /* AppModel.swift in Sources */,
+				C53B40A58E51DAE9F0146CAB /* PurchaseStore.swift in Sources */,
+				235495C3F75031A3CC97C7ED /* RootView.swift in Sources */,
+				138CA7EF110C30AE3B6EA68E /* SwipeBetterApp.swift in Sources */,
+				EBC57AFC074C49D9A09B4060 /* SwipeBetterShared.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AA5DB14474DB3A6B13C4155 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A176B0E7DC729545C6264E4C /* SwipeBetterUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7E2851D7824BA578F7DFF887 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C6BCD8D5A6BF6F11D73BC674 /* ShareViewController.swift in Sources */,
+				51D1A8D73AC20B5D1E243D99 /* SwipeBetterShared.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		986296AAEBCE162F417884AC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		49B50524A22C6D1586C925A2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D85F2700B119F85D8D224C35 /* SwipeBetterShare */;
+			targetProxy = D66637D891F49743775EF53D /* PBXContainerItemProxy */;
+		};
+		B58A336AF9DBD9E4D9B793B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AEA223383DD85CF66BE67F9C /* SwipeBetter */;
+			targetProxy = 9575CD7AEFFB0503063CADEA /* PBXContainerItemProxy */;
+		};
+		EBFEFA560D8D4040305DACAF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A3613D2309F73F5DB76F1AAA /* SwipeBetterKeyboard */;
+			targetProxy = 37E3C0927F5D86F8C92B5377 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		034B748DE724691FE93FD7BF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.10;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		483408B4F38BB5181CA4CA3E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/SwipeBetterShare.entitlements;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.share;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		50DD019E30BF82E7563B512B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SwipeBetterApp/SwipeBetter.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = SwipeBetterApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		5A847AC65ABE117FC5907747 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = KeyboardExtension/SwipeBetterKeyboard.entitlements;
+				INFOPLIST_FILE = KeyboardExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.keyboard;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		714A6D5B6C36B84AE4B770C2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = SwipeBetter;
+			};
+			name = Release;
+		};
+		7708CBE92864B5791FC332CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = KeyboardExtension/SwipeBetterKeyboard.entitlements;
+				INFOPLIST_FILE = KeyboardExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.keyboard;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		912EAAFD6AC5D340D1910CC5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.10;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A611FCC1ACCD6C32FE19E864 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SwipeBetterApp/SwipeBetter.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = SwipeBetterApp/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B8F7ABC1C707E3DAFD550FF6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/SwipeBetterShare.entitlements;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.share;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		DB359D669105174CA45C9A4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ai.swipebetter.app.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = SwipeBetter;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		21B68B6391D2C25C4BD67A1D /* Build configuration list for PBXNativeTarget "SwipeBetterShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8F7ABC1C707E3DAFD550FF6 /* Debug */,
+				483408B4F38BB5181CA4CA3E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		27FE01246F91BA79D3A67774 /* Build configuration list for PBXNativeTarget "SwipeBetterUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DB359D669105174CA45C9A4E /* Debug */,
+				714A6D5B6C36B84AE4B770C2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		51916579B29F137EE630BD1F /* Build configuration list for PBXNativeTarget "SwipeBetterKeyboard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A847AC65ABE117FC5907747 /* Debug */,
+				7708CBE92864B5791FC332CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		745007879EFCB028FBBE4B17 /* Build configuration list for PBXProject "SwipeBetter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				034B748DE724691FE93FD7BF /* Debug */,
+				912EAAFD6AC5D340D1910CC5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		ABBBF2C55DCCC519811C7E2F /* Build configuration list for PBXNativeTarget "SwipeBetter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A611FCC1ACCD6C32FE19E864 /* Debug */,
+				50DD019E30BF82E7563B512B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 17617D30C60E8CB53CB2C171 /* Project object */;
+}

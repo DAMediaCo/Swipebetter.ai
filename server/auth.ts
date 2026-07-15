@@ -281,14 +281,12 @@ export function registerAuthRoutes(app: Express) {
 
       // Accept multiple valid audiences for Apple Sign In:
       // - Web client ID (APPLE_CLIENT_ID)
-      // - Expo Go development (host.exp.Exponent)
       // - Production mobile app bundle ID
-      const validAudiences = [
+      const validAudiences = Array.from(new Set([
         process.env.APPLE_CLIENT_ID,
-        "host.exp.Exponent",
-        "com.swipebetter.app",
-        "app.replit.swipebetter",
-      ].filter(Boolean) as string[];
+        process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app",
+        "ai.swipebetter.app",
+      ].filter(Boolean))) as string[];
       
 
       let payload;
@@ -385,10 +383,18 @@ export function registerAuthRoutes(app: Express) {
       }
 
       const token = signToken({ userId: existingUser.id, email: existingUser.email });
-      
-      res.json({
-        token,
-        user: sanitizeUser(existingUser),
+
+      req.session.userId = existingUser.id;
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error after native Apple sign in:", err);
+          return res.status(500).json({ message: "Failed to save session" });
+        }
+
+        res.json({
+          token,
+          user: sanitizeUser(existingUser),
+        });
       });
     } catch (error) {
       console.error("Apple sign in error:", error);
@@ -751,10 +757,34 @@ export function registerAuthRoutes(app: Express) {
 
 // Middleware to require authentication
 export const requireAuth: RequestHandler = async (req, res, next) => {
-  if (!req.session.userId) {
+  const userId = req.session.userId;
+  if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  next();
+
+  try {
+    const [user] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!user) {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Stale session cleanup error:", err);
+        }
+        res.clearCookie("connect.sid");
+        res.status(401).json({ message: "Unauthorized" });
+      });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    console.error("Session verification error:", error);
+    res.status(500).json({ message: "Failed to verify session" });
+  }
 };
 
 // Helper to get current user ID from session

@@ -1,0 +1,42 @@
+{
+  "appName": "SwipeBetter: Dating AI",
+  "subtitle": "Profile Audits & Replies",
+  "promotionalText": "Get sharper dating photos, stronger bios, and better replies with AI coaching built for real conversations.",
+  "description": "SwipeBetter helps you improve your dating profile and write better replies without guessing what to change.\n\nUse the iPhone app to review profile screenshots, get a clear score, fix weak photos, improve your bio, and generate reply options for active conversations. The Share Extension lets you bring screenshots into SwipeBetter from other apps. The Keyboard Extension gives you a quick way to draft stronger replies while keeping Apple privacy controls intact.\n\nWhat you can do:\n- Run AI profile audits from screenshots\n- Improve bios, prompts, photos, and first impressions\n- Generate confident, flirty, thoughtful, or witty replies\n- Review past audits and reply sessions\n- Buy Starter credits or Unlimited access with Apple in-app purchases\n\nSwipeBetter is coaching software. It does not access other apps directly, read private messages in the background, or modify another app on your behalf. You stay in control of what you share and what you send.",
+  "keywords": "bio,photos,matches,flirting,chat,opener,texting,conversation,romance,coach",
+  "category": "Lifestyle",
+  "supportUrl": "https://swipebetter.ai/contact",
+  "privacyUrl": "https://swipebetter.ai/privacy",
+  "marketingUrl": "https://swipebetter.ai",
+  "termsUrl": "https://swipebetter.ai/terms",
+  "refundPolicyUrl": "https://swipebetter.ai/refund-policy",
+  "copyright": "2026 SwipeBetter",
+  "reviewNotes": "Use a sandbox Apple ID for purchases. The app supports email login and Sign in with Apple. Apple in-app purchases are Starter Pack, Unlimited Monthly, and Unlimited Annual. The app uses a Share Extension and Keyboard Extension as the App Store-safe workflow for importing screenshots and drafting replies; it does not overlay, scrape, or control other apps.",
+  "inAppPurchases": [
+    {
+      "productId": "ai.swipebetter.starter",
+      "displayName": "Starter Pack",
+      "description": "One profile or reply credit.",
+      "price": "$3.99"
+    },
+    {
+      "productId": "ai.swipebetter.unlimited.monthly",
+      "displayName": "Unlimited Monthly",
+      "description": "Unlimited audits and replies, billed monthly.",
+      "price": "$16.99"
+    },
+    {
+      "productId": "ai.swipebetter.unlimited.annual",
+      "displayName": "Unlimited Annual",
+      "description": "Unlimited audits and replies, billed yearly.",
+      "price": "$104.99"
+    }
+  ],
+  "screenshots": [
+    "Sign in with Apple and email login",
+    "Profile Audit screenshot picker and credit status",
+    "Profile Audit result with score and first fix",
+    "Reply Coach input and generated replies",
+    "Account screen with Apple billing controls"
+  ]
+}

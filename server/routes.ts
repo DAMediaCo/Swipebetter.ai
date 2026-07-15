@@ -10,6 +10,19 @@ import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { z } from "zod";
 import sharp from "sharp";
+import {
+  APPLE_IAP_PRODUCT_IDS,
+  AppleIapOwnershipError,
+  AppleIapValidationError,
+  type AppleTransactionPayload,
+  appleAppAccountTokenMatchesUser,
+  appleAppAccountTokensMatch,
+  classifyAppleNotification,
+  createAppleServerApiToken,
+  decodeAppleJwsPayload,
+  normalizedAppleAppAccountToken,
+  validateAppleTransaction,
+} from "./appleIap";
 
 const analysisLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -93,6 +106,105 @@ const checkoutSchema = z.object({
   returnTo: z.string().optional(),
 });
 
+const iosIapSchema = z.object({
+  transactionId: z.string().min(5).max(128),
+  productId: z.enum(APPLE_IAP_PRODUCT_IDS),
+  appAccountToken: z.string().uuid().optional(),
+});
+
+const iosServerNotificationSchema = z.object({
+  signedPayload: z.string().min(20),
+});
+
+function applePrivateKey(): string {
+  return (process.env.APPLE_IAP_PRIVATE_KEY || "").replace(/\\n/g, "\n");
+}
+
+function createConfiguredAppleServerApiToken(): string {
+  const issuerId = process.env.APPLE_IAP_ISSUER_ID;
+  const keyId = process.env.APPLE_IAP_KEY_ID;
+  const bundleId = process.env.APPLE_BUNDLE_ID || "ai.swipebetter.app";
+  const privateKey = applePrivateKey();
+
+  if (!issuerId || !keyId || !privateKey) {
+    throw new Error("Apple IAP verification is not configured");
+  }
+
+  return createAppleServerApiToken({ issuerId, keyId, bundleId, privateKey });
+}
+
+type AppleServerNotificationPayload = {
+  notificationType?: string;
+  subtype?: string;
+  notificationUUID?: string;
+  data?: {
+    bundleId?: string;
+    environment?: string;
+    signedTransactionInfo?: string;
+    signedRenewalInfo?: string;
+  };
+};
+
+async function fetchAppleTransaction(transactionId: string): Promise<AppleTransactionPayload> {
+  const token = createConfiguredAppleServerApiToken();
+  const endpoints = [
+    { environment: "Production", url: `https://api.storekit.itunes.apple.com/inApps/v1/transactions/${transactionId}` },
+    { environment: "Sandbox", url: `https://api.storekit-sandbox.itunes.apple.com/inApps/v1/transactions/${transactionId}` },
+  ];
+
+  let lastError = "";
+  for (const endpoint of endpoints) {
+    const response = await fetch(endpoint.url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) {
+      const body = await response.json() as { signedTransactionInfo?: string };
+      if (!body.signedTransactionInfo) {
+        throw new Error("Apple transaction response missing signedTransactionInfo");
+      }
+      const transaction = decodeAppleJwsPayload<AppleTransactionPayload>(body.signedTransactionInfo);
+      return {
+        ...transaction,
+        environment: transaction.environment || endpoint.environment,
+      };
+    }
+    lastError = `${response.status} ${await response.text()}`;
+    if (![401, 403, 404].includes(response.status)) break;
+  }
+
+  throw new Error(`Apple transaction verification failed: ${lastError}`);
+}
+
+function appleDate(value?: number): Date | null {
+  return value ? new Date(Number(value)) : null;
+}
+
+async function resolveAppleNotificationUser(transaction: AppleTransactionPayload): Promise<{
+  userId?: string;
+  accountTokenMismatch: boolean;
+}> {
+  const storedUserId = await storage.getAppleTransactionUserId(
+    transaction.transactionId,
+    transaction.originalTransactionId || null
+  );
+  if (storedUserId) {
+    return {
+      userId: storedUserId,
+      accountTokenMismatch: !appleAppAccountTokenMatchesUser(transaction.appAccountToken, storedUserId),
+    };
+  }
+
+  const accountToken = normalizedAppleAppAccountToken(transaction.appAccountToken);
+  const accountTokenUser = accountToken
+    ? await storage.getUser(accountToken)
+    : undefined;
+
+  return {
+    userId: accountTokenUser?.id,
+    accountTokenMismatch: false,
+  };
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -111,12 +223,17 @@ export async function registerRoutes(
     const userId = req.session.userId;
     const user = await storage.getUser(userId);
     const subscription = await storage.getUserSubscription(userId);
+    const planTier = await storage.getPlanTier(userId);
+    const credits = await storage.getCredits(userId);
+    const isSuperUser = await storage.isSuperUser(userId);
     
-    const isActive = subscription?.status === "active";
+    const periodEnd = subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd) : null;
+    const periodActive = !periodEnd || periodEnd.getTime() >= Date.now();
+    const isActive = subscription?.status === "active" && periodActive;
     const isTrialing = subscription?.status === "trialing";
-    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0 || credits > 0;
     
-    const proActive = isActive || isTrialing;
+    const proActive = isActive || isTrialing || planTier === "unlimited" || isSuperUser;
     const isPro = proActive || hasOneTimeCredits;
     
     let planType: "monthly" | "annual" | "starter" | null = null;
@@ -143,23 +260,64 @@ export async function registerRoutes(
       } : null,
       isPro,
       proActive,
+      planTier,
       planType,
       subscriptionStatus: subscription?.status || null,
-      oneTimeCredits: subscription?.oneTimeCredits || 0,
+      oneTimeCredits: Math.max(subscription?.oneTimeCredits || 0, credits),
     });
+  });
+
+  app.delete("/api/account", requireAuth, async (req: any, res) => {
+    const userId = req.session.userId;
+
+    try {
+      const subscription = await storage.getUserSubscription(userId);
+      const stripeSubscriptionId = subscription?.stripeSubscriptionId;
+      const shouldCancelStripe = !!stripeSubscriptionId
+        && ["active", "trialing", "past_due", "unpaid"].includes(subscription?.status || "");
+
+      if (shouldCancelStripe) {
+        const stripe = await getUncachableStripeClient();
+        await stripe.subscriptions.cancel(stripeSubscriptionId);
+      }
+
+      await db.delete(users).where(eq(users.id, userId));
+
+      req.session.destroy((err: Error | null) => {
+        if (err) {
+          console.error("Delete account session cleanup error:", err);
+          return res.status(500).json({ error: "Account deleted, but session cleanup failed" });
+        }
+
+        res.clearCookie("connect.sid");
+        res.json({
+          success: true,
+          stripeSubscriptionCanceled: shouldCancelStripe,
+        });
+      });
+    } catch (error) {
+      console.error("Delete account error:", error);
+      res.status(500).json({ error: "Failed to delete account" });
+    }
   });
 
   app.get("/api/subscription", requireAuth, async (req: any, res) => {
     const subscription = await storage.getUserSubscription(req.session.userId);
-    const isActive = subscription?.status === "active";
-    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+    const planTier = await storage.getPlanTier(req.session.userId);
+    const credits = await storage.getCredits(req.session.userId);
+    const periodEnd = subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd) : null;
+    const periodActive = !periodEnd || periodEnd.getTime() >= Date.now();
+    const isActive = subscription?.status === "active" && periodActive;
+    const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0 || credits > 0;
     
     res.json({ 
       subscription: subscription || null,
       canAnalyze: true, // Allow all users to analyze (freemium model)
-      isSubscribed: isActive,
-      oneTimeCredits: subscription?.oneTimeCredits || 0,
-      isPaidUser: isActive || hasOneTimeCredits, // For determining if user sees full results
+      isSubscribed: isActive || planTier === "unlimited",
+      planTier,
+      credits,
+      oneTimeCredits: Math.max(subscription?.oneTimeCredits || 0, credits),
+      isPaidUser: isActive || planTier === "unlimited" || hasOneTimeCredits, // For determining if user sees full results
     });
   });
 
@@ -331,13 +489,15 @@ export async function registerRoutes(
       const credits = await storage.getCredits(userId);
       const reportsUnlocked = await storage.getUnlockedReports(userId);
       const isSuperUser = await storage.isSuperUser(userId);
+      const isUnlimited = planTier === 'unlimited' || isSuperUser;
 
 
       res.json({
         planTier,
         credits,
         reportsUnlocked,
-        isUnlimited: planTier === 'unlimited',
+        hasAccess: isUnlimited || credits > 0,
+        isUnlimited,
         isSuperUser
       });
     } catch (error) {
@@ -712,19 +872,18 @@ export async function registerRoutes(
       const { tone, goal, screenshots, conversationText, enm } = parseResult.data;
       const userId = req.session.userId;
 
-      const subscription = await storage.getUserSubscription(userId);
-      const isSubscribed = subscription?.status === "active";
-      const hasOneTimeCredits = (subscription?.oneTimeCredits || 0) > 0;
+      const planTier = await storage.getPlanTier(userId);
+      const isSuperUser = await storage.isSuperUser(userId);
+      const hasUnlimitedAccess = planTier === "unlimited" || isSuperUser;
 
-      if (!isSubscribed && !hasOneTimeCredits) {
-        return res.status(403).json({ 
-          error: "Subscription required",
-          requiresSubscription: true 
-        });
-      }
-
-      if (!isSubscribed && hasOneTimeCredits) {
-        await storage.decrementOneTimeCredits(userId);
+      if (!hasUnlimitedAccess) {
+        const deducted = await storage.deductCredit(userId);
+        if (!deducted) {
+          return res.status(402).json({
+            error: "Subscription required",
+            requiresSubscription: true
+          });
+        }
       }
 
       const hasScreenshots = screenshots && screenshots.length > 0;
@@ -1232,7 +1391,12 @@ export async function registerRoutes(
       }
       
       if (isOneTime) {
-        await storage.addOneTimeCredits(userId, 1);
+        const currentTier = await storage.getPlanTier(userId);
+        if (currentTier !== 'unlimited') {
+          await storage.setPlanTier(userId, 'starter');
+        }
+        await storage.addCredits(userId, 1);
+        await storage.addOneTimeCredits(userId, 1, 'purchased');
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
           stripePriceId: priceId,
@@ -1257,6 +1421,7 @@ export async function registerRoutes(
           return res.status(400).json({ error: "No subscription found" });
         }
         
+        await storage.setPlanTier(userId, 'unlimited');
         await storage.updateUserSubscription(userId, {
           stripeCustomerId: customerId,
           stripeSubscriptionId: subscription.id,
@@ -1286,6 +1451,208 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Verify checkout error:", error);
       res.status(500).json({ error: "Failed to verify checkout" });
+    }
+  });
+
+  app.post("/api/ios/iap/transactions", requireAuth, async (req: any, res) => {
+    try {
+      const parseResult = iosIapSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          error: "Invalid input",
+          details: parseResult.error.flatten(),
+        });
+      }
+
+      const userId = req.session.userId;
+      const requested = parseResult.data;
+      const transaction = await fetchAppleTransaction(requested.transactionId);
+
+      if (transaction.transactionId !== requested.transactionId) {
+        return res.status(400).json({ error: "Apple transaction ID mismatch" });
+      }
+      validateAppleTransaction(transaction, requested.productId);
+      if (!normalizedAppleAppAccountToken(transaction.appAccountToken)) {
+        return res.status(400).json({ error: "Apple transaction is missing account token" });
+      }
+      if (requested.appAccountToken && !appleAppAccountTokenMatchesUser(requested.appAccountToken, userId)) {
+        return res.status(400).json({ error: "Requested Apple account token does not match session user" });
+      }
+      if (
+        requested.appAccountToken
+        && !appleAppAccountTokensMatch(transaction.appAccountToken, requested.appAccountToken)
+      ) {
+        return res.status(400).json({ error: "Apple account token request mismatch" });
+      }
+      if (!appleAppAccountTokenMatchesUser(transaction.appAccountToken, userId)) {
+        return res.status(400).json({ error: "Apple account token mismatch" });
+      }
+      if (transaction.revocationDate) {
+        return res.status(400).json({ error: "Apple transaction has been revoked" });
+      }
+
+      const result = await storage.applyAppleEntitlement({
+        userId,
+        transactionId: transaction.transactionId,
+        originalTransactionId: transaction.originalTransactionId || null,
+        productId: transaction.productId,
+        environment: transaction.environment || "Unknown",
+        purchaseDate: appleDate(transaction.purchaseDate),
+        expiresDate: appleDate(transaction.expiresDate),
+      });
+
+      res.json({
+        success: true,
+        processed: result.processed,
+        planTier: result.planTier,
+        credits: result.credits,
+      });
+    } catch (error: any) {
+      console.error("Apple IAP transaction sync error:", error);
+      if (error instanceof AppleIapOwnershipError) {
+        return res.status(409).json({ error: error.message });
+      }
+      if (error instanceof AppleIapValidationError) {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: error?.message || "Failed to sync Apple purchase" });
+    }
+  });
+
+  app.post("/api/ios/iap/notifications", async (req: any, res) => {
+    try {
+      const parseResult = iosServerNotificationSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({
+          error: "Invalid Apple notification",
+          details: parseResult.error.flatten(),
+        });
+      }
+
+      const notification = decodeAppleJwsPayload<AppleServerNotificationPayload>(parseResult.data.signedPayload);
+      const signedTransactionInfo = notification.data?.signedTransactionInfo;
+      if (!signedTransactionInfo) {
+        return res.json({
+          success: true,
+          ignored: true,
+          reason: "missing_signed_transaction_info",
+          notificationType: notification.notificationType || null,
+        });
+      }
+
+      const unverifiedTransaction = decodeAppleJwsPayload<AppleTransactionPayload>(signedTransactionInfo);
+      if (!unverifiedTransaction.transactionId) {
+        return res.json({
+          success: true,
+          ignored: true,
+          reason: "missing_transaction_id",
+          notificationType: notification.notificationType || null,
+        });
+      }
+
+      const transaction = await fetchAppleTransaction(unverifiedTransaction.transactionId);
+      validateAppleTransaction(transaction, undefined, { allowExpired: true });
+      const action = classifyAppleNotification(notification.notificationType, transaction);
+
+      if (action === "expired") {
+        const resolution = await resolveAppleNotificationUser(transaction);
+        if (resolution.accountTokenMismatch) {
+          return res.json({
+            success: true,
+            processed: false,
+            action: "account_token_mismatch",
+            notificationType: notification.notificationType || null,
+            subtype: notification.subtype || null,
+            notificationUUID: notification.notificationUUID || null,
+          });
+        }
+
+        const result = await storage.expireAppleEntitlement({
+          userId: resolution.userId || null,
+          transactionId: transaction.transactionId,
+          originalTransactionId: transaction.originalTransactionId || null,
+          productId: transaction.productId,
+          expiresDate: appleDate(transaction.expiresDate),
+          reason: transaction.revocationDate ? "revoked" : (notification.notificationType || "expired").toLowerCase(),
+        });
+
+        return res.json({
+          success: true,
+          processed: result.processed,
+          action: "expired",
+          notificationType: notification.notificationType || null,
+          subtype: notification.subtype || null,
+          notificationUUID: notification.notificationUUID || null,
+        });
+      }
+
+      if (action === "renewed") {
+        const resolution = await resolveAppleNotificationUser(transaction);
+        const userId = resolution.userId;
+
+        if (!userId) {
+          return res.json({
+            success: true,
+            processed: false,
+            action: "renewal_unmatched",
+            notificationType: notification.notificationType || null,
+            notificationUUID: notification.notificationUUID || null,
+          });
+        }
+
+        if (resolution.accountTokenMismatch) {
+          return res.json({
+            success: true,
+            processed: false,
+            action: "account_token_mismatch",
+            notificationType: notification.notificationType || null,
+            subtype: notification.subtype || null,
+            notificationUUID: notification.notificationUUID || null,
+          });
+        }
+
+        const result = await storage.applyAppleEntitlement({
+          userId,
+          transactionId: transaction.transactionId,
+          originalTransactionId: transaction.originalTransactionId || null,
+          productId: transaction.productId,
+          environment: transaction.environment || notification.data?.environment || "Unknown",
+          purchaseDate: appleDate(transaction.purchaseDate),
+          expiresDate: appleDate(transaction.expiresDate),
+        });
+
+        return res.json({
+          success: true,
+          processed: result.processed,
+          action: "renewed",
+          notificationType: notification.notificationType || null,
+          subtype: notification.subtype || null,
+          notificationUUID: notification.notificationUUID || null,
+        });
+      }
+
+      res.json({
+        success: true,
+        processed: false,
+        action: "acknowledged",
+        notificationType: notification.notificationType || null,
+        subtype: notification.subtype || null,
+        notificationUUID: notification.notificationUUID || null,
+      });
+    } catch (error: any) {
+      console.error("Apple IAP notification error:", error);
+      if (error instanceof AppleIapOwnershipError) {
+        return res.json({
+          success: true,
+          processed: false,
+          action: "ownership_conflict",
+          error: error.message,
+        });
+      }
+      if (error instanceof AppleIapValidationError) {
+        return res.status(400).json({ error: error.message });
+      }
+      res.status(500).json({ error: error?.message || "Failed to process Apple notification" });
     }
   });
 

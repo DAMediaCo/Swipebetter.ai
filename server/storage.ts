@@ -1,4 +1,4 @@
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc, or } from "drizzle-orm";
 import { db } from "./db";
 import {
   users,
@@ -7,6 +7,7 @@ import {
   userSubscriptions,
   promoCodes,
   promoRedemptions,
+  iosTransactions,
   type User,
   type ProfileAnalysis,
   type InsertProfileAnalysis,
@@ -18,6 +19,12 @@ import {
   type InsertPromoCode,
   type PromoRedemption,
 } from "@shared/schema";
+import {
+  AppleIapOwnershipError,
+  getAppleIapProductConfig,
+  isAppleSubscriptionProduct,
+  stripeSubscriptionPreservesAccess,
+} from "./appleIap";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -72,6 +79,24 @@ export interface IStorage {
   unlockReportWithCredit(userId: string, reportId: string): Promise<{ success: boolean; creditsRemaining: number }>;
   getUnlockedReports(userId: string): Promise<string[]>;
   claimCheckoutSession(userId: string, sessionId: string): Promise<boolean>;
+  getAppleTransactionUserId(transactionId: string, originalTransactionId?: string | null): Promise<string | undefined>;
+  applyAppleEntitlement(data: {
+    userId: string;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    environment: string;
+    purchaseDate?: Date | null;
+    expiresDate?: Date | null;
+  }): Promise<{ processed: boolean; planTier: 'free' | 'starter' | 'unlimited'; credits: number }>;
+  expireAppleEntitlement(data: {
+    userId?: string | null;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    expiresDate?: Date | null;
+    reason: string;
+  }): Promise<{ processed: boolean; userId?: string; planTier?: 'free' | 'starter' | 'unlimited'; credits?: number }>;
   
   // Super User (admin-granted free access)
   isSuperUser(userId: string): Promise<boolean>;
@@ -397,14 +422,22 @@ export class DatabaseStorage implements IStorage {
     const sub = await this.getUserSubscription(userId);
     if (!sub) return 'free';
     const tier = (sub as any).planTier;
-    if (tier === 'unlimited' || tier === 'starter') return tier;
+    if (tier === 'unlimited') {
+      const periodEnd = (sub as any).currentPeriodEnd ? new Date((sub as any).currentPeriodEnd) : null;
+      if (periodEnd && periodEnd.getTime() < Date.now()) {
+        const credits = Math.max((sub as any).credits || 0, (sub as any).oneTimeCredits || 0);
+        return credits > 0 ? 'starter' : 'free';
+      }
+      return 'unlimited';
+    }
+    if (tier === 'starter') return tier;
     return 'free';
   }
 
   async getCredits(userId: string): Promise<number> {
     const sub = await this.getUserSubscription(userId);
     if (!sub) return 0;
-    return (sub as any).credits || 0;
+    return Math.max((sub as any).credits || 0, (sub as any).oneTimeCredits || 0);
   }
 
   async addCredits(userId: string, amount: number): Promise<void> {
@@ -427,11 +460,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deductCredit(userId: string): Promise<boolean> {
-    // Atomic credit deduction - only deducts if credits > 0
+    // Atomic credit deduction, keeping legacy one_time_credits in sync.
     const result = await db.execute(
       sql`UPDATE user_subscriptions 
-          SET credits = credits - 1, updated_at = NOW()
-          WHERE user_id = ${userId} AND credits > 0
+          SET credits = GREATEST(COALESCE(credits, 0) - 1, 0),
+              one_time_credits = GREATEST(COALESCE(one_time_credits, 0) - 1, 0),
+              updated_at = NOW()
+          WHERE user_id = ${userId}
+          AND (COALESCE(credits, 0) > 0 OR COALESCE(one_time_credits, 0) > 0)
           RETURNING credits`
     );
     return result.rowCount !== null && result.rowCount > 0;
@@ -521,6 +557,225 @@ export class DatabaseStorage implements IStorage {
     );
     
     return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  async getAppleTransactionUserId(transactionId: string, originalTransactionId?: string | null): Promise<string | undefined> {
+    const conditions = [eq(iosTransactions.transactionId, transactionId)];
+    if (originalTransactionId) {
+      conditions.push(eq(iosTransactions.originalTransactionId, originalTransactionId));
+    }
+
+    const [transaction] = await db.select({ userId: iosTransactions.userId })
+      .from(iosTransactions)
+      .where(or(...conditions))
+      .limit(1);
+
+    return transaction?.userId;
+  }
+
+  async applyAppleEntitlement(data: {
+    userId: string;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    environment: string;
+    purchaseDate?: Date | null;
+    expiresDate?: Date | null;
+  }): Promise<{ processed: boolean; planTier: 'free' | 'starter' | 'unlimited'; credits: number }> {
+    const config = getAppleIapProductConfig(data.productId);
+
+    return db.transaction(async (tx) => {
+      const currentSubscriptionState = async () => {
+        const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+        return {
+          processed: false,
+          planTier: ((existing as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
+          credits: (existing as any)?.credits || 0,
+        };
+      };
+
+      const [existingTransaction] = await tx.select({ userId: iosTransactions.userId })
+        .from(iosTransactions)
+        .where(eq(iosTransactions.transactionId, data.transactionId))
+        .limit(1);
+
+      if (existingTransaction) {
+        if (existingTransaction.userId !== data.userId) {
+          throw new AppleIapOwnershipError("Apple transaction is already linked to another account");
+        }
+        return currentSubscriptionState();
+      }
+
+      if (data.originalTransactionId) {
+        const [conflictingOriginalTransaction] = await tx.select({ userId: iosTransactions.userId })
+          .from(iosTransactions)
+          .where(sql`
+            ${iosTransactions.originalTransactionId} = ${data.originalTransactionId}
+            AND ${iosTransactions.userId} != ${data.userId}
+          `)
+          .limit(1);
+
+        if (conflictingOriginalTransaction) {
+          throw new AppleIapOwnershipError("Apple subscription is already linked to another account");
+        }
+      }
+
+      const [inserted] = await tx.insert(iosTransactions).values({
+        userId: data.userId,
+        transactionId: data.transactionId,
+        originalTransactionId: data.originalTransactionId || null,
+        productId: data.productId,
+        environment: data.environment,
+        purchaseDate: data.purchaseDate || null,
+        expiresDate: data.expiresDate || null,
+      }).onConflictDoNothing({ target: iosTransactions.transactionId }).returning();
+
+      if (!inserted) {
+        const [conflictingTransaction] = await tx.select({ userId: iosTransactions.userId })
+          .from(iosTransactions)
+          .where(eq(iosTransactions.transactionId, data.transactionId))
+          .limit(1);
+
+        if (conflictingTransaction && conflictingTransaction.userId !== data.userId) {
+          throw new AppleIapOwnershipError("Apple transaction is already linked to another account");
+        }
+        return currentSubscriptionState();
+      }
+
+      const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+      const currentCredits = (existing as any)?.credits || 0;
+      const currentOneTimeCredits = (existing as any)?.oneTimeCredits || 0;
+      const currentSpend = (existing as any)?.lifetimeSpendCents || 0;
+      const patch = config.tier === "unlimited"
+        ? {
+            planTier: "unlimited",
+            plan: "ios_unlimited",
+            planType: config.planType,
+            status: "active",
+            creditsSource: "purchased",
+            lifetimeSpendCents: currentSpend + config.priceCents,
+            lastPaymentAt: data.purchaseDate || new Date(),
+            currentPeriodEnd: data.expiresDate || null,
+            updatedAt: new Date(),
+          }
+        : {
+            planTier: "starter",
+            plan: "ios_starter",
+            planType: "starter",
+            status: "inactive",
+            credits: currentCredits + config.credits,
+            oneTimeCredits: currentOneTimeCredits + config.credits,
+            creditsSource: "purchased",
+            lifetimeSpendCents: currentSpend + config.priceCents,
+            lastPaymentAt: data.purchaseDate || new Date(),
+            updatedAt: new Date(),
+          };
+
+      if (existing) {
+        await tx.update(userSubscriptions)
+          .set(patch as any)
+          .where(eq(userSubscriptions.userId, data.userId));
+      } else {
+        await tx.insert(userSubscriptions).values({
+          userId: data.userId,
+          ...(patch as any),
+        });
+      }
+
+      const [updated] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, data.userId));
+      return {
+        processed: true,
+        planTier: ((updated as any)?.planTier || "free") as 'free' | 'starter' | 'unlimited',
+        credits: (updated as any)?.credits || 0,
+      };
+    });
+  }
+
+  async expireAppleEntitlement(data: {
+    userId?: string | null;
+    transactionId: string;
+    originalTransactionId?: string | null;
+    productId: string;
+    expiresDate?: Date | null;
+    reason: string;
+  }): Promise<{ processed: boolean; userId?: string; planTier?: 'free' | 'starter' | 'unlimited'; credits?: number }> {
+    const userId = data.userId || await this.getAppleTransactionUserId(data.transactionId, data.originalTransactionId);
+    if (!userId) {
+      return { processed: false };
+    }
+
+    return db.transaction(async (tx) => {
+      const [existing] = await tx.select().from(userSubscriptions).where(eq(userSubscriptions.userId, userId));
+      if (!existing) {
+        return { processed: false, userId };
+      }
+
+      const currentCredits = (existing as any).credits || 0;
+      const currentOneTimeCredits = (existing as any).oneTimeCredits || 0;
+      const isAppleSubscription = isAppleSubscriptionProduct(data.productId);
+      const hasActiveStripeSubscription = stripeSubscriptionPreservesAccess(existing as any);
+      if (isAppleSubscription) {
+        if (hasActiveStripeSubscription) {
+          return {
+            processed: false,
+            userId,
+            planTier: "unlimited",
+            credits: Math.max(currentCredits, currentOneTimeCredits),
+          };
+        }
+
+        const activeAppleSubscriptions = await tx.select({ id: iosTransactions.id })
+          .from(iosTransactions)
+          .where(sql`
+            ${iosTransactions.userId} = ${userId}
+            AND ${iosTransactions.transactionId} != ${data.transactionId}
+            AND ${iosTransactions.productId} LIKE 'ai.swipebetter.unlimited%'
+            AND ${iosTransactions.expiresDate} > NOW()
+          `)
+          .limit(1);
+
+        if (activeAppleSubscriptions.length > 0) {
+          return {
+            processed: false,
+            userId,
+            planTier: ((existing as any).planTier || "free") as 'free' | 'starter' | 'unlimited',
+            credits: Math.max(currentCredits, currentOneTimeCredits),
+          };
+        }
+      }
+
+      const shouldRemoveStarterCredit = data.productId === "ai.swipebetter.starter"
+        && (data.reason === "refund" || data.reason === "revoked");
+      const nextCredits = shouldRemoveStarterCredit ? Math.max(currentCredits - 1, 0) : currentCredits;
+      const nextOneTimeCredits = shouldRemoveStarterCredit ? Math.max(currentOneTimeCredits - 1, 0) : currentOneTimeCredits;
+      const credits = Math.max(nextCredits, nextOneTimeCredits);
+      const nextTier: 'free' | 'starter' = credits > 0 ? 'starter' : 'free';
+      const nextPlanTier = hasActiveStripeSubscription ? 'unlimited' : nextTier;
+      await tx.update(userSubscriptions)
+        .set({
+          planTier: nextPlanTier,
+          status: hasActiveStripeSubscription
+            ? (existing as any).status
+            : (data.reason === "refund" || data.reason === "revoked" ? "canceled" : "inactive"),
+          plan: hasActiveStripeSubscription
+            ? (existing as any).plan
+            : (isAppleSubscription ? "ios_unlimited" : (existing as any).plan),
+          credits: nextCredits,
+          oneTimeCredits: nextOneTimeCredits,
+          currentPeriodEnd: hasActiveStripeSubscription
+            ? (existing as any).currentPeriodEnd || null
+            : (data.expiresDate || (existing as any).currentPeriodEnd || null),
+          updatedAt: new Date(),
+        } as any)
+        .where(eq(userSubscriptions.userId, userId));
+
+      return {
+        processed: true,
+        userId,
+        planTier: nextPlanTier,
+        credits,
+      };
+    });
   }
 
   async isSuperUser(userId: string): Promise<boolean> {

@@ -1,0 +1,89 @@
+{
+  "identifier" : "E73A517F-1AB1-46EE-A4D5-46B4EE709049",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "3.99",
+      "familyShareable" : false,
+      "internalID" : "4E0B0A12",
+      "localizations" : [
+        {
+          "description" : "One paid profile audit or reply session.",
+          "displayName" : "Starter Pack",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "ai.swipebetter.starter",
+      "referenceName" : "Starter Pack",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "0",
+    "_developerTeamID" : "LOCAL",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_storeKitErrors" : [],
+    "_storefront" : "USA",
+    "_storefronts" : [
+      {
+        "id" : "USA",
+        "name" : "United States"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "6E6D709D",
+      "localizations" : [
+        {
+          "locale" : "en_US",
+          "name" : "SwipeBetter Unlimited"
+        }
+      ],
+      "name" : "SwipeBetter Unlimited",
+      "subscriptions" : [
+        {
+          "displayPrice" : "16.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "15432101",
+          "localizations" : [
+            {
+              "description" : "Unlimited profile audits and reply coaching each month.",
+              "displayName" : "Unlimited Monthly",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "ai.swipebetter.unlimited.monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Unlimited Monthly",
+          "subscriptionGroupID" : "6E6D709D",
+          "type" : "RecurringSubscription"
+        },
+        {
+          "displayPrice" : "104.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "15432102",
+          "localizations" : [
+            {
+              "description" : "Unlimited profile audits and reply coaching for one year.",
+              "displayName" : "Unlimited Annual",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "ai.swipebetter.unlimited.annual",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Unlimited Annual",
+          "subscriptionGroupID" : "6E6D709D",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}
