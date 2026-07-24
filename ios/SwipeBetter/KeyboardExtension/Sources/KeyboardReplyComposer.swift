@@ -28,46 +28,48 @@ enum KeyboardReplyComposer {
     let text = raw.lowercased()
 
     if text.contains("taco") || text.contains("pizza") || text.contains("sushi") || text.contains("food") {
-      return style == .askOut
-        ? "We should settle this properly. Want to grab food this week?"
-        : "Okay, strong answer. What's your go-to spot?"
+      switch style {
+      case .warm: return "Now I'm hungry. What's your go-to order?"
+      case .confident: return "That's a solid choice. What's your go-to order?"
+      case .askOut: return "Want to grab food sometime this week?"
+      }
     }
 
     if text.contains("busy") || text.contains("crazy week") || text.contains("work") {
-      return style == .askOut
-        ? "Let's make this easy. When your week calms down, want to grab a drink?"
-        : "That sounds like a full week. What's been taking up most of your time?"
+      switch style {
+      case .warm: return "That sounds like a lot. How's the rest of your week looking?"
+      case .confident: return "Sounds busy. What have you been working on?"
+      case .askOut: return "When things calm down, want to grab a drink?"
+      }
     }
 
     if text.contains("cute") || text.contains("handsome") || text.contains("beautiful") || text.contains("pretty") {
-      return style == .confident
-        ? "I was thinking the same about you."
-        : "I'll happily take that. You're making this conversation easy."
+      switch style {
+      case .warm: return "That's sweet, thank you."
+      case .confident: return "Thanks, I was thinking the same about you."
+      case .askOut: return "Thank you. Want to grab a drink this week?"
+      }
     }
 
     if text.contains("weekend") || text.contains("saturday") || text.contains("sunday") {
-      return style == .askOut
-        ? "Let's turn that into a plan. Are you free this weekend?"
-        : "That sounds like a good weekend. What was the best part?"
-    }
-
-    if raw.contains("?") {
-      return style == .confident
-        ? "Good question. I'll answer, but then I get to ask you one."
-        : "I like that question. What's your answer?"
+      switch style {
+      case .warm: return "That sounds nice. What was the best part?"
+      case .confident: return "Sounds like a good weekend. What was the highlight?"
+      case .askOut: return "Are you free sometime this weekend?"
+      }
     }
 
     switch style {
     case .warm:
       return raw.isEmpty
-        ? "You seem fun. What's something you're looking forward to this week?"
-        : "I like where this conversation is going. Tell me more."
+        ? "What are you looking forward to this week?"
+        : "Tell me more about that."
     case .confident:
       return raw.isEmpty
-        ? "You caught my attention. What's your story?"
-        : "That's a good answer. I have a feeling we'd get along."
+        ? "What's something I should know about you?"
+        : "That's a good answer. I think we'd get along."
     case .askOut:
-      return "I like our vibe. Want to grab a drink this week?"
+      return "Want to grab a drink sometime this week?"
     }
   }
 }

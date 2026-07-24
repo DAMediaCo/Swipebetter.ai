@@ -9,6 +9,7 @@
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "test:ios-iap": "node --import tsx --test server/appleIap.test.ts",
+    "test:ai-prompts": "node --experimental-strip-types --test server/aiPrompts.test.mjs",
     "test:ios-ui": "scripts/ios-ui-tests.sh",
     "check:apple-iap-config": "tsx scripts/apple-iap-preflight.ts",
     "check:ios-release": "scripts/ios-release-preflight.sh",

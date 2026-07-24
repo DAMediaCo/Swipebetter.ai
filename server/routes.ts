@@ -11,6 +11,12 @@ import OpenAI from "openai";
 import { z } from "zod";
 import sharp from "sharp";
 import {
+  buildProfileAnalysisPrompt,
+  buildProfileSynthesisPrompt,
+  buildPhotoFeedbackPrompt,
+  buildReplyAnalysisPrompt,
+} from "./aiPrompts";
+import {
   APPLE_IAP_PRODUCT_IDS,
   AppleIapOwnershipError,
   AppleIapValidationError,
@@ -523,17 +529,7 @@ export async function registerRoutes(
       - Making the profile seem like they're single
       Instead, help them communicate their ENM status clearly and attract compatible matches who understand and appreciate ethical non-monogamy.` : '';
 
-      const systemPrompt = `You are an expert dating profile consultant specializing in ${platform}. 
-      The user is ${gender} looking for ${intent}.${enmContext}
-      
-      Analyze their profile screenshots and provide:
-      1. An overall score from 1-100
-      2. THREE complete, ready-to-use bio alternatives (not advice - write the actual bios they can copy/paste)
-      3. Photo feedback (what works, what to change for each photo)
-      4. Top 3 specific improvements to make
-      
-      Be constructive, specific, and actionable. Format your response as JSON with keys:
-      overallScore (number), bioSuggestions (JSON array of 3 complete bio strings they can use directly), photoFeedback (string), improvements (JSON array of 3 improvement strings).`;
+      const systemPrompt = buildProfileAnalysisPrompt(platform, gender, intent, enmContext);
 
       // Compress all images aggressively
       console.log(`[analyze-job:${jobId}] Compressing ${screenshots.length} images (500px, 45% quality)...`);
@@ -568,7 +564,7 @@ export async function registerRoutes(
           model: "grok-4-1-fast-non-reasoning",
           messages: [
             { role: "system", content: batches.length > 1 
-              ? "You are a dating profile expert. Analyze these profile photos and provide specific feedback. Format as JSON with: photoFeedback (string with numbered feedback for each photo)."
+              ? buildPhotoFeedbackPrompt()
               : systemPrompt 
             },
             { role: "user", content: [
@@ -606,7 +602,7 @@ export async function registerRoutes(
         const synthesisResponse = await grok.chat.completions.create({
           model: "grok-4-1-fast-non-reasoning",
           messages: [
-            { role: "system", content: `You are a dating profile expert. Based on the photo-by-photo feedback below, provide a comprehensive profile analysis. Format as JSON with: overallScore (1-100), bioSuggestions (JSON array of 3 complete ready-to-use bio strings they can copy/paste directly), photoFeedback (combined summary string), improvements (JSON array of 3 specific improvement strings).` },
+            { role: "system", content: buildProfileSynthesisPrompt() },
             { role: "user", content: `This is a ${platform} profile for a ${gender} looking for ${intent}.${enm ? ' ENM/Poly profile.' : ''}\n\nPhoto feedback:\n${combinedFeedback}\n\nProvide the final analysis.` }
           ],
           response_format: { type: "json_object" },
@@ -904,24 +900,14 @@ export async function registerRoutes(
       };
       const goalContext = goal ? `\n\nCONVERSATION GOAL: ${goalContextMap[goal] || ''}` : '';
 
-      const systemPrompt = `You are an expert dating conversation coach. Analyze the conversation and generate 3 reply suggestions with a ${tone} tone.${enmContext}${goalContext}
-      
-      Consider:
-      - The conversation flow and context
-      - What makes messages engaging
-      - How to keep the conversation going
-      - Appropriate humor and wit
-      
-      Format your response as JSON with keys:
-      conversationContext (brief summary of the conversation),
-      suggestedReplies (array of 3 string replies, each different in approach but matching the ${tone} tone)`;
+      const systemPrompt = buildReplyAnalysisPrompt(tone, enmContext, goalContext);
 
       let userContent: any[] = [];
       
       if (hasText) {
         userContent.push({
           type: "text" as const,
-          text: `Generate ${tone} reply suggestions for this dating app conversation:\n\n"${conversationText}"`
+          text: `Here is the dating-app conversation. Write the user's next message:\n\n${conversationText}`
         });
       } else {
         userContent.push({

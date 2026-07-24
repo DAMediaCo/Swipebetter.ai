@@ -13,19 +13,19 @@ Her: That sounds nice! I've been wanting to explore more trails lately.`;
 
 const replysByTone: Record<string, string[]> = {
   flirty: [
-    "Well, I know the perfect trail with an incredible sunset view... but it's way better with company.",
-    "I'd love to show you my favorite spot. The view is almost as nice as this conversation.",
-    "There's this hidden waterfall I've been wanting to share with someone special. Interested?",
+    "We should pick one and go together. Are you free this weekend?",
+    "I could show you my favorite one, but you'll have to rate the view.",
+    "Sounds like we need to plan a hike. Saturday or Sunday better for you?",
   ],
   witty: [
-    "Sounds like you need a hiking buddy who knows all the secret viewpoints! I happen to know a few...",
-    "Perfect timing! I was just planning my next adventure. Want to be my expedition partner?",
-    "We should totally go together! I'll bring the snacks, you bring the good vibes. Deal?",
+    "I can help with that. My fee is one trail snack.",
+    "Then I have a strong case for picking your next trail.",
+    "We should test one together. How serious are you about post-hike food?",
   ],
   confident: [
-    "Let's make it happen. This Saturday, I'll take you to the best trail in the area. You in?",
-    "I know exactly where to go. Grab your hiking boots - I'll plan the whole thing.",
-    "Perfect. Let's do Sunday morning. I'll send you the details. Trust me, you'll love it.",
+    "Let's go this weekend. Is Saturday good for you?",
+    "I know a good one. Want to check it out together?",
+    "Let's make a plan. Which day works better for you?",
   ],
 };
 
