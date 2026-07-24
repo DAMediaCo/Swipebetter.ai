@@ -447,7 +447,7 @@ if (screenshotScript.includes("requiredLater")) {
 for (const expected of [
   "SwipeBetterScreenshotFixtures",
   "Lead with the lake photo",
-  "Want to grab tacos Thursday?",
+  "Tacos sound good. Are you free Thursday?",
   "demo@swipebetter.ai",
 ]) {
   assertIncludes(rootView + appModel, expected, "deterministic App Store screenshot fixture contract");
