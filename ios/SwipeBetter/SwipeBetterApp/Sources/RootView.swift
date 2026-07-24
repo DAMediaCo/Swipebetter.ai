@@ -1039,19 +1039,19 @@ enum SwipeBetterScreenshotFixtures {
           "id": 9101,
           "tone": "confident",
           "suggestedReplies": [
-            "Tacos and a busy week is a dangerous combo. Want to grab tacos Thursday?",
-            "I respect the packed calendar. Give me one free night and I’ll make it worth leaving the couch.",
-            "You pick the taco spot, I’ll bring the questionable hot sauce confidence."
+            "Tacos sound good. Are you free Thursday?",
+            "What's your go-to taco spot?",
+            "I'm in. Pick a night that works for you."
           ],
-          "conversationContext": "The match is interested, playful, and waiting for a concrete plan.",
+          "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
           "createdAt": "2026-07-06T12:05:00Z"
         },
         "parsed": {
-          "conversationContext": "They gave a positive opening and an easy path to ask for a date.",
+          "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
           "suggestedReplies": [
-            "Tacos and a busy week is a dangerous combo. Want to grab tacos Thursday?",
-            "I respect the packed calendar. Give me one free night and I’ll make it worth leaving the couch.",
-            "You pick the taco spot, I’ll bring the questionable hot sauce confidence."
+            "Tacos sound good. Are you free Thursday?",
+            "What's your go-to taco spot?",
+            "I'm in. Pick a night that works for you."
           ]
         }
       }

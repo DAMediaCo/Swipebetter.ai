@@ -7,7 +7,7 @@ final class KeyboardReplyComposerTests: XCTestCase {
       style: .warm
     )
 
-    XCTAssertEqual(reply, "Okay, strong answer. What's your go-to spot?")
+    XCTAssertEqual(reply, "Now I'm hungry. What's your go-to order?")
   }
 
   func testBusyContextCreatesLowPressureDate() {
@@ -16,13 +16,13 @@ final class KeyboardReplyComposerTests: XCTestCase {
       style: .askOut
     )
 
-    XCTAssertTrue(reply.contains("week calms down"))
+    XCTAssertEqual(reply, "When things calm down, want to grab a drink?")
   }
 
   func testComplimentContextStaysConfident() {
     let reply = KeyboardReplyComposer.reply(for: "You're cute", style: .confident)
 
-    XCTAssertEqual(reply, "I was thinking the same about you.")
+    XCTAssertEqual(reply, "Thanks, I was thinking the same about you.")
   }
 
   func testEmptyContextStillWorksLocally() {
