@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Copy, ArrowRight } from "lucide-react";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 const bioExamples = [
   {
@@ -22,7 +23,8 @@ export function BeforeAfterBio() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const copyToClipboard = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
@@ -55,6 +57,8 @@ export function BeforeAfterBio() {
                       variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(example.after, index)}
+                      aria-label={copiedIndex === index ? `Bio ${index + 1} copied` : `Copy bio ${index + 1}`}
+                      title={copiedIndex === index ? "Copied" : "Copy bio"}
                       data-testid={`button-copy-bio-${index}`}
                     >
                       {copiedIndex === index ? (

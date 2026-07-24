@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, Camera, ArrowLeft, ArrowRight, Copy, Gamepad2, Code, Brain } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 const engineerBios = [
   {
@@ -77,8 +78,9 @@ export default function TinderBiosForEngineers() {
     }
   }, []);
 
-  const copyBio = (bio: string) => {
-    navigator.clipboard.writeText(bio);
+  const copyBio = async (bio: string) => {
+    const copied = await copyTextToClipboard(bio);
+    if (!copied) return;
     toast({
       description: "Bio copied to clipboard",
     });
@@ -154,21 +156,20 @@ export default function TinderBiosForEngineers() {
                 {category.bios.map((bio, bioIndex) => (
                   <Card 
                     key={bioIndex} 
-                    className="hover-elevate cursor-pointer"
-                    onClick={() => copyBio(bio)}
                   >
-                    <CardContent className="py-4 flex items-center justify-between gap-4">
-                      <p className="italic text-foreground/90">{bio}</p>
+                    <CardContent className="py-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <p className="italic text-foreground/90 leading-relaxed break-words">{bio}</p>
                       <Button
                         variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          copyBio(bio);
-                        }}
+                        size="sm"
+                        className="self-end shrink-0 gap-2 sm:self-start"
+                        onClick={() => copyBio(bio)}
+                        aria-label={`Copy bio ${bioIndex + 1}`}
+                        title="Copy bio"
                         data-testid={`button-copy-bio-${categoryIndex}-${bioIndex}`}
                       >
                         <Copy className="w-4 h-4" />
+                        Copy bio
                       </Button>
                     </CardContent>
                   </Card>

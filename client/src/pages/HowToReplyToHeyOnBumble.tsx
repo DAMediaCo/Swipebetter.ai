@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, MessageCircle, ArrowLeft, ArrowRight, Copy, Zap, Heart, Laugh } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 const replyCategories = [
   {
@@ -102,8 +103,9 @@ export default function HowToReplyToHeyOnBumble() {
     }
   }, []);
 
-  const copyReply = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const copyReply = async (text: string) => {
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
     toast({
       description: "Reply copied to clipboard",
     });
@@ -189,22 +191,21 @@ export default function HowToReplyToHeyOnBumble() {
                 {category.replies.map((reply, replyIndex) => (
                   <Card 
                     key={replyIndex} 
-                    className="hover-elevate cursor-pointer"
-                    onClick={() => copyReply(reply.text)}
                   >
                     <CardContent className="py-4">
-                      <div className="flex items-start justify-between gap-4 mb-3">
-                        <p className="font-medium text-foreground">"{reply.text}"</p>
+                      <div className="flex flex-col gap-3 mb-3 sm:flex-row sm:items-start sm:justify-between">
+                        <p className="font-medium text-foreground leading-relaxed break-words">"{reply.text}"</p>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyReply(reply.text);
-                          }}
+                          size="sm"
+                          className="self-end shrink-0 gap-2 sm:self-start"
+                          onClick={() => copyReply(reply.text)}
+                          aria-label={`Copy reply ${replyIndex + 1}`}
+                          title="Copy reply"
                           data-testid={`button-copy-reply-${categoryIndex}-${replyIndex}`}
                         >
                           <Copy className="w-4 h-4" />
+                          Copy reply
                         </Button>
                       </div>
                       <p className="text-sm text-foreground/80">

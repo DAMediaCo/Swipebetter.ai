@@ -1020,7 +1020,7 @@ enum SwipeBetterScreenshotFixtures {
           "platform": "Hinge",
           "gender": "Man",
           "intent": "Relationship",
-          "bioSuggestions": "Lead with a specific weekend plan, then keep one playful line that gives matches an easy question to answer.",
+          "bioSuggestions": "[\"Usually outside on the weekend, trying a new trail or finding a good taco spot. Looking for someone who wants something real and still knows how to have fun.\", \"My ideal Sunday: coffee, a long walk, and making dinner with someone who does not take the playlist too seriously.\", \"Looking for a relationship with someone kind, curious, and ready to make actual plans. Tell me where we should go for tacos.\"]",
           "photoFeedback": "Lead with the lake photo, keep the candid dinner shot, and replace the mirror selfie with a clear full-body photo.",
           "overallScore": 86,
           "improvements": "Swap photo order, remove the generic travel line, and add one prompt that shows confidence without sounding rehearsed.",
@@ -1040,7 +1040,7 @@ enum SwipeBetterScreenshotFixtures {
           "tone": "confident",
           "suggestedReplies": [
             "Tacos sound good. Are you free Thursday?",
-            "What's your go-to taco spot?",
+            "What's your go-to taco spot? I have a favorite, but I'm open to being convinced.",
             "I'm in. Pick a night that works for you."
           ],
           "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
@@ -1050,7 +1050,7 @@ enum SwipeBetterScreenshotFixtures {
           "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
           "suggestedReplies": [
             "Tacos sound good. Are you free Thursday?",
-            "What's your go-to taco spot?",
+            "What's your go-to taco spot? I have a favorite, but I'm open to being convinced.",
             "I'm in. Pick a night that works for you."
           ]
         }

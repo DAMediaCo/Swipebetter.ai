@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { TonePicker } from "./TonePicker";
 import { Check, Copy, Sparkles } from "lucide-react";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 const sampleConversation = `Her: Hey! I saw you're into hiking too. What's your favorite trail?
 
@@ -35,7 +36,8 @@ export function ConvoDemo() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const copyToClipboard = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
@@ -87,19 +89,28 @@ export function ConvoDemo() {
                 replies.map((reply, index) => (
                   <div
                     key={index}
-                    className="p-3 bg-primary/5 rounded-md border border-primary/20 flex items-start gap-2"
+                    className="p-3 bg-primary/5 rounded-md border border-primary/20 flex flex-col gap-3 sm:flex-row sm:items-start"
                   >
-                    <p className="text-sm flex-1">{reply}</p>
+                    <p className="text-sm leading-relaxed flex-1 min-w-0 break-words">{reply}</p>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
+                      className="self-end shrink-0 gap-2 sm:self-start"
                       onClick={() => copyToClipboard(reply, index)}
+                      aria-label={copiedIndex === index ? "Reply copied" : "Copy reply"}
+                      title={copiedIndex === index ? "Copied" : "Copy reply"}
                       data-testid={`button-copy-demo-reply-${index}`}
                     >
                       {copiedIndex === index ? (
-                        <Check className="w-4 h-4 text-primary" />
+                        <>
+                          <Check className="w-4 h-4 text-primary" />
+                          Copied
+                        </>
                       ) : (
-                        <Copy className="w-4 h-4" />
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copy
+                        </>
                       )}
                     </Button>
                   </div>

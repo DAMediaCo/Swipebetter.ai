@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
+import { copyTextToClipboard } from "@/lib/clipboard";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
@@ -50,7 +51,8 @@ export default function ReplyAuditView() {
   });
 
   const copyToClipboard = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
     setCopiedIndex(index);
     toast({
       description: "Reply copied to clipboard",
@@ -105,7 +107,13 @@ export default function ReplyAuditView() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" data-testid="button-back">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Back to dashboard"
+              title="Back to dashboard"
+              data-testid="button-back"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
@@ -132,7 +140,7 @@ export default function ReplyAuditView() {
               <CardTitle className="text-lg font-semibold">Conversation Context</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-foreground/90">{analysis.conversationContext}</p>
+              <p className="text-foreground/90 leading-relaxed break-words">{analysis.conversationContext}</p>
             </CardContent>
           </Card>
         )}
@@ -142,26 +150,31 @@ export default function ReplyAuditView() {
           {analysis.suggestedReplies?.map((reply, index) => (
             <Card 
               key={index} 
-              className="hover-elevate cursor-pointer"
-              onClick={() => copyToClipboard(reply, index)}
+              className="overflow-hidden"
             >
-              <CardContent className="py-4 flex items-start gap-4">
-                <div className="flex-1">
-                  <p className="text-foreground/90 leading-relaxed">{reply}</p>
+              <CardContent className="py-4 flex flex-col gap-4 sm:flex-row sm:items-start">
+                <div className="flex-1 min-w-0">
+                  <p className="text-foreground/90 leading-relaxed break-words">{reply}</p>
                 </div>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    copyToClipboard(reply, index);
-                  }}
+                  size="sm"
+                  className="self-end shrink-0 gap-2 sm:self-start"
+                  onClick={() => copyToClipboard(reply, index)}
+                  aria-label={copiedIndex === index ? `Reply ${index + 1} copied` : `Copy reply ${index + 1}`}
+                  title={copiedIndex === index ? "Copied" : "Copy reply"}
                   data-testid={`button-copy-reply-${index}`}
                 >
                   {copiedIndex === index ? (
-                    <Check className="w-4 h-4 text-primary" />
+                    <>
+                      <Check className="w-4 h-4 text-primary" />
+                      Copied
+                    </>
                   ) : (
-                    <Clipboard className="w-4 h-4" />
+                    <>
+                      <Clipboard className="w-4 h-4" />
+                      Copy reply
+                    </>
                   )}
                 </Button>
               </CardContent>

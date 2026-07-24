@@ -573,9 +573,14 @@ struct PremiumResultBlock: View {
   let index: Int
   let title: String
   let text: String?
+  @State private var copiedItem: Int?
+
+  private var items: [String] {
+    PremiumResultText.items(from: text)
+  }
 
   var body: some View {
-    if let text, !text.isEmpty {
+    if !items.isEmpty {
       VStack(alignment: .leading, spacing: 8) {
         SBDivider()
           .padding(.vertical, 12)
@@ -592,12 +597,48 @@ struct PremiumResultBlock: View {
             Text(title)
               .font(.subheadline.weight(.bold))
               .foregroundStyle(SBTheme.ink)
-            Text(text)
-              .font(.subheadline)
-              .foregroundStyle(SBTheme.secondaryInk)
-              .fixedSize(horizontal: false, vertical: true)
+
+            ForEach(Array(items.enumerated()), id: \.offset) { itemIndex, item in
+              VStack(alignment: .leading, spacing: 8) {
+                if items.count > 1 {
+                  Text("Option \(itemIndex + 1)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(SBTheme.accent)
+                }
+
+                Text(item)
+                  .font(.subheadline)
+                  .foregroundStyle(SBTheme.secondaryInk)
+                  .fixedSize(horizontal: false, vertical: true)
+                  .textSelection(.enabled)
+
+                Button {
+                  copy(item, at: itemIndex)
+                } label: {
+                  Label(
+                    copiedItem == itemIndex ? "Copied" : (items.count > 1 ? "Copy option" : "Copy"),
+                    systemImage: copiedItem == itemIndex ? "checkmark" : "doc.on.doc"
+                  )
+                }
+                .buttonStyle(SBSecondaryButtonStyle())
+                .accessibilityLabel(copiedItem == itemIndex ? "\(title) copied" : "Copy \(title.lowercased())")
+              }
+              .padding(.top, itemIndex == 0 ? 2 : 10)
+            }
           }
         }
+      }
+    }
+  }
+
+  private func copy(_ value: String, at itemIndex: Int) {
+    UIPasteboard.general.string = value
+    copiedItem = itemIndex
+    UIAccessibility.post(notification: .announcement, argument: "\(title) copied")
+    Task {
+      try? await Task.sleep(for: .seconds(2))
+      if copiedItem == itemIndex {
+        copiedItem = nil
       }
     }
   }
@@ -605,6 +646,7 @@ struct PremiumResultBlock: View {
 
 struct PremiumReplyResults: View {
   let parsed: ReplyParsed
+  @State private var copiedIndex: Int?
 
   var body: some View {
     VStack(spacing: 10) {
@@ -631,16 +673,33 @@ struct PremiumReplyResults: View {
               .font(.body.weight(.medium))
               .foregroundStyle(SBTheme.ink)
               .fixedSize(horizontal: false, vertical: true)
+              .textSelection(.enabled)
 
             Button {
-              UIPasteboard.general.string = reply
+              copy(reply, at: index)
             } label: {
-              Label("Copy reply", systemImage: "doc.on.doc")
+              Label(
+                copiedIndex == index ? "Copied" : "Copy reply",
+                systemImage: copiedIndex == index ? "checkmark" : "doc.on.doc"
+              )
             }
             .buttonStyle(SBSecondaryButtonStyle())
+            .accessibilityLabel(copiedIndex == index ? "Reply \(index + 1) copied" : "Copy reply \(index + 1)")
             .accessibilityIdentifier("replies.copyButton.\(index + 1)")
           }
         }
+      }
+    }
+  }
+
+  private func copy(_ reply: String, at index: Int) {
+    UIPasteboard.general.string = reply
+    copiedIndex = index
+    UIAccessibility.post(notification: .announcement, argument: "Reply \(index + 1) copied")
+    Task {
+      try? await Task.sleep(for: .seconds(2))
+      if copiedIndex == index {
+        copiedIndex = nil
       }
     }
   }
