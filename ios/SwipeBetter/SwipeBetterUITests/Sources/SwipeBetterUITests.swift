@@ -33,4 +33,22 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.buttons["account.restorePurchasesButton"].waitForExistence(timeout: 8))
     XCTAssertTrue(app.buttons["account.manageSubscriptionButton"].waitForExistence(timeout: 2))
   }
+
+  func testReplyResultsRemainReadableAndCopyable() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("replies")
+    app.launch()
+
+    let copyButton = app.buttons["replies.copyButton.1"]
+    for _ in 0..<5 where !copyButton.isHittable {
+      app.swipeUp()
+    }
+
+    XCTAssertTrue(copyButton.waitForExistence(timeout: 3))
+    XCTAssertTrue(copyButton.isHittable)
+    copyButton.tap()
+    XCTAssertEqual(copyButton.label, "Reply 1 copied")
+  }
 }

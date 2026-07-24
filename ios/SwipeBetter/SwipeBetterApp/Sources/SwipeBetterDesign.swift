@@ -137,8 +137,10 @@ struct SBSectionHeader: View {
 
       if let detail {
         Text(detail)
-          .font(.caption)
+          .font(.subheadline)
           .foregroundStyle(SBTheme.secondaryInk)
+          .lineSpacing(2)
+          .fixedSize(horizontal: false, vertical: true)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)

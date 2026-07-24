@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { loadAnalysis } from "@/lib/analysisStorage";
+import { copyTextToClipboard } from "@/lib/clipboard";
 import { trackPreviewViewed, trackEvent } from "@/lib/analytics";
 import { useEntitlement, useCustomerPortal, useAuth } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
@@ -223,14 +224,16 @@ export default function ProfileResults() {
   const copyToClipboard = async (text: string | string[], field: string) => {
     if (!hasFullAccess) return;
     const textString = Array.isArray(text) ? text.join('\n\n') : String(text || '');
-    await navigator.clipboard.writeText(textString);
+    const copied = await copyTextToClipboard(textString);
+    if (!copied) return;
     setCopiedField(field);
     setTimeout(() => setCopiedField(null), 2000);
   };
 
   const copyBio = async (bioText: string, index: number) => {
     if (!hasFullAccess) return;
-    await navigator.clipboard.writeText(bioText);
+    const copied = await copyTextToClipboard(bioText);
+    if (!copied) return;
     setCopiedBioIndex(index);
     toast({
       description: "Bio copied. Paste into your dating app.",
@@ -242,7 +245,8 @@ export default function ProfileResults() {
   const shareResult = async () => {
     const score = result?.overallScore || 0;
     const shareText = `I got my dating profile analyzed by AI! Score: ${score}/100. Get your free profile audit: https://swipebetter.ai`;
-    await navigator.clipboard.writeText(shareText);
+    const copied = await copyTextToClipboard(shareText);
+    if (!copied) return;
     setShareClicked(true);
     toast({
       description: "Copied! Share it with your friends.",
@@ -582,29 +586,34 @@ export default function ProfileResults() {
                 {parseBioSuggestions(result.bioSuggestions).map((bio, index) => (
                   <Card 
                     key={index} 
-                    className="hover-elevate cursor-pointer"
-                    onClick={() => copyBio(bio, index)}
+                    className="overflow-hidden"
                   >
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium text-primary">Option {index + 1}</span>
                         <Button
                           variant="ghost"
-                          size="icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyBio(bio, index);
-                          }}
+                          size="sm"
+                          className="shrink-0 gap-2"
+                          onClick={() => copyBio(bio, index)}
+                          aria-label={copiedBioIndex === index ? `Bio option ${index + 1} copied` : `Copy bio option ${index + 1}`}
+                          title={copiedBioIndex === index ? "Copied" : "Copy bio"}
                           data-testid={`button-copy-bio-${index}`}
                         >
                           {copiedBioIndex === index ? (
-                            <Check className="w-4 h-4 text-primary" />
+                            <>
+                              <Check className="w-4 h-4 text-primary" />
+                              Copied
+                            </>
                           ) : (
-                            <Clipboard className="w-4 h-4" />
+                            <>
+                              <Clipboard className="w-4 h-4" />
+                              Copy bio
+                            </>
                           )}
                         </Button>
                       </div>
-                      <p className="text-foreground/90 leading-relaxed">{bio}</p>
+                      <p className="text-foreground/90 leading-relaxed break-words">{bio}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -622,14 +631,23 @@ export default function ProfileResults() {
                   <CardTitle className="text-lg font-semibold">Top Improvements</CardTitle>
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm"
+                    className="shrink-0 gap-2"
                     onClick={() => copyToClipboard(result.improvements, "improvements")}
+                    aria-label={copiedField === "improvements" ? "Improvements copied" : "Copy improvements"}
+                    title={copiedField === "improvements" ? "Copied" : "Copy improvements"}
                     data-testid="button-copy-top-improvements"
                   >
                     {copiedField === "improvements" ? (
-                      <Check className="w-4 h-4 text-primary" />
+                      <>
+                        <Check className="w-4 h-4 text-primary" />
+                        Copied
+                      </>
                     ) : (
-                      <Clipboard className="w-4 h-4" />
+                      <>
+                        <Clipboard className="w-4 h-4" />
+                        Copy all
+                      </>
                     )}
                   </Button>
                 </CardHeader>
@@ -662,7 +680,7 @@ export default function ProfileResults() {
             </>
           )}
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <Link href="/fix-profile" className="flex-1">
               <Button
                 variant="outline"
@@ -723,14 +741,23 @@ function ResultCard({
         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         <Button
           variant="ghost"
-          size="icon"
+          size="sm"
+          className="shrink-0 gap-2"
           onClick={onCopy}
+          aria-label={copied ? `${title} copied` : `Copy ${title}`}
+          title={copied ? "Copied" : `Copy ${title}`}
           data-testid={`button-copy-${title.toLowerCase().replace(/ /g, "-")}`}
         >
           {copied ? (
-            <Check className="w-4 h-4 text-primary" />
+            <>
+              <Check className="w-4 h-4 text-primary" />
+              Copied
+            </>
           ) : (
-            <Clipboard className="w-4 h-4" />
+            <>
+              <Clipboard className="w-4 h-4" />
+              Copy all
+            </>
           )}
         </Button>
       </CardHeader>
@@ -742,4 +769,3 @@ function ResultCard({
     </Card>
   );
 }
-

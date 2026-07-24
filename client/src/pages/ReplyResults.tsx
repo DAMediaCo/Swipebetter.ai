@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { loadAnalysis } from "@/lib/analysisStorage";
 import { trackPreviewViewed } from "@/lib/analytics";
+import { copyTextToClipboard } from "@/lib/clipboard";
 import { 
   Clipboard, 
   Check,
@@ -43,7 +44,8 @@ export default function ReplyResults() {
   }, []);
 
   const copyToClipboard = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
     setCopiedIndex(index);
     setTimeout(() => setCopiedIndex(null), 2000);
   };
@@ -71,7 +73,7 @@ export default function ReplyResults() {
                 <CardTitle className="text-lg font-semibold">Conversation Context</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-foreground/90">{result.conversationContext}</p>
+                <p className="text-foreground/90 leading-relaxed break-words">{result.conversationContext}</p>
               </CardContent>
             </Card>
           )}
@@ -81,26 +83,31 @@ export default function ReplyResults() {
             {result.suggestedReplies?.map((reply, index) => (
               <Card 
                 key={index} 
-                className="hover-elevate cursor-pointer"
-                onClick={() => copyToClipboard(reply, index)}
+                className="overflow-hidden"
               >
-                <CardContent className="py-4 flex items-start gap-4">
-                  <div className="flex-1 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-p:text-foreground/90">
+                <CardContent className="py-4 flex flex-col gap-4 sm:flex-row sm:items-start">
+                  <div className="flex-1 min-w-0 break-words prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-p:leading-relaxed prose-p:text-foreground/90">
                     <ReactMarkdown>{reply}</ReactMarkdown>
                   </div>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      copyToClipboard(reply, index);
-                    }}
+                    size="sm"
+                    className="self-end shrink-0 gap-2 sm:self-start"
+                    onClick={() => copyToClipboard(reply, index)}
+                    aria-label={copiedIndex === index ? `Reply ${index + 1} copied` : `Copy reply ${index + 1}`}
+                    title={copiedIndex === index ? "Copied" : "Copy reply"}
                     data-testid={`button-copy-reply-${index}`}
                   >
                     {copiedIndex === index ? (
-                      <Check className="w-4 h-4 text-primary" />
+                      <>
+                        <Check className="w-4 h-4 text-primary" />
+                        Copied
+                      </>
                     ) : (
-                      <Clipboard className="w-4 h-4" />
+                      <>
+                        <Clipboard className="w-4 h-4" />
+                        Copy reply
+                      </>
                     )}
                   </Button>
                 </CardContent>
@@ -109,7 +116,7 @@ export default function ReplyResults() {
           </div>
 
           <div className="space-y-3">
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/dashboard?tab=reply" className="flex-1">
                 <Button
                   variant="outline"

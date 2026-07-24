@@ -85,6 +85,7 @@ targets:
     platform: iOS
     sources:
       - path: KeyboardExtension/Sources/KeyboardReplyComposer.swift
+      - path: Shared/Sources/PremiumResultText.swift
       - path: SwipeBetterTests/Sources
     settings:
       base:

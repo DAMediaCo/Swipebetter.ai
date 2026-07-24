@@ -30,4 +30,16 @@ final class KeyboardReplyComposerTests: XCTestCase {
 
     XCTAssertFalse(reply.isEmpty)
   }
+
+  func testProfileResultTextSplitsJsonOptionsForIndividualCopying() {
+    let items = PremiumResultText.items(from: "[\"First bio\", \"Second bio\", \"Third bio\"]")
+
+    XCTAssertEqual(items, ["First bio", "Second bio", "Third bio"])
+  }
+
+  func testProfileResultTextKeepsPlainFeedbackReadable() {
+    let items = PremiumResultText.items(from: "Move the outdoor photo to the first slot.")
+
+    XCTAssertEqual(items, ["Move the outdoor photo to the first slot."])
+  }
 }

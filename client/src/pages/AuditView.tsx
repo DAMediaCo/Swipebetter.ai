@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation, useRoute, Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/lib/auth";
+import { copyTextToClipboard } from "@/lib/clipboard";
+import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, 
   Camera, 
   FileText, 
   Sparkles, 
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Clipboard,
+  Check
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
@@ -118,7 +122,9 @@ export default function AuditView() {
   const [, params] = useRoute("/audit/:id");
   const [, setLocation] = useLocation();
   const { data: authData, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
   const user = authData?.user;
+  const [copiedField, setCopiedField] = useState<string | null>(null);
   
   const analysisId = params?.id;
 
@@ -152,6 +158,14 @@ export default function AuditView() {
       hour: "2-digit",
       minute: "2-digit"
     });
+  };
+
+  const copyToClipboard = async (text: string, field: string, label: string) => {
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
+    setCopiedField(field);
+    toast({ description: `${label} copied. Ready to paste.` });
+    setTimeout(() => setCopiedField(null), 2000);
   };
 
   if (authLoading || isLoading) {
@@ -191,7 +205,13 @@ export default function AuditView() {
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-6">
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" data-testid="button-back">
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Back to dashboard"
+              title="Back to dashboard"
+              data-testid="button-back"
+            >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
@@ -230,8 +250,30 @@ export default function AuditView() {
               {parseContentToList(analysis.bioSuggestions).length > 0 ? (
                 parseContentToList(analysis.bioSuggestions).map((bio, index) => (
                   <div key={index} className="p-3 bg-muted/50 rounded-lg">
-                    <span className="text-xs font-medium text-primary mb-1 block">Option {index + 1}</span>
-                    <p className="text-foreground/90 leading-relaxed text-sm">{bio}</p>
+                    <div className="flex items-center justify-between gap-3 mb-2">
+                      <span className="text-xs font-medium text-primary">Option {index + 1}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="shrink-0 gap-2"
+                        onClick={() => copyToClipboard(bio, `bio-${index}`, `Bio option ${index + 1}`)}
+                        aria-label={copiedField === `bio-${index}` ? `Bio option ${index + 1} copied` : `Copy bio option ${index + 1}`}
+                        title={copiedField === `bio-${index}` ? "Copied" : "Copy bio"}
+                      >
+                        {copiedField === `bio-${index}` ? (
+                          <>
+                            <Check className="w-4 h-4 text-primary" />
+                            Copied
+                          </>
+                        ) : (
+                          <>
+                            <Clipboard className="w-4 h-4" />
+                            Copy bio
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                    <p className="text-foreground/90 leading-relaxed text-sm break-words">{bio}</p>
                   </div>
                 ))
               ) : (
@@ -244,11 +286,32 @@ export default function AuditView() {
         </Card>
 
         <Card className="mb-4">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <Camera className="w-5 h-5 text-primary" />
               Photo Feedback
             </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="shrink-0 gap-2"
+              onClick={() => copyToClipboard(analysis.photoFeedback || "", "photos", "Photo feedback")}
+              disabled={!analysis.photoFeedback}
+              aria-label={copiedField === "photos" ? "Photo feedback copied" : "Copy photo feedback"}
+              title={copiedField === "photos" ? "Copied" : "Copy photo feedback"}
+            >
+              {copiedField === "photos" ? (
+                <>
+                  <Check className="w-4 h-4 text-primary" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Clipboard className="w-4 h-4" />
+                  Copy all
+                </>
+              )}
+            </Button>
           </CardHeader>
           <CardContent>
             <div 
@@ -261,11 +324,32 @@ export default function AuditView() {
         </Card>
 
         <Card className="mb-4">
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-2 flex flex-row items-center justify-between gap-3">
             <CardTitle className="text-lg font-semibold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
               Improvements
             </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="shrink-0 gap-2"
+              onClick={() => copyToClipboard(analysis.improvements || "", "improvements", "Improvements")}
+              disabled={!analysis.improvements}
+              aria-label={copiedField === "improvements" ? "Improvements copied" : "Copy improvements"}
+              title={copiedField === "improvements" ? "Copied" : "Copy improvements"}
+            >
+              {copiedField === "improvements" ? (
+                <>
+                  <Check className="w-4 h-4 text-primary" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Clipboard className="w-4 h-4" />
+                  Copy all
+                </>
+              )}
+            </Button>
           </CardHeader>
           <CardContent>
             <div data-testid="text-improvements">

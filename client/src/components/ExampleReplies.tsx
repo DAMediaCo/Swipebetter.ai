@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TonePicker } from "./TonePicker";
 import { Check, Copy, MessageSquare } from "lucide-react";
+import { copyTextToClipboard } from "@/lib/clipboard";
 
 interface Scenario {
   title: string;
@@ -81,7 +82,8 @@ export function ExampleReplies() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const copyToClipboard = async (text: string, key: string) => {
-    await navigator.clipboard.writeText(text);
+    const copied = await copyTextToClipboard(text);
+    if (!copied) return;
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
@@ -113,19 +115,28 @@ export function ExampleReplies() {
                 return (
                   <div
                     key={rIndex}
-                    className="p-3 bg-primary/5 rounded-md border border-primary/20 flex items-start gap-2"
+                    className="p-3 bg-primary/5 rounded-md border border-primary/20 flex flex-col gap-3 sm:flex-row sm:items-start"
                   >
-                    <p className="text-sm flex-1">{reply}</p>
+                    <p className="text-sm leading-relaxed flex-1 min-w-0 break-words">{reply}</p>
                     <Button
                       variant="ghost"
-                      size="icon"
+                      size="sm"
+                      className="self-end shrink-0 gap-2 sm:self-start"
                       onClick={() => copyToClipboard(reply, key)}
+                      aria-label={copiedKey === key ? "Reply copied" : "Copy reply"}
+                      title={copiedKey === key ? "Copied" : "Copy reply"}
                       data-testid={`button-copy-example-${sIndex}-${rIndex}`}
                     >
                       {copiedKey === key ? (
-                        <Check className="w-4 h-4 text-green-500" />
+                        <>
+                          <Check className="w-4 h-4 text-green-500" />
+                          Copied
+                        </>
                       ) : (
-                        <Copy className="w-4 h-4" />
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copy
+                        </>
                       )}
                     </Button>
                   </div>
