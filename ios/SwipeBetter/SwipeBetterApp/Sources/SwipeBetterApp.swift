@@ -1,3 +1,4 @@
+import AppIntents
 import SwiftUI
 
 @main
@@ -9,6 +10,8 @@ struct SwipeBetterApp: App {
       RootView(initialTab: AppTab.screenshotInitialTab(from: ProcessInfo.processInfo.arguments))
         .environment(model)
         .task {
+          SwipeBetterAppShortcuts.updateAppShortcutParameters()
+
           let arguments = ProcessInfo.processInfo.arguments
           if arguments.contains("-SWIPEBETTER_APP_STORE_SCREENSHOTS") {
             model.configureForAppStoreScreenshots()

@@ -93,6 +93,7 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.staticTexts["Step 1 of 5"].exists)
     XCTAssertTrue(app.staticTexts["Allow screenshot access"].exists)
     XCTAssertTrue(app.buttons["snap.photoAccessButton"].exists)
+    XCTAssertTrue(app.staticTexts["snap.shortcutLocationNote"].exists)
 
     let nextButton = app.buttons["snap.nextStepButton"]
     XCTAssertTrue(nextButton.isHittable)
