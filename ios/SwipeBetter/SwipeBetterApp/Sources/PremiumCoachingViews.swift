@@ -22,6 +22,32 @@ struct PremiumProfileAuditView: View {
     images.isEmpty ? "No screenshots selected" : "\(images.count) of 10 screenshots selected"
   }
 
+  private var accessStatus: String {
+    if model.credits?.isUnlimited == true
+      || model.credits?.planTier?.lowercased() == "unlimited"
+      || model.me?.proActive == true {
+      return "Unlimited"
+    }
+    let credits = model.credits?.credits ?? model.me?.oneTimeCredits ?? 0
+    return "\(credits) \(credits == 1 ? "credit" : "credits")"
+  }
+
+  private var importButton: AnyView {
+    AnyView(
+      Button {
+        model.loadSharedImport()
+        applyPendingImport()
+      } label: {
+        Image(systemName: "square.and.arrow.down")
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(.white)
+          .frame(width: 38, height: 38)
+          .background(Color.white.opacity(0.11), in: Circle())
+      }
+      .accessibilityLabel("Import shared screenshots")
+    )
+  }
+
   private var datingContextSection: some View {
     VStack(spacing: 10) {
       SBSectionHeader(
@@ -60,20 +86,20 @@ struct PremiumProfileAuditView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(spacing: 16) {
-        SBSurface {
-          PremiumUsageStatus(
-            title: "Profile audit",
-            detail: "One starter credit · unlimited on paid plans",
-            systemImage: "person.crop.rectangle.stack"
-          )
-        }
-        .padding(.horizontal, 20)
+      LazyVStack(spacing: 24) {
+        SBWorkspaceHeader(
+          eyebrow: "Profile lab",
+          title: "Build a profile worth pausing on.",
+          detail: "Stack your screenshots in order. SwipeBetter turns them into a focused edit plan.",
+          systemImage: "person.crop.rectangle.stack",
+          status: accessStatus,
+          trailing: importButton
+        )
 
         VStack(spacing: 10) {
           SBSectionHeader(
-            title: "Profile screenshots",
-            detail: "Add your full profile in order. Up to 10 images."
+            title: "Start with the evidence",
+            detail: "Add the full profile exactly as people see it. Up to 10 screenshots."
           )
 
           SBSurface {
@@ -120,6 +146,22 @@ struct PremiumProfileAuditView: View {
 
         datingContextSection
 
+        if let analysis = result?.analysis {
+          PremiumProfileResult(analysis: analysis)
+            .padding(.horizontal, 20)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        } else if let result, result.status == "failed" {
+          PremiumInlineError(message: result.error ?? "The audit could not be completed. Try again.")
+            .padding(.horizontal, 20)
+        }
+      }
+      .padding(.bottom, 112)
+    }
+    .scrollDismissesKeyboard(.interactively)
+    .sbPageBackground()
+    .navigationBarHidden(true)
+    .safeAreaInset(edge: .bottom, spacing: 0) {
+      SBGlassCluster {
         Button {
           Task {
             result = await model.startProfileAudit(
@@ -131,39 +173,17 @@ struct PremiumProfileAuditView: View {
             )
           }
         } label: {
-          Label("Run profile audit", systemImage: "sparkles")
+          Label(result == nil ? "Run profile audit" : "Run another audit", systemImage: "arrow.up.right")
         }
         .buttonStyle(SBPrimaryButtonStyle())
         .disabled(model.isBusy || images.isEmpty)
         .opacity(images.isEmpty ? 0.48 : 1)
         .accessibilityIdentifier("audit.runButton")
-        .padding(.horizontal, 20)
-
-        if let analysis = result?.analysis {
-          PremiumProfileResult(analysis: analysis)
-            .padding(.horizontal, 20)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-        } else if let result, result.status == "failed" {
-          PremiumInlineError(message: result.error ?? "The audit could not be completed. Try again.")
-            .padding(.horizontal, 20)
-        }
       }
-      .padding(.bottom, 28)
-    }
-    .scrollDismissesKeyboard(.interactively)
-    .sbPageBackground()
-    .navigationTitle("Profile audit")
-    .navigationBarTitleDisplayMode(.large)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button {
-          model.loadSharedImport()
-          applyPendingImport()
-        } label: {
-          Image(systemName: "square.and.arrow.down")
-        }
-        .accessibilityLabel("Import shared screenshots")
-      }
+      .padding(.horizontal, 20)
+      .padding(.top, 10)
+      .padding(.bottom, 8)
+      .background(.ultraThinMaterial)
     }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 10) }
@@ -231,22 +251,48 @@ struct PremiumReplyAssistantView: View {
     !conversation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty
   }
 
+  private var accessStatus: String {
+    if model.credits?.isUnlimited == true
+      || model.credits?.planTier?.lowercased() == "unlimited"
+      || model.me?.proActive == true {
+      return "Unlimited"
+    }
+    let credits = model.credits?.credits ?? model.me?.oneTimeCredits ?? 0
+    return "\(credits) \(credits == 1 ? "credit" : "credits")"
+  }
+
+  private var importButton: AnyView {
+    AnyView(
+      Button {
+        model.loadSharedImport()
+        applyPendingImport()
+      } label: {
+        Image(systemName: "square.and.arrow.down")
+          .font(.system(size: 16, weight: .semibold))
+          .foregroundStyle(.white)
+          .frame(width: 38, height: 38)
+          .background(Color.white.opacity(0.11), in: Circle())
+      }
+      .accessibilityLabel("Import shared chat")
+    )
+  }
+
   var body: some View {
     ScrollView {
-      LazyVStack(spacing: 16) {
-        SBSurface {
-          PremiumUsageStatus(
-            title: "Reply coaching",
-            detail: "One starter credit · unlimited on paid plans",
-            systemImage: "message.badge.waveform"
-          )
-        }
-        .padding(.horizontal, 20)
+      LazyVStack(spacing: 24) {
+        SBWorkspaceHeader(
+          eyebrow: "Reply studio",
+          title: "Say less. Land better.",
+          detail: "Bring the thread, choose the direction, and leave with three replies that sound like you.",
+          systemImage: "message.badge.waveform",
+          status: accessStatus,
+          trailing: importButton
+        )
 
         VStack(spacing: 10) {
           SBSectionHeader(
-            title: "Conversation",
-            detail: "Paste the visible chat or attach up to 3 screenshots."
+            title: "Bring the thread",
+            detail: "Paste the visible chat or attach up to three screenshots."
           )
 
           SBSurface {
@@ -332,6 +378,19 @@ struct PremiumReplyAssistantView: View {
         }
         .padding(.horizontal, 20)
 
+        if let parsed = response?.parsed {
+          PremiumReplyResults(parsed: parsed)
+            .padding(.horizontal, 20)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+      }
+      .padding(.bottom, 112)
+    }
+    .scrollDismissesKeyboard(.interactively)
+    .sbPageBackground()
+    .navigationBarHidden(true)
+    .safeAreaInset(edge: .bottom, spacing: 0) {
+      SBGlassCluster {
         Button {
           Task {
             response = await model.generateReplies(
@@ -343,36 +402,17 @@ struct PremiumReplyAssistantView: View {
             )
           }
         } label: {
-          Label("Generate three replies", systemImage: "sparkles")
+          Label(response == nil ? "Generate three replies" : "Generate again", systemImage: "arrow.up.right")
         }
         .buttonStyle(SBPrimaryButtonStyle())
         .disabled(model.isBusy || !canGenerate)
         .opacity(canGenerate ? 1 : 0.48)
         .accessibilityIdentifier("replies.generateButton")
-        .padding(.horizontal, 20)
-
-        if let parsed = response?.parsed {
-          PremiumReplyResults(parsed: parsed)
-            .padding(.horizontal, 20)
-            .transition(.move(edge: .bottom).combined(with: .opacity))
-        }
       }
-      .padding(.bottom, 28)
-    }
-    .scrollDismissesKeyboard(.interactively)
-    .sbPageBackground()
-    .navigationTitle("Reply coach")
-    .navigationBarTitleDisplayMode(.large)
-    .toolbar {
-      ToolbarItem(placement: .topBarTrailing) {
-        Button {
-          model.loadSharedImport()
-          applyPendingImport()
-        } label: {
-          Image(systemName: "square.and.arrow.down")
-        }
-        .accessibilityLabel("Import shared chat")
-      }
+      .padding(.horizontal, 20)
+      .padding(.top, 10)
+      .padding(.bottom, 8)
+      .background(.ultraThinMaterial)
     }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 3) }

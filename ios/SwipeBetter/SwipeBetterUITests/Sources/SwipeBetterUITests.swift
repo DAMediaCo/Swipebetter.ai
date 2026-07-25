@@ -14,7 +14,12 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.secureTextFields["auth.passwordField"].exists)
     XCTAssertTrue(app.buttons["auth.loginButton"].exists)
     XCTAssertTrue(app.buttons["auth.appleSignInButton"].exists)
-    XCTAssertTrue(app.staticTexts["Turn profile screenshots and awkward chat moments into specific, useful next moves."].exists)
+    XCTAssertTrue(app.staticTexts["Stop guessing what to change."].exists)
+    XCTAssertTrue(
+      app.staticTexts[
+        "Bring the profile or the conversation. Leave with a clear next move that still sounds like you."
+      ].exists
+    )
     XCTAssertTrue(app.staticTexts["iOS pricing includes Apple purchase fees."].exists)
 
     app.buttons["Create account"].tap()
@@ -32,6 +37,28 @@ final class SwipeBetterUITests: XCTestCase {
 
     XCTAssertTrue(app.buttons["account.restorePurchasesButton"].waitForExistence(timeout: 8))
     XCTAssertTrue(app.buttons["account.manageSubscriptionButton"].waitForExistence(timeout: 2))
+  }
+
+  func testRedesignedWorkspacesHaveDistinctHierarchy() throws {
+    let audit = XCUIApplication()
+    audit.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    audit.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    audit.launchArguments.append("audit")
+    audit.launch()
+
+    XCTAssertTrue(appText("PROFILE LAB", in: audit).waitForExistence(timeout: 8))
+    XCTAssertTrue(appText("Build a profile worth pausing on.", in: audit).exists)
+    XCTAssertTrue(audit.buttons["audit.runButton"].isHittable)
+
+    let replies = XCUIApplication()
+    replies.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    replies.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    replies.launchArguments.append("replies")
+    replies.launch()
+
+    XCTAssertTrue(appText("REPLY STUDIO", in: replies).waitForExistence(timeout: 8))
+    XCTAssertTrue(appText("Say less. Land better.", in: replies).exists)
+    XCTAssertTrue(replies.buttons["replies.generateButton"].isHittable)
   }
 
   func testAppleAccountDeletionReauthenticationIsClearAndActionable() throws {
@@ -137,5 +164,9 @@ final class SwipeBetterUITests: XCTestCase {
     attachment.name = "SwipeBetter Keyboard"
     attachment.lifetime = .keepAlways
     add(attachment)
+  }
+
+  private func appText(_ value: String, in app: XCUIApplication) -> XCUIElement {
+    app.staticTexts[value]
   }
 }

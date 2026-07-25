@@ -18,16 +18,19 @@ struct PremiumAuthView: View {
   var body: some View {
     NavigationStack {
       ScrollView {
-        VStack(alignment: .leading, spacing: 22) {
+        VStack(alignment: .leading, spacing: 0) {
           brandHeader
-          authForm
-          appleSignIn
-          pricingNote
-          legalLinks
+
+          VStack(alignment: .leading, spacing: 22) {
+            authForm
+            appleSignIn
+            pricingNote
+            legalLinks
+          }
+          .padding(.horizontal, 20)
+          .padding(.top, 24)
+          .padding(.bottom, 32)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 28)
-        .padding(.bottom, 32)
       }
       .scrollDismissesKeyboard(.interactively)
       .sbPageBackground()
@@ -41,25 +44,47 @@ struct PremiumAuthView: View {
   }
 
   private var brandHeader: some View {
-    VStack(alignment: .leading, spacing: 16) {
+    VStack(alignment: .leading, spacing: 22) {
       HStack(alignment: .center, spacing: 14) {
         SBLogoMark(size: 58)
 
         VStack(alignment: .leading, spacing: 2) {
           Text("SwipeBetter")
             .font(.system(size: 31, weight: .bold))
-            .foregroundStyle(SBTheme.ink)
+            .foregroundStyle(SBTheme.headerInk)
 
           Text("Dating decisions, made clearer.")
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(SBTheme.secondaryInk)
+            .foregroundStyle(SBTheme.headerSecondaryInk)
         }
       }
 
-      Text("Turn profile screenshots and awkward chat moments into specific, useful next moves.")
-        .font(.title3.weight(.medium))
-        .foregroundStyle(SBTheme.ink)
+      Text("Stop guessing what to change.")
+        .font(.system(size: 32, weight: .bold))
+        .foregroundStyle(SBTheme.headerInk)
         .fixedSize(horizontal: false, vertical: true)
+
+      Text("Bring the profile or the conversation. Leave with a clear next move that still sounds like you.")
+        .font(.subheadline)
+        .foregroundStyle(SBTheme.headerSecondaryInk)
+        .lineSpacing(2)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    .padding(.horizontal, 20)
+    .padding(.top, 54)
+    .padding(.bottom, 26)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background {
+      ZStack(alignment: .bottomLeading) {
+        SBTheme.header
+        HStack(spacing: 0) {
+          SBTheme.accent.frame(maxWidth: .infinity)
+          SBTheme.teal.frame(width: 86)
+          SBTheme.sky.frame(width: 52)
+        }
+        .frame(height: 4)
+      }
+      .ignoresSafeArea(edges: .top)
     }
   }
 
