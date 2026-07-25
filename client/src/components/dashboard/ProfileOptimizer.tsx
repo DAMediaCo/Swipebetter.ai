@@ -252,25 +252,31 @@ export function ProfileOptimizer() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-4 rounded-lg bg-muted/50">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
             <Checkbox
               id="enm-toggle-profile"
               checked={isEnm}
               onCheckedChange={(checked) => setIsEnm(checked === true)}
               data-testid="checkbox-enm"
+              className="mt-0.5"
             />
-            <label 
-              htmlFor="enm-toggle-profile" 
-              className="text-sm font-medium cursor-pointer flex-1"
-            >
-              This is an ENM/Poly profile
-            </label>
+            <div className="flex-1">
+              <label
+                htmlFor="enm-toggle-profile"
+                className="text-sm font-medium cursor-pointer"
+              >
+                This is an ENM/Poly profile
+              </label>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                Partner photos are expected. We’ll recognize photos with your partner, including an opposite-sex partner, and review them in the context of your ENM/poly profile.
+              </p>
+            </div>
             <Tooltip>
               <TooltipTrigger asChild>
-                <HelpCircle className="w-4 h-4 text-muted-foreground cursor-help" />
+                <HelpCircle className="mt-0.5 w-4 h-4 text-muted-foreground cursor-help" />
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
-                <p>Selecting this helps us tailor your feedback for ethical non-monogamy profiles.</p>
+                <p>We won’t treat an intentional partner photo like a profile mistake.</p>
               </TooltipContent>
             </Tooltip>
           </div>

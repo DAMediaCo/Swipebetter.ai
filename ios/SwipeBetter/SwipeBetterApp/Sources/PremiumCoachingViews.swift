@@ -18,6 +18,46 @@ struct PremiumProfileAuditView: View {
   private let genders = ["Man", "Woman", "Non-binary"]
   private let intents = ["Relationship", "Casual Dating", "Friendship", "Not Sure"]
 
+  private var screenshotSelectionSummary: String {
+    images.isEmpty ? "No screenshots selected" : "\(images.count) of 10 screenshots selected"
+  }
+
+  private var datingContextSection: some View {
+    VStack(spacing: 10) {
+      SBSectionHeader(
+        title: "Dating context",
+        detail: "This keeps advice specific to the audience and outcome you want."
+      )
+
+      SBSurface {
+        VStack(spacing: 2) {
+          SBSelectRow(title: "Dating app", selection: $platform) {
+            ForEach(platforms, id: \.self) { Text($0) }
+          }
+          SBDivider()
+          SBSelectRow(title: "Your profile", selection: $gender) {
+            ForEach(genders, id: \.self) { Text($0) }
+          }
+          SBDivider()
+          SBSelectRow(title: "What you want", selection: $intent) {
+            ForEach(intents, id: \.self) { Text($0) }
+          }
+          SBDivider()
+          Toggle("ENM / poly profile", isOn: $enm)
+            .font(.subheadline.weight(.medium))
+            .tint(SBTheme.accent)
+            .frame(minHeight: 42)
+          Text("Partner photos are expected. We’ll recognize photos with your partner, including an opposite-sex partner, and review them in the context of your ENM/poly profile.")
+            .font(.caption)
+            .foregroundStyle(SBTheme.secondaryInk)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 8)
+        }
+      }
+    }
+    .padding(.horizontal, 20)
+  }
+
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 16) {
@@ -80,7 +120,7 @@ struct PremiumProfileAuditView: View {
                 }
               }
 
-              Text(images.isEmpty ? "No screenshots selected" : "\(images.count) of 10 screenshots selected")
+              Text(screenshotSelectionSummary)
                 .font(.caption)
                 .foregroundStyle(SBTheme.secondaryInk)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -89,34 +129,7 @@ struct PremiumProfileAuditView: View {
         }
         .padding(.horizontal, 20)
 
-        VStack(spacing: 10) {
-          SBSectionHeader(
-            title: "Dating context",
-            detail: "This keeps advice specific to the audience and outcome you want."
-          )
-
-          SBSurface {
-            VStack(spacing: 2) {
-              SBSelectRow(title: "Dating app", selection: $platform) {
-                ForEach(platforms, id: \.self) { Text($0) }
-              }
-              SBDivider()
-              SBSelectRow(title: "Your profile", selection: $gender) {
-                ForEach(genders, id: \.self) { Text($0) }
-              }
-              SBDivider()
-              SBSelectRow(title: "What you want", selection: $intent) {
-                ForEach(intents, id: \.self) { Text($0) }
-              }
-              SBDivider()
-              Toggle("ENM / poly profile", isOn: $enm)
-                .font(.subheadline.weight(.medium))
-                .tint(SBTheme.accent)
-                .frame(minHeight: 42)
-            }
-          }
-        }
-        .padding(.horizontal, 20)
+        datingContextSection
 
         Button {
           Task {
