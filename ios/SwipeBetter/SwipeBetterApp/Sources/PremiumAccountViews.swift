@@ -716,92 +716,198 @@ struct PremiumKeyboardGuide: View {
 struct PremiumSnapSetupGuide: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(\.openURL) private var openURL
+  @State private var currentStep = 0
+
+  private let totalSteps = 6
 
   var body: some View {
     NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 18) {
-          HStack(spacing: 14) {
-            SBLogoMark(size: 52)
-            VStack(alignment: .leading, spacing: 3) {
-              Text("SwipeBetter Snap")
-                .font(.system(.title2, design: .rounded, weight: .bold))
-                .foregroundStyle(SBTheme.ink)
-              Text("One gesture from chat to ready-to-send replies")
-                .font(.subheadline)
-                .foregroundStyle(SBTheme.secondaryInk)
-            }
-          }
-
-          SBSurface {
-            VStack(alignment: .leading, spacing: 14) {
-              SBSectionHeader(title: "Create the shortcut", detail: "You only do this once.")
-              snapStep(1, "Tap Create Shortcut below.")
-              snapStep(2, "Add the Take Screenshot action.")
-              snapStep(3, "Add Create Replies from Screenshot from SwipeBetter directly underneath it.")
-              snapStep(4, "Name the shortcut SwipeBetter Snap, then tap Done.")
-
-              Button {
-                guard let url = URL(string: "shortcuts://create-shortcut") else { return }
-                openURL(url)
-              } label: {
-                Label("Create Shortcut", systemImage: "plus.square")
+      VStack(spacing: 0) {
+        ScrollView {
+          VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 14) {
+              SBLogoMark(size: 52)
+              VStack(alignment: .leading, spacing: 3) {
+                Text("SwipeBetter Snap")
+                  .font(.system(.title2, design: .rounded, weight: .bold))
+                  .foregroundStyle(SBTheme.ink)
+                Text("Guided setup for iOS 27")
+                  .font(.subheadline)
+                  .foregroundStyle(SBTheme.secondaryInk)
               }
-              .buttonStyle(SBPrimaryButtonStyle())
-              .accessibilityIdentifier("snap.openShortcutEditorButton")
             }
+
+            VStack(alignment: .leading, spacing: 8) {
+              HStack {
+                Text("Step \(currentStep + 1) of \(totalSteps)")
+                  .font(.caption.weight(.bold))
+                  .foregroundStyle(SBTheme.accent)
+                Spacer()
+                Text("\(Int(Double(currentStep + 1) / Double(totalSteps) * 100))%")
+                  .font(.caption.monospacedDigit())
+                  .foregroundStyle(SBTheme.secondaryInk)
+              }
+
+              ProgressView(value: Double(currentStep + 1), total: Double(totalSteps))
+                .tint(SBTheme.accent)
+            }
+
+            SBSurface {
+              VStack(alignment: .leading, spacing: 16) {
+                Image(systemName: stepIcon)
+                  .font(.system(size: 22, weight: .semibold))
+                  .foregroundStyle(SBTheme.accent)
+                  .frame(width: 44, height: 44)
+                  .background(SBTheme.accentSoft)
+                  .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                Text(stepTitle)
+                  .font(.system(.title3, design: .rounded, weight: .bold))
+                  .foregroundStyle(SBTheme.ink)
+
+                Text(stepInstructions)
+                  .font(.body)
+                  .foregroundStyle(SBTheme.ink)
+                  .fixedSize(horizontal: false, vertical: true)
+
+                if currentStep == 0 {
+                  Label(
+                    "Do not ask Siri to create or run this. Build it inside Apple’s Shortcuts app.",
+                    systemImage: "exclamationmark.triangle.fill"
+                  )
+                  .font(.subheadline.weight(.semibold))
+                  .foregroundStyle(SBTheme.teal)
+                  .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if currentStep < 5 {
+                  Button {
+                    guard let url = URL(string: "shortcuts://") else { return }
+                    openURL(url)
+                  } label: {
+                    Label("Open Apple Shortcuts", systemImage: "arrow.up.forward.app")
+                  }
+                  .buttonStyle(SBSecondaryButtonStyle())
+                  .accessibilityIdentifier("snap.openShortcutsButton")
+                }
+              }
+            }
+
+            if currentStep == 5 {
+              SBSurface {
+                VStack(alignment: .leading, spacing: 10) {
+                  Label("Action Button option", systemImage: "button.programmable")
+                    .font(.headline)
+                    .foregroundStyle(SBTheme.ink)
+                  Text("If your Action Button currently opens Siri, change it to Shortcut, then select your custom SwipeBetter Snap shortcut.")
+                    .font(.subheadline)
+                    .foregroundStyle(SBTheme.secondaryInk)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+              }
+            }
+
+            Text("Each run captures one screenshot and uses one reply-coaching credit. It does not continuously record your screen.")
+              .font(.caption)
+              .foregroundStyle(SBTheme.secondaryInk)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+          .padding(20)
+        }
+
+        SBDivider()
+
+        HStack(spacing: 12) {
+          if currentStep > 0 {
+            Button {
+              currentStep -= 1
+            } label: {
+              Label("Back", systemImage: "chevron.left")
+            }
+            .buttonStyle(SBSecondaryButtonStyle())
+            .accessibilityIdentifier("snap.previousStepButton")
           }
 
-          SBSurface {
-            VStack(alignment: .leading, spacing: 14) {
-              SBSectionHeader(title: "Connect the gesture")
-              snapStep(1, "Open Settings → Accessibility → Touch → Back Tap.")
-              snapStep(2, "Choose Double Tap or Triple Tap.")
-              snapStep(3, "Select SwipeBetter Snap under Shortcuts.")
-
-              Text("On iPhones with an Action Button, you can assign SwipeBetter Snap there instead.")
-                .font(.caption)
-                .foregroundStyle(SBTheme.secondaryInk)
-                .fixedSize(horizontal: false, vertical: true)
+          Button {
+            if currentStep < totalSteps - 1 {
+              currentStep += 1
+            } else {
+              currentStep = 0
+              dismiss()
             }
+          } label: {
+            Label(
+              currentStep < totalSteps - 1 ? "Next step" : "Finish setup",
+              systemImage: currentStep < totalSteps - 1 ? "chevron.right" : "checkmark"
+            )
           }
-
-          SBSurface {
-            VStack(alignment: .leading, spacing: 10) {
-              Label("How it works", systemImage: "hand.raised.fill")
-                .font(.headline)
-                .foregroundStyle(SBTheme.ink)
-              Text("Each time you run SwipeBetter Snap, Apple takes one screenshot and sends that image to SwipeBetter. It is not continuous screen recording. Each successful analysis uses one reply-coaching credit; unlimited plans remain unlimited.")
-                .font(.subheadline)
-                .foregroundStyle(SBTheme.secondaryInk)
-                .fixedSize(horizontal: false, vertical: true)
-            }
-          }
+          .buttonStyle(SBPrimaryButtonStyle())
+          .accessibilityIdentifier("snap.nextStepButton")
         }
         .padding(20)
+        .background(SBTheme.surface)
       }
       .sbPageBackground()
       .toolbar {
         ToolbarItem(placement: .confirmationAction) {
-          Button("Done") { dismiss() }
+          Button("Close") { dismiss() }
             .foregroundStyle(SBTheme.accent)
         }
+      }
+      .onAppear {
+        currentStep = 0
       }
     }
   }
 
-  private func snapStep(_ number: Int, _ text: String) -> some View {
-    HStack(alignment: .top, spacing: 10) {
-      Text("\(number)")
-        .font(.caption.weight(.bold))
-        .foregroundStyle(.white)
-        .frame(width: 24, height: 24)
-        .background(SBTheme.accent)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
-      Text(text)
-        .font(.subheadline)
-        .foregroundStyle(SBTheme.ink)
-        .fixedSize(horizontal: false, vertical: true)
+  private var stepTitle: String {
+    switch currentStep {
+    case 0:
+      return "Use Shortcuts, not Siri"
+    case 1:
+      return "Create a blank shortcut"
+    case 2:
+      return "Add Take Screenshot first"
+    case 3:
+      return "Add the SwipeBetter action second"
+    case 4:
+      return "Name and save it"
+    default:
+      return "Connect Back Tap"
+    }
+  }
+
+  private var stepInstructions: String {
+    switch currentStep {
+    case 0:
+      return "Open Apple’s Shortcuts app with the button below. If Siri appears, close it and return here. The setup must happen inside Shortcuts."
+    case 1:
+      return "In Shortcuts, tap the + button in the upper-right corner to create a new blank shortcut. Do not run a SwipeBetter suggestion by itself."
+    case 2:
+      return "Tap Add Action. Search for Take Screenshot, then tap the Take Screenshot action to add it as the first step."
+    case 3:
+      return "Tap Search Actions at the bottom. Search SwipeBetter, then add Create Replies from Screenshot directly below Take Screenshot. Its Screenshot field should connect automatically."
+    case 4:
+      return "Tap the shortcut name at the top, choose Rename, enter SwipeBetter Snap, then tap Done."
+    default:
+      return "Open Settings → Accessibility → Touch → Back Tap. Choose Double Tap or Triple Tap, then select the custom shortcut named SwipeBetter Snap."
+    }
+  }
+
+  private var stepIcon: String {
+    switch currentStep {
+    case 0:
+      return "square.grid.2x2"
+    case 1:
+      return "plus"
+    case 2:
+      return "camera.viewfinder"
+    case 3:
+      return "message.badge.waveform"
+    case 4:
+      return "checkmark.square"
+    default:
+      return "hand.tap"
     }
   }
 }

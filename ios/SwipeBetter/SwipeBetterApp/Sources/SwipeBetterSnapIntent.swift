@@ -106,24 +106,6 @@ struct CreateRepliesFromScreenshotIntent: AppIntent {
   }
 }
 
-struct SwipeBetterAppShortcuts: AppShortcutsProvider {
-  static var appShortcuts: [AppShortcut] {
-    AppShortcut(
-      intent: CreateRepliesFromScreenshotIntent(),
-      phrases: [
-        "Create replies with \(.applicationName)",
-        "Analyze this chat with \(.applicationName)",
-      ],
-      shortTitle: "Create Chat Replies",
-      systemImageName: "message.badge.waveform"
-    )
-  }
-
-  static var shortcutTileColor: ShortcutTileColor {
-    .orange
-  }
-}
-
 enum SwipeBetterSnapIntentError: LocalizedError {
   case invalidImage
   case noReplies
