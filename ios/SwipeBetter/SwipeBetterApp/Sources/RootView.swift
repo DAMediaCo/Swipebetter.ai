@@ -88,6 +88,15 @@ struct RootView: View {
           .background(.red.gradient, in: Capsule())
           .padding()
           .transition(.move(edge: .bottom).combined(with: .opacity))
+      } else if let message = model.snapStatusMessage {
+        Text(message)
+          .font(.footnote.weight(.semibold))
+          .foregroundStyle(.white)
+          .padding(.horizontal, 14)
+          .padding(.vertical, 10)
+          .background(SBTheme.teal, in: Capsule())
+          .padding()
+          .transition(.move(edge: .bottom).combined(with: .opacity))
       }
     }
     .sheet(

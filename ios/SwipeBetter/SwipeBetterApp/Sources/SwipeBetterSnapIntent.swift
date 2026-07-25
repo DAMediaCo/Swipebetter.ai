@@ -67,7 +67,7 @@ struct SwipeBetterAppShortcuts: AppShortcutsProvider {
   }
 }
 
-private enum SwipeBetterLatestScreenshotLoader {
+enum SwipeBetterLatestScreenshotLoader {
   static func load(
     now: Date = Date(),
     maxAge: TimeInterval = 2 * 60
@@ -127,7 +127,7 @@ private enum SwipeBetterLatestScreenshotLoader {
   }
 }
 
-private enum SwipeBetterSnapRunner {
+enum SwipeBetterSnapRunner {
   static func run(imageData: Data) async throws {
     let operationId = UUID().uuidString
     try SwipeBetterSnapStore.save(
@@ -219,7 +219,7 @@ enum SwipeBetterSnapIntentError: LocalizedError {
     case .photoAccessRequired:
       return "Open SwipeBetter, set up SwipeBetter Snap, and allow Full Photo Access."
     case .noRecentScreenshot:
-      return "No new screenshot was found. Take a screenshot, approve the automation, and try again."
+      return "No new screenshot was found. Take a screenshot, then tap Snap Back on the SwipeBetter keyboard."
     case .noReplies:
       return "SwipeBetter could not find enough conversation context in that screenshot."
     case .requestFailed(let message):

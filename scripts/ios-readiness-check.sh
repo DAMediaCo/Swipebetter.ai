@@ -90,7 +90,7 @@ const urlScheme = appInfo.CFBundleURLTypes?.[0]?.CFBundleURLSchemes?.[0];
 assertEqual(urlScheme, "swipebetter", "main app URL scheme");
 assertEqual(
   appInfo.NSPhotoLibraryUsageDescription,
-  "SwipeBetter uses selected screenshots for profile and chat coaching. SwipeBetter Snap reads only your newest screenshot when you approve its automation.",
+  "SwipeBetter uses selected screenshots for profile and chat coaching. Snap Back reads only your newest screenshot after you tap Snap Back on the SwipeBetter keyboard.",
   "photo library purpose string"
 );
 
@@ -444,14 +444,13 @@ for (const expected of [
   "nextKeyboardButton?.isHidden = !needsInputModeSwitchKey",
   'next.accessibilityIdentifier = "keyboard.nextKeyboardButton"',
   "advanceToNextInputMode()",
-  'coach.accessibilityIdentifier = "keyboard.coachChatButton"',
   'paste.accessibilityIdentifier = "keyboard.pasteChatButton"',
+  'snapBack.accessibilityIdentifier = "keyboard.snapBackButton"',
   "guard hasFullAccess else",
   "UIPasteboard.general.string",
   "KeyboardReplyComposer.reply",
-  'components.scheme = "swipebetter"',
-  'components.host = "replies"',
-  'URLQueryItem(name: "text", value: context)',
+  'URL(string: "swipebetter://snap")',
+  'message: "Opening SwipeBetter to read your newest screenshot..."',
   "textDocumentProxy.documentContextBeforeInput",
   "textDocumentProxy.documentContextAfterInput",
   "String(combined.suffix(1600))",
