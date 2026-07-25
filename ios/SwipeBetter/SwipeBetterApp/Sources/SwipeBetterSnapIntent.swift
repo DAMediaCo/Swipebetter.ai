@@ -49,6 +49,7 @@ struct CreateRepliesFromLatestScreenshotIntent: AppIntent {
 }
 
 struct SwipeBetterAppShortcuts: AppShortcutsProvider {
+  @AppShortcutsBuilder
   static var appShortcuts: [AppShortcut] {
     AppShortcut(
       intent: CreateRepliesFromLatestScreenshotIntent(),
@@ -59,6 +60,10 @@ struct SwipeBetterAppShortcuts: AppShortcutsProvider {
       shortTitle: "Snap Back",
       systemImageName: "message.badge.waveform"
     )
+  }
+
+  static var shortcutTileColor: ShortcutTileColor {
+    .pink
   }
 }
 

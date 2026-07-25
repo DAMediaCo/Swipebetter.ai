@@ -815,6 +815,15 @@ struct PremiumSnapSetupGuide: View {
                 .tint(SBTheme.accent)
             }
 
+            Label(
+              "Snap Back is available under Shortcuts → App Shortcuts → SwipeBetter. Apple does not place app shortcuts in All Shortcuts.",
+              systemImage: "square.grid.2x2"
+            )
+            .font(.caption)
+            .foregroundStyle(SBTheme.secondaryInk)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityIdentifier("snap.shortcutLocationNote")
+
             SBSurface {
               VStack(alignment: .leading, spacing: 16) {
                 Image(systemName: stepIcon)
