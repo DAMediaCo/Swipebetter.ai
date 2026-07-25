@@ -208,12 +208,23 @@ for (const expected of [
 
 const authSchema = fs.readFileSync("shared/models/auth.ts", "utf8");
 assertIncludes(authSchema, 'id: varchar("id").primaryKey().default(sql`gen_random_uuid()`)', "user ID UUID contract");
+for (const expected of [
+  'appleRefreshTokenEncrypted: text("apple_refresh_token_encrypted")',
+  'appleRefreshTokenClientId: varchar("apple_refresh_token_client_id")',
+  "'appleRefreshTokenEncrypted' | 'appleRefreshTokenClientId'",
+]) {
+  assertIncludes(authSchema, expected, "Apple account deletion token privacy contract");
+}
 
 const authRoutes = fs.readFileSync("server/auth.ts", "utf8");
 for (const expected of [
   'process.env.APPLE_CLIENT_ID',
   'process.env.APPLE_BUNDLE_ID || "app.replit.swipebetter"',
   '"app.replit.swipebetter"',
+  "authorizationCode",
+  "exchangeAppleAuthorizationCode",
+  "appleRefreshTokenEncrypted",
+  "appleRefreshTokenClientId",
 ]) {
   assertIncludes(authRoutes, expected, "native Apple Sign In audience contract");
 }
@@ -265,6 +276,14 @@ if (!deleteMatch) {
   throw new Error("Could not find delete account implementation");
 }
 assertIncludes(deleteMatch[0], "clearLocalAccountState()", "delete account privacy cleanup contract");
+for (const expected of [
+  "credential.authorizationCode",
+  "authorizationCode: authorizationCode",
+  "requiresAppleReauthenticationForDeletion = true",
+  "func confirmAppleAndDelete",
+]) {
+  assertIncludes(appModel, expected, "Sign in with Apple account deletion contract");
+}
 const clearStateMatch = appModel.match(/private func clearLocalAccountState\(\) \{[\s\S]*?\n  \}/);
 if (!clearStateMatch) {
   throw new Error("Could not find local account state cleanup implementation");
@@ -305,6 +324,13 @@ assertIncludes(refreshAfterAuthMatch[0], "startPurchaseUpdates()", "purchase lis
 assertIncludes(clearStateMatch[0], "stopPurchaseUpdates()", "purchase listener privacy cleanup contract");
 
 const rootView = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/RootView.swift", "utf8");
+for (const expected of [
+  "AppleDeletionReauthenticationView",
+  '"Confirm with Apple"',
+  '"account.appleDeletionReauthenticationButton"',
+]) {
+  assertIncludes(rootView, expected, "Apple deletion reauthentication UI contract");
+}
 for (const expected of [
   '"root.tabView"',
   '"auth.emailField"',
@@ -356,7 +382,9 @@ const appEntry = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/SwipeBe
 for (const expected of [
   '"-SWIPEBETTER_UI_TESTING"',
   '"-SWIPEBETTER_APP_STORE_SCREENSHOTS"',
+  '"-SWIPEBETTER_APPLE_DELETE_REAUTH"',
   "configureForAppStoreScreenshots()",
+  "requiresAppleReauthenticationForDeletion = true",
   "await model.bootstrap()",
 ]) {
   assertIncludes(appEntry, expected, "native UI testing launch contract");
@@ -368,6 +396,7 @@ for (const expected of [
   'app.launchArguments.append("-SWIPEBETTER_UI_TESTING")',
   'app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")',
   'app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")',
+  'app.launchArguments.append("-SWIPEBETTER_APPLE_DELETE_REAUTH")',
   '"auth.emailField"',
   '"auth.passwordField"',
   '"auth.loginButton"',
@@ -376,6 +405,8 @@ for (const expected of [
   '"auth.promoCodeField"',
   '"account.restorePurchasesButton"',
   '"account.manageSubscriptionButton"',
+  '"account.appleDeletionReauthenticationButton"',
+  "testAppleAccountDeletionReauthenticationIsClearAndActionable",
 ]) {
   assertIncludes(uiTests, expected, "native UI smoke test contract");
 }

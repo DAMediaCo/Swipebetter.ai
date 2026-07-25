@@ -9,6 +9,7 @@ import { users } from "@shared/models/auth";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
 import { excludeScreenshotsFromHistory } from "./privacy";
+import { revokeAppleAuthorization } from "./appleAuthTokens";
 import { z } from "zod";
 import sharp from "sharp";
 import {
@@ -278,6 +279,25 @@ export async function registerRoutes(
     const userId = req.session.userId;
 
     try {
+      const [account] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      if (!account) {
+        return res.status(404).json({ error: "Account not found" });
+      }
+
+      if (
+        account.appleId
+        && (!account.appleRefreshTokenEncrypted || !account.appleRefreshTokenClientId)
+      ) {
+        return res.status(409).json({
+          code: "APPLE_REAUTH_REQUIRED",
+          error: "Confirm with Apple once more to securely delete this account.",
+        });
+      }
+
       const subscription = await storage.getUserSubscription(userId);
       const stripeSubscriptionId = subscription?.stripeSubscriptionId;
       const shouldCancelStripe = !!stripeSubscriptionId
@@ -286,6 +306,13 @@ export async function registerRoutes(
       if (shouldCancelStripe) {
         const stripe = await getUncachableStripeClient();
         await stripe.subscriptions.cancel(stripeSubscriptionId);
+      }
+
+      if (account.appleRefreshTokenEncrypted && account.appleRefreshTokenClientId) {
+        await revokeAppleAuthorization(
+          account.appleRefreshTokenEncrypted,
+          account.appleRefreshTokenClientId,
+        );
       }
 
       await db.delete(users).where(eq(users.id, userId));
@@ -300,6 +327,7 @@ export async function registerRoutes(
         res.json({
           success: true,
           stripeSubscriptionCanceled: shouldCancelStripe,
+          appleAuthorizationRevoked: !!account.appleRefreshTokenEncrypted,
         });
       });
     } catch (error) {

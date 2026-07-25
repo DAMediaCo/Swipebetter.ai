@@ -239,7 +239,9 @@ export default function Account() {
 
             {deleteAccountMutation.isError && (
               <p className="text-sm text-destructive" role="alert">
-                We could not delete your account. Please try again or contact support.
+                {deleteAccountMutation.error instanceof Error
+                  ? deleteAccountMutation.error.message
+                  : "We could not delete your account. Please try again or contact support."}
               </p>
             )}
           </CardContent>

@@ -77,6 +77,7 @@ public struct AppleAuthRequest: Encodable {
   }
 
   public let identityToken: String
+  public let authorizationCode: String
   public let user: AppleUser?
 }
 

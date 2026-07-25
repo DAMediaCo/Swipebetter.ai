@@ -12,6 +12,7 @@ import { signToken } from "./jwt";
 import { OAuth2Client } from "google-auth-library";
 import appleSignin from "apple-signin-auth";
 import { sendPasswordResetEmail } from "./email";
+import { exchangeAppleAuthorizationCode } from "./appleAuthTokens";
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -79,7 +80,12 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
 }
 
 function sanitizeUser(user: typeof users.$inferSelect): SafeUser {
-  const { passwordHash, ...safeUser } = user;
+  const {
+    passwordHash,
+    appleRefreshTokenEncrypted,
+    appleRefreshTokenClientId,
+    ...safeUser
+  } = user;
   return safeUser;
 }
 
@@ -260,7 +266,7 @@ export function registerAuthRoutes(app: Express) {
 
   app.post("/api/auth/apple", authLimiter, async (req, res) => {
     try {
-      const { identityToken, user: appleUser } = req.body;
+      const { identityToken, authorizationCode, user: appleUser } = req.body;
       
       if (!identityToken) {
         return res.status(400).json({ message: "Missing identity token" });
@@ -331,6 +337,10 @@ export function registerAuthRoutes(app: Express) {
       const email = payload.email || appleUser?.email;
       const firstName = appleUser?.name?.firstName || null;
       const lastName = appleUser?.name?.lastName || null;
+      const appleClientId = payload.aud;
+      const encryptedRefreshToken = authorizationCode
+        ? await exchangeAppleAuthorizationCode(authorizationCode, appleClientId)
+        : null;
 
       // First, try to find user by appleId (Apple only provides email on first sign-in)
       let [existingUser] = await db
@@ -357,9 +367,23 @@ export function registerAuthRoutes(app: Express) {
         if (!existingUser.appleId) {
           await db
             .update(users)
-            .set({ appleId })
+            .set({
+              appleId,
+              ...(encryptedRefreshToken ? {
+                appleRefreshTokenEncrypted: encryptedRefreshToken,
+                appleRefreshTokenClientId: appleClientId,
+              } : {}),
+            })
             .where(eq(users.id, existingUser.id));
           existingUser.appleId = appleId;
+        } else if (encryptedRefreshToken) {
+          await db
+            .update(users)
+            .set({
+              appleRefreshTokenEncrypted: encryptedRefreshToken,
+              appleRefreshTokenClientId: appleClientId,
+            })
+            .where(eq(users.id, existingUser.id));
         }
       } else {
         const [newUser] = await db
@@ -367,6 +391,8 @@ export function registerAuthRoutes(app: Express) {
           .values({
             email,
             appleId,
+            appleRefreshTokenEncrypted: encryptedRefreshToken,
+            appleRefreshTokenClientId: encryptedRefreshToken ? appleClientId : null,
             firstName,
             lastName,
           })
@@ -430,7 +456,7 @@ export function registerAuthRoutes(app: Express) {
     });
     try {
       // Apple sends form-urlencoded data with id_token and optionally user info
-      const { id_token, user: userJson, state } = req.body;
+      const { code, id_token, user: userJson, state } = req.body;
       
       // Validate state to prevent CSRF (using cookie instead of session)
       if (!state || state !== storedState) {
@@ -458,6 +484,14 @@ export function registerAuthRoutes(app: Express) {
 
       const appleId = payload.sub;
       const email = payload.email;
+      const appleClientId = process.env.APPLE_CLIENT_ID!;
+      const encryptedRefreshToken = code
+        ? await exchangeAppleAuthorizationCode(
+          code,
+          appleClientId,
+          "https://swipebetter.ai/api/auth/apple/callback",
+        )
+        : null;
       
       // Parse user info if provided (only on first sign-in)
       let firstName = null;
@@ -497,9 +531,23 @@ export function registerAuthRoutes(app: Express) {
         if (!existingUser.appleId) {
           await db
             .update(users)
-            .set({ appleId })
+            .set({
+              appleId,
+              ...(encryptedRefreshToken ? {
+                appleRefreshTokenEncrypted: encryptedRefreshToken,
+                appleRefreshTokenClientId: appleClientId,
+              } : {}),
+            })
             .where(eq(users.id, existingUser.id));
           existingUser.appleId = appleId;
+        } else if (encryptedRefreshToken) {
+          await db
+            .update(users)
+            .set({
+              appleRefreshTokenEncrypted: encryptedRefreshToken,
+              appleRefreshTokenClientId: appleClientId,
+            })
+            .where(eq(users.id, existingUser.id));
         }
       } else {
         const [newUser] = await db
@@ -507,6 +555,8 @@ export function registerAuthRoutes(app: Express) {
           .values({
             email: email!,
             appleId,
+            appleRefreshTokenEncrypted: encryptedRefreshToken,
+            appleRefreshTokenClientId: encryptedRefreshToken ? appleClientId : null,
             firstName,
             lastName,
           })

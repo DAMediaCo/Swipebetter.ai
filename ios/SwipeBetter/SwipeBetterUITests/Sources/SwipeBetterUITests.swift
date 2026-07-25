@@ -34,6 +34,22 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.buttons["account.manageSubscriptionButton"].waitForExistence(timeout: 2))
   }
 
+  func testAppleAccountDeletionReauthenticationIsClearAndActionable() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("account")
+    app.launchArguments.append("-SWIPEBETTER_APPLE_DELETE_REAUTH")
+    app.launch()
+
+    XCTAssertTrue(app.staticTexts["Confirm with Apple"].waitForExistence(timeout: 8))
+    let explanation = app.staticTexts.matching(
+      NSPredicate(format: "label CONTAINS %@", "revoke its sign-in permission")
+    ).firstMatch
+    XCTAssertTrue(explanation.exists)
+    XCTAssertTrue(app.buttons["account.appleDeletionReauthenticationButton"].isHittable)
+  }
+
   func testSnapSetupGuideIsVisibleAndReadable() throws {
     let app = XCUIApplication()
     app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
