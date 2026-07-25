@@ -10,7 +10,7 @@ on:
 jobs:
   ios-readiness:
     name: Readiness Gate
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 30
     concurrency:
       group: ios-readiness-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
