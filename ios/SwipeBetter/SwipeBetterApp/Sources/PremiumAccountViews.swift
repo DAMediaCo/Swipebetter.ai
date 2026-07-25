@@ -1,4 +1,5 @@
 import StoreKit
+import Photos
 import SwiftUI
 import UIKit
 
@@ -778,8 +779,9 @@ struct PremiumSnapSetupGuide: View {
   @Environment(\.dismiss) private var dismiss
   @Environment(\.openURL) private var openURL
   @State private var currentStep = 0
+  @State private var photoAccess = PHPhotoLibrary.authorizationStatus(for: .readWrite)
 
-  private let totalSteps = 6
+  private let totalSteps = 5
 
   var body: some View {
     NavigationStack {
@@ -831,6 +833,10 @@ struct PremiumSnapSetupGuide: View {
                   .foregroundStyle(SBTheme.ink)
                   .fixedSize(horizontal: false, vertical: true)
 
+                if currentStep == 0 {
+                  photoAccessControl
+                }
+
                 if currentStep == 2 {
                   Label(
                     "Choose Run After Confirmation. Run Immediately could send every screenshot for analysis.",
@@ -841,7 +847,7 @@ struct PremiumSnapSetupGuide: View {
                   .fixedSize(horizontal: false, vertical: true)
                 }
 
-                if currentStep < 5 {
+                if currentStep > 0 && currentStep < 4 {
                   Button {
                     guard let url = URL(string: "shortcuts://") else { return }
                     openURL(url)
@@ -854,7 +860,7 @@ struct PremiumSnapSetupGuide: View {
               }
             }
 
-            Text("SwipeBetter analyzes one approved screenshot per run and uses one reply-coaching credit. This setup does not continuously record your screen.")
+            Text("SwipeBetter reads only the newest screenshot when you approve the automation. It does not continuously record your screen or scan older photos.")
               .font(.caption)
               .foregroundStyle(SBTheme.secondaryInk)
               .fixedSize(horizontal: false, vertical: true)
@@ -911,15 +917,13 @@ struct PremiumSnapSetupGuide: View {
   private var stepTitle: String {
     switch currentStep {
     case 0:
-      return "Create a new shortcut"
+      return "Allow screenshot access"
     case 1:
-      return "Add the Screenshot automation"
+      return "Create a Screenshot automation"
     case 2:
       return "Require your approval"
     case 3:
-      return "Get the newest photo"
-    case 4:
-      return "Send it to SwipeBetter"
+      return "Add one SwipeBetter action"
     default:
       return "Test it in your dating app"
     }
@@ -928,34 +932,61 @@ struct PremiumSnapSetupGuide: View {
   private var stepInstructions: String {
     switch currentStep {
     case 0:
-      return "Open Apple’s Shortcuts app and tap +. The Siri or Describe a Change box is now part of the iOS 27 shortcut editor; it has not taken you out of Shortcuts. Leave that box empty and open Automation in the editor."
+      return "Allow Full Photo Access once. SwipeBetter needs this only to find the newest screenshot after you approve the automation."
     case 1:
-      return "Inside the shortcut editor, open Automation, choose Screenshot, and select the trigger that runs when a screenshot is saved."
+      return "Open Shortcuts, tap Automation, tap +, choose Screenshot, and select the trigger that runs when a screenshot is saved."
     case 2:
       return "Set the screenshot automation to Run After Confirmation. This keeps unrelated screenshots private unless you approve the SwipeBetter run."
     case 3:
-      return "Add the Get Latest Photos action and set it to retrieve 1 photo. Because the automation starts after a screenshot is saved, this retrieves that new screenshot."
-    case 4:
-      return "Add Create Replies from Screenshot directly below Get Latest Photos. If its Screenshot field is blank, tap it and choose Latest Photos."
+      return "Delete the old Get Latest Photos and Create Replies from Screenshot actions. Add the new Create Replies from Latest Screenshot action by itself. It has no fields to connect."
     default:
-      return "Name it SwipeBetter Snap and tap Done. Open Bumble, Tinder, or another dating app and take a screenshot. Approve the automation, then open the SwipeBetter keyboard when the ready notice appears."
+      return "Tap Done. Open Bumble, Tinder, or another dating app and take a screenshot. Approve the automation, then open the SwipeBetter keyboard when the ready notice appears."
     }
   }
 
   private var stepIcon: String {
     switch currentStep {
     case 0:
-      return "plus"
+      return "photo.badge.checkmark"
     case 1:
       return "camera.viewfinder"
     case 2:
       return "hand.raised.fill"
     case 3:
-      return "photo.on.rectangle"
-    case 4:
       return "message.badge.waveform"
     default:
       return "checkmark.circle"
+    }
+  }
+
+  @ViewBuilder
+  private var photoAccessControl: some View {
+    switch photoAccess {
+    case .authorized:
+      Label("Full Photo Access allowed", systemImage: "checkmark.circle.fill")
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(SBTheme.teal)
+        .accessibilityIdentifier("snap.photoAccessGranted")
+    case .denied, .restricted, .limited:
+      Button {
+        openURL(URL(string: UIApplication.openSettingsURLString)!)
+      } label: {
+        Label("Open Settings for Full Access", systemImage: "gear")
+      }
+      .buttonStyle(SBSecondaryButtonStyle())
+      .accessibilityIdentifier("snap.photoAccessButton")
+    case .notDetermined:
+      Button {
+        Task {
+          photoAccess = await PHPhotoLibrary.requestAuthorization(for: .readWrite)
+        }
+      } label: {
+        Label("Allow Full Photo Access", systemImage: "photo.badge.checkmark")
+      }
+      .buttonStyle(SBSecondaryButtonStyle())
+      .accessibilityIdentifier("snap.photoAccessButton")
+    @unknown default:
+      EmptyView()
     }
   }
 }
