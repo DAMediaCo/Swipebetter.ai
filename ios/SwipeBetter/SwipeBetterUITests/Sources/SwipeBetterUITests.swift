@@ -90,19 +90,20 @@ final class SwipeBetterUITests: XCTestCase {
     setupButton.tap()
 
     XCTAssertTrue(app.staticTexts["SwipeBetter Snap"].waitForExistence(timeout: 3))
-    XCTAssertTrue(app.staticTexts["Step 1 of 6"].exists)
-    XCTAssertTrue(app.staticTexts["Create a new shortcut"].exists)
-    XCTAssertTrue(app.buttons["snap.openShortcutsButton"].isHittable)
+    XCTAssertTrue(app.staticTexts["Step 1 of 5"].exists)
+    XCTAssertTrue(app.staticTexts["Allow screenshot access"].exists)
+    XCTAssertTrue(app.buttons["snap.photoAccessButton"].exists)
 
     let nextButton = app.buttons["snap.nextStepButton"]
     XCTAssertTrue(nextButton.isHittable)
     nextButton.tap()
-    XCTAssertTrue(app.staticTexts["Step 2 of 6"].waitForExistence(timeout: 2))
-    XCTAssertTrue(app.staticTexts["Add the Screenshot automation"].exists)
+    XCTAssertTrue(app.staticTexts["Step 2 of 5"].waitForExistence(timeout: 2))
+    XCTAssertTrue(app.staticTexts["Create a Screenshot automation"].exists)
+    XCTAssertTrue(app.buttons["snap.openShortcutsButton"].isHittable)
 
-    for step in 3...6 {
+    for step in 3...5 {
       nextButton.tap()
-      XCTAssertTrue(app.staticTexts["Step \(step) of 6"].waitForExistence(timeout: 2))
+      XCTAssertTrue(app.staticTexts["Step \(step) of 5"].waitForExistence(timeout: 2))
     }
     XCTAssertTrue(app.staticTexts["Test it in your dating app"].exists)
     XCTAssertTrue(app.staticTexts["snap.privacyNote"].exists)

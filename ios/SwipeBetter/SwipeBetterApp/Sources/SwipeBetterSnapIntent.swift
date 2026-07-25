@@ -1,13 +1,15 @@
 import AppIntents
 import Foundation
+import Photos
 import UIKit
 
 struct CreateRepliesFromScreenshotIntent: AppIntent {
-  static let title: LocalizedStringResource = "Create Replies from Screenshot"
+  static let title: LocalizedStringResource = "Create Replies from Screenshot (Legacy)"
   static let description = IntentDescription(
-    "Reads a dating-app chat screenshot and prepares three replies in the SwipeBetter keyboard."
+    "Legacy compatibility action. Use Create Replies from Latest Screenshot for new automations."
   )
   static let openAppWhenRun = false
+  static let isDiscoverable = false
 
   @Parameter(
     title: "Screenshot",
@@ -27,6 +29,101 @@ struct CreateRepliesFromScreenshotIntent: AppIntent {
   }
 
   func perform() async throws -> some IntentResult & ProvidesDialog {
+    try await SwipeBetterSnapRunner.run(imageData: screenshot.data)
+    return .result(dialog: "Your replies are ready. Open the SwipeBetter keyboard and tap one to send it.")
+  }
+}
+
+struct CreateRepliesFromLatestScreenshotIntent: AppIntent {
+  static let title: LocalizedStringResource = "Create Replies from Latest Screenshot"
+  static let description = IntentDescription(
+    "Reads only the newest screenshot in Photos and prepares three replies in the SwipeBetter keyboard."
+  )
+  static let openAppWhenRun = false
+
+  func perform() async throws -> some IntentResult & ProvidesDialog {
+    let imageData = try await SwipeBetterLatestScreenshotLoader.load()
+    try await SwipeBetterSnapRunner.run(imageData: imageData)
+    return .result(dialog: "Your replies are ready. Open the SwipeBetter keyboard and tap one to send it.")
+  }
+}
+
+struct SwipeBetterAppShortcuts: AppShortcutsProvider {
+  static var appShortcuts: [AppShortcut] {
+    AppShortcut(
+      intent: CreateRepliesFromLatestScreenshotIntent(),
+      phrases: [
+        "Create replies with \(.applicationName)",
+        "Read my latest screenshot with \(.applicationName)",
+      ],
+      shortTitle: "Snap Back",
+      systemImageName: "message.badge.waveform"
+    )
+  }
+}
+
+private enum SwipeBetterLatestScreenshotLoader {
+  static func load(
+    now: Date = Date(),
+    maxAge: TimeInterval = 2 * 60
+  ) async throws -> Data {
+    let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+    guard status == .authorized else {
+      throw SwipeBetterSnapIntentError.photoAccessRequired
+    }
+
+    for attempt in 0..<5 {
+      if let asset = newestRecentScreenshot(now: now, maxAge: maxAge),
+         let data = await imageData(for: asset) {
+        return data
+      }
+
+      if attempt < 4 {
+        try await Task.sleep(nanoseconds: 400_000_000)
+      }
+    }
+
+    throw SwipeBetterSnapIntentError.noRecentScreenshot
+  }
+
+  private static func newestRecentScreenshot(now: Date, maxAge: TimeInterval) -> PHAsset? {
+    let options = PHFetchOptions()
+    options.fetchLimit = 25
+    options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+
+    let assets = PHAsset.fetchAssets(with: .image, options: options)
+    var result: PHAsset?
+    assets.enumerateObjects { asset, _, stop in
+      guard asset.mediaSubtypes.contains(.photoScreenshot),
+            let createdAt = asset.creationDate,
+            now.timeIntervalSince(createdAt) <= maxAge else {
+        return
+      }
+      result = asset
+      stop.pointee = true
+    }
+    return result
+  }
+
+  private static func imageData(for asset: PHAsset) async -> Data? {
+    await withCheckedContinuation { continuation in
+      let options = PHImageRequestOptions()
+      options.deliveryMode = .highQualityFormat
+      options.isNetworkAccessAllowed = true
+      options.isSynchronous = false
+
+      PHImageManager.default().requestImageDataAndOrientation(
+        for: asset,
+        options: options
+      ) { data, _, _, _ in
+        continuation.resume(returning: data)
+      }
+    }
+  }
+}
+
+private enum SwipeBetterSnapRunner {
+  static func run(imageData: Data) async throws {
     let operationId = UUID().uuidString
     try SwipeBetterSnapStore.save(
       SwipeBetterSnapPayload(
@@ -37,9 +134,8 @@ struct CreateRepliesFromScreenshotIntent: AppIntent {
     )
 
     do {
-      let imageData = screenshot.data
       guard UIImage(data: imageData) != nil,
-            let screenshotDataURL = Self.jpegDataURL(from: imageData) else {
+            let screenshotDataURL = jpegDataURL(from: imageData) else {
         throw SwipeBetterSnapIntentError.invalidImage
       }
 
@@ -71,10 +167,8 @@ struct CreateRepliesFromScreenshotIntent: AppIntent {
           message: "Replies are ready in the SwipeBetter keyboard."
         )
       )
-
-      return .result(dialog: "Your replies are ready. Open the SwipeBetter keyboard and tap one to send it.")
     } catch {
-      let message = Self.friendlyMessage(for: error)
+      let message = friendlyMessage(for: error)
       try? SwipeBetterSnapStore.save(
         SwipeBetterSnapPayload(
           id: operationId,
@@ -108,6 +202,8 @@ struct CreateRepliesFromScreenshotIntent: AppIntent {
 
 enum SwipeBetterSnapIntentError: LocalizedError {
   case invalidImage
+  case photoAccessRequired
+  case noRecentScreenshot
   case noReplies
   case requestFailed(String)
 
@@ -115,6 +211,10 @@ enum SwipeBetterSnapIntentError: LocalizedError {
     switch self {
     case .invalidImage:
       return "The shortcut did not provide a readable screenshot."
+    case .photoAccessRequired:
+      return "Open SwipeBetter, set up SwipeBetter Snap, and allow Full Photo Access."
+    case .noRecentScreenshot:
+      return "No new screenshot was found. Take a screenshot, approve the automation, and try again."
     case .noReplies:
       return "SwipeBetter could not find enough conversation context in that screenshot."
     case .requestFailed(let message):

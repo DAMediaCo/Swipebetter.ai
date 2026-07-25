@@ -88,7 +88,11 @@ assertEqual(appInfo.ITSAppUsesNonExemptEncryption, false, "export compliance dec
 assertEqual(appInfo.UIRequiresFullScreen, true, "main app full-screen posture");
 const urlScheme = appInfo.CFBundleURLTypes?.[0]?.CFBundleURLSchemes?.[0];
 assertEqual(urlScheme, "swipebetter", "main app URL scheme");
-assertEqual(appInfo.NSPhotoLibraryUsageDescription, "SwipeBetter uses selected screenshots to analyze dating profiles and chats.", "photo library purpose string");
+assertEqual(
+  appInfo.NSPhotoLibraryUsageDescription,
+  "SwipeBetter uses selected screenshots for profile and chat coaching. SwipeBetter Snap reads only your newest screenshot when you approve its automation.",
+  "photo library purpose string"
+);
 
 const appIconSetPath = "ios/SwipeBetter/SwipeBetterApp/Resources/Assets.xcassets/AppIcon.appiconset";
 const appIconSet = JSON.parse(fs.readFileSync(`${appIconSetPath}/Contents.json`, "utf8"));
