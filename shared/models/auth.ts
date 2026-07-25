@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, jsonb, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { index, jsonb, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -23,6 +23,8 @@ export const users = pgTable("users", {
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   appleId: varchar("apple_id").unique(),
+  appleRefreshTokenEncrypted: text("apple_refresh_token_encrypted"),
+  appleRefreshTokenClientId: varchar("apple_refresh_token_client_id"),
   googleId: varchar("google_id").unique(),
   lastActiveAt: timestamp("last_active_at"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -50,7 +52,10 @@ export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 
 // Safe user type (without password)
-export type SafeUser = Omit<User, 'passwordHash'>;
+export type SafeUser = Omit<
+  User,
+  'passwordHash' | 'appleRefreshTokenEncrypted' | 'appleRefreshTokenClientId'
+>;
 
 // Password reset tokens table
 export const passwordResetTokens = pgTable("password_reset_tokens", {

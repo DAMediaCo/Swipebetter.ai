@@ -19,6 +19,7 @@ final class AppModel {
   var deepLinkRevision = 0
   var lastError: String?
   var isBusy = false
+  var requiresAppleReauthenticationForDeletion = false
 
   let api = SwipeBetterAPI.shared
   let purchases = PurchaseStore()
@@ -155,24 +156,8 @@ final class AppModel {
   }
 
   func signInWithApple(credential: ASAuthorizationAppleIDCredential) async {
-    guard let tokenData = credential.identityToken,
-          let identityToken = String(data: tokenData, encoding: .utf8) else {
-      lastError = "Apple did not return a usable identity token."
-      return
-    }
     await runBusy {
-      let name = AppleAuthRequest.AppleUser.Name(
-        firstName: credential.fullName?.givenName,
-        lastName: credential.fullName?.familyName
-      )
-      let appleUser = AppleAuthRequest.AppleUser(
-        email: credential.email,
-        name: name.firstName == nil && name.lastName == nil ? nil : name
-      )
-      let response: AuthUserResponse = try await api.post(
-        "/api/auth/apple",
-        body: AppleAuthRequest(identityToken: identityToken, user: appleUser)
-      )
+      let response = try await authenticateWithApple(credential: credential)
       user = response.user
       await refreshAfterAuth()
     }
@@ -272,8 +257,25 @@ final class AppModel {
   }
 
   func deleteAccount() async {
-    await runBusy {
+    isBusy = true
+    lastError = nil
+    defer { isBusy = false }
+    do {
       let _: EmptyResponse = try await api.delete("/api/account")
+      clearLocalAccountState()
+    } catch SwipeBetterAPIError.server(let status, _) where status == 409 {
+      requiresAppleReauthenticationForDeletion = true
+    } catch {
+      lastError = error.localizedDescription
+    }
+  }
+
+  func confirmAppleAndDelete(credential: ASAuthorizationAppleIDCredential) async {
+    await runBusy {
+      let response = try await authenticateWithApple(credential: credential)
+      user = response.user
+      let _: EmptyResponse = try await api.delete("/api/account")
+      requiresAppleReauthenticationForDeletion = false
       clearLocalAccountState()
     }
   }
@@ -347,6 +349,36 @@ final class AppModel {
     }
   }
 
+  private func authenticateWithApple(
+    credential: ASAuthorizationAppleIDCredential
+  ) async throws -> AuthUserResponse {
+    guard let tokenData = credential.identityToken,
+          let identityToken = String(data: tokenData, encoding: .utf8),
+          let codeData = credential.authorizationCode,
+          let authorizationCode = String(data: codeData, encoding: .utf8) else {
+      throw SwipeBetterAPIError.server(
+        status: 400,
+        message: "Apple did not return the authorization needed to secure this account."
+      )
+    }
+    let name = AppleAuthRequest.AppleUser.Name(
+      firstName: credential.fullName?.givenName,
+      lastName: credential.fullName?.familyName
+    )
+    let appleUser = AppleAuthRequest.AppleUser(
+      email: credential.email,
+      name: name.firstName == nil && name.lastName == nil ? nil : name
+    )
+    return try await api.post(
+      "/api/auth/apple",
+      body: AppleAuthRequest(
+        identityToken: identityToken,
+        authorizationCode: authorizationCode,
+        user: appleUser
+      )
+    )
+  }
+
   private func runBusyReturning<T>(_ operation: () async throws -> T) async -> T? {
     isBusy = true
     lastError = nil
@@ -397,6 +429,7 @@ final class AppModel {
     replyHistory = []
     pendingImportText = ""
     pendingImportImages = []
+    requiresAppleReauthenticationForDeletion = false
     requestedTabIdentifier = nil
     stopPurchaseUpdates()
     purchases.resetTransientState()

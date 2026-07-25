@@ -12,6 +12,9 @@ struct SwipeBetterApp: App {
           let arguments = ProcessInfo.processInfo.arguments
           if arguments.contains("-SWIPEBETTER_APP_STORE_SCREENSHOTS") {
             model.configureForAppStoreScreenshots()
+            if arguments.contains("-SWIPEBETTER_APPLE_DELETE_REAUTH") {
+              model.requiresAppleReauthenticationForDeletion = true
+            }
             return
           }
           guard !arguments.contains("-SWIPEBETTER_UI_TESTING") else { return }

@@ -10,7 +10,7 @@
     "check": "tsc",
     "test:ios-iap": "node --import tsx --test server/appleIap.test.ts",
     "test:ai-prompts": "node --experimental-strip-types --test server/aiPrompts.test.mjs",
-    "test:privacy": "node --import tsx --test server/privacy.test.ts server/historicalScreenshotCleanup.test.ts",
+    "test:privacy": "node --import tsx --test server/privacy.test.ts server/historicalScreenshotCleanup.test.ts server/appleAuthTokens.test.ts",
     "audit:historical-screenshots": "tsx scripts/purge-historical-screenshots.ts",
     "test:ios-ui": "scripts/ios-ui-tests.sh",
     "check:apple-iap-config": "tsx scripts/apple-iap-preflight.ts",

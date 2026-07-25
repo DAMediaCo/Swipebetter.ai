@@ -90,6 +90,14 @@ struct RootView: View {
           .transition(.move(edge: .bottom).combined(with: .opacity))
       }
     }
+    .sheet(
+      isPresented: Binding(
+        get: { model.requiresAppleReauthenticationForDeletion },
+        set: { model.requiresAppleReauthenticationForDeletion = $0 }
+      )
+    ) {
+      AppleDeletionReauthenticationView()
+    }
     .overlay {
       if model.isBusy {
         ZStack {
@@ -153,6 +161,60 @@ struct RootView: View {
       return
     }
     selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies
+  }
+}
+
+private struct AppleDeletionReauthenticationView: View {
+  @Environment(AppModel.self) private var model
+  @Environment(\.dismiss) private var dismiss
+
+  var body: some View {
+    NavigationStack {
+      VStack(alignment: .leading, spacing: 20) {
+        Image(systemName: "person.badge.key.fill")
+          .font(.system(size: 34, weight: .semibold))
+          .foregroundStyle(SBTheme.accent)
+
+        Text("Confirm with Apple")
+          .font(.title2.weight(.bold))
+
+        Text("Apple requires SwipeBetter to revoke its sign-in permission when your account is deleted. Confirm your identity once more, then deletion will finish automatically.")
+          .font(.body)
+          .foregroundStyle(.secondary)
+
+        SignInWithAppleButton(.continue) { request in
+          request.requestedScopes = []
+        } onCompletion: { result in
+          if case .success(let authorization) = result,
+             let credential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            Task {
+              await model.confirmAppleAndDelete(credential: credential)
+              if !model.isSignedIn {
+                dismiss()
+              }
+            }
+          } else if case .failure(let error) = result {
+            model.lastError = error.localizedDescription
+          }
+        }
+        .signInWithAppleButtonStyle(.black)
+        .frame(height: 50)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityIdentifier("account.appleDeletionReauthenticationButton")
+
+        Spacer()
+      }
+      .padding(24)
+      .navigationTitle("Delete Account")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .cancellationAction) {
+          Button("Cancel") { dismiss() }
+        }
+      }
+      .interactiveDismissDisabled(model.isBusy)
+    }
+    .presentationDetents([.medium])
   }
 }
 
