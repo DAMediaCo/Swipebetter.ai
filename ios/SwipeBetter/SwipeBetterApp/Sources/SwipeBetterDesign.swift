@@ -222,6 +222,7 @@ struct SBEmptyState: View {
 struct SBPrimaryButtonStyle: ButtonStyle {
   @ViewBuilder
   func makeBody(configuration: Configuration) -> some View {
+    #if compiler(>=6.2)
     if #available(iOS 26.0, *) {
       configuration.label
         .font(.headline)
@@ -242,12 +243,21 @@ struct SBPrimaryButtonStyle: ButtonStyle {
         .background(configuration.isPressed ? SBTheme.accentPressed : SBTheme.accent)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
+    #else
+    configuration.label
+      .font(.headline)
+      .foregroundStyle(.white)
+      .frame(maxWidth: .infinity, minHeight: 52)
+      .background(configuration.isPressed ? SBTheme.accentPressed : SBTheme.accent)
+      .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    #endif
   }
 }
 
 struct SBSecondaryButtonStyle: ButtonStyle {
   @ViewBuilder
   func makeBody(configuration: Configuration) -> some View {
+    #if compiler(>=6.2)
     if #available(iOS 26.0, *) {
       configuration.label
         .font(.subheadline.weight(.semibold))
@@ -264,6 +274,14 @@ struct SBSecondaryButtonStyle: ButtonStyle {
         .background(configuration.isPressed ? SBTheme.surfaceMuted : SBTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
+    #else
+    configuration.label
+      .font(.subheadline.weight(.semibold))
+      .foregroundStyle(SBTheme.ink)
+      .frame(maxWidth: .infinity, minHeight: 46)
+      .background(configuration.isPressed ? SBTheme.surfaceMuted : SBTheme.surface)
+      .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    #endif
   }
 }
 
@@ -291,11 +309,15 @@ extension View {
 
   @ViewBuilder
   func sbGlassControl<S: Shape>(shape: S) -> some View {
+    #if compiler(>=6.2)
     if #available(iOS 26.0, *) {
       glassEffect(.regular.interactive(), in: shape)
     } else {
       background(.regularMaterial, in: shape)
     }
+    #else
+    background(.regularMaterial, in: shape)
+    #endif
   }
 }
 
