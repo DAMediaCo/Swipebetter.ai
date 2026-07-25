@@ -11,7 +11,7 @@ struct CreateRepliesFromScreenshotIntent: AppIntent {
 
   @Parameter(
     title: "Screenshot",
-    description: "The screenshot produced by the Take Screenshot action.",
+    description: "The image provided by a screenshot automation or another Shortcuts photo action.",
     inputConnectionBehavior: .connectToPreviousIntentResult
   )
   var screenshot: IntentFile
