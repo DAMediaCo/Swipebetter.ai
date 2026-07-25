@@ -374,6 +374,9 @@ struct ProfileAuditView: View {
           ForEach(intents, id: \.self) { Text($0) }
         }
         Toggle("ENM / poly profile", isOn: $enm)
+        Text("Partner photos are expected. We’ll recognize photos with your partner, including an opposite-sex partner, and review them in the context of your ENM/poly profile.")
+          .font(.caption)
+          .foregroundStyle(.secondary)
       }
 
       Section {

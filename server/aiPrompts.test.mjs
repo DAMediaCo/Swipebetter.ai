@@ -29,3 +29,17 @@ test("profile prompts prohibit invented details and ad-like bios", () => {
   assert.match(photoPrompt, /without sounding harsh, clinical, or formulaic/);
 });
 
+test("ENM partner-photo context survives every profile analysis stage", () => {
+  const enmContext = `
+Photos may intentionally show the user with their partner, including a partner of the opposite sex.
+Do not recommend removing the photo solely because it shows their partner.`;
+
+  const analysisPrompt = buildProfileAnalysisPrompt("Hinge", "Woman", "Dating", enmContext);
+  const photoPrompt = buildPhotoFeedbackPrompt(enmContext);
+  const synthesisPrompt = buildProfileSynthesisPrompt(enmContext);
+
+  for (const prompt of [analysisPrompt, photoPrompt, synthesisPrompt]) {
+    assert.match(prompt, /partner of the opposite sex/);
+    assert.match(prompt, /Do not recommend removing/);
+  }
+});

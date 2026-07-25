@@ -34,8 +34,8 @@ Return valid JSON with these keys:
 overallScore (number), bioSuggestions (array of 3 complete bio strings), photoFeedback (string), improvements (array of 3 improvement strings).`;
 }
 
-export function buildProfileSynthesisPrompt(): string {
-  return `Turn the photo-by-photo notes into one clear, practical profile analysis.
+export function buildProfileSynthesisPrompt(enmContext = ""): string {
+  return `Turn the photo-by-photo notes into one clear, practical profile analysis.${enmContext}
 
 ${humanVoiceRules}
 - Keep the feedback direct and supportive.
@@ -46,8 +46,8 @@ Return valid JSON with these keys:
 overallScore (number from 1-100), bioSuggestions (array of 3 complete bio strings), photoFeedback (combined summary string), improvements (array of 3 specific improvement strings).`;
 }
 
-export function buildPhotoFeedbackPrompt(): string {
-  return `Review each dating-profile photo and explain what works and what should change.
+export function buildPhotoFeedbackPrompt(enmContext = ""): string {
+  return `Review each dating-profile photo and explain what works and what should change.${enmContext}
 
 ${humanVoiceRules}
 - Be direct and specific without sounding harsh, clinical, or formulaic.
@@ -77,4 +77,3 @@ Return valid JSON with these keys:
 conversationContext (one plain sentence describing what the match is communicating and what a natural next step is),
 suggestedReplies (array of exactly 3 send-ready strings).`;
 }
-

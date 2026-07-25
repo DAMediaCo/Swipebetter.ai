@@ -527,7 +527,8 @@ export async function registerRoutes(
       - Removing mentions of being married or partnered
       - Hiding relationship status
       - Making the profile seem like they're single
-      Instead, help them communicate their ENM status clearly and attract compatible matches who understand and appreciate ethical non-monogamy.` : '';
+      - Removing, cropping, or criticizing a photo solely because it shows the user with their partner
+      Photos may intentionally show the user with their partner, including a partner of the opposite sex. Treat that person as the user's partner unless the profile clearly says otherwise. Do not misidentify them as an ex, sibling, friend, or competing match. Instead, assess whether the photo and profile communicate the relationship clearly, and help the user attract compatible matches who understand and appreciate ethical non-monogamy.` : '';
 
       const systemPrompt = buildProfileAnalysisPrompt(platform, gender, intent, enmContext);
 
@@ -564,7 +565,7 @@ export async function registerRoutes(
           model: "grok-4-1-fast-non-reasoning",
           messages: [
             { role: "system", content: batches.length > 1 
-              ? buildPhotoFeedbackPrompt()
+              ? buildPhotoFeedbackPrompt(enmContext)
               : systemPrompt 
             },
             { role: "user", content: [
@@ -602,7 +603,7 @@ export async function registerRoutes(
         const synthesisResponse = await grok.chat.completions.create({
           model: "grok-4-1-fast-non-reasoning",
           messages: [
-            { role: "system", content: buildProfileSynthesisPrompt() },
+            { role: "system", content: buildProfileSynthesisPrompt(enmContext) },
             { role: "user", content: `This is a ${platform} profile for a ${gender} looking for ${intent}.${enm ? ' ENM/Poly profile.' : ''}\n\nPhoto feedback:\n${combinedFeedback}\n\nProvide the final analysis.` }
           ],
           response_format: { type: "json_object" },
