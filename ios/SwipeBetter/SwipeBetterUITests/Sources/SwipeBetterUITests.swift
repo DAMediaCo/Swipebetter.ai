@@ -102,7 +102,9 @@ final class SwipeBetterUITests: XCTestCase {
 
     nextButton.tap()
     XCTAssertTrue(app.staticTexts["Step 3 of 3"].waitForExistence(timeout: 2))
-    XCTAssertTrue(app.staticTexts["Tap Snap Back"].exists)
+    XCTAssertTrue(app.staticTexts["Choose voice or keyboard"].exists)
+    XCTAssertTrue(app.staticTexts["Voice"].exists)
+    XCTAssertTrue(app.staticTexts["Quiet"].exists)
     XCTAssertTrue(app.staticTexts["snap.privacyNote"].exists)
 
     let attachment = XCTAttachment(screenshot: app.screenshot())

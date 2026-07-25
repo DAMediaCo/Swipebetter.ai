@@ -54,6 +54,8 @@ struct SwipeBetterAppShortcuts: AppShortcutsProvider {
     AppShortcut(
       intent: CreateRepliesFromLatestScreenshotIntent(),
       phrases: [
+        "Snap Back with \(.applicationName)",
+        "\(.applicationName) Snap Back",
         "Create replies with \(.applicationName)",
         "Read my latest screenshot with \(.applicationName)",
       ],
