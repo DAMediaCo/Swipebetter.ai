@@ -68,6 +68,16 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+
+  await esbuild({
+    entryPoints: ["scripts/purge-historical-screenshots.ts"],
+    platform: "node",
+    bundle: true,
+    format: "cjs",
+    outfile: "dist/purge-historical-screenshots.cjs",
+    minify: true,
+    logLevel: "info",
+  });
 }
 
 async function generateSeoHtmlFiles() {
