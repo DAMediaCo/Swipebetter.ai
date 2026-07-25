@@ -42,4 +42,35 @@ final class KeyboardReplyComposerTests: XCTestCase {
 
     XCTAssertEqual(items, ["Move the outdoor photo to the first slot."])
   }
+
+  func testSnapReturnsFreshGeneratedReply() {
+    let now = Date()
+    let payload = SwipeBetterSnapPayload(
+      updatedAt: now,
+      state: .ready,
+      replies: ["  That sounds fun. What's the story?  "]
+    )
+
+    XCTAssertEqual(payload.usableReply(at: 0, now: now), "That sounds fun. What's the story?")
+  }
+
+  func testSnapRejectsExpiredReply() {
+    let now = Date()
+    let payload = SwipeBetterSnapPayload(
+      updatedAt: now.addingTimeInterval(-31 * 60),
+      state: .ready,
+      replies: ["Old reply"]
+    )
+
+    XCTAssertNil(payload.usableReply(at: 0, now: now))
+  }
+
+  func testSnapRejectsReplyUntilReady() {
+    let payload = SwipeBetterSnapPayload(
+      state: .processing,
+      replies: ["Not ready"]
+    )
+
+    XCTAssertNil(payload.usableReply(at: 0))
+  }
 }

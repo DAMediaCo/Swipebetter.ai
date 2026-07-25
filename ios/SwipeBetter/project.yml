@@ -8,7 +8,7 @@ settings:
     SWIFT_VERSION: "5.10"
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "11"
+    CURRENT_PROJECT_VERSION: "12"
     TARGETED_DEVICE_FAMILY: "1"
 fileGroups:
   - Configuration.storekit
@@ -71,6 +71,7 @@ targets:
     platform: iOS
     sources:
       - path: KeyboardExtension/Sources
+      - path: Shared/Sources/SwipeBetterSnapShared.swift
       - path: Shared/Resources/PrivacyInfo.xcprivacy
         buildPhase: resources
     settings:
@@ -86,6 +87,7 @@ targets:
     sources:
       - path: KeyboardExtension/Sources/KeyboardReplyComposer.swift
       - path: Shared/Sources/PremiumResultText.swift
+      - path: Shared/Sources/SwipeBetterSnapShared.swift
       - path: SwipeBetterTests/Sources
     settings:
       base:

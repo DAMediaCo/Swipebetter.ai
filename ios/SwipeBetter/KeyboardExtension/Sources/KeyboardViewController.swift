@@ -7,6 +7,8 @@ final class KeyboardViewController: UIInputViewController {
   private var nextKeyboardButton: UIButton?
   private var replyButtons: [KeyboardReplyStyle: UIButton] = [:]
   private var pastedContext: String?
+  private var snapPayload: SwipeBetterSnapPayload?
+  private var snapRefreshTimer: Timer?
 
   private let coral = UIColor { traits in
     traits.userInterfaceStyle == .dark
@@ -33,6 +35,18 @@ final class KeyboardViewController: UIInputViewController {
     super.viewDidLoad()
     buildKeyboard()
     refreshContext()
+  }
+
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    refreshContext()
+    startSnapRefreshTimer()
+  }
+
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    snapRefreshTimer?.invalidate()
+    snapRefreshTimer = nil
   }
 
   override func viewWillLayoutSubviews() {
@@ -205,14 +219,17 @@ final class KeyboardViewController: UIInputViewController {
   }
 
   private func refreshContext() {
+    refreshSnapPayload()
     let context = activeContext
     accessLabel.text = hasFullAccess ? "Full Access on" : "Local mode"
     accessLabel.textColor = hasFullAccess ? .systemGreen : .secondaryLabel
-    contextLabel.text = context ?? "No readable text here yet. Paste the chat or start typing."
-    contextLabel.textColor = context == nil ? .secondaryLabel : ink
+    contextLabel.text = contextMessage(fallbackContext: context)
+    contextLabel.textColor = context == nil && snapPayload == nil ? .secondaryLabel : ink
 
-    for style in KeyboardReplyStyle.allCases {
-      replyButtons[style]?.accessibilityValue = KeyboardReplyComposer.reply(for: context, style: style)
+    for (index, style) in KeyboardReplyStyle.allCases.enumerated() {
+      let snapReply = snapPayload?.usableReply(at: index)
+      replyButtons[style]?.accessibilityValue = snapReply ?? KeyboardReplyComposer.reply(for: context, style: style)
+      replyButtons[style]?.configuration?.title = snapReply == nil ? style.title : "Reply \(index + 1)"
     }
   }
 
@@ -235,7 +252,7 @@ final class KeyboardViewController: UIInputViewController {
   @objc private func insertSuggestedReply(_ sender: UIButton) {
     guard KeyboardReplyStyle.allCases.indices.contains(sender.tag) else { return }
     let style = KeyboardReplyStyle.allCases[sender.tag]
-    let reply = KeyboardReplyComposer.reply(for: activeContext, style: style)
+    let reply = snapPayload?.usableReply(at: sender.tag) ?? KeyboardReplyComposer.reply(for: activeContext, style: style)
     let before = textDocumentProxy.documentContextBeforeInput ?? ""
     let separator = before.last.map { $0.isWhitespace ? "" : " " } ?? ""
     textDocumentProxy.insertText(separator + reply)
@@ -269,5 +286,45 @@ final class KeyboardViewController: UIInputViewController {
       components.queryItems = [URLQueryItem(name: "text", value: context)]
     }
     return components.url
+  }
+
+  private func startSnapRefreshTimer() {
+    snapRefreshTimer?.invalidate()
+    snapRefreshTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+      self?.refreshContext()
+    }
+  }
+
+  private func refreshSnapPayload() {
+    guard hasFullAccess,
+          let payload = SwipeBetterSnapStore.load(),
+          payload.isCurrent(maxAge: 30 * 60) else {
+      snapPayload = nil
+      return
+    }
+    snapPayload = payload
+  }
+
+  private func contextMessage(fallbackContext: String?) -> String {
+    guard let snapPayload else {
+      return fallbackContext ?? "No readable text here yet. Paste the chat or start typing."
+    }
+
+    switch snapPayload.state {
+    case .processing:
+      return "SwipeBetter Snap is creating replies..."
+    case .ready:
+      return snapPayload.conversationContext?.trimmedKeyboardContext
+        ?? "SwipeBetter Snap is ready. Tap Reply 1, 2, or 3."
+    case .failed:
+      return snapPayload.message ?? "SwipeBetter Snap could not create replies."
+    }
+  }
+}
+
+private extension String {
+  var trimmedKeyboardContext: String? {
+    let clean = trimmingCharacters(in: .whitespacesAndNewlines)
+    return clean.isEmpty ? nil : String(clean.prefix(220))
   }
 }

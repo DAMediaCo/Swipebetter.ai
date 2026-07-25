@@ -11,14 +11,17 @@
 		138CA7EF110C30AE3B6EA68E /* SwipeBetterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */; };
 		235495C3F75031A3CC97C7ED /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BAC957192BE2A009D79F187 /* RootView.swift */; };
 		403EA46B4518C091852EF78D /* SwipeBetterShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		42AAF5685376794FDD17C2B3 /* SwipeBetterSnapShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0DD51D3D9091BBF71B77434 /* SwipeBetterSnapShared.swift */; };
 		51BA230D3389EFA59887666B /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0619175018F158E01D1872EF /* AppModel.swift */; };
 		51D1A8D73AC20B5D1E243D99 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
 		6A733AE70ED1A4E238DD0C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F846A09D1251E63BBECD73F /* Assets.xcassets */; };
 		6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
 		8184072E0217B13542161BB8 /* PremiumResultText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8086249E1E4A56AEA2E4DA /* PremiumResultText.swift */; };
+		8382BDBBDC83EC7225C97723 /* SwipeBetterSnapShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0DD51D3D9091BBF71B77434 /* SwipeBetterSnapShared.swift */; };
 		886E231F77D66C9337CA5257 /* PremiumResultText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8086249E1E4A56AEA2E4DA /* PremiumResultText.swift */; };
 		96F23D864C9E1A05928CFF51 /* PremiumResultText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8086249E1E4A56AEA2E4DA /* PremiumResultText.swift */; };
 		9FF0462EE197F2EF27840E95 /* KeyboardReplyComposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A08A085686780D10B2623316 /* KeyboardReplyComposerTests.swift */; };
+		A0DA93E7742B2BDAA9D3A995 /* SwipeBetterSnapShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0DD51D3D9091BBF71B77434 /* SwipeBetterSnapShared.swift */; };
 		A176B0E7DC729545C6264E4C /* SwipeBetterUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */; };
 		A191EABCD2F34B492AC39A44 /* KeyboardReplyComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F7CAAB74187DD545E08717C /* KeyboardReplyComposer.swift */; };
 		A6B297709CF82FC7A5456A83 /* KeyboardReplyComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F7CAAB74187DD545E08717C /* KeyboardReplyComposer.swift */; };
@@ -28,8 +31,10 @@
 		C00CA427102EBC6FA72E33E2 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
 		C53B40A58E51DAE9F0146CAB /* PurchaseStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */; };
 		C6BCD8D5A6BF6F11D73BC674 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224C6A0979B8FD308802F0B /* ShareViewController.swift */; };
+		C7EB0A164F95E12270DBEC83 /* SwipeBetterSnapIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F5758876FDB52EB15FCBEDC /* SwipeBetterSnapIntent.swift */; };
 		CDBC2E4E5C2EA79835513940 /* PremiumAuthViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C364F509F85099ABF89B5E7 /* PremiumAuthViews.swift */; };
 		DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */; };
+		E99A0CB7D7513FFA415F9FBA /* SwipeBetterSnapShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0DD51D3D9091BBF71B77434 /* SwipeBetterSnapShared.swift */; };
 		EBC57AFC074C49D9A09B4060 /* SwipeBetterShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */; };
 		FC001B6202989B476D16528D /* SwipeBetterDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC23D7BCFF5B47C1230E3849 /* SwipeBetterDesign.swift */; };
 /* End PBXBuildFile section */
@@ -75,6 +80,7 @@
 
 /* Begin PBXFileReference section */
 		0619175018F158E01D1872EF /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		0F5758876FDB52EB15FCBEDC /* SwipeBetterSnapIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterSnapIntent.swift; sourceTree = "<group>"; };
 		1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterShared.swift; sourceTree = "<group>"; };
 		376459A3BA708D2A61836129 /* SwipeBetterUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = SwipeBetterUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F846A09D1251E63BBECD73F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -97,6 +103,7 @@
 		D8010EF76FBBB8C0C47ABA0A /* SwipeBetterShare.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SwipeBetterShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterApp.swift; sourceTree = "<group>"; };
 		EF0D8106BA7CADA98EE0D0AE /* SwipeBetterUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterUITests.swift; sourceTree = "<group>"; };
+		F0DD51D3D9091BBF71B77434 /* SwipeBetterSnapShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwipeBetterSnapShared.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -133,6 +140,7 @@
 			children = (
 				6F8086249E1E4A56AEA2E4DA /* PremiumResultText.swift */,
 				1A7081A54BB2E8C92978C8F1 /* SwipeBetterShared.swift */,
+				F0DD51D3D9091BBF71B77434 /* SwipeBetterSnapShared.swift */,
 			);
 			name = Sources;
 			path = Shared/Sources;
@@ -158,6 +166,7 @@
 				7BAC957192BE2A009D79F187 /* RootView.swift */,
 				E1925C59576B92ADC4AF63A2 /* SwipeBetterApp.swift */,
 				CC23D7BCFF5B47C1230E3849 /* SwipeBetterDesign.swift */,
+				0F5758876FDB52EB15FCBEDC /* SwipeBetterSnapIntent.swift */,
 			);
 			name = Sources;
 			path = SwipeBetterApp/Sources;
@@ -384,6 +393,8 @@
 				138CA7EF110C30AE3B6EA68E /* SwipeBetterApp.swift in Sources */,
 				FC001B6202989B476D16528D /* SwipeBetterDesign.swift in Sources */,
 				EBC57AFC074C49D9A09B4060 /* SwipeBetterShared.swift in Sources */,
+				C7EB0A164F95E12270DBEC83 /* SwipeBetterSnapIntent.swift in Sources */,
+				8382BDBBDC83EC7225C97723 /* SwipeBetterSnapShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +405,7 @@
 				A6B297709CF82FC7A5456A83 /* KeyboardReplyComposer.swift in Sources */,
 				9FF0462EE197F2EF27840E95 /* KeyboardReplyComposerTests.swift in Sources */,
 				96F23D864C9E1A05928CFF51 /* PremiumResultText.swift in Sources */,
+				42AAF5685376794FDD17C2B3 /* SwipeBetterSnapShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,6 +424,7 @@
 				886E231F77D66C9337CA5257 /* PremiumResultText.swift in Sources */,
 				C6BCD8D5A6BF6F11D73BC674 /* ShareViewController.swift in Sources */,
 				51D1A8D73AC20B5D1E243D99 /* SwipeBetterShared.swift in Sources */,
+				A0DA93E7742B2BDAA9D3A995 /* SwipeBetterSnapShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +434,7 @@
 			files = (
 				A191EABCD2F34B492AC39A44 /* KeyboardReplyComposer.swift in Sources */,
 				DC1F83BE8F0B927C94D02F76 /* KeyboardViewController.swift in Sources */,
+				E99A0CB7D7513FFA415F9FBA /* SwipeBetterSnapShared.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -479,7 +493,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -662,7 +676,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

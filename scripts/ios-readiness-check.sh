@@ -128,8 +128,13 @@ const shareEntitlements = readPlist("ios/SwipeBetter/ShareExtension/SwipeBetterS
 assertIncludes(shareEntitlements["com.apple.security.application-groups"] || [], "group.ai.swipebetter.shared", "share extension app group");
 
 const keyboardEntitlements = readPlist("ios/SwipeBetter/KeyboardExtension/SwipeBetterKeyboard.entitlements");
-if (Object.keys(keyboardEntitlements).length !== 0) {
-  throw new Error("Keyboard extension entitlements must stay empty until it requires shared-container access");
+const keyboardEntitlementKeys = Object.keys(keyboardEntitlements);
+if (keyboardEntitlementKeys.length !== 1 || keyboardEntitlementKeys[0] !== "com.apple.security.application-groups") {
+  throw new Error("Keyboard extension may only use the app-group entitlement required by SwipeBetter Snap");
+}
+const keyboardAppGroups = keyboardEntitlements["com.apple.security.application-groups"] || [];
+if (keyboardAppGroups.length !== 1 || keyboardAppGroups[0] !== "group.ai.swipebetter.shared") {
+  throw new Error("Keyboard extension must share only the SwipeBetter app group");
 }
 
 const privacy = readPlist("ios/SwipeBetter/Shared/Resources/PrivacyInfo.xcprivacy");
@@ -177,6 +182,26 @@ for (const expected of [
   ".protectionKey: FileProtectionType.complete",
 ]) {
   assertIncludes(shared, expected, "shared import cleanup contract");
+}
+
+const snapShared = fs.readFileSync("ios/SwipeBetter/Shared/Sources/SwipeBetterSnapShared.swift", "utf8");
+for (const expected of [
+  'appGroupId = "group.ai.swipebetter.shared"',
+  'payloadKey = "swipeBetterSnapPayload"',
+  "maxAge: TimeInterval = 30 * 60",
+]) {
+  assertIncludes(snapShared, expected, "SwipeBetter Snap shared-state contract");
+}
+
+const snapIntent = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/SwipeBetterSnapIntent.swift", "utf8");
+for (const expected of [
+  "CreateRepliesFromScreenshotIntent",
+  "inputConnectionBehavior: .connectToPreviousIntentResult",
+  'tone: "flirty"',
+  'goal: "keep_going"',
+  "Array(replies.prefix(3))",
+]) {
+  assertIncludes(snapIntent, expected, "SwipeBetter Snap intent contract");
 }
 
 const authSchema = fs.readFileSync("shared/models/auth.ts", "utf8");

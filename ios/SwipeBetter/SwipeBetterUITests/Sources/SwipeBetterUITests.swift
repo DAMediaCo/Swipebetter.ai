@@ -34,6 +34,29 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.buttons["account.manageSubscriptionButton"].waitForExistence(timeout: 2))
   }
 
+  func testSnapSetupGuideIsVisibleAndReadable() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("account")
+    app.launch()
+
+    let setupButton = app.buttons["account.setupSnapButton"]
+    XCTAssertTrue(setupButton.waitForExistence(timeout: 8))
+    XCTAssertTrue(setupButton.isHittable)
+    setupButton.tap()
+
+    XCTAssertTrue(app.staticTexts["SwipeBetter Snap"].waitForExistence(timeout: 3))
+    XCTAssertTrue(app.staticTexts["Create the shortcut"].exists)
+    XCTAssertTrue(app.staticTexts["Connect the gesture"].exists)
+    XCTAssertTrue(app.buttons["snap.openShortcutEditorButton"].isHittable)
+
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = "SwipeBetter Snap Setup"
+    attachment.lifetime = .keepAlways
+    add(attachment)
+  }
+
   func testReplyResultsRemainReadableAndCopyable() throws {
     let app = XCUIApplication()
     app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")

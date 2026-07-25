@@ -134,6 +134,7 @@ struct PremiumAccountView: View {
   @Environment(AppModel.self) private var model
   @State private var showingDeleteConfirmation = false
   @State private var showingKeyboardGuide = false
+  @State private var showingSnapGuide = false
 
   var body: some View {
     ScrollView {
@@ -145,8 +146,8 @@ struct PremiumAccountView: View {
         )
 
         accountSummary
-        plansSection
         keyboardSection
+        plansSection
         billingSection
         helpSection
         destructiveSection
@@ -162,6 +163,11 @@ struct PremiumAccountView: View {
     .navigationBarHidden(true)
     .sheet(isPresented: $showingKeyboardGuide) {
       PremiumKeyboardGuide()
+        .presentationDetents([.large])
+        .presentationDragIndicator(.visible)
+    }
+    .sheet(isPresented: $showingSnapGuide) {
+      PremiumSnapSetupGuide()
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
@@ -291,6 +297,35 @@ struct PremiumAccountView: View {
 
       SBSurface {
         VStack(alignment: .leading, spacing: 12) {
+          HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "hand.tap")
+              .font(.system(size: 18, weight: .semibold))
+              .foregroundStyle(SBTheme.teal)
+              .frame(width: 40, height: 40)
+              .background(SBTheme.tealSoft)
+              .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+
+            VStack(alignment: .leading, spacing: 4) {
+              Text("SwipeBetter Snap")
+                .font(.headline)
+                .foregroundStyle(SBTheme.ink)
+              Text("Double-tap your phone to turn any visible chat into three replies without copying text.")
+                .font(.caption)
+                .foregroundStyle(SBTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+
+          Button {
+            showingSnapGuide = true
+          } label: {
+            Label("Set up SwipeBetter Snap", systemImage: "wand.and.stars")
+          }
+          .buttonStyle(SBPrimaryButtonStyle())
+          .accessibilityIdentifier("account.setupSnapButton")
+
+          SBDivider()
+
           HStack(alignment: .top, spacing: 12) {
             Image(systemName: "keyboard")
               .font(.system(size: 18, weight: .semibold))
@@ -663,6 +698,99 @@ struct PremiumKeyboardGuide: View {
   }
 
   private func setupStep(_ number: Int, _ text: String) -> some View {
+    HStack(alignment: .top, spacing: 10) {
+      Text("\(number)")
+        .font(.caption.weight(.bold))
+        .foregroundStyle(.white)
+        .frame(width: 24, height: 24)
+        .background(SBTheme.accent)
+        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+      Text(text)
+        .font(.subheadline)
+        .foregroundStyle(SBTheme.ink)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+  }
+}
+
+struct PremiumSnapSetupGuide: View {
+  @Environment(\.dismiss) private var dismiss
+  @Environment(\.openURL) private var openURL
+
+  var body: some View {
+    NavigationStack {
+      ScrollView {
+        VStack(alignment: .leading, spacing: 18) {
+          HStack(spacing: 14) {
+            SBLogoMark(size: 52)
+            VStack(alignment: .leading, spacing: 3) {
+              Text("SwipeBetter Snap")
+                .font(.system(.title2, design: .rounded, weight: .bold))
+                .foregroundStyle(SBTheme.ink)
+              Text("One gesture from chat to ready-to-send replies")
+                .font(.subheadline)
+                .foregroundStyle(SBTheme.secondaryInk)
+            }
+          }
+
+          SBSurface {
+            VStack(alignment: .leading, spacing: 14) {
+              SBSectionHeader(title: "Create the shortcut", detail: "You only do this once.")
+              snapStep(1, "Tap Create Shortcut below.")
+              snapStep(2, "Add the Take Screenshot action.")
+              snapStep(3, "Add Create Replies from Screenshot from SwipeBetter directly underneath it.")
+              snapStep(4, "Name the shortcut SwipeBetter Snap, then tap Done.")
+
+              Button {
+                guard let url = URL(string: "shortcuts://create-shortcut") else { return }
+                openURL(url)
+              } label: {
+                Label("Create Shortcut", systemImage: "plus.square")
+              }
+              .buttonStyle(SBPrimaryButtonStyle())
+              .accessibilityIdentifier("snap.openShortcutEditorButton")
+            }
+          }
+
+          SBSurface {
+            VStack(alignment: .leading, spacing: 14) {
+              SBSectionHeader(title: "Connect the gesture")
+              snapStep(1, "Open Settings → Accessibility → Touch → Back Tap.")
+              snapStep(2, "Choose Double Tap or Triple Tap.")
+              snapStep(3, "Select SwipeBetter Snap under Shortcuts.")
+
+              Text("On iPhones with an Action Button, you can assign SwipeBetter Snap there instead.")
+                .font(.caption)
+                .foregroundStyle(SBTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+
+          SBSurface {
+            VStack(alignment: .leading, spacing: 10) {
+              Label("How it works", systemImage: "hand.raised.fill")
+                .font(.headline)
+                .foregroundStyle(SBTheme.ink)
+              Text("Each time you run SwipeBetter Snap, Apple takes one screenshot and sends that image to SwipeBetter. It is not continuous screen recording. Each successful analysis uses one reply-coaching credit; unlimited plans remain unlimited.")
+                .font(.subheadline)
+                .foregroundStyle(SBTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+          }
+        }
+        .padding(20)
+      }
+      .sbPageBackground()
+      .toolbar {
+        ToolbarItem(placement: .confirmationAction) {
+          Button("Done") { dismiss() }
+            .foregroundStyle(SBTheme.accent)
+        }
+      }
+    }
+  }
+
+  private func snapStep(_ number: Int, _ text: String) -> some View {
     HStack(alignment: .top, spacing: 10) {
       Text("\(number)")
         .font(.caption.weight(.bold))
