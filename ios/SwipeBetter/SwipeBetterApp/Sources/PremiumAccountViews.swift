@@ -309,7 +309,7 @@ struct PremiumAccountView: View {
               Text("SwipeBetter Snap")
                 .font(.headline)
                 .foregroundStyle(SBTheme.ink)
-              Text("Double-tap your phone to turn any visible chat into three replies without copying text.")
+              Text("Take a screenshot, approve the automation, and get three replies without copying text.")
                 .font(.caption)
                 .foregroundStyle(SBTheme.secondaryInk)
                 .fixedSize(horizontal: false, vertical: true)
@@ -731,7 +731,7 @@ struct PremiumSnapSetupGuide: View {
                 Text("SwipeBetter Snap")
                   .font(.system(.title2, design: .rounded, weight: .bold))
                   .foregroundStyle(SBTheme.ink)
-                Text("Guided setup for iOS 27")
+                Text("Screenshot Automation for iOS 27")
                   .font(.subheadline)
                   .foregroundStyle(SBTheme.secondaryInk)
               }
@@ -770,10 +770,10 @@ struct PremiumSnapSetupGuide: View {
                   .foregroundStyle(SBTheme.ink)
                   .fixedSize(horizontal: false, vertical: true)
 
-                if currentStep == 0 {
+                if currentStep == 2 {
                   Label(
-                    "Do not ask Siri to create or run this. Build it inside Apple’s Shortcuts app.",
-                    systemImage: "exclamationmark.triangle.fill"
+                    "Choose Run After Confirmation. Run Immediately could send every screenshot for analysis.",
+                    systemImage: "hand.raised.fill"
                   )
                   .font(.subheadline.weight(.semibold))
                   .foregroundStyle(SBTheme.teal)
@@ -793,24 +793,11 @@ struct PremiumSnapSetupGuide: View {
               }
             }
 
-            if currentStep == 5 {
-              SBSurface {
-                VStack(alignment: .leading, spacing: 10) {
-                  Label("Action Button option", systemImage: "button.programmable")
-                    .font(.headline)
-                    .foregroundStyle(SBTheme.ink)
-                  Text("If your Action Button currently opens Siri, change it to Shortcut, then select your custom SwipeBetter Snap shortcut.")
-                    .font(.subheadline)
-                    .foregroundStyle(SBTheme.secondaryInk)
-                    .fixedSize(horizontal: false, vertical: true)
-                }
-              }
-            }
-
-            Text("Each run captures one screenshot and uses one reply-coaching credit. It does not continuously record your screen.")
+            Text("SwipeBetter analyzes one approved screenshot per run and uses one reply-coaching credit. This setup does not continuously record your screen.")
               .font(.caption)
               .foregroundStyle(SBTheme.secondaryInk)
               .fixedSize(horizontal: false, vertical: true)
+              .accessibilityIdentifier("snap.privacyNote")
           }
           .padding(20)
         }
@@ -863,51 +850,51 @@ struct PremiumSnapSetupGuide: View {
   private var stepTitle: String {
     switch currentStep {
     case 0:
-      return "Use Shortcuts, not Siri"
+      return "Create a new shortcut"
     case 1:
-      return "Create a blank shortcut"
+      return "Add the Screenshot automation"
     case 2:
-      return "Add Take Screenshot first"
+      return "Require your approval"
     case 3:
-      return "Add the SwipeBetter action second"
+      return "Get the newest photo"
     case 4:
-      return "Name and save it"
+      return "Send it to SwipeBetter"
     default:
-      return "Connect Back Tap"
+      return "Test it in your dating app"
     }
   }
 
   private var stepInstructions: String {
     switch currentStep {
     case 0:
-      return "Open Apple’s Shortcuts app with the button below. If Siri appears, close it and return here. The setup must happen inside Shortcuts."
+      return "Open Apple’s Shortcuts app and tap the + button to create a new shortcut. Siri AI’s Describe a Change control is part of Shortcuts in iOS 27; you can leave it alone and add the actions manually."
     case 1:
-      return "In Shortcuts, tap the + button in the upper-right corner to create a new blank shortcut. Do not run a SwipeBetter suggestion by itself."
+      return "Inside the shortcut editor, open Automation, choose Screenshot, and select the trigger that runs when a screenshot is saved."
     case 2:
-      return "Tap Add Action. Search for Take Screenshot, then tap the Take Screenshot action to add it as the first step."
+      return "Set the screenshot automation to Run After Confirmation. This keeps unrelated screenshots private unless you approve the SwipeBetter run."
     case 3:
-      return "Tap Search Actions at the bottom. Search SwipeBetter, then add Create Replies from Screenshot directly below Take Screenshot. Its Screenshot field should connect automatically."
+      return "Add the Get Latest Photos action and set it to retrieve 1 photo. Because the automation starts after a screenshot is saved, this retrieves that new screenshot."
     case 4:
-      return "Tap the shortcut name at the top, choose Rename, enter SwipeBetter Snap, then tap Done."
+      return "Add Create Replies from Screenshot directly below Get Latest Photos. If its Screenshot field is blank, tap it and choose Latest Photos."
     default:
-      return "Open Settings → Accessibility → Touch → Back Tap. Choose Double Tap or Triple Tap, then select the custom shortcut named SwipeBetter Snap."
+      return "Name it SwipeBetter Snap and tap Done. Open Bumble, Tinder, or another dating app and take a screenshot. Approve the automation, then open the SwipeBetter keyboard when the ready notice appears."
     }
   }
 
   private var stepIcon: String {
     switch currentStep {
     case 0:
-      return "square.grid.2x2"
-    case 1:
       return "plus"
-    case 2:
+    case 1:
       return "camera.viewfinder"
+    case 2:
+      return "hand.raised.fill"
     case 3:
-      return "message.badge.waveform"
+      return "photo.on.rectangle"
     case 4:
-      return "checkmark.square"
+      return "message.badge.waveform"
     default:
-      return "hand.tap"
+      return "checkmark.circle"
     }
   }
 }
