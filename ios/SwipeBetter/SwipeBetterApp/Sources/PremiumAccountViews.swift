@@ -326,7 +326,7 @@ struct PremiumAccountView: View {
               Text("SwipeBetter Snap")
                 .font(.headline)
                 .foregroundStyle(SBTheme.ink)
-              Text("Take a screenshot, approve the automation, and get three replies without copying text.")
+              Text("Take a screenshot, tap Snap Back on the keyboard, and get three replies without copying text or building a Shortcut.")
                 .font(.caption)
                 .foregroundStyle(SBTheme.secondaryInk)
                 .fixedSize(horizontal: false, vertical: true)
@@ -336,7 +336,7 @@ struct PremiumAccountView: View {
           Button {
             showingSnapGuide = true
           } label: {
-            Label("Set up SwipeBetter Snap", systemImage: "wand.and.stars")
+            Label("Enable Snap Back", systemImage: "camera.viewfinder")
           }
           .buttonStyle(SBPrimaryButtonStyle())
           .accessibilityIdentifier("account.setupSnapButton")
@@ -781,7 +781,7 @@ struct PremiumSnapSetupGuide: View {
   @State private var currentStep = 0
   @State private var photoAccess = PHPhotoLibrary.authorizationStatus(for: .readWrite)
 
-  private let totalSteps = 5
+  private let totalSteps = 3
 
   var body: some View {
     NavigationStack {
@@ -794,7 +794,7 @@ struct PremiumSnapSetupGuide: View {
                 Text("SwipeBetter Snap")
                   .font(.title2.weight(.bold))
                   .foregroundStyle(SBTheme.ink)
-                Text("Screenshot Automation for iOS 27")
+                Text("No Apple Shortcuts setup required")
                   .font(.subheadline)
                   .foregroundStyle(SBTheme.secondaryInk)
               }
@@ -814,15 +814,6 @@ struct PremiumSnapSetupGuide: View {
               ProgressView(value: Double(currentStep + 1), total: Double(totalSteps))
                 .tint(SBTheme.accent)
             }
-
-            Label(
-              "Snap Back is available under Shortcuts → App Shortcuts → SwipeBetter. Apple does not place app shortcuts in All Shortcuts.",
-              systemImage: "square.grid.2x2"
-            )
-            .font(.caption)
-            .foregroundStyle(SBTheme.secondaryInk)
-            .fixedSize(horizontal: false, vertical: true)
-            .accessibilityIdentifier("snap.shortcutLocationNote")
 
             SBSurface {
               VStack(alignment: .leading, spacing: 16) {
@@ -846,9 +837,9 @@ struct PremiumSnapSetupGuide: View {
                   photoAccessControl
                 }
 
-                if currentStep == 2 {
+                if currentStep == 1 {
                   Label(
-                    "Choose Run After Confirmation. Run Immediately could send every screenshot for analysis.",
+                    "Only the newest screenshot is read, and only after you tap Snap Back.",
                     systemImage: "hand.raised.fill"
                   )
                   .font(.subheadline.weight(.semibold))
@@ -856,20 +847,10 @@ struct PremiumSnapSetupGuide: View {
                   .fixedSize(horizontal: false, vertical: true)
                 }
 
-                if currentStep > 0 && currentStep < 4 {
-                  Button {
-                    guard let url = URL(string: "shortcuts://") else { return }
-                    openURL(url)
-                  } label: {
-                    Label("Open Apple Shortcuts", systemImage: "arrow.up.forward.app")
-                  }
-                  .buttonStyle(SBSecondaryButtonStyle())
-                  .accessibilityIdentifier("snap.openShortcutsButton")
-                }
               }
             }
 
-            Text("SwipeBetter reads only the newest screenshot when you approve the automation. It does not continuously record your screen or scan older photos.")
+            Text("SwipeBetter does not record your screen. Snap Back reads only the newest recent screenshot after you tap the keyboard button.")
               .font(.caption)
               .foregroundStyle(SBTheme.secondaryInk)
               .fixedSize(horizontal: false, vertical: true)
@@ -928,28 +909,20 @@ struct PremiumSnapSetupGuide: View {
     case 0:
       return "Allow screenshot access"
     case 1:
-      return "Create a Screenshot automation"
-    case 2:
-      return "Require your approval"
-    case 3:
-      return "Add one SwipeBetter action"
+      return "Take a screenshot"
     default:
-      return "Test it in your dating app"
+      return "Tap Snap Back"
     }
   }
 
   private var stepInstructions: String {
     switch currentStep {
     case 0:
-      return "Allow Full Photo Access once. SwipeBetter needs this only to find the newest screenshot after you approve the automation."
+      return "Allow Full Photo Access once. SwipeBetter needs this only to find the newest screenshot after you tap Snap Back."
     case 1:
-      return "Open Shortcuts, tap Automation, tap +, choose Screenshot, and select the trigger that runs when a screenshot is saved."
-    case 2:
-      return "Set the screenshot automation to Run After Confirmation. This keeps unrelated screenshots private unless you approve the SwipeBetter run."
-    case 3:
-      return "Delete the old Get Latest Photos and Create Replies from Screenshot actions. Add the new Create Replies from Latest Screenshot action by itself. It has no fields to connect."
+      return "In Bumble, Tinder, or another dating app, take one screenshot that clearly shows the recent conversation."
     default:
-      return "Tap Done. Open Bumble, Tinder, or another dating app and take a screenshot. Approve the automation, then open the SwipeBetter keyboard when the ready notice appears."
+      return "Open the SwipeBetter keyboard and tap Snap Back. SwipeBetter opens, creates three replies, and saves them to the keyboard. Return to the dating app and tap the reply you want."
     }
   }
 
@@ -959,12 +932,8 @@ struct PremiumSnapSetupGuide: View {
       return "photo.badge.checkmark"
     case 1:
       return "camera.viewfinder"
-    case 2:
-      return "hand.raised.fill"
-    case 3:
-      return "message.badge.waveform"
     default:
-      return "checkmark.circle"
+      return "keyboard"
     }
   }
 

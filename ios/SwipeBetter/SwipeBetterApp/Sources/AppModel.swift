@@ -17,6 +17,8 @@ final class AppModel {
   var importRevision = 0
   var requestedTabIdentifier: String?
   var deepLinkRevision = 0
+  var pendingSnapRequest = false
+  var snapStatusMessage: String?
   var lastError: String?
   var isBusy = false
   var requiresAppleReauthenticationForDeletion = false
@@ -38,6 +40,7 @@ final class AppModel {
       _ = try? await purchases.syncCurrentEntitlements(api: api)
       await refreshAccount()
     }
+    await processPendingSnapRequest()
   }
 
   func configureForAppStoreScreenshots() {
@@ -128,6 +131,7 @@ final class AppModel {
       user = response.user
       await refreshAfterAuth()
     }
+    await processPendingSnapRequest()
   }
 
   func signup(email: String, password: String, firstName: String, lastName: String, promoCode: String) async {
@@ -143,6 +147,7 @@ final class AppModel {
       user = response.user
       await refreshAfterAuth()
     }
+    await processPendingSnapRequest()
   }
 
   func requestPasswordReset(email: String) async -> String? {
@@ -161,6 +166,7 @@ final class AppModel {
       user = response.user
       await refreshAfterAuth()
     }
+    await processPendingSnapRequest()
   }
 
   func logout() async {
@@ -314,7 +320,10 @@ final class AppModel {
       return
     }
 
-    if target == "import" {
+    if target == "snap" {
+      pendingSnapRequest = true
+      requestedTabIdentifier = "replies"
+    } else if target == "import" {
       loadSharedImport()
       requestedTabIdentifier = tabIdentifierForPendingImport(defaultingTo: "replies")
     } else {
@@ -322,6 +331,33 @@ final class AppModel {
     }
 
     deepLinkRevision += 1
+  }
+
+  func processPendingSnapRequest() async {
+    guard pendingSnapRequest, isSignedIn, !isBusy else { return }
+
+    pendingSnapRequest = false
+    isBusy = true
+    lastError = nil
+    snapStatusMessage = nil
+    defer { isBusy = false }
+
+    do {
+      let imageData = try await SwipeBetterLatestScreenshotLoader.load()
+      try await SwipeBetterSnapRunner.run(imageData: imageData)
+      snapStatusMessage = "Replies are ready. Return to your dating app and open the SwipeBetter keyboard."
+      await refreshAccount()
+      await refreshHistory()
+    } catch {
+      let message = error.localizedDescription
+      lastError = message
+      try? SwipeBetterSnapStore.save(
+        SwipeBetterSnapPayload(
+          state: .failed,
+          message: message
+        )
+      )
+    }
   }
 
   private func pollProfile(jobId: String) async throws -> ProfileStatusResponse {

@@ -34,7 +34,7 @@
     <string>swipebetter</string>
   </array>
   <key>NSPhotoLibraryUsageDescription</key>
-  <string>SwipeBetter uses selected screenshots for profile and chat coaching. SwipeBetter Snap reads only your newest screenshot when you approve its automation.</string>
+  <string>SwipeBetter uses selected screenshots for profile and chat coaching. Snap Back reads only your newest screenshot after you tap Snap Back on the SwipeBetter keyboard.</string>
   <key>UIRequiresFullScreen</key>
   <true/>
   <key>UILaunchScreen</key>

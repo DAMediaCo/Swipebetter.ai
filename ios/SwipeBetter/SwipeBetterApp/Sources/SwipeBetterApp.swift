@@ -25,6 +25,9 @@ struct SwipeBetterApp: App {
         }
         .onOpenURL { url in
           model.handleDeepLink(url)
+          Task {
+            await model.processPendingSnapRequest()
+          }
         }
     }
   }

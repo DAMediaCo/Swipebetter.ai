@@ -232,13 +232,13 @@ final class KeyboardViewController: UIInputViewController {
     paste.accessibilityIdentifier = "keyboard.pasteChatButton"
     paste.addTarget(self, action: #selector(importClipboard), for: .touchUpInside)
 
-    let coach = outlineButton(title: "Open coach", systemImage: "arrow.up.forward.app")
-    coach.accessibilityIdentifier = "keyboard.coachChatButton"
-    coach.addTarget(self, action: #selector(openCoach), for: .touchUpInside)
+    let snapBack = outlineButton(title: "Snap Back", systemImage: "camera.viewfinder")
+    snapBack.accessibilityIdentifier = "keyboard.snapBackButton"
+    snapBack.addTarget(self, action: #selector(openSnapBack), for: .touchUpInside)
 
     row.addArrangedSubview(next)
     row.addArrangedSubview(paste)
-    row.addArrangedSubview(coach)
+    row.addArrangedSubview(snapBack)
     return row
   }
 
@@ -334,19 +334,31 @@ final class KeyboardViewController: UIInputViewController {
     refreshContext()
   }
 
-  @objc private func openCoach() {
-    guard let url = coachURL() else { return }
-    extensionContext?.open(url)
-  }
-
-  private func coachURL() -> URL? {
-    var components = URLComponents()
-    components.scheme = "swipebetter"
-    components.host = "replies"
-    if let context = activeContext {
-      components.queryItems = [URLQueryItem(name: "text", value: context)]
+  @objc private func openSnapBack() {
+    guard hasFullAccess else {
+      contextLabel.text = "Turn on Full Access to use Snap Back."
+      contextLabel.textColor = coral
+      return
     }
-    return components.url
+    guard let url = URL(string: "swipebetter://snap") else { return }
+
+    try? SwipeBetterSnapStore.save(
+      SwipeBetterSnapPayload(
+        state: .processing,
+        message: "Opening SwipeBetter to read your newest screenshot..."
+      )
+    )
+    refreshContext()
+
+    extensionContext?.open(url) { opened in
+      guard !opened else { return }
+      try? SwipeBetterSnapStore.save(
+        SwipeBetterSnapPayload(
+          state: .failed,
+          message: "SwipeBetter could not open. Open the app once, then try again."
+        )
+      )
+    }
   }
 
   private func startSnapRefreshTimer() {
