@@ -1,3 +1,4 @@
+import AppIntents
 import StoreKit
 import Photos
 import SwiftUI
@@ -326,7 +327,7 @@ struct PremiumAccountView: View {
               Text("SwipeBetter Snap")
                 .font(.headline)
                 .foregroundStyle(SBTheme.ink)
-              Text("Take a screenshot, tap Snap Back on the keyboard, and get three replies without copying text or building a Shortcut.")
+              Text("Take a screenshot, then use Siri or tap Snap Back on the keyboard. No custom Shortcut or automation required.")
                 .font(.caption)
                 .foregroundStyle(SBTheme.secondaryInk)
                 .fixedSize(horizontal: false, vertical: true)
@@ -839,7 +840,7 @@ struct PremiumSnapSetupGuide: View {
 
                 if currentStep == 1 {
                   Label(
-                    "Only the newest screenshot is read, and only after you tap Snap Back.",
+                    "Only the newest screenshot is read, and only after you ask Siri or tap Snap Back.",
                     systemImage: "hand.raised.fill"
                   )
                   .font(.subheadline.weight(.semibold))
@@ -847,10 +848,33 @@ struct PremiumSnapSetupGuide: View {
                   .fixedSize(horizontal: false, vertical: true)
                 }
 
+                if currentStep == 2 {
+                  VStack(alignment: .leading, spacing: 14) {
+                    Label("Voice", systemImage: "waveform")
+                      .font(.subheadline.weight(.bold))
+                      .foregroundStyle(SBTheme.ink)
+
+                    SiriTipView(intent: CreateRepliesFromLatestScreenshotIntent())
+                      .siriTipViewStyle(.automatic)
+                      .accessibilityIdentifier("snap.siriTip")
+
+                    SBDivider()
+
+                    Label("Quiet", systemImage: "keyboard")
+                      .font(.subheadline.weight(.bold))
+                      .foregroundStyle(SBTheme.ink)
+
+                    Text("Open the SwipeBetter keyboard and tap Snap Back.")
+                      .font(.subheadline)
+                      .foregroundStyle(SBTheme.secondaryInk)
+                      .fixedSize(horizontal: false, vertical: true)
+                  }
+                }
+
               }
             }
 
-            Text("SwipeBetter does not record your screen. Snap Back reads only the newest recent screenshot after you tap the keyboard button.")
+            Text("SwipeBetter does not record your screen. Snap Back reads only the newest recent screenshot after you ask Siri or tap the keyboard button.")
               .font(.caption)
               .foregroundStyle(SBTheme.secondaryInk)
               .fixedSize(horizontal: false, vertical: true)
@@ -911,7 +935,7 @@ struct PremiumSnapSetupGuide: View {
     case 1:
       return "Take a screenshot"
     default:
-      return "Tap Snap Back"
+      return "Choose voice or keyboard"
     }
   }
 
@@ -922,7 +946,7 @@ struct PremiumSnapSetupGuide: View {
     case 1:
       return "In Bumble, Tinder, or another dating app, take one screenshot that clearly shows the recent conversation."
     default:
-      return "Open the SwipeBetter keyboard and tap Snap Back. SwipeBetter opens, creates three replies, and saves them to the keyboard. Return to the dating app and tap the reply you want."
+      return "Say “Siri, Snap Back with SwipeBetter,” or open the SwipeBetter keyboard and tap Snap Back. Your three replies will appear on the keyboard."
     }
   }
 
@@ -933,7 +957,7 @@ struct PremiumSnapSetupGuide: View {
     case 1:
       return "camera.viewfinder"
     default:
-      return "keyboard"
+      return "waveform.and.mic"
     }
   }
 

@@ -5,13 +5,15 @@ import SwiftUI
 struct SwipeBetterApp: App {
   @State private var model = AppModel()
 
+  init() {
+    SwipeBetterAppShortcuts.updateAppShortcutParameters()
+  }
+
   var body: some Scene {
     WindowGroup {
       RootView(initialTab: AppTab.screenshotInitialTab(from: ProcessInfo.processInfo.arguments))
         .environment(model)
         .task {
-          SwipeBetterAppShortcuts.updateAppShortcutParameters()
-
           let arguments = ProcessInfo.processInfo.arguments
           if arguments.contains("-SWIPEBETTER_APP_STORE_SCREENSHOTS") {
             model.configureForAppStoreScreenshots()

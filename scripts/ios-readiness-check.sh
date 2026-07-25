@@ -90,7 +90,7 @@ const urlScheme = appInfo.CFBundleURLTypes?.[0]?.CFBundleURLSchemes?.[0];
 assertEqual(urlScheme, "swipebetter", "main app URL scheme");
 assertEqual(
   appInfo.NSPhotoLibraryUsageDescription,
-  "SwipeBetter uses selected screenshots for profile and chat coaching. Snap Back reads only your newest screenshot after you tap Snap Back on the SwipeBetter keyboard.",
+  "SwipeBetter uses selected screenshots for profile and chat coaching. Snap Back reads only your newest screenshot after you ask Siri or tap Snap Back on the SwipeBetter keyboard.",
   "photo library purpose string"
 );
 
@@ -390,8 +390,30 @@ for (const expected of [
   "configureForAppStoreScreenshots()",
   "requiresAppleReauthenticationForDeletion = true",
   "await model.bootstrap()",
+  "SwipeBetterAppShortcuts.updateAppShortcutParameters()",
 ]) {
   assertIncludes(appEntry, expected, "native UI testing launch contract");
+}
+
+for (const expected of [
+  '"Snap Back with \\(.applicationName)"',
+  '"\\(.applicationName) Snap Back"',
+  'shortTitle: "Snap Back"',
+  "CreateRepliesFromLatestScreenshotIntent()",
+]) {
+  assertIncludes(snapIntent, expected, "Snap Back Siri contract");
+}
+
+const premiumAccountViews = fs.readFileSync(
+  "ios/SwipeBetter/SwipeBetterApp/Sources/PremiumAccountViews.swift",
+  "utf8"
+);
+for (const expected of [
+  "SiriTipView(intent: CreateRepliesFromLatestScreenshotIntent())",
+  '"Choose voice or keyboard"',
+  '"Open the SwipeBetter keyboard and tap Snap Back."',
+]) {
+  assertIncludes(premiumAccountViews, expected, "Snap Back onboarding contract");
 }
 
 const uiTests = fs.readFileSync("ios/SwipeBetter/SwipeBetterUITests/Sources/SwipeBetterUITests.swift", "utf8");
