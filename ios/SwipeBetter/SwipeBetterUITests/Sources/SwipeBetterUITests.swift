@@ -47,9 +47,22 @@ final class SwipeBetterUITests: XCTestCase {
     setupButton.tap()
 
     XCTAssertTrue(app.staticTexts["SwipeBetter Snap"].waitForExistence(timeout: 3))
-    XCTAssertTrue(app.staticTexts["Create the shortcut"].exists)
-    XCTAssertTrue(app.staticTexts["Connect the gesture"].exists)
-    XCTAssertTrue(app.buttons["snap.openShortcutEditorButton"].isHittable)
+    XCTAssertTrue(app.staticTexts["Step 1 of 6"].exists)
+    XCTAssertTrue(app.staticTexts["Use Shortcuts, not Siri"].exists)
+    XCTAssertTrue(app.buttons["snap.openShortcutsButton"].isHittable)
+
+    let nextButton = app.buttons["snap.nextStepButton"]
+    XCTAssertTrue(nextButton.isHittable)
+    nextButton.tap()
+    XCTAssertTrue(app.staticTexts["Step 2 of 6"].waitForExistence(timeout: 2))
+    XCTAssertTrue(app.staticTexts["Create a blank shortcut"].exists)
+
+    for step in 3...6 {
+      nextButton.tap()
+      XCTAssertTrue(app.staticTexts["Step \(step) of 6"].waitForExistence(timeout: 2))
+    }
+    XCTAssertTrue(app.staticTexts["Connect Back Tap"].exists)
+    XCTAssertTrue(app.staticTexts["Action Button option"].exists)
 
     let attachment = XCTAttachment(screenshot: app.screenshot())
     attachment.name = "SwipeBetter Snap Setup"
