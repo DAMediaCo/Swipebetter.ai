@@ -7,7 +7,15 @@ struct PremiumHistoryView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(spacing: 16) {
+      LazyVStack(spacing: 24) {
+        SBWorkspaceHeader(
+          eyebrow: "Your playbook",
+          title: "Keep the lessons. Skip the repeat mistakes.",
+          detail: "Revisit the profile edits and conversation choices that moved things forward.",
+          systemImage: "clock.arrow.circlepath",
+          status: "\(model.profileHistory.count + model.replyHistory.count) saved"
+        )
+
         historySection(
           title: "Profile audits",
           detail: "Saved profile scores and highest-priority fixes",
@@ -44,7 +52,7 @@ struct PremiumHistoryView: View {
           }
         }
       }
-      .padding(.bottom, 28)
+      .padding(.bottom, 36)
     }
     .refreshable { await model.refreshHistory() }
     .task {
@@ -52,8 +60,7 @@ struct PremiumHistoryView: View {
       await model.refreshHistory()
     }
     .sbPageBackground()
-    .navigationTitle("History")
-    .navigationBarTitleDisplayMode(.large)
+    .navigationBarHidden(true)
     .accessibilityIdentifier("history.list")
   }
 
@@ -133,16 +140,26 @@ struct PremiumAccountView: View {
 
   var body: some View {
     ScrollView {
-      LazyVStack(spacing: 16) {
-        accountSummary
-        keyboardSection
-        plansSection
-        billingSection
-        privacySection
-        helpSection
-        destructiveSection
+      LazyVStack(spacing: 24) {
+        SBWorkspaceHeader(
+          eyebrow: "Control room",
+          title: greeting,
+          detail: "Manage access, billing, keyboard tools, and exactly what stays in your account.",
+          systemImage: "person.crop.circle",
+          status: accountPlan
+        )
+
+        VStack(spacing: 24) {
+          accountSummary
+          keyboardSection
+          plansSection
+          billingSection
+          privacySection
+          helpSection
+          destructiveSection
+        }
+        .padding(.horizontal, 20)
       }
-      .padding(.horizontal, 20)
       .padding(.bottom, 30)
     }
     .refreshable {
@@ -150,8 +167,7 @@ struct PremiumAccountView: View {
       await model.purchases.loadProducts()
     }
     .sbPageBackground()
-    .navigationTitle("Account")
-    .navigationBarTitleDisplayMode(.large)
+    .navigationBarHidden(true)
     .sheet(isPresented: $showingKeyboardGuide) {
       PremiumKeyboardGuide()
         .presentationDetents([.large])
@@ -178,9 +194,15 @@ struct PremiumAccountView: View {
 
   private var greeting: String {
     if let firstName = model.user?.firstName, !firstName.isEmpty {
-      return "Good to see you, \(firstName)"
+      return "Everything is in your hands, \(firstName)."
     }
-    return "Your SwipeBetter account"
+    return "Your account. Your call."
+  }
+
+  private var accountPlan: String {
+    model.credits?.planTier?.capitalized
+      ?? model.me?.planType?.capitalized
+      ?? "Free"
   }
 
   private var accountSummary: some View {
@@ -210,16 +232,12 @@ struct PremiumAccountView: View {
 
         SBDivider()
 
-        HStack(spacing: 12) {
-          summaryMetric(
-            label: "Plan",
-            value: model.credits?.planTier?.capitalized ?? model.me?.planType?.capitalized ?? "Free",
-            color: SBTheme.teal
-          )
-          summaryMetric(
+        HStack(spacing: 10) {
+          SBMetricChip(label: "Plan", value: accountPlan, tint: SBTheme.teal)
+          SBMetricChip(
             label: "Credits",
             value: "\(model.credits?.credits ?? model.me?.oneTimeCredits ?? 0)",
-            color: SBTheme.accent
+            tint: SBTheme.accent
           )
         }
       }
@@ -493,23 +511,6 @@ struct PremiumAccountView: View {
     let first = model.user?.firstName?.first.map(String.init) ?? "S"
     let last = model.user?.lastName?.first.map(String.init) ?? "B"
     return first + last
-  }
-
-  private func summaryMetric(label: String, value: String, color: Color) -> some View {
-    VStack(alignment: .leading, spacing: 4) {
-      Text(label)
-        .font(.caption)
-        .foregroundStyle(SBTheme.secondaryInk)
-      Text(value)
-        .font(.title3.weight(.bold).monospacedDigit())
-        .foregroundStyle(color)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
-    }
-    .padding(12)
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(SBTheme.canvas)
-    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
   }
 
   private func accountURL(_ path: String) -> URL {
