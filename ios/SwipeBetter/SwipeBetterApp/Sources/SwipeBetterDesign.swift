@@ -2,59 +2,20 @@ import SwiftUI
 import UIKit
 
 enum SBTheme {
-  private static func adaptive(light: UIColor, dark: UIColor) -> Color {
-    Color(uiColor: UIColor { traits in
-      traits.userInterfaceStyle == .dark ? dark : light
-    })
-  }
-
-  static let canvas = adaptive(
-    light: UIColor(red: 0.957, green: 0.965, blue: 0.973, alpha: 1),
-    dark: UIColor(red: 0.055, green: 0.059, blue: 0.067, alpha: 1)
-  )
-  static let surface = adaptive(light: .white, dark: UIColor(red: 0.11, green: 0.115, blue: 0.13, alpha: 1))
-  static let surfaceMuted = adaptive(
-    light: UIColor(red: 0.925, green: 0.938, blue: 0.949, alpha: 1),
-    dark: UIColor(red: 0.16, green: 0.17, blue: 0.19, alpha: 1)
-  )
-  static let ink = adaptive(
-    light: UIColor(red: 0.075, green: 0.094, blue: 0.122, alpha: 1),
-    dark: UIColor(red: 0.95, green: 0.96, blue: 0.98, alpha: 1)
-  )
-  static let secondaryInk = adaptive(
-    light: UIColor(red: 0.34, green: 0.38, blue: 0.44, alpha: 1),
-    dark: UIColor(red: 0.66, green: 0.68, blue: 0.73, alpha: 1)
-  )
-  static let strongFill = Color(red: 0.075, green: 0.094, blue: 0.122)
-  static let accent = adaptive(
-    light: UIColor(red: 0.88, green: 0.27, blue: 0.23, alpha: 1),
-    dark: UIColor(red: 1.0, green: 0.39, blue: 0.34, alpha: 1)
-  )
-  static let accentPressed = adaptive(
-    light: UIColor(red: 0.72, green: 0.18, blue: 0.15, alpha: 1),
-    dark: UIColor(red: 0.87, green: 0.25, blue: 0.22, alpha: 1)
-  )
-  static let accentSoft = adaptive(
-    light: UIColor(red: 1.0, green: 0.91, blue: 0.89, alpha: 1),
-    dark: UIColor(red: 0.26, green: 0.11, blue: 0.10, alpha: 1)
-  )
-  static let teal = adaptive(
-    light: UIColor(red: 0.08, green: 0.43, blue: 0.40, alpha: 1),
-    dark: UIColor(red: 0.31, green: 0.77, blue: 0.70, alpha: 1)
-  )
-  static let tealSoft = adaptive(
-    light: UIColor(red: 0.87, green: 0.95, blue: 0.93, alpha: 1),
-    dark: UIColor(red: 0.08, green: 0.23, blue: 0.21, alpha: 1)
-  )
-  static let warning = adaptive(light: UIColor(red: 0.68, green: 0.38, blue: 0.02, alpha: 1), dark: .systemOrange)
-  static let warningSoft = adaptive(
-    light: UIColor(red: 1.0, green: 0.95, blue: 0.84, alpha: 1),
-    dark: UIColor(red: 0.25, green: 0.17, blue: 0.06, alpha: 1)
-  )
-  static let divider = adaptive(
-    light: UIColor(red: 0.84, green: 0.86, blue: 0.89, alpha: 1),
-    dark: UIColor(red: 0.24, green: 0.25, blue: 0.28, alpha: 1)
-  )
+  static let canvas = Color(uiColor: .systemGroupedBackground)
+  static let surface = Color(uiColor: .secondarySystemGroupedBackground)
+  static let surfaceMuted = Color(uiColor: .tertiarySystemGroupedBackground)
+  static let ink = Color(uiColor: .label)
+  static let secondaryInk = Color(uiColor: .secondaryLabel)
+  static let strongFill = Color(uiColor: .label)
+  static let accent = Color(uiColor: .systemPink)
+  static let accentPressed = Color(uiColor: .systemRed)
+  static let accentSoft = Color(uiColor: .systemPink).opacity(0.11)
+  static let teal = Color(uiColor: .systemTeal)
+  static let tealSoft = Color(uiColor: .systemTeal).opacity(0.12)
+  static let warning = Color(uiColor: .systemOrange)
+  static let warningSoft = Color(uiColor: .systemOrange).opacity(0.12)
+  static let divider = Color(uiColor: .separator).opacity(0.45)
 }
 
 struct SBLogoMark: View {
@@ -62,20 +23,11 @@ struct SBLogoMark: View {
 
   var body: some View {
     ZStack {
-      RoundedRectangle(cornerRadius: size * 0.17)
-        .fill(SBTheme.strongFill)
-        .frame(width: size * 0.74, height: size * 0.86)
-        .rotationEffect(.degrees(-7))
-        .offset(x: -size * 0.08)
+      RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
+        .fill(SBTheme.accent.gradient)
 
-      RoundedRectangle(cornerRadius: size * 0.17)
-        .fill(SBTheme.accent)
-        .frame(width: size * 0.74, height: size * 0.86)
-        .rotationEffect(.degrees(7))
-        .offset(x: size * 0.08)
-
-      Image(systemName: "sparkles")
-        .font(.system(size: size * 0.3, weight: .bold))
+      Image(systemName: "bubble.left.and.text.bubble.right.fill")
+        .font(.system(size: size * 0.33, weight: .semibold))
         .foregroundStyle(.white)
     }
     .frame(width: size, height: size)
@@ -100,11 +52,11 @@ struct SBPageHeader: View {
     HStack(alignment: .top, spacing: 16) {
       VStack(alignment: .leading, spacing: 7) {
         Text(eyebrow)
-          .font(.caption.weight(.semibold))
-          .foregroundStyle(SBTheme.accent)
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(SBTheme.secondaryInk)
 
         Text(title)
-          .font(.system(.largeTitle, design: .rounded, weight: .bold))
+          .font(.largeTitle.weight(.bold))
           .foregroundStyle(SBTheme.ink)
 
         Text(detail)
@@ -120,8 +72,8 @@ struct SBPageHeader: View {
       }
     }
     .padding(.horizontal, 20)
-    .padding(.top, 14)
-    .padding(.bottom, 10)
+    .padding(.top, 12)
+    .padding(.bottom, 6)
   }
 }
 
@@ -160,11 +112,6 @@ struct SBSurface<Content: View>: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       .background(SBTheme.surface)
       .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 8, style: .continuous)
-          .stroke(SBTheme.divider.opacity(0.8), lineWidth: 1)
-      }
-      .shadow(color: SBTheme.ink.opacity(0.055), radius: 12, x: 0, y: 5)
   }
 }
 
@@ -181,8 +128,7 @@ struct SBStatusBanner: View {
         .font(.system(size: 17, weight: .semibold))
         .foregroundStyle(positive ? SBTheme.teal : SBTheme.warning)
         .frame(width: 38, height: 38)
-        .background(positive ? SBTheme.tealSoft : SBTheme.warningSoft)
-        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+        .background(positive ? SBTheme.tealSoft : SBTheme.warningSoft, in: Circle())
 
       VStack(alignment: .leading, spacing: 3) {
         Text(title)
@@ -202,8 +148,7 @@ struct SBStatusBanner: View {
         .foregroundStyle(positive ? SBTheme.teal : SBTheme.warning)
         .padding(.horizontal, 8)
         .padding(.vertical, 5)
-        .background(positive ? SBTheme.tealSoft : SBTheme.warningSoft)
-        .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .background(positive ? SBTheme.tealSoft : SBTheme.warningSoft, in: Capsule())
     }
     .accessibilityElement(children: .combine)
   }
@@ -258,8 +203,7 @@ struct SBEmptyState: View {
         .font(.system(size: 25, weight: .medium))
         .foregroundStyle(SBTheme.accent)
         .frame(width: 52, height: 52)
-        .background(SBTheme.accentSoft)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .background(SBTheme.accentSoft, in: Circle())
 
       Text(title)
         .font(.headline)
@@ -276,31 +220,68 @@ struct SBEmptyState: View {
 }
 
 struct SBPrimaryButtonStyle: ButtonStyle {
+  @ViewBuilder
   func makeBody(configuration: Configuration) -> some View {
+    #if compiler(>=6.2)
+    if #available(iOS 26.0, *) {
+      configuration.label
+        .font(.headline)
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, minHeight: 52)
+        .contentShape(Rectangle())
+        .glassEffect(
+          .regular.tint(configuration.isPressed ? SBTheme.accentPressed : SBTheme.accent).interactive(),
+          in: .rect(cornerRadius: 18)
+        )
+        .scaleEffect(configuration.isPressed ? 0.98 : 1)
+        .animation(.snappy(duration: 0.18), value: configuration.isPressed)
+    } else {
+      configuration.label
+        .font(.headline)
+        .foregroundStyle(.white)
+        .frame(maxWidth: .infinity, minHeight: 52)
+        .background(configuration.isPressed ? SBTheme.accentPressed : SBTheme.accent)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+    #else
     configuration.label
       .font(.headline)
       .foregroundStyle(.white)
-      .frame(maxWidth: .infinity, minHeight: 50)
+      .frame(maxWidth: .infinity, minHeight: 52)
       .background(configuration.isPressed ? SBTheme.accentPressed : SBTheme.accent)
       .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-      .scaleEffect(configuration.isPressed ? 0.985 : 1)
-      .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+    #endif
   }
 }
 
 struct SBSecondaryButtonStyle: ButtonStyle {
+  @ViewBuilder
   func makeBody(configuration: Configuration) -> some View {
+    #if compiler(>=6.2)
+    if #available(iOS 26.0, *) {
+      configuration.label
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(SBTheme.ink)
+        .frame(maxWidth: .infinity, minHeight: 46)
+        .contentShape(Rectangle())
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 16))
+        .scaleEffect(configuration.isPressed ? 0.98 : 1)
+    } else {
+      configuration.label
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(SBTheme.ink)
+        .frame(maxWidth: .infinity, minHeight: 46)
+        .background(configuration.isPressed ? SBTheme.surfaceMuted : SBTheme.surface)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+    #else
     configuration.label
       .font(.subheadline.weight(.semibold))
       .foregroundStyle(SBTheme.ink)
-      .frame(maxWidth: .infinity, minHeight: 44)
+      .frame(maxWidth: .infinity, minHeight: 46)
       .background(configuration.isPressed ? SBTheme.surfaceMuted : SBTheme.surface)
       .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 8, style: .continuous)
-          .stroke(SBTheme.divider, lineWidth: 1)
-      }
-      .scaleEffect(configuration.isPressed ? 0.985 : 1)
+    #endif
   }
 }
 
@@ -314,13 +295,8 @@ struct SBIconButton: View {
       Image(systemName: systemImage)
         .font(.system(size: 16, weight: .semibold))
         .foregroundStyle(SBTheme.ink)
-        .frame(width: 42, height: 42)
-        .background(SBTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .overlay {
-          RoundedRectangle(cornerRadius: 8, style: .continuous)
-            .stroke(SBTheme.divider, lineWidth: 1)
-        }
+        .frame(width: 44, height: 44)
+        .sbGlassControl(shape: Circle())
     }
     .accessibilityLabel(label)
   }
@@ -330,23 +306,27 @@ extension View {
   func sbPageBackground() -> some View {
     background(SBTheme.canvas.ignoresSafeArea())
   }
+
+  @ViewBuilder
+  func sbGlassControl<S: Shape>(shape: S) -> some View {
+    #if compiler(>=6.2)
+    if #available(iOS 26.0, *) {
+      glassEffect(.regular.interactive(), in: shape)
+    } else {
+      background(.regularMaterial, in: shape)
+    }
+    #else
+    background(.regularMaterial, in: shape)
+    #endif
+  }
 }
 
 enum SBAppearance {
   static func configure() {
-    let tabAppearance = UITabBarAppearance()
-    tabAppearance.configureWithOpaqueBackground()
-    tabAppearance.backgroundColor = UIColor(SBTheme.surface)
-    tabAppearance.shadowColor = UIColor(SBTheme.divider)
-    tabAppearance.stackedLayoutAppearance.normal.iconColor = UIColor(SBTheme.secondaryInk)
-    tabAppearance.stackedLayoutAppearance.normal.titleTextAttributes = [
-      .foregroundColor: UIColor(SBTheme.secondaryInk),
-    ]
-    tabAppearance.stackedLayoutAppearance.selected.iconColor = UIColor(SBTheme.accent)
-    tabAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [
-      .foregroundColor: UIColor(SBTheme.accent),
-    ]
-    UITabBar.appearance().standardAppearance = tabAppearance
-    UITabBar.appearance().scrollEdgeAppearance = tabAppearance
+    guard #unavailable(iOS 26.0) else { return }
+    let appearance = UITabBarAppearance()
+    appearance.configureWithDefaultBackground()
+    UITabBar.appearance().standardAppearance = appearance
+    UITabBar.appearance().scrollEdgeAppearance = appearance
   }
 }

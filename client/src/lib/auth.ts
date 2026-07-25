@@ -111,6 +111,19 @@ export function useLogout() {
   });
 }
 
+export function useDeleteAccount() {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", "/api/account");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.clear();
+      queryClient.setQueryData(["/api/auth/user"], { user: null });
+    },
+  });
+}
+
 export function useCheckout() {
   return useMutation({
     mutationFn: async ({ priceId, returnTo }: { priceId: string; returnTo?: string }) => {

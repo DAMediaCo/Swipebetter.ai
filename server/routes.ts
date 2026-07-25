@@ -8,6 +8,7 @@ import { db } from "./db";
 import { users } from "@shared/models/auth";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
+import { excludeScreenshotsFromHistory } from "./privacy";
 import { z } from "zod";
 import sharp from "sharp";
 import {
@@ -701,7 +702,7 @@ export async function registerRoutes(
         console.log(`[analyze-profile] Deducted 1 credit from user ${userId}`);
       }
 
-      const savedAnalysis = await storage.createProfileAnalysis({
+      const savedAnalysis = await storage.createProfileAnalysis(excludeScreenshotsFromHistory({
         userId,
         platform,
         gender,
@@ -709,7 +710,7 @@ export async function registerRoutes(
         screenshots,
         analysisStatus: 'pending',
         enm: enm || false,
-      });
+      }));
 
       console.log(`[analyze-profile] Created job ${savedAnalysis.id} (poll: ${savedAnalysis.pollToken}) for user ${userId}, isFreeAnalysis=${isFreeAnalysis}`);
 
@@ -945,13 +946,13 @@ export async function registerRoutes(
         };
       }
 
-      const savedAnalysis = await storage.createReplyAnalysis({
+      const savedAnalysis = await storage.createReplyAnalysis(excludeScreenshotsFromHistory({
         userId,
         tone,
         screenshots: screenshots || [],
         suggestedReplies: analysis.suggestedReplies || [],
         conversationContext: analysis.conversationContext,
-      });
+      }));
 
       await storage.updateLastActiveAt(userId);
 
@@ -1004,7 +1005,7 @@ export async function registerRoutes(
 
       const { platform, gender, intent, screenshots, bioSuggestions, photoFeedback, overallScore, improvements } = parseResult.data;
 
-      const analysis = await storage.createProfileAnalysis({
+      const analysis = await storage.createProfileAnalysis(excludeScreenshotsFromHistory({
         userId,
         platform,
         gender,
@@ -1014,7 +1015,7 @@ export async function registerRoutes(
         photoFeedback: photoFeedback ?? null,
         overallScore: overallScore ?? null,
         improvements: improvements ?? null,
-      });
+      }));
 
       res.status(201).json(analysis);
     } catch (error) {
@@ -1100,13 +1101,13 @@ export async function registerRoutes(
 
       const { tone, screenshots, conversationText, suggestedReplies, conversationContext } = parseResult.data;
 
-      const analysis = await storage.createReplyAnalysis({
+      const analysis = await storage.createReplyAnalysis(excludeScreenshotsFromHistory({
         userId,
         tone,
         screenshots: screenshots ?? [],
         suggestedReplies: suggestedReplies ?? [],
         conversationContext: conversationContext ?? conversationText ?? null,
-      });
+      }));
 
       res.status(201).json(analysis);
     } catch (error) {

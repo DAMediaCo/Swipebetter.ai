@@ -4,7 +4,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth, useSubscription, useCredits, useCustomerPortal, useLogout } from "@/lib/auth";
+import {
+  useAuth,
+  useSubscription,
+  useCredits,
+  useCustomerPortal,
+  useDeleteAccount,
+  useLogout,
+} from "@/lib/auth";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { 
   Crown,
   CreditCard,
@@ -12,7 +30,8 @@ import {
   User,
   Mail,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Trash2,
 } from "lucide-react";
 
 export default function Account() {
@@ -22,6 +41,7 @@ export default function Account() {
   const { data: creditsData } = useCredits();
   const portalMutation = useCustomerPortal();
   const logoutMutation = useLogout();
+  const deleteAccountMutation = useDeleteAccount();
   const user = authData?.user;
 
   useEffect(() => {
@@ -167,9 +187,12 @@ export default function Account() {
         </Card>
 
         <Card>
-          <CardContent className="pt-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Account access</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <Button
-              variant="destructive"
+              variant="outline"
               className="w-full"
               onClick={() => logoutMutation.mutate()}
               disabled={logoutMutation.isPending}
@@ -178,6 +201,47 @@ export default function Account() {
               <LogOut className="w-4 h-4 mr-2" />
               {logoutMutation.isPending ? "Logging out..." : "Log Out"}
             </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="w-full"
+                  data-testid="button-delete-account"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Permanently delete your account?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This removes your account, saved analyses, reply history, credits, and profile
+                    data. Active Stripe subscriptions are canceled. Apple subscriptions must be
+                    managed through Apple. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep Account</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => deleteAccountMutation.mutate(undefined, {
+                      onSuccess: () => setLocation("/"),
+                    })}
+                    data-testid="button-confirm-delete-account"
+                  >
+                    {deleteAccountMutation.isPending ? "Deleting..." : "Delete Account"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            {deleteAccountMutation.isError && (
+              <p className="text-sm text-destructive" role="alert">
+                We could not delete your account. Please try again or contact support.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>

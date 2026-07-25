@@ -87,4 +87,39 @@ final class SwipeBetterUITests: XCTestCase {
     copyButton.tap()
     XCTAssertEqual(copyButton.label, "Reply 1 copied")
   }
+
+  func testKeyboardExtensionVisualQA() throws {
+    guard ProcessInfo.processInfo.environment["SWIPEBETTER_RUN_KEYBOARD_VISUAL_QA"] == "1" else {
+      throw XCTSkip("Run manually after enabling SwipeBetter Keyboard in the simulator.")
+    }
+
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_KEYBOARD_VISUAL_TEST")
+    app.launch()
+
+    let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+    let continueButton = springboard.buttons["Continue"]
+    if continueButton.waitForExistence(timeout: 3) {
+      continueButton.tap()
+    }
+
+    let field = app.textFields["keyboardTest.textField"]
+    XCTAssertTrue(field.waitForExistence(timeout: 8))
+    field.tap()
+
+    let swipeBetterButton = app.buttons["keyboard.warmReplyButton"]
+    for _ in 0..<5 where !swipeBetterButton.exists {
+      let nextKeyboard = app.buttons.matching(
+        NSPredicate(format: "label CONTAINS[c] %@", "next keyboard")
+      ).firstMatch
+      guard nextKeyboard.waitForExistence(timeout: 2) else { break }
+      nextKeyboard.tap()
+    }
+
+    XCTAssertTrue(swipeBetterButton.waitForExistence(timeout: 5))
+    let attachment = XCTAttachment(screenshot: app.screenshot())
+    attachment.name = "SwipeBetter Keyboard"
+    attachment.lifetime = .keepAlways
+    add(attachment)
+  }
 }
