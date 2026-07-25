@@ -61,18 +61,6 @@ struct PremiumProfileAuditView: View {
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 16) {
-        SBPageHeader(
-          eyebrow: "PROFILE COACH",
-          title: "Make the first swipe count",
-          detail: "Add your current profile, then get a prioritized photo and bio plan.",
-          trailing: AnyView(
-            SBIconButton(systemImage: "square.and.arrow.down", label: "Import shared screenshots") {
-              model.loadSharedImport()
-              applyPendingImport()
-            }
-          )
-        )
-
         SBSurface {
           PremiumUsageStatus(
             title: "Profile audit",
@@ -80,6 +68,7 @@ struct PremiumProfileAuditView: View {
             systemImage: "person.crop.rectangle.stack"
           )
         }
+        .padding(.horizontal, 20)
 
         VStack(spacing: 10) {
           SBSectionHeader(
@@ -163,7 +152,19 @@ struct PremiumProfileAuditView: View {
     }
     .scrollDismissesKeyboard(.interactively)
     .sbPageBackground()
-    .navigationBarHidden(true)
+    .navigationTitle("Profile audit")
+    .navigationBarTitleDisplayMode(.large)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          model.loadSharedImport()
+          applyPendingImport()
+        } label: {
+          Image(systemName: "square.and.arrow.down")
+        }
+        .accessibilityLabel("Import shared screenshots")
+      }
+    }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 10) }
     }
@@ -233,18 +234,6 @@ struct PremiumReplyAssistantView: View {
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 16) {
-        SBPageHeader(
-          eyebrow: "REPLY COACH",
-          title: "Say what you mean — better",
-          detail: "Bring the conversation. Choose the energy. Leave with three replies you can send.",
-          trailing: AnyView(
-            SBIconButton(systemImage: "square.and.arrow.down", label: "Import shared chat") {
-              model.loadSharedImport()
-              applyPendingImport()
-            }
-          )
-        )
-
         SBSurface {
           PremiumUsageStatus(
             title: "Reply coaching",
@@ -372,7 +361,19 @@ struct PremiumReplyAssistantView: View {
     }
     .scrollDismissesKeyboard(.interactively)
     .sbPageBackground()
-    .navigationBarHidden(true)
+    .navigationTitle("Reply coach")
+    .navigationBarTitleDisplayMode(.large)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) {
+        Button {
+          model.loadSharedImport()
+          applyPendingImport()
+        } label: {
+          Image(systemName: "square.and.arrow.down")
+        }
+        .accessibilityLabel("Import shared chat")
+      }
+    }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 3) }
     }
@@ -509,7 +510,7 @@ struct PremiumScreenshotStrip: View {
                 .font(.caption.weight(.bold))
                 .foregroundStyle(.white)
                 .frame(width: 26, height: 26)
-                .background(SBTheme.strongFill.opacity(0.86))
+                .background(Color.black.opacity(0.72))
                 .clipShape(Circle())
             }
             .offset(x: 6, y: -6)
@@ -547,7 +548,7 @@ struct PremiumProfileResult: View {
                 .rotationEffect(.degrees(-90))
 
               Text("\(analysis.overallScore ?? 0)")
-                .font(.system(.title2, design: .rounded, weight: .bold))
+                .font(.title2.weight(.bold).monospacedDigit())
                 .foregroundStyle(SBTheme.ink)
             }
             .frame(width: 72, height: 72)

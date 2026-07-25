@@ -16,7 +16,7 @@ const faqs = [
   },
   {
     question: "Do you store my screenshots or conversations?",
-    answer: "No. Screenshots and conversations are processed to generate feedback, then deleted. We do not permanently store your uploads.",
+    answer: "Uploaded screenshots are sent for analysis and are not saved in your SwipeBetter history. We save the generated advice and a short conversation summary so you can reopen past results. Delete your account at any time to remove that saved history.",
   },
   {
     question: "How long does it take?",

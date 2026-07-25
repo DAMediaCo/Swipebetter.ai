@@ -1,6 +1,9 @@
 import UIKit
 
 final class KeyboardViewController: UIInputViewController {
+  private let backgroundEffectView = UIVisualEffectView(
+    effect: UIBlurEffect(style: .systemChromeMaterial)
+  )
   private let rootStack = UIStackView()
   private let contextLabel = UILabel()
   private let accessLabel = UILabel()
@@ -15,21 +18,7 @@ final class KeyboardViewController: UIInputViewController {
       ? UIColor(red: 1.0, green: 0.39, blue: 0.34, alpha: 1)
       : UIColor(red: 0.91, green: 0.27, blue: 0.24, alpha: 1)
   }
-  private let ink = UIColor { traits in
-    traits.userInterfaceStyle == .dark
-      ? UIColor(red: 0.95, green: 0.96, blue: 0.98, alpha: 1)
-      : UIColor(red: 0.09, green: 0.10, blue: 0.12, alpha: 1)
-  }
-  private let canvas = UIColor { traits in
-    traits.userInterfaceStyle == .dark
-      ? UIColor(red: 0.055, green: 0.059, blue: 0.067, alpha: 1)
-      : UIColor(red: 0.95, green: 0.96, blue: 0.97, alpha: 1)
-  }
-  private let buttonFill = UIColor { traits in
-    traits.userInterfaceStyle == .dark
-      ? UIColor(red: 0.91, green: 0.27, blue: 0.24, alpha: 1)
-      : UIColor(red: 0.09, green: 0.10, blue: 0.12, alpha: 1)
-  }
+  private let ink = UIColor.label
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -61,11 +50,13 @@ final class KeyboardViewController: UIInputViewController {
   }
 
   private func buildKeyboard() {
-    view.backgroundColor = canvas
+    view.backgroundColor = .clear
+    backgroundEffectView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(backgroundEffectView)
 
     rootStack.axis = .vertical
-    rootStack.spacing = 9
-    rootStack.layoutMargins = UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
+    rootStack.spacing = 10
+    rootStack.layoutMargins = UIEdgeInsets(top: 10, left: 12, bottom: 9, right: 12)
     rootStack.isLayoutMarginsRelativeArrangement = true
     rootStack.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(rootStack)
@@ -75,9 +66,13 @@ final class KeyboardViewController: UIInputViewController {
     rootStack.addArrangedSubview(makeReplyRow())
     rootStack.addArrangedSubview(makeUtilityRow())
 
-    let preferredHeight = view.heightAnchor.constraint(equalToConstant: 286)
+    let preferredHeight = view.heightAnchor.constraint(equalToConstant: 292)
     preferredHeight.priority = .defaultHigh
     NSLayoutConstraint.activate([
+      backgroundEffectView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      backgroundEffectView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      backgroundEffectView.topAnchor.constraint(equalTo: view.topAnchor),
+      backgroundEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
       rootStack.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       rootStack.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       rootStack.topAnchor.constraint(equalTo: view.topAnchor),
@@ -93,22 +88,22 @@ final class KeyboardViewController: UIInputViewController {
     row.spacing = 8
 
     let mark = UILabel()
-    mark.text = "S"
-    mark.font = .systemFont(ofSize: 13, weight: .black)
+    mark.text = "↗"
+    mark.font = .systemFont(ofSize: 14, weight: .bold)
     mark.textColor = .white
     mark.textAlignment = .center
     mark.backgroundColor = coral
-    mark.layer.cornerRadius = 5
+    mark.layer.cornerRadius = 12.5
     mark.layer.masksToBounds = true
     mark.widthAnchor.constraint(equalToConstant: 25).isActive = true
     mark.heightAnchor.constraint(equalToConstant: 25).isActive = true
 
     let title = UILabel()
     title.text = "SwipeBetter"
-    title.font = .systemFont(ofSize: 15, weight: .bold)
+    title.font = .systemFont(ofSize: 15, weight: .semibold)
     title.textColor = ink
 
-    accessLabel.font = .systemFont(ofSize: 11, weight: .semibold)
+    accessLabel.font = .systemFont(ofSize: 11, weight: .medium)
     accessLabel.textAlignment = .right
 
     row.addArrangedSubview(mark)
@@ -120,17 +115,16 @@ final class KeyboardViewController: UIInputViewController {
 
   private func makeContextCard() -> UIView {
     let card = UIView()
-    card.backgroundColor = .secondarySystemBackground
-    card.layer.cornerRadius = 8
-    card.layer.borderWidth = 1
-    card.layer.borderColor = UIColor.black.withAlphaComponent(0.08).cgColor
+    card.backgroundColor = .tertiarySystemFill
+    card.layer.cornerCurve = .continuous
+    card.layer.cornerRadius = 12
 
     let caption = UILabel()
-    caption.text = "CONTEXT NEAR CURSOR"
-    caption.font = .systemFont(ofSize: 10, weight: .bold)
+    caption.text = "Conversation context"
+    caption.font = .systemFont(ofSize: 11, weight: .semibold)
     caption.textColor = .secondaryLabel
 
-    contextLabel.font = .systemFont(ofSize: 13, weight: .medium)
+    contextLabel.font = .systemFont(ofSize: 13, weight: .regular)
     contextLabel.textColor = ink
     contextLabel.numberOfLines = 3
 
@@ -145,7 +139,7 @@ final class KeyboardViewController: UIInputViewController {
       stack.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -12),
       stack.topAnchor.constraint(equalTo: card.topAnchor, constant: 9),
       stack.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -9),
-      card.heightAnchor.constraint(greaterThanOrEqualToConstant: 78),
+      card.heightAnchor.constraint(greaterThanOrEqualToConstant: 76),
     ])
     return card
   }
@@ -183,7 +177,7 @@ final class KeyboardViewController: UIInputViewController {
     paste.accessibilityIdentifier = "keyboard.pasteChatButton"
     paste.addTarget(self, action: #selector(importClipboard), for: .touchUpInside)
 
-    let coach = outlineButton(title: "AI Coach", systemImage: "sparkles")
+    let coach = outlineButton(title: "Open coach", systemImage: "arrow.up.forward.app")
     coach.accessibilityIdentifier = "keyboard.coachChatButton"
     coach.addTarget(self, action: #selector(openCoach), for: .touchUpInside)
 
@@ -194,14 +188,14 @@ final class KeyboardViewController: UIInputViewController {
   }
 
   private func filledButton(title: String, systemImage: String? = nil) -> UIButton {
-    var config = UIButton.Configuration.filled()
+    var config = UIButton.Configuration.tinted()
     config.title = title
     config.image = systemImage.flatMap(UIImage.init(systemName:))
     config.imagePadding = 5
-    config.baseBackgroundColor = buttonFill
-    config.baseForegroundColor = .white
-    config.cornerStyle = .medium
-    config.contentInsets = NSDirectionalEdgeInsets(top: 11, leading: 9, bottom: 11, trailing: 9)
+    config.baseBackgroundColor = coral
+    config.baseForegroundColor = coral
+    config.cornerStyle = .capsule
+    config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 9, bottom: 12, trailing: 9)
     let button = UIButton(configuration: config)
     button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
     return button
@@ -213,16 +207,16 @@ final class KeyboardViewController: UIInputViewController {
     config.image = UIImage(systemName: systemImage)
     config.imagePadding = 5
     config.baseForegroundColor = ink
-    config.cornerStyle = .medium
-    config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 8, bottom: 10, trailing: 8)
+    config.cornerStyle = .capsule
+    config.contentInsets = NSDirectionalEdgeInsets(top: 11, leading: 8, bottom: 11, trailing: 8)
     return UIButton(configuration: config)
   }
 
   private func refreshContext() {
     refreshSnapPayload()
     let context = activeContext
-    accessLabel.text = hasFullAccess ? "Full Access on" : "Local mode"
-    accessLabel.textColor = hasFullAccess ? .systemGreen : .secondaryLabel
+    accessLabel.text = hasFullAccess ? "Full Access" : "Private mode"
+    accessLabel.textColor = hasFullAccess ? .systemTeal : .secondaryLabel
     contextLabel.text = contextMessage(fallbackContext: context)
     contextLabel.textColor = context == nil && snapPayload == nil ? .secondaryLabel : ink
 
@@ -252,10 +246,16 @@ final class KeyboardViewController: UIInputViewController {
   @objc private func insertSuggestedReply(_ sender: UIButton) {
     guard KeyboardReplyStyle.allCases.indices.contains(sender.tag) else { return }
     let style = KeyboardReplyStyle.allCases[sender.tag]
-    let reply = snapPayload?.usableReply(at: sender.tag) ?? KeyboardReplyComposer.reply(for: activeContext, style: style)
+    let generatedReply = snapPayload?.usableReply(at: sender.tag)
+    let reply = generatedReply ?? KeyboardReplyComposer.reply(for: activeContext, style: style)
     let before = textDocumentProxy.documentContextBeforeInput ?? ""
     let separator = before.last.map { $0.isWhitespace ? "" : " " } ?? ""
     textDocumentProxy.insertText(separator + reply)
+    if generatedReply != nil {
+      SwipeBetterSnapStore.clear()
+      snapPayload = nil
+      refreshContext()
+    }
   }
 
   @objc private func importClipboard() {
@@ -296,9 +296,12 @@ final class KeyboardViewController: UIInputViewController {
   }
 
   private func refreshSnapPayload() {
-    guard hasFullAccess,
-          let payload = SwipeBetterSnapStore.load(),
-          payload.isCurrent(maxAge: 30 * 60) else {
+    guard hasFullAccess, let payload = SwipeBetterSnapStore.load() else {
+      snapPayload = nil
+      return
+    }
+    guard payload.isCurrent(maxAge: 30 * 60) else {
+      SwipeBetterSnapStore.clear()
       snapPayload = nil
       return
     }

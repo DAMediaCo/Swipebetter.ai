@@ -47,7 +47,7 @@ struct PremiumAuthView: View {
 
         VStack(alignment: .leading, spacing: 2) {
           Text("SwipeBetter")
-            .font(.system(size: 31, weight: .bold, design: .rounded))
+            .font(.system(size: 31, weight: .bold))
             .foregroundStyle(SBTheme.ink)
 
           Text("Dating decisions, made clearer.")
@@ -125,6 +125,14 @@ struct PremiumAuthView: View {
         .disabled(!canSubmit)
         .opacity(canSubmit ? 1 : 0.48)
         .accessibilityIdentifier(isSignup ? "auth.createAccountButton" : "auth.loginButton")
+
+        if isSignup {
+          Text("By creating an account, you confirm you’re 18 or older and agree to the Terms and Privacy Policy.")
+            .font(.caption)
+            .foregroundStyle(SBTheme.secondaryInk)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+        }
 
         if !isSignup {
           Button("Forgot password?") {
@@ -237,7 +245,7 @@ struct PremiumPasswordResetSheet: View {
       VStack(alignment: .leading, spacing: 18) {
         VStack(alignment: .leading, spacing: 6) {
           Text("Reset your password")
-            .font(.system(.title2, design: .rounded, weight: .bold))
+            .font(.title2.weight(.bold))
             .foregroundStyle(SBTheme.ink)
 
           Text("We’ll send a secure reset link to your account email.")

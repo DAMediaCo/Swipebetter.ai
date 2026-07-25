@@ -230,6 +230,15 @@ export default function Auth() {
               ) : null}
               {isSignUp ? "Create Account" : "Sign In"}
             </Button>
+
+            {isSignUp && (
+              <p className="text-xs text-muted-foreground text-center leading-relaxed">
+                By creating an account, you confirm you are 18 or older and agree to the{" "}
+                <Link href="/terms" className="text-primary hover:underline">Terms of Service</Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+              </p>
+            )}
           </form>
 
           <div className="relative my-6">

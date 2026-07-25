@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
         </Link>
 
         <h1 className="text-3xl font-bold mb-2">Privacy Policy</h1>
-        <p className="text-muted-foreground mb-8">Effective Date: January 1, 2025</p>
+        <p className="text-muted-foreground mb-8">Effective Date: July 25, 2026</p>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <section>
@@ -43,6 +43,14 @@ export default function PrivacyPolicy() {
               <li>Screenshots of dating profiles and conversations</li>
               <li>Profile text and bio information</li>
               <li>Messages and conversation content</li>
+            </ul>
+
+            <h3 className="text-lg font-medium mt-4 mb-2">iOS App and Keyboard</h3>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>Text immediately around the cursor when you use the SwipeBetter keyboard</li>
+              <li>Clipboard text only when you tap Paste Chat and allow Full Access</li>
+              <li>Screenshots only when you select them or approve a SwipeBetter Shortcut run</li>
+              <li>App Store purchase and entitlement information supplied by Apple</li>
             </ul>
 
             <h3 className="text-lg font-medium mt-4 mb-2">Automatically Collected Information</h3>
@@ -74,9 +82,10 @@ export default function PrivacyPolicy() {
             <h2 className="text-xl font-semibold mt-8 mb-4">4. Third-Party Services</h2>
             <p>We use the following third-party services that may collect and process your data:</p>
             <ul className="list-disc pl-6 space-y-2 mt-2">
-              <li><strong>Stripe:</strong> For payment processing and subscription management</li>
-              <li><strong>AI Providers:</strong> For processing and analyzing your content to generate suggestions</li>
-              <li><strong>Analytics Services:</strong> For understanding how users interact with our service</li>
+              <li><strong>Apple:</strong> For Sign in with Apple and iOS purchases</li>
+              <li><strong>Stripe:</strong> For web payment processing and subscription management</li>
+              <li><strong>xAI and OpenAI-compatible services:</strong> For processing content and generating analysis or replies</li>
+              <li><strong>Analytics services:</strong> For understanding website use</li>
             </ul>
             <p className="mt-2">
               These third parties have their own privacy policies and we encourage you to review them.
@@ -93,10 +102,26 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-xl font-semibold mt-8 mb-4">6. Data Retention</h2>
             <p>
-              We retain your account information for as long as your account is active or as needed to provide you with our services. Uploaded screenshots and content are processed in memory for AI analysis and are not permanently stored on our servers. Analysis results may be retained to allow you to access your history.
+              We retain your account information while your account is active. Uploaded screenshots
+              are sent to our AI provider for the requested analysis but are not saved in your
+              SwipeBetter history. Generated advice, profile scores, suggested replies, and a short
+              conversation summary may be saved so you can reopen your history. We keep up to 10
+              profile audits per account; reply sessions remain until the account is deleted.
             </p>
             <p className="mt-2">
-              If you delete your account, we will delete or anonymize your personal information within 30 days, except where we are required by law to retain certain data.
+              The keyboard cannot read an entire app screen or secure password fields. SwipeBetter
+              Snap analyzes one screenshot only after you approve its Shortcut automation. Neither
+              feature continuously records your screen. Keyboard quick replies are generated on
+              your device. Full Access enables the keyboard to read clipboard text when you tap
+              Paste Chat and to read a user-approved Snap result from the shared App Group; it does
+              not cause SwipeBetter to transmit your keystrokes. A Snap result expires after 30
+              minutes and is removed after you insert one of its replies.
+            </p>
+            <p className="mt-2">
+              When you delete your account, SwipeBetter immediately removes the account and
+              database records linked to it, including saved audits and reply history. We may retain
+              limited transaction or security records where required by law or needed to prevent
+              fraud. Apple controls Apple purchase records and subscription management.
             </p>
           </section>
 
@@ -111,7 +136,8 @@ export default function PrivacyPolicy() {
               <li><strong>Data Portability:</strong> Request your data in a portable format</li>
             </ul>
             <p className="mt-2">
-              To exercise any of these rights, please contact us at hello@swipebetter.ai.
+              Delete your account from Account settings in the iOS app or website. For other privacy
+              requests, contact hello@swipebetter.ai.
             </p>
           </section>
 

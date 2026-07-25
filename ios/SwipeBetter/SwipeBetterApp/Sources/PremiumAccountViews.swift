@@ -8,12 +8,6 @@ struct PremiumHistoryView: View {
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 16) {
-        SBPageHeader(
-          eyebrow: "YOUR PLAYBOOK",
-          title: "What worked before",
-          detail: "Revisit profile advice and reply sessions without starting over."
-        )
-
         historySection(
           title: "Profile audits",
           detail: "Saved profile scores and highest-priority fixes",
@@ -58,7 +52,8 @@ struct PremiumHistoryView: View {
       await model.refreshHistory()
     }
     .sbPageBackground()
-    .navigationBarHidden(true)
+    .navigationTitle("History")
+    .navigationBarTitleDisplayMode(.large)
     .accessibilityIdentifier("history.list")
   }
 
@@ -119,7 +114,7 @@ struct PremiumHistoryRow: View {
 
       if let trailing {
         Text(trailing)
-          .font(.system(.title3, design: .rounded, weight: .bold))
+          .font(.title3.weight(.bold).monospacedDigit())
           .foregroundStyle(SBTheme.teal)
       }
     }
@@ -139,16 +134,11 @@ struct PremiumAccountView: View {
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 16) {
-        SBPageHeader(
-          eyebrow: "ACCOUNT",
-          title: greeting,
-          detail: "Manage access, Apple billing, keyboard setup, and account privacy."
-        )
-
         accountSummary
         keyboardSection
         plansSection
         billingSection
+        privacySection
         helpSection
         destructiveSection
       }
@@ -160,7 +150,8 @@ struct PremiumAccountView: View {
       await model.purchases.loadProducts()
     }
     .sbPageBackground()
-    .navigationBarHidden(true)
+    .navigationTitle("Account")
+    .navigationBarTitleDisplayMode(.large)
     .sheet(isPresented: $showingKeyboardGuide) {
       PremiumKeyboardGuide()
         .presentationDetents([.large])
@@ -181,7 +172,7 @@ struct PremiumAccountView: View {
       }
       Button("Cancel", role: .cancel) {}
     } message: {
-      Text("This cannot be undone. Apple subscriptions must be managed through Apple billing.")
+      Text("This immediately removes saved audits, reply history, credits, and profile data. This cannot be undone. Apple subscriptions must be managed through Apple billing.")
     }
   }
 
@@ -197,10 +188,10 @@ struct PremiumAccountView: View {
       VStack(spacing: 14) {
         HStack(alignment: .center, spacing: 12) {
           Text(initials)
-            .font(.system(.headline, design: .rounded, weight: .bold))
+            .font(.headline.weight(.bold))
             .foregroundStyle(.white)
             .frame(width: 48, height: 48)
-            .background(SBTheme.strongFill)
+            .background(SBTheme.accent.gradient)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
           VStack(alignment: .leading, spacing: 3) {
@@ -281,10 +272,17 @@ struct PremiumAccountView: View {
         }
       }
 
-      Text("Purchases are billed by Apple. Stripe checkout is not shown in the iOS app.")
+      Text("Subscriptions renew automatically unless canceled at least 24 hours before the current period ends. Apple charges your account and manages renewal.")
         .font(.caption)
         .foregroundStyle(SBTheme.secondaryInk)
         .frame(maxWidth: .infinity, alignment: .leading)
+
+      HStack(spacing: 16) {
+        Link("Terms", destination: accountURL("/terms"))
+        Link("Privacy", destination: accountURL("/privacy"))
+      }
+      .font(.caption.weight(.semibold))
+      .frame(maxWidth: .infinity, alignment: .leading)
     }
   }
 
@@ -416,6 +414,59 @@ struct PremiumAccountView: View {
     }
   }
 
+  private var privacySection: some View {
+    VStack(spacing: 10) {
+      SBSectionHeader(
+        title: "Your data",
+        detail: "What SwipeBetter processes and what remains in your account."
+      )
+
+      SBSurface {
+        VStack(spacing: 0) {
+          privacyRow(
+            title: "Screenshots",
+            detail: "Sent for the analysis you request, then excluded from your saved history.",
+            systemImage: "photo.badge.checkmark"
+          )
+          SBDivider()
+          privacyRow(
+            title: "Saved history",
+            detail: "Generated advice, scores, suggested replies, and a short conversation summary.",
+            systemImage: "clock.arrow.circlepath"
+          )
+          SBDivider()
+          privacyRow(
+            title: "Keyboard",
+            detail: "Reads only text available near the cursor. It cannot inspect the full screen or secure fields.",
+            systemImage: "keyboard"
+          )
+        }
+      }
+    }
+  }
+
+  private func privacyRow(title: String, detail: String, systemImage: String) -> some View {
+    HStack(alignment: .top, spacing: 12) {
+      Image(systemName: systemImage)
+        .font(.system(size: 16, weight: .semibold))
+        .foregroundStyle(SBTheme.teal)
+        .frame(width: 32, height: 32)
+        .background(SBTheme.tealSoft, in: Circle())
+
+      VStack(alignment: .leading, spacing: 3) {
+        Text(title)
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(SBTheme.ink)
+        Text(detail)
+          .font(.caption)
+          .foregroundStyle(SBTheme.secondaryInk)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+      Spacer(minLength: 0)
+    }
+    .padding(.vertical, 11)
+  }
+
   private var destructiveSection: some View {
     VStack(spacing: 10) {
       Button {
@@ -450,7 +501,7 @@ struct PremiumAccountView: View {
         .font(.caption)
         .foregroundStyle(SBTheme.secondaryInk)
       Text(value)
-        .font(.system(.title3, design: .rounded, weight: .bold))
+        .font(.title3.weight(.bold).monospacedDigit())
         .foregroundStyle(color)
         .lineLimit(1)
         .minimumScaleFactor(0.8)
@@ -506,7 +557,7 @@ struct PremiumProductRow: View {
         } else {
           VStack(alignment: .trailing, spacing: 3) {
             Text(product.displayPrice)
-              .font(.system(.headline, design: .rounded, weight: .bold))
+              .font(.headline.weight(.bold).monospacedDigit())
               .foregroundStyle(SBTheme.accent)
             Image(systemName: "arrow.right")
               .font(.caption.weight(.bold))
@@ -638,7 +689,7 @@ struct PremiumKeyboardGuide: View {
             SBLogoMark(size: 52)
             VStack(alignment: .leading, spacing: 3) {
               Text("SwipeBetter Keyboard")
-                .font(.system(.title2, design: .rounded, weight: .bold))
+                .font(.title2.weight(.bold))
                 .foregroundStyle(SBTheme.ink)
               Text("Fast replies where you already chat")
                 .font(.subheadline)
@@ -661,7 +712,16 @@ struct PremiumKeyboardGuide: View {
               Label("What the keyboard can read", systemImage: "eye")
                 .font(.headline)
                 .foregroundStyle(SBTheme.ink)
-              Text("Apple gives custom keyboards text immediately before and after the cursor in the active text field. SwipeBetter uses that visible context to tailor local quick replies and pass context to AI Coach.")
+              Text("Apple gives custom keyboards text immediately before and after the cursor in the active text field. SwipeBetter uses that visible context to create quick replies on your device.")
+                .font(.subheadline)
+                .foregroundStyle(SBTheme.secondaryInk)
+
+              SBDivider()
+
+              Label("What Full Access enables", systemImage: "lock.open")
+                .font(.headline)
+                .foregroundStyle(SBTheme.ink)
+              Text("Full Access lets you paste clipboard text and lets the keyboard read a reply result created by SwipeBetter Snap. The keyboard does not send keystrokes to our servers. Snap results expire after 30 minutes and are removed after you insert one.")
                 .font(.subheadline)
                 .foregroundStyle(SBTheme.secondaryInk)
 
@@ -729,7 +789,7 @@ struct PremiumSnapSetupGuide: View {
               SBLogoMark(size: 52)
               VStack(alignment: .leading, spacing: 3) {
                 Text("SwipeBetter Snap")
-                  .font(.system(.title2, design: .rounded, weight: .bold))
+                  .font(.title2.weight(.bold))
                   .foregroundStyle(SBTheme.ink)
                 Text("Screenshot Automation for iOS 27")
                   .font(.subheadline)
@@ -762,7 +822,7 @@ struct PremiumSnapSetupGuide: View {
                   .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
                 Text(stepTitle)
-                  .font(.system(.title3, design: .rounded, weight: .bold))
+                  .font(.title3.weight(.bold))
                   .foregroundStyle(SBTheme.ink)
 
                 Text(stepInstructions)
@@ -867,7 +927,7 @@ struct PremiumSnapSetupGuide: View {
   private var stepInstructions: String {
     switch currentStep {
     case 0:
-      return "Open Apple’s Shortcuts app and tap the + button to create a new shortcut. Siri AI’s Describe a Change control is part of Shortcuts in iOS 27; you can leave it alone and add the actions manually."
+      return "Open Apple’s Shortcuts app and tap +. The Siri or Describe a Change box is now part of the iOS 27 shortcut editor; it has not taken you out of Shortcuts. Leave that box empty and open Automation in the editor."
     case 1:
       return "Inside the shortcut editor, open Automation, choose Screenshot, and select the trigger that runs when a screenshot is saved."
     case 2:

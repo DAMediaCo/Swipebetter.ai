@@ -14,7 +14,7 @@ export default function TermsOfService() {
         </Link>
 
         <h1 className="text-3xl font-bold mb-2">Terms of Service</h1>
-        <p className="text-muted-foreground mb-8">Effective Date: January 1, 2025</p>
+        <p className="text-muted-foreground mb-8">Effective Date: July 25, 2026</p>
 
         <div className="prose prose-neutral dark:prose-invert max-w-none space-y-6">
           <section>
@@ -90,42 +90,59 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">8. Account Suspension and Termination</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">8. Purchases and Subscriptions</h2>
             <p>
+              iOS purchases are processed by Apple and are subject to Apple&apos;s payment terms.
+              Web purchases are processed by Stripe. Subscription prices and billing periods are
+              shown before purchase. Subscriptions renew automatically unless canceled through the
+              store or billing provider that processed the purchase.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold mt-8 mb-4">9. Account Deletion and Termination</h2>
+            <p>
+              You can permanently delete your account from Account settings. Deletion removes saved
+              audits, reply history, credits, and profile data and cannot be undone. Deleting an
+              account does not automatically cancel an Apple subscription; manage Apple
+              subscriptions through Apple. Active Stripe subscriptions are canceled during account
+              deletion.
+            </p>
+            <p className="mt-2">
               SwipeBetter.ai reserves the right to suspend or terminate your account at any time, with or without notice, for any reason, including but not limited to violation of these Terms of Service, suspected fraudulent activity, or conduct that we determine to be harmful to other users or the service.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">9. Limitation of Liability</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">10. Limitation of Liability</h2>
             <p>
               To the maximum extent permitted by law, SwipeBetter.ai and its officers, directors, employees, and agents shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or other intangible losses, resulting from your use of or inability to use the service.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">10. Indemnification</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">11. Indemnification</h2>
             <p>
               You agree to indemnify, defend, and hold harmless SwipeBetter.ai and its officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, and expenses arising out of or in connection with your use of the service, your violation of these Terms, or your violation of any rights of another party.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">11. Governing Law</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">12. Governing Law</h2>
             <p>
               These Terms of Service shall be governed by and construed in accordance with the laws of the United States. Any disputes arising from these Terms or your use of the service shall be resolved in the appropriate courts within the United States.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">12. Changes to Terms</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">13. Changes to Terms</h2>
             <p>
               SwipeBetter.ai reserves the right to modify these Terms of Service at any time. We will notify users of significant changes by posting a notice on our website. Your continued use of the service after such modifications constitutes your acceptance of the updated Terms.
             </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mt-8 mb-4">13. Contact Information</h2>
+            <h2 className="text-xl font-semibold mt-8 mb-4">14. Contact Information</h2>
             <p>
               If you have any questions about these Terms of Service, please contact us at:
             </p>

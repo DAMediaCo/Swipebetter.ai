@@ -144,10 +144,12 @@ if ((privacy.NSPrivacyTrackingDomains || []).length !== 0) {
 }
 const collectedTypes = new Set((privacy.NSPrivacyCollectedDataTypes || []).map((item) => item.NSPrivacyCollectedDataType));
 for (const type of [
+  "NSPrivacyCollectedDataTypeName",
   "NSPrivacyCollectedDataTypeEmailAddress",
   "NSPrivacyCollectedDataTypeUserID",
   "NSPrivacyCollectedDataTypePhotosorVideos",
   "NSPrivacyCollectedDataTypeOtherUserContent",
+  "NSPrivacyCollectedDataTypePurchaseHistory",
 ]) {
   if (!collectedTypes.has(type)) {
     throw new Error(`Privacy manifest missing collected data type: ${type}`);
@@ -419,6 +421,7 @@ for (const expected of [
   "textDocumentProxy.documentContextAfterInput",
   "String(combined.suffix(1600))",
   "textDocumentProxy.insertText",
+  "SwipeBetterSnapStore.clear()",
 ]) {
   assertIncludes(keyboardExtension, expected, "keyboard extension privacy contract");
 }
@@ -811,6 +814,9 @@ npm run check
 
 echo "Running Apple IAP regression tests..."
 npm run test:ios-iap
+
+echo "Running privacy regression tests..."
+npm run test:privacy
 
 echo "Running production build..."
 npm run build

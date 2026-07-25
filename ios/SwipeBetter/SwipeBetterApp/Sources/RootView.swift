@@ -48,7 +48,13 @@ struct RootView: View {
 
   var body: some View {
     Group {
-      if model.isSignedIn {
+      if keyboardVisualTestEnabled {
+#if DEBUG
+        KeyboardVisualTestHost()
+#else
+        EmptyView()
+#endif
+      } else if model.isSignedIn {
         TabView(selection: $selectedTab) {
           NavigationStack { PremiumProfileAuditView(isActive: selectedTab == .audit) }
             .tabItem { AppTab.audit.label }
@@ -113,6 +119,14 @@ struct RootView: View {
     }
   }
 
+  private var keyboardVisualTestEnabled: Bool {
+#if DEBUG
+    ProcessInfo.processInfo.arguments.contains("-SWIPEBETTER_KEYBOARD_VISUAL_TEST")
+#else
+    false
+#endif
+  }
+
   private func routeToRequestedTabIfNeeded() {
     guard model.isSignedIn else { return }
     guard let requested = model.requestedTabIdentifier else { return }
@@ -141,6 +155,28 @@ struct RootView: View {
     selectedTab = model.pendingImportText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? .audit : .replies
   }
 }
+
+#if DEBUG
+private struct KeyboardVisualTestHost: View {
+  @FocusState private var isFocused: Bool
+  @State private var text = ""
+
+  var body: some View {
+    NavigationStack {
+      Form {
+        TextField("Tap to test SwipeBetter Keyboard", text: $text, axis: .vertical)
+          .focused($isFocused)
+          .accessibilityIdentifier("keyboardTest.textField")
+      }
+      .navigationTitle("Keyboard QA")
+    }
+    .task {
+      try? await Task.sleep(for: .milliseconds(500))
+      isFocused = true
+    }
+  }
+}
+#endif
 
 struct AuthView: View {
   @Environment(AppModel.self) private var model
