@@ -18,62 +18,68 @@ struct PremiumProfileAuditView: View {
   private let genders = ["Man", "Woman", "Non-binary"]
   private let intents = ["Relationship", "Casual Dating", "Friendship", "Not Sure"]
 
-  private var screenshotSelectionSummary: String {
-    images.isEmpty ? "No screenshots selected" : "\(images.count) of 10 screenshots selected"
-  }
-
   private var accessStatus: String {
-    if model.credits?.isUnlimited == true
-      || model.credits?.planTier?.lowercased() == "unlimited"
-      || model.me?.proActive == true {
+    if isUnlimited {
       return "Unlimited"
     }
     let credits = model.credits?.credits ?? model.me?.oneTimeCredits ?? 0
     return "\(credits) \(credits == 1 ? "credit" : "credits")"
   }
 
+  private var isUnlimited: Bool {
+    model.credits?.isUnlimited == true
+      || model.credits?.planTier?.lowercased() == "unlimited"
+      || model.me?.proActive == true
+  }
+
   private var importButton: AnyView {
     AnyView(
-      Button {
-        model.loadSharedImport()
-        applyPendingImport()
+      Menu {
+        Button("Import shared screenshots", systemImage: "square.and.arrow.down") {
+          model.loadSharedImport()
+          applyPendingImport()
+        }
       } label: {
-        Image(systemName: "square.and.arrow.down")
-          .font(.system(size: 16, weight: .semibold))
+        Image(systemName: "person.crop.circle")
+          .font(.system(size: 18, weight: .semibold))
           .foregroundStyle(SBTheme.ink)
           .frame(width: 44, height: 44)
           .sbGlassControl(shape: Circle())
       }
-      .accessibilityLabel("Import shared screenshots")
+      .accessibilityLabel("Profile and import options")
     )
   }
 
   private var datingContextSection: some View {
     VStack(spacing: 10) {
       SBSectionHeader(
-        title: "Dating context",
-        detail: "This keeps advice specific to the audience and outcome you want."
+        title: "Dating App",
+        detail: nil
       )
 
       SBSurface {
+        SBSelectRow(title: "App", selection: $platform) {
+          ForEach(platforms, id: \.self) { Text($0) }
+        }
+      }
+
+      SBSectionHeader(title: "Your Profile", detail: nil)
+
+      SBSurface {
         VStack(spacing: 2) {
-          SBSelectRow(title: "Dating app", selection: $platform) {
-            ForEach(platforms, id: \.self) { Text($0) }
-          }
-          SBDivider()
-          SBSelectRow(title: "Your profile", selection: $gender) {
+          SBSelectRow(title: "Gender", selection: $gender) {
             ForEach(genders, id: \.self) { Text($0) }
           }
           SBDivider()
-          SBSelectRow(title: "What you want", selection: $intent) {
+          SBSelectRow(title: "Looking for", selection: $intent) {
             ForEach(intents, id: \.self) { Text($0) }
           }
           SBDivider()
-          Toggle("ENM / poly profile", isOn: $enm)
+          Toggle("Open to ENM / poly", isOn: $enm)
             .font(.subheadline.weight(.medium))
             .tint(SBTheme.accent)
             .frame(minHeight: 44)
-          Text("Partner photos are expected. We’ll recognize photos with your partner, including an opposite-sex partner, and review them in the context of your ENM/poly profile.")
+          Text("Partner photos are expected. We review them in the context of your ENM/poly profile.")
             .font(.caption)
             .foregroundStyle(SBTheme.secondaryInk)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -81,25 +87,32 @@ struct PremiumProfileAuditView: View {
         }
       }
     }
-    .padding(.horizontal, 20)
+    .padding(.horizontal, 16)
   }
 
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 24) {
-        SBWorkspaceHeader(
-          eyebrow: "Profile lab",
-          title: "Audit",
-          detail: "Add your profile screenshots and get a focused edit plan.",
-          systemImage: "person.crop.rectangle.stack",
-          status: accessStatus,
-          trailing: importButton
-        )
+        if result?.analysis == nil {
+          SBWorkspaceHeader(
+            eyebrow: "Profile lab",
+            title: "Profile Audit",
+            detail: "Add your profile screenshots and get a focused edit plan.",
+            systemImage: "person.crop.rectangle.stack",
+            status: accessStatus,
+            trailing: importButton
+          )
+        } else {
+          auditResultNavigation
+        }
+
+        if result?.analysis == nil && result?.status != "failed" {
+          datingContextSection
 
         VStack(spacing: 10) {
           SBSectionHeader(
-            title: "Start with the evidence",
-            detail: "Add the full profile exactly as people see it. Up to 10 screenshots."
+            title: "Profile Screenshots",
+            detail: "Up to 10 screenshots, in the order people see them."
           )
 
           SBSurface {
@@ -115,44 +128,50 @@ struct PremiumProfileAuditView: View {
                 .buttonStyle(.plain)
                 .accessibilityIdentifier("audit.addScreenshotsButton")
               } else {
-                PremiumScreenshotStrip(images: images, onRemove: removeImage)
+                PremiumScreenshotStrip(
+                  images: images,
+                  onRemove: removeImage,
+                  addContent: AnyView(
+                    PhotosPicker(selection: $pickerItems, maxSelectionCount: max(10 - images.count, 1), matching: .images) {
+                      Image(systemName: "plus")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(SBTheme.accentPressed)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(SBTheme.surfaceMuted, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Add more screenshots")
+                    .accessibilityIdentifier("audit.addScreenshotsButton")
+                  )
+                )
 
-                HStack(spacing: 10) {
-                  PhotosPicker(selection: $pickerItems, maxSelectionCount: max(10 - images.count, 1), matching: .images) {
-                    Label("Add more", systemImage: "plus")
-                  }
-                  .buttonStyle(SBSecondaryButtonStyle())
-                  .accessibilityIdentifier("audit.addScreenshotsButton")
-
-                  Button(role: .destructive) {
-                    pickerItems = []
-                    images = []
-                    result = nil
-                  } label: {
-                    Label("Clear", systemImage: "trash")
-                  }
-                  .buttonStyle(SBSecondaryButtonStyle())
-                }
               }
-
-              Text(screenshotSelectionSummary)
-                .font(.caption)
-                .foregroundStyle(SBTheme.secondaryInk)
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
           }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
 
-        datingContextSection
+          SBSurface {
+            HStack {
+              Text("Credits")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(SBTheme.ink)
+              Spacer()
+              Text(accessStatus)
+                .font(.subheadline.weight(.bold).monospacedDigit())
+                .foregroundStyle(SBTheme.teal)
+            }
+          }
+          .padding(.horizontal, 16)
+        }
 
         if let analysis = result?.analysis {
-          PremiumProfileResult(analysis: analysis)
-            .padding(.horizontal, 20)
+          PremiumProfileResult(analysis: analysis, images: images)
+            .padding(.horizontal, 16)
             .transition(.move(edge: .bottom).combined(with: .opacity))
         } else if let result, result.status == "failed" {
           PremiumInlineError(message: result.error ?? "The audit could not be completed. Try again.")
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
         }
       }
       .padding(.bottom, 112)
@@ -161,29 +180,31 @@ struct PremiumProfileAuditView: View {
     .sbPageBackground()
     .navigationBarHidden(true)
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      SBGlassCluster {
-        Button {
-          Task {
-            result = await model.startProfileAudit(
-              platform: platform,
-              gender: gender,
-              intent: intent,
-              enm: enm,
-              images: images
-            )
+      if result?.analysis == nil {
+        SBGlassCluster {
+          Button {
+            Task {
+              result = await model.startProfileAudit(
+                platform: platform,
+                gender: gender,
+                intent: intent,
+                enm: enm,
+                images: images
+              )
+            }
+          } label: {
+            Text("Run Audit")
           }
-        } label: {
-          Label(result == nil ? "Run profile audit" : "Run another audit", systemImage: "arrow.up.right")
+          .buttonStyle(SBPrimaryButtonStyle())
+          .disabled(model.isBusy || images.isEmpty)
+          .opacity(images.isEmpty ? 0.48 : 1)
+          .accessibilityIdentifier("audit.runButton")
         }
-        .buttonStyle(SBPrimaryButtonStyle())
-        .disabled(model.isBusy || images.isEmpty)
-        .opacity(images.isEmpty ? 0.48 : 1)
-        .accessibilityIdentifier("audit.runButton")
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(.ultraThinMaterial)
       }
-      .padding(.horizontal, 20)
-      .padding(.top, 10)
-      .padding(.bottom, 8)
-      .background(.ultraThinMaterial)
     }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 10) }
@@ -199,6 +220,47 @@ struct PremiumProfileAuditView: View {
       applyScreenshotFixturesIfNeeded()
       applyPendingImport()
     }
+  }
+
+  private var auditResultNavigation: some View {
+    HStack(spacing: 12) {
+      Button {
+        result = nil
+      } label: {
+        Label("Audit", systemImage: "chevron.left")
+          .font(.subheadline.weight(.semibold))
+          .frame(minWidth: 64, minHeight: 44, alignment: .leading)
+      }
+      .foregroundStyle(SBTheme.accentPressed)
+      .accessibilityLabel("Back to audit inputs")
+
+      Spacer()
+      Text("\(result?.analysis?.platform ?? "Profile") · Today")
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(SBTheme.ink)
+      Spacer()
+
+      ShareLink(item: auditShareText) {
+        Text("Share")
+      }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(SBTheme.accentPressed)
+        .frame(minWidth: 44, minHeight: 44)
+    }
+    .padding(.horizontal, 16)
+    .frame(height: 64)
+  }
+
+  private var auditShareText: String {
+    guard let analysis = result?.analysis else { return "SwipeBetter profile audit" }
+    return [
+      "SwipeBetter \(analysis.platform ?? "profile") audit",
+      analysis.overallScore.map { "Score: \($0)/100" },
+      analysis.firstTip,
+      analysis.improvements,
+    ]
+    .compactMap { $0 }
+    .joined(separator: "\n\n")
   }
 
   private func applyScreenshotFixturesIfNeeded() {
@@ -238,6 +300,7 @@ struct PremiumReplyAssistantView: View {
   @State private var images: [Data] = []
   @State private var response: ReplyAnalysisResponse?
   @State private var appliedImportRevision = -1
+  @State private var inputMode = "text"
 
   private let tones = ["flirty", "witty", "confident", "thoughtful"]
   private let goals = [
@@ -251,118 +314,160 @@ struct PremiumReplyAssistantView: View {
     !conversation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !images.isEmpty
   }
 
+  private var replyResultAvailable: Bool {
+    guard let response else { return false }
+    return response.parsed != nil || response.analysis != nil
+  }
+
+  private var replyResultReplies: [String] {
+    response?.parsed?.suggestedReplies ?? response?.analysis?.suggestedReplies ?? []
+  }
+
+  private var toneLabel: String {
+    ["flirty": "Warm", "witty": "Playful", "confident": "Direct", "thoughtful": "Sincere"][tone] ?? tone.capitalized
+  }
+
+  private var goalLabel: String {
+    goals[goal] ?? goal
+  }
+
   private var accessStatus: String {
-    if model.credits?.isUnlimited == true
-      || model.credits?.planTier?.lowercased() == "unlimited"
-      || model.me?.proActive == true {
+    if isUnlimited {
       return "Unlimited"
     }
     let credits = model.credits?.credits ?? model.me?.oneTimeCredits ?? 0
     return "\(credits) \(credits == 1 ? "credit" : "credits")"
   }
 
+  private var isUnlimited: Bool {
+    model.credits?.isUnlimited == true
+      || model.credits?.planTier?.lowercased() == "unlimited"
+      || model.me?.proActive == true
+  }
+
   private var importButton: AnyView {
     AnyView(
-      Button {
-        model.loadSharedImport()
-        applyPendingImport()
+      Menu {
+        Button("Import shared chat", systemImage: "square.and.arrow.down") {
+          model.loadSharedImport()
+          applyPendingImport()
+        }
       } label: {
-        Image(systemName: "square.and.arrow.down")
-          .font(.system(size: 16, weight: .semibold))
+        Image(systemName: "person.crop.circle")
+          .font(.system(size: 18, weight: .semibold))
           .foregroundStyle(SBTheme.ink)
           .frame(width: 44, height: 44)
           .sbGlassControl(shape: Circle())
       }
-      .accessibilityLabel("Import shared chat")
+      .accessibilityLabel("Profile and import options")
     )
   }
 
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 24) {
-        SBWorkspaceHeader(
-          eyebrow: "Reply studio",
-          title: "Replies",
-          detail: "Bring the thread, choose a direction, and get three replies.",
-          systemImage: "message.badge.waveform",
-          status: accessStatus,
-          trailing: importButton
-        )
+        if !replyResultAvailable {
+          SBWorkspaceHeader(
+            eyebrow: "Reply studio",
+            title: "Replies",
+            detail: "Bring the thread, choose a direction, and get three replies.",
+            systemImage: "message.badge.waveform",
+            status: accessStatus,
+            trailing: importButton
+          )
+        } else {
+          replyResultNavigation
+        }
+
+        if !replyResultAvailable {
+          Picker("Input", selection: $inputMode) {
+          Text("Paste text").tag("text")
+          Text("Screenshots").tag("screenshots")
+          }
+          .pickerStyle(.segmented)
+          .accessibilityIdentifier("replies.inputModePicker")
+          .padding(.horizontal, 16)
 
         VStack(spacing: 10) {
           SBSectionHeader(
-            title: "Bring the thread",
-            detail: "Paste the visible chat or attach up to three screenshots."
+            title: "Conversation",
+            detail: nil
           )
 
           SBSurface {
             VStack(spacing: 14) {
-              ZStack(alignment: .topLeading) {
-                TextEditor(text: $conversation)
-                  .font(.body)
-                  .frame(minHeight: 150)
-                  .scrollContentBackground(.hidden)
-                  .padding(4)
-                  .background(SBTheme.canvas)
-                  .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-                  .overlay {
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                      .stroke(SBTheme.divider, lineWidth: 1)
-                  }
-                  .accessibilityIdentifier("replies.conversationEditor")
-
-                if conversation.isEmpty {
-                  Text("Paste the conversation here…")
+              if inputMode == "text" {
+                ZStack(alignment: .topLeading) {
+                  TextEditor(text: $conversation)
                     .font(.body)
-                    .foregroundStyle(SBTheme.secondaryInk.opacity(0.72))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 12)
-                    .allowsHitTesting(false)
-                }
-              }
+                    .frame(minHeight: 150)
+                    .scrollContentBackground(.hidden)
+                    .padding(4)
+                    .background(SBTheme.canvas)
+                    .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
+                    .overlay {
+                      RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .stroke(SBTheme.divider, lineWidth: 1)
+                    }
+                    .accessibilityIdentifier("replies.conversationEditor")
 
-              if images.isEmpty {
-                PhotosPicker(selection: $pickerItems, maxSelectionCount: 3, matching: .images) {
-                  Label("Add chat screenshots", systemImage: "photo.badge.plus")
+                  if conversation.isEmpty {
+                    Text("Paste the conversation here…")
+                      .font(.body)
+                      .foregroundStyle(SBTheme.secondaryInk.opacity(0.72))
+                      .padding(.horizontal, 10)
+                      .padding(.vertical, 12)
+                      .allowsHitTesting(false)
+                  }
                 }
-                .buttonStyle(SBSecondaryButtonStyle())
-                .accessibilityIdentifier("replies.addScreenshotsButton")
+
+                Button {
+                  if let pasted = UIPasteboard.general.string, !pasted.isEmpty {
+                    conversation = String(pasted.prefix(5000))
+                  }
+                } label: {
+                  Label("Paste", systemImage: "doc.on.clipboard")
+                }
+                .foregroundStyle(SBTheme.accentPressed)
+                .frame(minHeight: 44)
               } else {
-                PremiumScreenshotStrip(images: images, onRemove: removeImage)
-
-                HStack(spacing: 10) {
-                  PhotosPicker(selection: $pickerItems, maxSelectionCount: max(3 - images.count, 1), matching: .images) {
-                    Label("Add more", systemImage: "plus")
-                  }
-                  .buttonStyle(SBSecondaryButtonStyle())
-                  .accessibilityIdentifier("replies.addScreenshotsButton")
-
-                  Button(role: .destructive) {
-                    pickerItems = []
-                    images = []
-                  } label: {
-                    Label("Clear", systemImage: "trash")
-                  }
-                  .buttonStyle(SBSecondaryButtonStyle())
+                if !images.isEmpty {
+                  PremiumScreenshotStrip(images: images, onRemove: removeImage)
+                } else {
+                  Text("Select up to three screenshots from the conversation.")
+                    .font(.subheadline)
+                    .foregroundStyle(SBTheme.secondaryInk)
+                    .frame(maxWidth: .infinity, minHeight: 92, alignment: .center)
                 }
+
+                PhotosPicker(selection: $pickerItems, maxSelectionCount: 3, matching: .images) {
+                  Label(images.isEmpty ? "Add screenshot" : "Add more", systemImage: "plus.circle")
+                }
+                .foregroundStyle(SBTheme.accentPressed)
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("replies.addScreenshotsButton")
               }
             }
           }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
 
         VStack(spacing: 10) {
           SBSectionHeader(
-            title: "Direction",
-            detail: "Set the tone and the outcome before generating."
+            title: "Tone",
+            detail: nil
           )
+
+          Picker("Tone", selection: $tone) {
+            Text("Warm").tag("flirty")
+            Text("Playful").tag("witty")
+            Text("Direct").tag("confident")
+            Text("Sincere").tag("thoughtful")
+          }
+          .pickerStyle(.segmented)
 
           SBSurface {
             VStack(spacing: 2) {
-              SBSelectRow(title: "Tone", selection: $tone) {
-                ForEach(tones, id: \.self) { Text($0.capitalized) }
-              }
-              SBDivider()
               SBSelectRow(title: "Goal", selection: $goal) {
                 ForEach(goals.sorted(by: { $0.value < $1.value }), id: \.key) { key, label in
                   Text(label).tag(key)
@@ -373,14 +478,30 @@ struct PremiumReplyAssistantView: View {
                 .font(.subheadline.weight(.medium))
                 .tint(SBTheme.accent)
                 .frame(minHeight: 44)
+              SBDivider()
+              HStack {
+                Text("Credits")
+                  .font(.subheadline.weight(.medium))
+                Spacer()
+                Text(isUnlimited ? "Unlimited" : accessStatus)
+                  .font(.subheadline.weight(.semibold).monospacedDigit())
+                  .foregroundStyle(SBTheme.teal)
+              }
+              .frame(minHeight: 44)
             }
           }
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
 
-        if let parsed = response?.parsed {
-          PremiumReplyResults(parsed: parsed)
-            .padding(.horizontal, 20)
+        }
+
+        if replyResultAvailable {
+          PremiumReplyResults(
+            context: response?.parsed?.conversationContext ?? response?.analysis?.conversationContext,
+            replies: replyResultReplies,
+            metadata: "\(toneLabel) · \(goalLabel)"
+          )
+            .padding(.horizontal, 16)
             .transition(.move(edge: .bottom).combined(with: .opacity))
         }
       }
@@ -390,29 +511,31 @@ struct PremiumReplyAssistantView: View {
     .sbPageBackground()
     .navigationBarHidden(true)
     .safeAreaInset(edge: .bottom, spacing: 0) {
-      SBGlassCluster {
-        Button {
-          Task {
-            response = await model.generateReplies(
-              tone: tone,
-              goal: goal,
-              enm: enm,
-              conversationText: conversation,
-              images: images
-            )
+      if !replyResultAvailable {
+        SBGlassCluster {
+          Button {
+            Task {
+              response = await model.generateReplies(
+                tone: tone,
+                goal: goal,
+                enm: enm,
+                conversationText: conversation,
+                images: images
+              )
+            }
+          } label: {
+            Text("Generate Replies")
           }
-        } label: {
-          Label(response == nil ? "Generate three replies" : "Generate again", systemImage: "arrow.up.right")
+          .buttonStyle(SBPrimaryButtonStyle())
+          .disabled(model.isBusy || !canGenerate)
+          .opacity(canGenerate ? 1 : 0.48)
+          .accessibilityIdentifier("replies.generateButton")
         }
-        .buttonStyle(SBPrimaryButtonStyle())
-        .disabled(model.isBusy || !canGenerate)
-        .opacity(canGenerate ? 1 : 0.48)
-        .accessibilityIdentifier("replies.generateButton")
+        .padding(.horizontal, 16)
+        .padding(.top, 10)
+        .padding(.bottom, 8)
+        .background(.ultraThinMaterial)
       }
-      .padding(.horizontal, 20)
-      .padding(.top, 10)
-      .padding(.bottom, 8)
-      .background(.ultraThinMaterial)
     }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 3) }
@@ -430,6 +553,37 @@ struct PremiumReplyAssistantView: View {
     }
   }
 
+  private var replyResultNavigation: some View {
+    HStack(spacing: 12) {
+      Button {
+        response = nil
+      } label: {
+        Label("Replies", systemImage: "chevron.left")
+          .font(.subheadline.weight(.semibold))
+          .frame(minWidth: 64, minHeight: 44, alignment: .leading)
+      }
+      .foregroundStyle(SBTheme.accentPressed)
+      .accessibilityLabel("Back to reply inputs")
+
+      Spacer()
+
+      Text("\(replyResultReplies.count) replies")
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(SBTheme.ink)
+
+      Spacer()
+
+      Button("Redo") {
+        response = nil
+      }
+      .font(.subheadline.weight(.semibold))
+      .foregroundStyle(SBTheme.accentPressed)
+      .frame(minWidth: 44, minHeight: 44)
+    }
+    .padding(.horizontal, 16)
+    .frame(height: 64)
+  }
+
   private func applyScreenshotFixturesIfNeeded() {
     guard isActive, SwipeBetterScreenshotFixtures.isEnabled else { return }
     if conversation.isEmpty {
@@ -438,7 +592,7 @@ struct PremiumReplyAssistantView: View {
     if images.isEmpty {
       images = [SwipeBetterScreenshotFixtures.chatScreenshotData]
     }
-    if response == nil {
+    if SwipeBetterScreenshotFixtures.tab == "replyResult", response == nil {
       response = SwipeBetterScreenshotFixtures.replyResponse
     }
   }
@@ -499,48 +653,60 @@ struct PremiumImageDropzone: View {
   let systemImage: String
 
   var body: some View {
-    VStack(spacing: 10) {
-      Image(systemName: systemImage)
-        .font(.system(size: 25, weight: .medium))
-        .foregroundStyle(SBTheme.accent)
+    VStack(alignment: .leading, spacing: 8) {
+      HStack(spacing: 8) {
+        ForEach(0..<3, id: \.self) { _ in
+          RoundedRectangle(cornerRadius: 9, style: .continuous)
+            .fill(SBTheme.surfaceMuted)
+            .aspectRatio(9.0 / 16.0, contentMode: .fit)
+            .overlay {
+              Image(systemName: systemImage)
+                .font(.caption)
+                .foregroundStyle(SBTheme.secondaryInk)
+            }
+        }
+
+        Image(systemName: "plus")
+          .font(.headline)
+          .foregroundStyle(SBTheme.accentPressed)
+          .frame(maxWidth: .infinity)
+          .aspectRatio(9.0 / 16.0, contentMode: .fit)
+      }
 
       Text(title)
-        .font(.headline)
+        .font(.subheadline.weight(.semibold))
         .foregroundStyle(SBTheme.ink)
 
       Text(detail)
         .font(.caption)
         .foregroundStyle(SBTheme.secondaryInk)
     }
-    .frame(maxWidth: .infinity, minHeight: 132)
-    .background(SBTheme.accentSoft.opacity(0.42))
-    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-    .overlay {
-      RoundedRectangle(cornerRadius: 8, style: .continuous)
-        .stroke(SBTheme.accent.opacity(0.48), style: StrokeStyle(lineWidth: 1, dash: [6, 5]))
-    }
+    .frame(maxWidth: .infinity)
   }
 }
 
 struct PremiumScreenshotStrip: View {
   let images: [Data]
   let onRemove: (Int) -> Void
+  let addContent: AnyView?
+
+  init(images: [Data], onRemove: @escaping (Int) -> Void, addContent: AnyView? = nil) {
+    self.images = images
+    self.onRemove = onRemove
+    self.addContent = addContent
+  }
 
   var body: some View {
-    ScrollView(.horizontal, showsIndicators: false) {
-      HStack(spacing: 10) {
+    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {
         ForEach(Array(images.enumerated()), id: \.offset) { index, data in
           ZStack(alignment: .topTrailing) {
             if let image = UIImage(data: data) {
               Image(uiImage: image)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 94, height: 126)
-                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-                .overlay {
-                  RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .stroke(SBTheme.divider, lineWidth: 1)
-                }
+                .frame(maxWidth: .infinity)
+                .aspectRatio(9.0 / 16.0, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
             }
 
             Button {
@@ -557,61 +723,62 @@ struct PremiumScreenshotStrip: View {
             .offset(x: 6, y: -6)
             .accessibilityLabel("Remove screenshot \(index + 1)")
           }
-          .padding(.top, 7)
-          .padding(.trailing, 5)
         }
-      }
-      .padding(.horizontal, 2)
+
+        if let addContent {
+          addContent
+            .aspectRatio(9.0 / 16.0, contentMode: .fit)
+            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+        }
     }
-    .frame(height: 140)
   }
 }
 
 struct PremiumProfileResult: View {
   let analysis: ProfileAnalysis
+  let images: [Data]
 
   var body: some View {
-    VStack(spacing: 10) {
-      SBSectionHeader(
-        title: "Your profile plan",
-        detail: "Start with the first fix, then work down the list."
-      )
-
+    VStack(alignment: .leading, spacing: 12) {
       SBSurface {
-        VStack(spacing: 0) {
-          HStack(spacing: 14) {
-            ZStack {
-              Circle()
-                .stroke(SBTheme.surfaceMuted, lineWidth: 7)
-              Circle()
-                .trim(from: 0, to: CGFloat(min(max(analysis.overallScore ?? 0, 0), 100)) / 100)
-                .stroke(SBTheme.teal, style: StrokeStyle(lineWidth: 7, lineCap: .round))
-                .rotationEffect(.degrees(-90))
-
-              Text("\(analysis.overallScore ?? 0)")
-                .font(.title2.weight(.bold).monospacedDigit())
-                .foregroundStyle(SBTheme.ink)
-            }
-            .frame(width: 72, height: 72)
-
-            VStack(alignment: .leading, spacing: 4) {
-              Text("Overall score")
-                .font(.headline)
-                .foregroundStyle(SBTheme.ink)
-              Text(scoreSummary(analysis.overallScore ?? 0))
-                .font(.subheadline)
-                .foregroundStyle(SBTheme.secondaryInk)
-            }
-
-            Spacer()
+        HStack(spacing: 14) {
+          ZStack {
+            Circle()
+              .stroke(SBTheme.surfaceMuted, lineWidth: 8)
+            Circle()
+              .trim(from: 0, to: CGFloat(min(max(analysis.overallScore ?? 0, 0), 100)) / 100)
+              .stroke(SBTheme.accent, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+              .rotationEffect(.degrees(-90))
+            Text("\(analysis.overallScore ?? 0)")
+              .font(.title2.weight(.bold).monospacedDigit())
+              .foregroundStyle(SBTheme.ink)
           }
+          .frame(width: 86, height: 86)
 
-          PremiumResultBlock(index: 1, title: "First fix", text: analysis.firstTip)
-          PremiumResultBlock(index: 2, title: "Bio", text: analysis.bioSuggestions)
-          PremiumResultBlock(index: 3, title: "Photos", text: analysis.photoFeedback)
-          PremiumResultBlock(index: 4, title: "Next improvements", text: analysis.improvements)
+          VStack(alignment: .leading, spacing: 4) {
+            Text("Overall score")
+              .font(.headline)
+              .foregroundStyle(SBTheme.ink)
+            Text(scoreSummary(analysis.overallScore ?? 0))
+              .font(.subheadline)
+              .foregroundStyle(SBTheme.secondaryInk)
+          }
+          Spacer()
         }
       }
+
+      PremiumAuditPlanCard(number: 1, title: "First fix", text: analysis.firstTip)
+      PremiumAuditFixesCard(text: analysis.improvements)
+      PremiumAuditPlanCard(number: 2, title: "New bio", text: analysis.bioSuggestions)
+      PremiumAuditPlanCard(number: 3, title: "Photo feedback", text: analysis.photoFeedback)
+      if !images.isEmpty {
+        PremiumReviewedPhotoStrip(images: images)
+      }
+
+      Text("Saved to History")
+        .font(.caption)
+        .foregroundStyle(SBTheme.secondaryInk)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
   }
 
@@ -620,6 +787,145 @@ struct PremiumProfileResult: View {
     case 85...: return "Strong profile. Tighten the details."
     case 70..<85: return "Good foundation with clear wins available."
     default: return "Focus on the first two changes for the biggest lift."
+    }
+  }
+
+}
+
+private struct PremiumAuditFixesCard: View {
+  let text: String?
+  @State private var copiedIndex: Int?
+
+  var body: some View {
+    let items = PremiumResultText.items(from: text)
+    if !items.isEmpty {
+      SBSurface {
+        VStack(alignment: .leading, spacing: 10) {
+          Text("FIX THESE FIRST")
+            .font(.caption.weight(.bold))
+            .tracking(0.6)
+            .foregroundStyle(SBTheme.secondaryInk)
+          ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+            VStack(alignment: .leading, spacing: 8) {
+              HStack(alignment: .top, spacing: 10) {
+              Text("\(index + 1)")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.white)
+                .frame(width: 24, height: 24)
+                .background(SBTheme.primaryActionFill, in: Circle())
+              Text(item)
+                .font(.subheadline)
+                .foregroundStyle(SBTheme.ink)
+                .fixedSize(horizontal: false, vertical: true)
+              Spacer(minLength: 0)
+              }
+              Button {
+                UIPasteboard.general.string = item
+                copiedIndex = index
+                UIAccessibility.post(notification: .announcement, argument: "Fix copied")
+              } label: {
+                Text(copiedIndex == index ? "Copied" : "Copy")
+                  .font(.caption.weight(.semibold))
+                  .foregroundStyle(SBTheme.accentPressed)
+                  .padding(.horizontal, 14)
+                  .frame(minHeight: 40)
+                  .background(SBTheme.accentSoft, in: Capsule())
+              }
+              .buttonStyle(.plain)
+              .accessibilityIdentifier("audit.copyButton.fixes.\(index)")
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+private struct PremiumReviewedPhotoStrip: View {
+  let images: [Data]
+
+  var body: some View {
+    SBSurface {
+      VStack(alignment: .leading, spacing: 8) {
+        Text("REVIEWED PHOTOS")
+          .font(.caption.weight(.bold))
+          .tracking(0.6)
+          .foregroundStyle(SBTheme.secondaryInk)
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: 8) {
+            ForEach(Array(images.enumerated()), id: \.offset) { _, data in
+              if let image = UIImage(data: data) {
+                Image(uiImage: image)
+                  .resizable()
+                  .scaledToFill()
+                  .frame(width: 58, height: 88)
+                  .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+              }
+            }
+          }
+        }
+        .frame(height: 88)
+      }
+    }
+  }
+}
+
+private struct PremiumAuditPlanCard: View {
+  let number: Int
+  let title: String
+  let text: String?
+  @State private var copiedItem: Int?
+
+  var body: some View {
+    let items = PremiumResultText.items(from: text)
+    if !items.isEmpty {
+      SBSurface {
+        VStack(alignment: .leading, spacing: 8) {
+          HStack(spacing: 10) {
+            Text("\(number)")
+              .font(.caption.weight(.bold))
+              .foregroundStyle(SBTheme.accentPressed)
+              .frame(width: 28, height: 28)
+              .background(SBTheme.accentSoft, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            Text(title)
+              .font(.subheadline.weight(.bold))
+              .foregroundStyle(SBTheme.ink)
+          }
+          ForEach(Array(items.enumerated()), id: \.offset) { itemIndex, item in
+            VStack(alignment: .leading, spacing: 8) {
+              Text(item)
+                .font(.subheadline)
+                .foregroundStyle(SBTheme.secondaryInk)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+
+              Button {
+                copy(item, at: itemIndex)
+              } label: {
+                Label(copiedItem == itemIndex ? "Copied" : "Copy", systemImage: copiedItem == itemIndex ? "checkmark" : "doc.on.doc")
+                  .font(.caption.weight(.semibold))
+                  .foregroundStyle(SBTheme.accentPressed)
+                  .padding(.horizontal, 14)
+                  .frame(minHeight: 44)
+                  .background(SBTheme.accentSoft, in: Capsule())
+              }
+              .buttonStyle(.plain)
+              .accessibilityLabel(copiedItem == itemIndex ? "\(title) copied" : "Copy \(title.lowercased())")
+              .accessibilityIdentifier("audit.copyButton.\(number).\(itemIndex)")
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private func copy(_ value: String, at itemIndex: Int) {
+    UIPasteboard.general.string = value
+    copiedItem = itemIndex
+    UIAccessibility.post(notification: .announcement, argument: "\(title) copied")
+    Task {
+      try? await Task.sleep(for: .seconds(2))
+      if copiedItem == itemIndex { copiedItem = nil }
     }
   }
 }
@@ -700,28 +1006,37 @@ struct PremiumResultBlock: View {
 }
 
 struct PremiumReplyResults: View {
-  let parsed: ReplyParsed
+  let context: String?
+  let replies: [String]
+  let metadata: String
   @State private var copiedIndex: Int?
 
   var body: some View {
-    VStack(spacing: 10) {
-      SBSectionHeader(
-        title: "Three ways forward",
-        detail: parsed.conversationContext
-      )
+    VStack(alignment: .leading, spacing: 12) {
+      VStack(alignment: .leading, spacing: 6) {
+        Text("CONVERSATION INSIGHT")
+          .font(.caption.weight(.bold))
+          .tracking(0.6)
+          .foregroundStyle(SBTheme.teal)
+        Text(context ?? "A clear next move is ready.")
+          .font(.subheadline)
+          .foregroundStyle(SBTheme.ink)
+          .fixedSize(horizontal: false, vertical: true)
+      }
+      .padding(14)
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .background(SBTheme.tealSoft, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
-      ForEach(Array((parsed.suggestedReplies ?? []).enumerated()), id: \.offset) { index, reply in
+      ForEach(Array(replies.enumerated()), id: \.offset) { index, reply in
         SBSurface {
           VStack(alignment: .leading, spacing: 14) {
-            HStack {
+            HStack(spacing: 8) {
               Text("Option \(index + 1)")
                 .font(.caption.weight(.bold))
-                .foregroundStyle(SBTheme.accent)
-
-              Spacer()
-
-              Image(systemName: index == 0 ? "star.fill" : "sparkle")
-                .foregroundStyle(index == 0 ? SBTheme.warning : SBTheme.secondaryInk)
+                .foregroundStyle(SBTheme.accentPressed)
+              Text(metadata)
+                .font(.caption)
+                .foregroundStyle(SBTheme.secondaryInk)
             }
 
             Text(reply)
@@ -733,17 +1048,24 @@ struct PremiumReplyResults: View {
             Button {
               copy(reply, at: index)
             } label: {
-              Label(
-                copiedIndex == index ? "Copied" : "Copy reply",
-                systemImage: copiedIndex == index ? "checkmark" : "doc.on.doc"
-              )
+              Text(copiedIndex == index ? "Copied" : "Copy reply")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(SBTheme.accentPressed)
+                .padding(.horizontal, 16)
+                .frame(minHeight: 44)
+                .background(SBTheme.accentSoft, in: Capsule())
             }
-            .buttonStyle(SBSecondaryButtonStyle())
             .accessibilityLabel(copiedIndex == index ? "Reply \(index + 1) copied" : "Copy reply \(index + 1)")
             .accessibilityIdentifier("replies.copyButton.\(index + 1)")
           }
         }
       }
+
+      Text("Saved to History")
+        .font(.caption)
+        .foregroundStyle(SBTheme.secondaryInk)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(.top, 4)
     }
   }
 

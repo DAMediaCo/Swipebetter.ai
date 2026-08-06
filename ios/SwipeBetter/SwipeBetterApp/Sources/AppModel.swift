@@ -80,8 +80,13 @@ final class AppModel {
         "isSuperUser": false
       }
       """)
-    profileHistory = SwipeBetterScreenshotFixtures.profileStatus?.analysis.map { [$0] } ?? []
-    replyHistory = SwipeBetterScreenshotFixtures.replyResponse?.analysis.map { [$0] } ?? []
+    if SwipeBetterScreenshotFixtures.tab == "historyEmpty" {
+      profileHistory = []
+      replyHistory = []
+    } else {
+      profileHistory = SwipeBetterScreenshotFixtures.profileStatus?.analysis.map { [$0] } ?? []
+      replyHistory = SwipeBetterScreenshotFixtures.replyResponse?.analysis.map { [$0] } ?? []
+    }
     lastError = nil
     isBusy = false
   }

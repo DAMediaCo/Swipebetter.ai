@@ -25,9 +25,9 @@ enum AppTab: Hashable, CaseIterable {
 
   static func screenshotInitialTab(from arguments: [String]) -> AppTab {
     switch SwipeBetterScreenshotFixtures.tabArgument(from: arguments) {
-    case "replies":
+    case "replies", "replyResult":
       return .replies
-    case "history":
+    case "history", "historyEmpty":
       return .history
     case "account":
       return .account
@@ -351,7 +351,7 @@ struct AuthView: View {
 
           VStack(alignment: .leading, spacing: 8) {
             Label("iOS pricing includes Apple purchase fees.", systemImage: "info.circle")
-            Text("Starter $3.99, Unlimited $16.99/month, Annual $104.99/year.")
+            Text("Current App Store pricing is shown in Account.")
           }
           .font(.footnote)
           .foregroundStyle(.secondary)
@@ -1119,7 +1119,7 @@ enum SwipeBetterScreenshotFixtures {
   }
 
   static var profileStatus: ProfileStatusResponse? {
-    decode("""
+    decode(#"""
       {
         "jobId": "demo-profile-audit",
         "status": "completed",
@@ -1136,11 +1136,11 @@ enum SwipeBetterScreenshotFixtures {
           "overallScore": 86,
           "improvements": "Swap photo order, remove the generic travel line, and add one prompt that shows confidence without sounding rehearsed.",
           "analysisStatus": "completed",
-          "createdAt": "2026-07-06T12:00:00Z",
+          "createdAt": "2026-08-01T12:00:00.125Z",
           "firstTip": "Move the smiling outdoor photo to slot one so the profile feels warmer in the first second."
         }
       }
-      """)
+      """#)
   }
 
   static var replyResponse: ReplyAnalysisResponse? {
@@ -1155,7 +1155,7 @@ enum SwipeBetterScreenshotFixtures {
             "I'm in. Pick a night that works for you."
           ],
           "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
-          "createdAt": "2026-07-06T12:05:00Z"
+          "createdAt": "2026-07-31T12:05:00.875Z"
         },
         "parsed": {
           "conversationContext": "They seem interested and gave you an easy opening to make a plan.",

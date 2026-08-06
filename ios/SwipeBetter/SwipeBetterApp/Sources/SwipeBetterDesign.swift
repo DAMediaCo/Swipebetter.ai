@@ -9,11 +9,17 @@ enum SBTheme {
   }
 
   static let canvas = adaptive(
-    light: UIColor(red: 0.965, green: 0.969, blue: 0.976, alpha: 1),
-    dark: UIColor(red: 0.045, green: 0.047, blue: 0.055, alpha: 1)
+    light: UIColor(red: 0.949, green: 0.949, blue: 0.969, alpha: 1),
+    dark: UIColor.black
   )
-  static let surface = Color(uiColor: .secondarySystemBackground)
-  static let surfaceMuted = Color(uiColor: .tertiarySystemBackground)
+  static let surface = adaptive(
+    light: UIColor.white,
+    dark: UIColor(red: 0.110, green: 0.110, blue: 0.118, alpha: 1)
+  )
+  static let surfaceMuted = adaptive(
+    light: UIColor(red: 0.91, green: 0.91, blue: 0.93, alpha: 1),
+    dark: UIColor(red: 0.17, green: 0.17, blue: 0.18, alpha: 1)
+  )
   static let ink = Color(uiColor: .label)
   static let secondaryInk = Color(uiColor: .secondaryLabel)
   static let strongFill = adaptive(
@@ -21,22 +27,22 @@ enum SBTheme {
     dark: UIColor(red: 0.93, green: 0.94, blue: 0.97, alpha: 1)
   )
   static let accent = adaptive(
-    light: UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1),
-    dark: UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1)
+    light: UIColor(red: 0.941, green: 0.259, blue: 0.306, alpha: 1),
+    dark: UIColor(red: 1.0, green: 0.416, blue: 0.447, alpha: 1)
   )
   static let accentPressed = adaptive(
-    light: UIColor(red: 0.82, green: 0.16, blue: 0.21, alpha: 1),
-    dark: UIColor(red: 0.92, green: 0.29, blue: 0.34, alpha: 1)
+    light: UIColor(red: 0.847, green: 0.196, blue: 0.243, alpha: 1),
+    dark: UIColor(red: 0.847, green: 0.196, blue: 0.243, alpha: 1)
   )
   // Separate action fill keeps white button labels above WCAG AA contrast in light mode.
   static let primaryActionFill = adaptive(
-    light: UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1),
-    dark: UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1)
+    light: UIColor(red: 0.941, green: 0.259, blue: 0.306, alpha: 1),
+    dark: UIColor(red: 1.0, green: 0.416, blue: 0.447, alpha: 1)
   )
   static let accentSoft = accent.opacity(0.12)
   static let teal = adaptive(
-    light: UIColor(red: 0.00, green: 0.50, blue: 0.52, alpha: 1),
-    dark: UIColor(red: 0.25, green: 0.82, blue: 0.79, alpha: 1)
+    light: UIColor(red: 0.055, green: 0.624, blue: 0.561, alpha: 1),
+    dark: UIColor(red: 0.055, green: 0.624, blue: 0.561, alpha: 1)
   )
   static let tealSoft = teal.opacity(0.13)
   static let warning = Color(uiColor: .systemOrange)
@@ -50,10 +56,10 @@ struct SBLogoMark: View {
   var body: some View {
     ZStack {
       RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
-        .fill(SBTheme.accent)
+        .fill(SBTheme.primaryActionFill)
 
-      Image(systemName: "bubble.left.and.text.bubble.right.fill")
-        .font(.system(size: size * 0.33, weight: .semibold))
+      Text("S")
+        .font(.system(size: size * 0.42, weight: .bold, design: .rounded))
         .foregroundStyle(.white)
     }
     .frame(width: size, height: size)
@@ -134,19 +140,6 @@ struct SBWorkspaceHeader: View {
           .font(.largeTitle.weight(.bold))
           .foregroundStyle(SBTheme.ink)
           .fixedSize(horizontal: false, vertical: true)
-
-        Text(detail)
-          .font(.subheadline)
-          .foregroundStyle(SBTheme.secondaryInk)
-          .lineSpacing(2)
-          .fixedSize(horizontal: false, vertical: true)
-
-        if let status {
-          Text(status)
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(SBTheme.teal)
-            .fixedSize(horizontal: false, vertical: true)
-        }
       }
       .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -172,14 +165,16 @@ struct SBSectionHeader: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 3) {
       Text(title)
-        .font(.title3.weight(.bold))
-        .foregroundStyle(SBTheme.ink)
+        .font(.caption.weight(.medium))
+        .foregroundStyle(SBTheme.secondaryInk)
+        .textCase(.uppercase)
+        .tracking(0.5)
 
       if let detail {
         Text(detail)
-          .font(.subheadline)
+          .font(.caption)
           .foregroundStyle(SBTheme.secondaryInk)
-          .lineSpacing(2)
+          .lineSpacing(1)
           .fixedSize(horizontal: false, vertical: true)
       }
     }
@@ -365,10 +360,8 @@ struct SBPrimaryButtonStyle: ButtonStyle {
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity, minHeight: 52)
         .contentShape(Rectangle())
-        .glassEffect(.regular.tint(
-          configuration.isPressed ? SBTheme.accentPressed : SBTheme.primaryActionFill
-        ).interactive(), in: .capsule)
-        .scaleEffect(configuration.isPressed ? 0.98 : 1)
+        .background(configuration.isPressed ? SBTheme.accentPressed : SBTheme.primaryActionFill, in: Capsule())
+        .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
         .animation(reduceMotion ? nil : .snappy(duration: 0.18), value: configuration.isPressed)
     } else {
       configuration.label

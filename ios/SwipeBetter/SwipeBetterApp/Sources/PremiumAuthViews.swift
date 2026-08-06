@@ -11,6 +11,7 @@ struct PremiumAuthView: View {
   @State private var lastName = ""
   @State private var promoCode = ""
   @State private var showingPasswordReset = false
+  @State private var showingEmailForm = false
 
   private var canSubmit: Bool {
     !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && password.count >= 8
@@ -18,23 +19,29 @@ struct PremiumAuthView: View {
 
   var body: some View {
     NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 0) {
-          brandHeader
+      Group {
+        if showingEmailForm {
+          ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+              brandHeader
 
-          VStack(alignment: .leading, spacing: 22) {
-            authForm
-            appleSignIn
-            pricingNote
-            legalLinks
+              VStack(alignment: .leading, spacing: 22) {
+                authForm
+                appleSignIn
+                pricingNote
+                legalLinks
+              }
+              .padding(.horizontal, 20)
+              .padding(.top, 24)
+              .padding(.bottom, 32)
+            }
           }
-          .padding(.horizontal, 20)
-          .padding(.top, 24)
-          .padding(.bottom, 32)
+          .scrollDismissesKeyboard(.interactively)
+          .sbPageBackground()
+        } else {
+          choiceScreen
         }
       }
-      .scrollDismissesKeyboard(.interactively)
-      .sbPageBackground()
     }
     .sheet(isPresented: $showingPasswordReset) {
       PremiumPasswordResetSheet(initialEmail: email)
@@ -42,6 +49,76 @@ struct PremiumAuthView: View {
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
     }
+  }
+
+  private var choiceScreen: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      SBLogoMark(size: 62)
+
+      Text("SwipeBetter")
+        .font(.largeTitle.weight(.bold))
+        .foregroundStyle(.white)
+        .padding(.top, 18)
+
+      Text("Audit your dating profile and get replies that still sound like you.")
+        .font(.body)
+        .foregroundStyle(.white.opacity(0.72))
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, 8)
+
+      Spacer(minLength: 30)
+
+      SignInWithAppleButton(.continue) { request in
+        request.requestedScopes = [.fullName, .email]
+      } onCompletion: { result in
+        if case .success(let authorization) = result,
+           let credential = authorization.credential as? ASAuthorizationAppleIDCredential {
+          Task { await model.signInWithApple(credential: credential) }
+        } else if case .failure(let error) = result {
+          model.lastError = error.localizedDescription
+        }
+      }
+      .signInWithAppleButtonStyle(.white)
+      .frame(height: 52)
+      .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .accessibilityIdentifier("auth.appleSignInButton")
+
+      Button("Continue with email") {
+        isSignup = false
+        showingEmailForm = true
+      }
+      .font(.headline)
+      .foregroundStyle(.white)
+      .frame(maxWidth: .infinity, minHeight: 52)
+      .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .padding(.top, 12)
+      .accessibilityIdentifier("auth.continueWithEmailButton")
+
+      Button("Create account") {
+        isSignup = true
+        showingEmailForm = true
+      }
+      .font(.subheadline.weight(.semibold))
+      .foregroundStyle(SBTheme.accent)
+      .frame(maxWidth: .infinity, minHeight: 44)
+      .padding(.top, 4)
+      .accessibilityIdentifier("auth.createAccountChoiceButton")
+
+      Text("Screenshots are sent only for requested analysis and are excluded from your saved history.")
+        .font(.caption)
+        .foregroundStyle(.white.opacity(0.58))
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, 6)
+
+      Spacer(minLength: 54)
+    }
+    .padding(.horizontal, 24)
+    .padding(.top, 120)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    .background(Color.black.ignoresSafeArea())
+    .preferredColorScheme(.dark)
   }
 
   private var brandHeader: some View {
@@ -179,8 +256,8 @@ struct PremiumAuthView: View {
         }
       }
       .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
-      .frame(height: 50)
-      .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+      .frame(height: 52)
+      .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
       .accessibilityIdentifier("auth.appleSignInButton")
     }
   }
@@ -195,7 +272,7 @@ struct PremiumAuthView: View {
           .font(.caption.weight(.bold))
           .foregroundStyle(SBTheme.ink)
 
-        Text("Starter $3.99 · Monthly $16.99 · Annual $104.99")
+        Text("Starter credit pack, monthly, and annual options are available in Account.")
           .font(.caption)
           .foregroundStyle(SBTheme.secondaryInk)
 

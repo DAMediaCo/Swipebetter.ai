@@ -356,7 +356,7 @@ for (const expected of [
   'Link("Privacy", destination: authURL("/privacy"))',
   'Link("Support", destination: authURL("/contact"))',
   'Label("iOS pricing includes Apple purchase fees.", systemImage: "info.circle")',
-  'Text("Starter $3.99, Unlimited $16.99/month, Annual $104.99/year.")',
+  'Text("Current App Store pricing is shown in Account.")',
   'Text("iOS purchases are billed by Apple. Web Stripe checkout is intentionally not shown inside the app.")',
   'Label("Reload Plans", systemImage: "arrow.clockwise")',
   "model.purchases.purchasingProductId == product.id",
@@ -380,6 +380,30 @@ for (const expected of [
 }
 if (/checkout|stripe/i.test(rootView.replace("Web Stripe checkout is intentionally not shown inside the app.", ""))) {
   throw new Error("iOS app UI must not expose web Stripe checkout paths");
+}
+
+const premiumAuthViews = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/PremiumAuthViews.swift", "utf8");
+assertIncludes(
+  premiumAuthViews,
+  'Text("Starter credit pack, monthly, and annual options are available in Account.")',
+  "auth pricing routing contract"
+);
+for (const staleAuthPricing of [
+  'Text("Starter $3.99, Unlimited $16.99/month, Annual $104.99/year.")',
+  'Text("Starter $3.99 · Monthly $16.99 · Annual $104.99")',
+]) {
+  if ((rootView + premiumAuthViews).includes(staleAuthPricing)) {
+    throw new Error(`Auth UI must not hard-code App Store prices: ${staleAuthPricing}`);
+  }
+}
+
+const premiumAccountPricing = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/PremiumAccountViews.swift", "utf8");
+for (const expected of [
+  "ForEach(model.purchases.products, id: \\.id) { product in",
+  "PremiumProductRow(",
+  "Text(product.displayPrice)",
+]) {
+  assertIncludes(premiumAccountPricing, expected, "dynamic App Store pricing UI contract");
 }
 
 const appEntry = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/SwipeBetterApp.swift", "utf8");

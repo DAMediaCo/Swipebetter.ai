@@ -10,14 +10,20 @@ final class SwipeBetterUITests: XCTestCase {
     app.launchArguments.append("-SWIPEBETTER_UI_TESTING")
     app.launch()
 
-    XCTAssertTrue(app.textFields["auth.emailField"].waitForExistence(timeout: 8))
+    XCTAssertTrue(app.staticTexts["SwipeBetter"].waitForExistence(timeout: 8))
+    XCTAssertTrue(app.buttons["auth.appleSignInButton"].exists)
+    XCTAssertTrue(app.buttons["auth.continueWithEmailButton"].exists)
+    XCTAssertTrue(app.buttons["auth.createAccountChoiceButton"].exists)
+    XCTAssertTrue(app.staticTexts["Screenshots are sent only for requested analysis and are excluded from your saved history."].exists)
+
+    app.buttons["auth.continueWithEmailButton"].tap()
+
+    XCTAssertTrue(app.textFields["auth.emailField"].waitForExistence(timeout: 3))
     XCTAssertTrue(app.secureTextFields["auth.passwordField"].exists)
     XCTAssertTrue(app.buttons["auth.loginButton"].exists)
-    XCTAssertTrue(app.buttons["auth.appleSignInButton"].exists)
-    XCTAssertTrue(app.staticTexts["A clearer next move."].exists)
     XCTAssertTrue(
       app.staticTexts[
-        "Bring a profile or conversation and leave with advice that still sounds like you."
+        "A clearer next move."
       ].exists
     )
     XCTAssertTrue(app.staticTexts["iOS pricing includes Apple purchase fees."].exists)
@@ -46,8 +52,8 @@ final class SwipeBetterUITests: XCTestCase {
     audit.launchArguments.append("audit")
     audit.launch()
 
-    XCTAssertTrue(appText("Audit", in: audit).waitForExistence(timeout: 8))
-    XCTAssertTrue(appText("Add your profile screenshots and get a focused edit plan.", in: audit).exists)
+    XCTAssertTrue(appText("Profile Audit", in: audit).waitForExistence(timeout: 8))
+    XCTAssertTrue(appText("Dating App", in: audit).exists)
     XCTAssertTrue(audit.buttons["audit.runButton"].isHittable)
 
     let replies = XCUIApplication()
@@ -57,7 +63,7 @@ final class SwipeBetterUITests: XCTestCase {
     replies.launch()
 
     XCTAssertTrue(appText("Replies", in: replies).waitForExistence(timeout: 8))
-    XCTAssertTrue(appText("Bring the thread, choose a direction, and get three replies.", in: replies).exists)
+    XCTAssertTrue(appText("Conversation", in: replies).exists)
     XCTAssertTrue(replies.buttons["replies.generateButton"].isHittable)
   }
 
@@ -87,7 +93,7 @@ final class SwipeBetterUITests: XCTestCase {
     let setupButton = app.buttons["account.setupSnapButton"]
     XCTAssertTrue(setupButton.waitForExistence(timeout: 8))
     XCTAssertTrue(setupButton.isHittable)
-    setupButton.tap()
+    app.staticTexts["Snap Back"].tap()
 
     XCTAssertTrue(app.staticTexts["SwipeBetter Snap"].waitForExistence(timeout: 3))
     XCTAssertTrue(app.staticTexts["Step 1 of 3"].exists)
@@ -117,7 +123,7 @@ final class SwipeBetterUITests: XCTestCase {
     let app = XCUIApplication()
     app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
     app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
-    app.launchArguments.append("replies")
+    app.launchArguments.append("replyResult")
     app.launch()
 
     let copyButton = app.buttons["replies.copyButton.1"]
@@ -129,6 +135,88 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(copyButton.isHittable)
     copyButton.tap()
     XCTAssertEqual(copyButton.label, "Reply 1 copied")
+  }
+
+  func testReplyInputModeSwitchesVisibleContent() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("replies")
+    app.launch()
+
+    let mode = app.segmentedControls["replies.inputModePicker"]
+    XCTAssertTrue(mode.waitForExistence(timeout: 8))
+    XCTAssertTrue(app.textViews["replies.conversationEditor"].exists)
+    mode.buttons["Screenshots"].tap()
+    XCTAssertFalse(app.textViews["replies.conversationEditor"].exists)
+    XCTAssertTrue(app.buttons["replies.addScreenshotsButton"].exists)
+    mode.buttons["Paste text"].tap()
+    XCTAssertTrue(app.textViews["replies.conversationEditor"].waitForExistence(timeout: 2))
+  }
+
+  func testAuditResultsRemainCopyable() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("auditResult")
+    app.launch()
+
+    let copyButton = app.buttons["audit.copyButton.2.0"]
+    for _ in 0..<5 where !copyButton.isHittable { app.swipeUp() }
+    let firstFixCopy = app.buttons["audit.copyButton.1.0"]
+    XCTAssertTrue(firstFixCopy.waitForExistence(timeout: 3))
+    firstFixCopy.tap()
+    XCTAssertEqual(firstFixCopy.label, "First fix copied")
+
+    let improvementCopy = app.buttons["audit.copyButton.fixes.0"]
+    XCTAssertTrue(improvementCopy.waitForExistence(timeout: 3))
+    improvementCopy.tap()
+    XCTAssertEqual(improvementCopy.label, "Copied")
+
+    XCTAssertTrue(copyButton.waitForExistence(timeout: 3))
+    copyButton.tap()
+    XCTAssertEqual(copyButton.label, "New bio copied")
+    XCTAssertTrue(app.buttons["audit.copyButton.fixes.0"].exists)
+  }
+
+  func testHistoryParsesProductionFractionalTimestamps() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("history")
+    app.launch()
+
+    XCTAssertTrue(app.staticTexts["AUG 1"].firstMatch.waitForExistence(timeout: 8))
+    XCTAssertTrue(app.staticTexts["JUL 31"].firstMatch.waitForExistence(timeout: 2))
+    XCTAssertLessThan(
+      app.staticTexts["AUG 1"].firstMatch.frame.minY,
+      app.staticTexts["JUL 31"].firstMatch.frame.minY
+    )
+    XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "\\d{4}-\\d{2}-\\d{2}.*")).firstMatch.exists)
+  }
+
+  func testHistoryRowOpensClientOnlyDetail() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("history")
+    app.launch()
+
+    let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'history.row.'")).firstMatch
+    XCTAssertTrue(row.waitForExistence(timeout: 8))
+    row.tap()
+    XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 3))
+  }
+
+  func testHistoryEmptyStateIsActionable() throws {
+    let app = XCUIApplication()
+    app.launchArguments.append("-SWIPEBETTER_APP_STORE_SCREENSHOTS")
+    app.launchArguments.append("-SWIPEBETTER_SCREENSHOT_TAB")
+    app.launchArguments.append("historyEmpty")
+    app.launch()
+
+    XCTAssertTrue(app.staticTexts["Your playbook is empty"].waitForExistence(timeout: 8))
+    XCTAssertTrue(app.buttons["history.runFirstAuditButton"].isHittable)
   }
 
   func testKeyboardExtensionVisualQA() throws {
@@ -160,6 +248,7 @@ final class SwipeBetterUITests: XCTestCase {
     }
 
     XCTAssertTrue(swipeBetterButton.waitForExistence(timeout: 5))
+    XCTAssertTrue(app.buttons["keyboard.deleteBackwardButton"].exists)
     let attachment = XCTAttachment(screenshot: app.screenshot())
     attachment.name = "SwipeBetter Keyboard"
     attachment.lifetime = .keepAlways
