@@ -40,9 +40,9 @@ struct PremiumProfileAuditView: View {
       } label: {
         Image(systemName: "square.and.arrow.down")
           .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(.white)
-          .frame(width: 38, height: 38)
-          .background(Color.white.opacity(0.11), in: Circle())
+          .foregroundStyle(SBTheme.ink)
+          .frame(width: 44, height: 44)
+          .sbGlassControl(shape: Circle())
       }
       .accessibilityLabel("Import shared screenshots")
     )
@@ -72,7 +72,7 @@ struct PremiumProfileAuditView: View {
           Toggle("ENM / poly profile", isOn: $enm)
             .font(.subheadline.weight(.medium))
             .tint(SBTheme.accent)
-            .frame(minHeight: 42)
+            .frame(minHeight: 44)
           Text("Partner photos are expected. We’ll recognize photos with your partner, including an opposite-sex partner, and review them in the context of your ENM/poly profile.")
             .font(.caption)
             .foregroundStyle(SBTheme.secondaryInk)
@@ -89,8 +89,8 @@ struct PremiumProfileAuditView: View {
       LazyVStack(spacing: 24) {
         SBWorkspaceHeader(
           eyebrow: "Profile lab",
-          title: "Build a profile worth pausing on.",
-          detail: "Stack your screenshots in order. SwipeBetter turns them into a focused edit plan.",
+          title: "Audit",
+          detail: "Add your profile screenshots and get a focused edit plan.",
           systemImage: "person.crop.rectangle.stack",
           status: accessStatus,
           trailing: importButton
@@ -269,9 +269,9 @@ struct PremiumReplyAssistantView: View {
       } label: {
         Image(systemName: "square.and.arrow.down")
           .font(.system(size: 16, weight: .semibold))
-          .foregroundStyle(.white)
-          .frame(width: 38, height: 38)
-          .background(Color.white.opacity(0.11), in: Circle())
+          .foregroundStyle(SBTheme.ink)
+          .frame(width: 44, height: 44)
+          .sbGlassControl(shape: Circle())
       }
       .accessibilityLabel("Import shared chat")
     )
@@ -282,8 +282,8 @@ struct PremiumReplyAssistantView: View {
       LazyVStack(spacing: 24) {
         SBWorkspaceHeader(
           eyebrow: "Reply studio",
-          title: "Say less. Land better.",
-          detail: "Bring the thread, choose the direction, and leave with three replies that sound like you.",
+          title: "Replies",
+          detail: "Bring the thread, choose a direction, and get three replies.",
           systemImage: "message.badge.waveform",
           status: accessStatus,
           trailing: importButton
@@ -372,7 +372,7 @@ struct PremiumReplyAssistantView: View {
               Toggle("ENM / poly context", isOn: $enm)
                 .font(.subheadline.weight(.medium))
                 .tint(SBTheme.accent)
-                .frame(minHeight: 42)
+                .frame(minHeight: 44)
             }
           }
         }
@@ -552,6 +552,7 @@ struct PremiumScreenshotStrip: View {
                 .frame(width: 26, height: 26)
                 .background(Color.black.opacity(0.72))
                 .clipShape(Circle())
+                .frame(width: 44, height: 44)
             }
             .offset(x: 6, y: -6)
             .accessibilityLabel("Remove screenshot \(index + 1)")

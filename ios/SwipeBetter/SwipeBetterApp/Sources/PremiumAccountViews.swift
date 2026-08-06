@@ -12,8 +12,8 @@ struct PremiumHistoryView: View {
       LazyVStack(spacing: 24) {
         SBWorkspaceHeader(
           eyebrow: "Your playbook",
-          title: "Keep the lessons. Skip the repeat mistakes.",
-          detail: "Revisit the profile edits and conversation choices that moved things forward.",
+          title: "History",
+          detail: "Revisit profile edits and conversation choices.",
           systemImage: "clock.arrow.circlepath",
           status: "\(model.profileHistory.count + model.replyHistory.count) saved"
         )
@@ -145,8 +145,8 @@ struct PremiumAccountView: View {
       LazyVStack(spacing: 24) {
         SBWorkspaceHeader(
           eyebrow: "Control room",
-          title: greeting,
-          detail: "Manage access, billing, keyboard tools, and exactly what stays in your account.",
+          title: "Account",
+          detail: "Manage access, billing, keyboard tools, and your data.",
           systemImage: "person.crop.circle",
           status: accountPlan
         )
@@ -162,7 +162,7 @@ struct PremiumAccountView: View {
         }
         .padding(.horizontal, 20)
       }
-      .padding(.bottom, 30)
+      .padding(.bottom, 112)
     }
     .refreshable {
       await model.refreshAccount()
@@ -194,13 +194,6 @@ struct PremiumAccountView: View {
     }
   }
 
-  private var greeting: String {
-    if let firstName = model.user?.firstName, !firstName.isEmpty {
-      return "Everything is in your hands, \(firstName)."
-    }
-    return "Your account. Your call."
-  }
-
   private var accountPlan: String {
     model.credits?.planTier?.capitalized
       ?? model.me?.planType?.capitalized
@@ -215,7 +208,7 @@ struct PremiumAccountView: View {
             .font(.headline.weight(.bold))
             .foregroundStyle(.white)
             .frame(width: 48, height: 48)
-            .background(SBTheme.accent.gradient)
+            .background(SBTheme.accent)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
           VStack(alignment: .leading, spacing: 3) {
@@ -234,9 +227,14 @@ struct PremiumAccountView: View {
 
         SBDivider()
 
-        HStack(spacing: 10) {
-          SBMetricChip(label: "Plan", value: accountPlan, tint: SBTheme.teal)
-          SBMetricChip(
+        HStack(spacing: 0) {
+          accountStat(label: "Plan", value: accountPlan, tint: SBTheme.teal)
+
+          SBTheme.divider
+            .frame(width: 1, height: 34)
+            .accessibilityHidden(true)
+
+          accountStat(
             label: "Credits",
             value: "\(model.credits?.credits ?? model.me?.oneTimeCredits ?? 0)",
             tint: SBTheme.accent
@@ -244,6 +242,19 @@ struct PremiumAccountView: View {
         }
       }
     }
+  }
+
+  private func accountStat(label: String, value: String, tint: Color) -> some View {
+    VStack(alignment: .leading, spacing: 3) {
+      Text(label.uppercased())
+        .font(.caption2.weight(.bold))
+        .foregroundStyle(SBTheme.secondaryInk)
+      Text(value)
+        .font(.subheadline.weight(.bold).monospacedDigit())
+        .foregroundStyle(tint)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .padding(.horizontal, 4)
   }
 
   private var plansSection: some View {

@@ -3,6 +3,7 @@ import SwiftUI
 
 struct PremiumAuthView: View {
   @Environment(AppModel.self) private var model
+  @Environment(\.colorScheme) private var colorScheme
   @State private var isSignup = false
   @State private var email = ""
   @State private var password = ""
@@ -44,48 +45,36 @@ struct PremiumAuthView: View {
   }
 
   private var brandHeader: some View {
-    VStack(alignment: .leading, spacing: 22) {
+    VStack(alignment: .leading, spacing: 16) {
       HStack(alignment: .center, spacing: 14) {
         SBLogoMark(size: 58)
 
         VStack(alignment: .leading, spacing: 2) {
           Text("SwipeBetter")
-            .font(.system(size: 31, weight: .bold))
-            .foregroundStyle(SBTheme.headerInk)
+            .font(.title2.weight(.bold))
+            .foregroundStyle(SBTheme.ink)
 
           Text("Dating decisions, made clearer.")
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(SBTheme.headerSecondaryInk)
+            .foregroundStyle(SBTheme.secondaryInk)
         }
       }
 
-      Text("Stop guessing what to change.")
-        .font(.system(size: 32, weight: .bold))
-        .foregroundStyle(SBTheme.headerInk)
+      Text("A clearer next move.")
+        .font(.largeTitle.weight(.bold))
+        .foregroundStyle(SBTheme.ink)
         .fixedSize(horizontal: false, vertical: true)
 
-      Text("Bring the profile or the conversation. Leave with a clear next move that still sounds like you.")
+      Text("Bring a profile or conversation and leave with advice that still sounds like you.")
         .font(.subheadline)
-        .foregroundStyle(SBTheme.headerSecondaryInk)
+        .foregroundStyle(SBTheme.secondaryInk)
         .lineSpacing(2)
         .fixedSize(horizontal: false, vertical: true)
     }
     .padding(.horizontal, 20)
-    .padding(.top, 54)
-    .padding(.bottom, 26)
+    .padding(.top, 24)
+    .padding(.bottom, 4)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background {
-      ZStack(alignment: .bottomLeading) {
-        SBTheme.header
-        HStack(spacing: 0) {
-          SBTheme.accent.frame(maxWidth: .infinity)
-          SBTheme.teal.frame(width: 86)
-          SBTheme.sky.frame(width: 52)
-        }
-        .frame(height: 4)
-      }
-      .ignoresSafeArea(edges: .top)
-    }
   }
 
   private var authForm: some View {
@@ -97,36 +86,35 @@ struct PremiumAuthView: View {
         }
         .pickerStyle(.segmented)
 
-        if isSignup {
-          HStack(spacing: 10) {
-            premiumField("First name", text: $firstName, contentType: .givenName)
-            premiumField("Last name", text: $lastName, contentType: .familyName)
+        VStack(spacing: 0) {
+          if isSignup {
+            HStack(spacing: 12) {
+              premiumField("First name", text: $firstName, contentType: .givenName)
+              premiumField("Last name", text: $lastName, contentType: .familyName)
+            }
+            SBDivider()
           }
-        }
 
-        premiumField("Email", text: $email, contentType: .emailAddress)
-          .keyboardType(.emailAddress)
-          .textInputAutocapitalization(.never)
-          .autocorrectionDisabled()
-          .accessibilityIdentifier("auth.emailField")
-
-        SecureField("Password", text: $password)
-          .textContentType(isSignup ? .newPassword : .password)
-          .padding(.horizontal, 13)
-          .frame(minHeight: 48)
-          .background(SBTheme.canvas)
-          .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-          .overlay {
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
-              .stroke(SBTheme.divider, lineWidth: 1)
-          }
-          .accessibilityIdentifier("auth.passwordField")
-
-        if isSignup {
-          premiumField("Promo code (optional)", text: $promoCode, contentType: nil)
-            .textInputAutocapitalization(.characters)
+          premiumField("Email", text: $email, contentType: .emailAddress)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
-            .accessibilityIdentifier("auth.promoCodeField")
+            .accessibilityIdentifier("auth.emailField")
+
+          SBDivider()
+
+          SecureField("Password", text: $password)
+            .textContentType(isSignup ? .newPassword : .password)
+            .frame(minHeight: 48)
+            .accessibilityIdentifier("auth.passwordField")
+
+          if isSignup {
+            SBDivider()
+            premiumField("Promo code (optional)", text: $promoCode, contentType: nil)
+              .textInputAutocapitalization(.characters)
+              .autocorrectionDisabled()
+              .accessibilityIdentifier("auth.promoCodeField")
+          }
         }
 
         Button {
@@ -190,7 +178,7 @@ struct PremiumAuthView: View {
           model.lastError = error.localizedDescription
         }
       }
-      .signInWithAppleButtonStyle(.black)
+      .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
       .frame(height: 50)
       .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
       .accessibilityIdentifier("auth.appleSignInButton")
@@ -240,14 +228,8 @@ struct PremiumAuthView: View {
   ) -> some View {
     TextField(title, text: text)
       .textContentType(contentType)
-      .padding(.horizontal, 13)
       .frame(minHeight: 48)
-      .background(SBTheme.canvas)
-      .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 7, style: .continuous)
-          .stroke(SBTheme.divider, lineWidth: 1)
-      }
+      .textFieldStyle(.plain)
   }
 
   private func authURL(_ path: String) -> URL {

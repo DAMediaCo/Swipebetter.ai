@@ -12,32 +12,39 @@ final class KeyboardViewController: UIInputViewController {
   private var pastedContext: String?
   private var snapPayload: SwipeBetterSnapPayload?
   private var snapRefreshTimer: Timer?
+  private var preferredHeightConstraint: NSLayoutConstraint?
+  private var replyRowContainer: UIStackView?
+  private var utilityRowContainer: UIStackView?
+  private var replyControls: [UIView] = []
+  private var utilityControls: [UIView] = []
+  private var usesAccessibilityControlLayout = false
 
   private let coral = UIColor { traits in
-    traits.userInterfaceStyle == .dark
-      ? UIColor(red: 1.0, green: 0.39, blue: 0.34, alpha: 1)
-      : UIColor(red: 0.91, green: 0.27, blue: 0.24, alpha: 1)
+    _ = traits
+    return UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1)
   }
   private let teal = UIColor { traits in
-    traits.userInterfaceStyle == .dark
-      ? UIColor(red: 0.25, green: 0.82, blue: 0.79, alpha: 1)
-      : UIColor(red: 0.00, green: 0.50, blue: 0.52, alpha: 1)
+    _ = traits
+    return UIColor(red: 0.00, green: 0.48, blue: 0.48, alpha: 1)
   }
-  private let sky = UIColor { traits in
+  private let askOut = UIColor { traits in
     traits.userInterfaceStyle == .dark
-      ? UIColor(red: 0.34, green: 0.62, blue: 1.0, alpha: 1)
+      ? UIColor(red: 0.13, green: 0.37, blue: 0.67, alpha: 1)
       : UIColor(red: 0.12, green: 0.38, blue: 0.78, alpha: 1)
   }
   private let stageFill = UIColor { traits in
     traits.userInterfaceStyle == .dark
-      ? UIColor(red: 0.11, green: 0.115, blue: 0.14, alpha: 1)
-      : UIColor(red: 0.045, green: 0.049, blue: 0.064, alpha: 1)
+      ? UIColor.secondarySystemBackground
+      : UIColor.systemBackground
   }
   private let ink = UIColor.label
 
   override func viewDidLoad() {
     super.viewDidLoad()
     buildKeyboard()
+    registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (self: Self, _) in
+      self.updatePreferredKeyboardHeight()
+    }
     refreshContext()
   }
 
@@ -76,14 +83,14 @@ final class KeyboardViewController: UIInputViewController {
     rootStack.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(rootStack)
 
-    rootStack.addArrangedSubview(makeAccentRail())
     rootStack.addArrangedSubview(makeHeader())
     rootStack.addArrangedSubview(makeContextCard())
     rootStack.addArrangedSubview(makeReplyRow())
     rootStack.addArrangedSubview(makeUtilityRow())
 
-    let preferredHeight = view.heightAnchor.constraint(equalToConstant: 310)
+    let preferredHeight = view.heightAnchor.constraint(equalToConstant: preferredKeyboardHeight)
     preferredHeight.priority = .defaultHigh
+    preferredHeightConstraint = preferredHeight
     NSLayoutConstraint.activate([
       backgroundEffectView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
       backgroundEffectView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -97,21 +104,23 @@ final class KeyboardViewController: UIInputViewController {
     ])
   }
 
-  private func makeAccentRail() -> UIView {
-    let rail = UIStackView()
-    rail.axis = .horizontal
-    rail.distribution = .fillEqually
-    rail.spacing = 0
+  private var preferredKeyboardHeight: CGFloat {
+    traitCollection.preferredContentSizeCategory.isAccessibilityCategory ? 380 : 310
+  }
 
-    for color in [coral, teal, sky] {
-      let segment = UIView()
-      segment.backgroundColor = color
-      rail.addArrangedSubview(segment)
-    }
-    rail.heightAnchor.constraint(equalToConstant: 3).isActive = true
-    rail.layer.cornerRadius = 1.5
-    rail.layer.masksToBounds = true
-    return rail
+  private func updatePreferredKeyboardHeight() {
+    preferredHeightConstraint?.constant = preferredKeyboardHeight
+    updateControlLayoutIfNeeded()
+  }
+
+  private func scaledFont(
+    size: CGFloat,
+    weight: UIFont.Weight,
+    textStyle: UIFont.TextStyle = .subheadline
+  ) -> UIFont {
+    UIFontMetrics(forTextStyle: textStyle).scaledFont(
+      for: .systemFont(ofSize: size, weight: weight)
+    )
   }
 
   private func makeHeader() -> UIView {
@@ -121,7 +130,7 @@ final class KeyboardViewController: UIInputViewController {
     row.spacing = 8
 
     let mark = UILabel()
-    mark.text = "↗"
+    mark.text = "S"
     mark.font = .systemFont(ofSize: 14, weight: .bold)
     mark.textColor = .white
     mark.textAlignment = .center
@@ -133,19 +142,22 @@ final class KeyboardViewController: UIInputViewController {
 
     let title = UILabel()
     title.text = "SwipeBetter"
-    title.font = .systemFont(ofSize: 14, weight: .bold)
+    title.font = scaledFont(size: 14, weight: .bold, textStyle: .subheadline)
+    title.adjustsFontForContentSizeCategory = true
     title.textColor = ink
 
     let subtitle = UILabel()
-    subtitle.text = "REPLY STUDIO"
-    subtitle.font = .systemFont(ofSize: 9, weight: .bold)
+    subtitle.text = "REPLY COACH"
+    subtitle.font = scaledFont(size: 9, weight: .bold, textStyle: .caption2)
+    subtitle.adjustsFontForContentSizeCategory = true
     subtitle.textColor = .secondaryLabel
 
     let titleStack = UIStackView(arrangedSubviews: [title, subtitle])
     titleStack.axis = .vertical
     titleStack.spacing = 0
 
-    accessLabel.font = .systemFont(ofSize: 11, weight: .medium)
+    accessLabel.font = scaledFont(size: 11, weight: .medium, textStyle: .caption1)
+    accessLabel.adjustsFontForContentSizeCategory = true
     accessLabel.textAlignment = .right
 
     row.addArrangedSubview(mark)
@@ -163,11 +175,13 @@ final class KeyboardViewController: UIInputViewController {
 
     let caption = UILabel()
     caption.text = "CONVERSATION IN VIEW"
-    caption.font = .systemFont(ofSize: 11, weight: .semibold)
-    caption.textColor = UIColor.white.withAlphaComponent(0.58)
+    caption.font = scaledFont(size: 11, weight: .semibold, textStyle: .caption1)
+    caption.adjustsFontForContentSizeCategory = true
+    caption.textColor = .secondaryLabel
 
-    contextLabel.font = .systemFont(ofSize: 13, weight: .regular)
-    contextLabel.textColor = .white
+    contextLabel.font = scaledFont(size: 13, weight: .regular, textStyle: .body)
+    contextLabel.adjustsFontForContentSizeCategory = true
+    contextLabel.textColor = ink
     contextLabel.numberOfLines = 3
 
     let stack = UIStackView(arrangedSubviews: [caption, contextLabel])
@@ -188,9 +202,8 @@ final class KeyboardViewController: UIInputViewController {
 
   private func makeReplyRow() -> UIView {
     let row = UIStackView()
-    row.axis = .horizontal
-    row.distribution = .fillEqually
-    row.spacing = 7
+    replyRowContainer = row
+    replyControls = []
 
     for (index, style) in KeyboardReplyStyle.allCases.enumerated() {
       let tint: UIColor
@@ -200,7 +213,7 @@ final class KeyboardViewController: UIInputViewController {
       case .confident:
         tint = teal
       case .askOut:
-        tint = sky
+        tint = askOut
       }
       let button = filledButton(
         title: style.title,
@@ -211,16 +224,16 @@ final class KeyboardViewController: UIInputViewController {
       button.accessibilityIdentifier = style.accessibilityIdentifier
       button.addTarget(self, action: #selector(insertSuggestedReply(_:)), for: .touchUpInside)
       replyButtons[style] = button
-      row.addArrangedSubview(button)
+      replyControls.append(button)
     }
+    configureControlRows(row, controls: replyControls)
     return row
   }
 
   private func makeUtilityRow() -> UIView {
     let row = UIStackView()
-    row.axis = .horizontal
-    row.distribution = .fillEqually
-    row.spacing = 7
+    utilityRowContainer = row
+    utilityControls = []
 
     let next = outlineButton(title: "", systemImage: "globe")
     next.accessibilityIdentifier = "keyboard.nextKeyboardButton"
@@ -236,10 +249,56 @@ final class KeyboardViewController: UIInputViewController {
     snapBack.accessibilityIdentifier = "keyboard.snapBackButton"
     snapBack.addTarget(self, action: #selector(openSnapBack), for: .touchUpInside)
 
-    row.addArrangedSubview(next)
-    row.addArrangedSubview(paste)
-    row.addArrangedSubview(snapBack)
+    utilityControls = [next, paste, snapBack]
+    configureControlRows(row, controls: utilityControls)
     return row
+  }
+
+  private func configureControlRows(_ container: UIStackView, controls: [UIView]) {
+    let accessibilityLayout = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+    usesAccessibilityControlLayout = accessibilityLayout
+
+    controls.forEach { $0.removeFromSuperview() }
+    container.arrangedSubviews.forEach {
+      container.removeArrangedSubview($0)
+      $0.removeFromSuperview()
+    }
+
+    guard accessibilityLayout else {
+      container.axis = .horizontal
+      container.distribution = .fillEqually
+      container.spacing = 7
+      controls.forEach { container.addArrangedSubview($0) }
+      return
+    }
+
+    container.axis = .vertical
+    container.distribution = .fill
+    container.spacing = 7
+
+    if controls.count > 2 {
+      let firstRow = UIStackView()
+      firstRow.axis = .horizontal
+      firstRow.distribution = .fillEqually
+      firstRow.spacing = 7
+      firstRow.addArrangedSubview(controls[0])
+      firstRow.addArrangedSubview(controls[1])
+      container.addArrangedSubview(firstRow)
+      container.addArrangedSubview(controls[2])
+    } else {
+      controls.forEach { container.addArrangedSubview($0) }
+    }
+  }
+
+  private func updateControlLayoutIfNeeded() {
+    let accessibilityLayout = traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+    guard accessibilityLayout != usesAccessibilityControlLayout else { return }
+    if let replyRowContainer {
+      configureControlRows(replyRowContainer, controls: replyControls)
+    }
+    if let utilityRowContainer {
+      configureControlRows(utilityRowContainer, controls: utilityControls)
+    }
   }
 
   private func filledButton(
@@ -256,7 +315,12 @@ final class KeyboardViewController: UIInputViewController {
     config.cornerStyle = .capsule
     config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 9, bottom: 12, trailing: 9)
     let button = UIButton(configuration: config)
-    button.titleLabel?.font = .systemFont(ofSize: 13, weight: .semibold)
+    button.titleLabel?.font = scaledFont(size: 13, weight: .semibold, textStyle: .subheadline)
+    button.titleLabel?.adjustsFontForContentSizeCategory = true
+    button.titleLabel?.numberOfLines = 0
+    button.titleLabel?.lineBreakMode = .byWordWrapping
+    button.titleLabel?.textAlignment = .center
+    button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
     return button
   }
 
@@ -268,7 +332,14 @@ final class KeyboardViewController: UIInputViewController {
     config.baseForegroundColor = ink
     config.cornerStyle = .capsule
     config.contentInsets = NSDirectionalEdgeInsets(top: 11, leading: 8, bottom: 11, trailing: 8)
-    return UIButton(configuration: config)
+    let button = UIButton(configuration: config)
+    button.titleLabel?.font = scaledFont(size: 13, weight: .regular, textStyle: .subheadline)
+    button.titleLabel?.adjustsFontForContentSizeCategory = true
+    button.titleLabel?.numberOfLines = 0
+    button.titleLabel?.lineBreakMode = .byWordWrapping
+    button.titleLabel?.textAlignment = .center
+    button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+    return button
   }
 
   private func refreshContext() {
@@ -277,9 +348,7 @@ final class KeyboardViewController: UIInputViewController {
     accessLabel.text = hasFullAccess ? "FULL ACCESS" : "PRIVATE"
     accessLabel.textColor = hasFullAccess ? .systemTeal : .secondaryLabel
     contextLabel.text = contextMessage(fallbackContext: context)
-    contextLabel.textColor = context == nil && snapPayload == nil
-      ? UIColor.white.withAlphaComponent(0.58)
-      : .white
+    contextLabel.textColor = context == nil && snapPayload == nil ? .secondaryLabel : ink
 
     for (index, style) in KeyboardReplyStyle.allCases.enumerated() {
       let snapReply = snapPayload?.usableReply(at: index)

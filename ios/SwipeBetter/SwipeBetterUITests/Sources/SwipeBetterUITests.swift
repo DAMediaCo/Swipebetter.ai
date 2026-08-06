@@ -14,10 +14,10 @@ final class SwipeBetterUITests: XCTestCase {
     XCTAssertTrue(app.secureTextFields["auth.passwordField"].exists)
     XCTAssertTrue(app.buttons["auth.loginButton"].exists)
     XCTAssertTrue(app.buttons["auth.appleSignInButton"].exists)
-    XCTAssertTrue(app.staticTexts["Stop guessing what to change."].exists)
+    XCTAssertTrue(app.staticTexts["A clearer next move."].exists)
     XCTAssertTrue(
       app.staticTexts[
-        "Bring the profile or the conversation. Leave with a clear next move that still sounds like you."
+        "Bring a profile or conversation and leave with advice that still sounds like you."
       ].exists
     )
     XCTAssertTrue(app.staticTexts["iOS pricing includes Apple purchase fees."].exists)
@@ -46,8 +46,8 @@ final class SwipeBetterUITests: XCTestCase {
     audit.launchArguments.append("audit")
     audit.launch()
 
-    XCTAssertTrue(appText("PROFILE LAB", in: audit).waitForExistence(timeout: 8))
-    XCTAssertTrue(appText("Build a profile worth pausing on.", in: audit).exists)
+    XCTAssertTrue(appText("Audit", in: audit).waitForExistence(timeout: 8))
+    XCTAssertTrue(appText("Add your profile screenshots and get a focused edit plan.", in: audit).exists)
     XCTAssertTrue(audit.buttons["audit.runButton"].isHittable)
 
     let replies = XCUIApplication()
@@ -56,8 +56,8 @@ final class SwipeBetterUITests: XCTestCase {
     replies.launchArguments.append("replies")
     replies.launch()
 
-    XCTAssertTrue(appText("REPLY STUDIO", in: replies).waitForExistence(timeout: 8))
-    XCTAssertTrue(appText("Say less. Land better.", in: replies).exists)
+    XCTAssertTrue(appText("Replies", in: replies).waitForExistence(timeout: 8))
+    XCTAssertTrue(appText("Bring the thread, choose a direction, and get three replies.", in: replies).exists)
     XCTAssertTrue(replies.buttons["replies.generateButton"].isHittable)
   }
 

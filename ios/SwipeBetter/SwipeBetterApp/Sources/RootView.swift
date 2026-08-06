@@ -85,7 +85,7 @@ struct RootView: View {
           .foregroundStyle(.white)
           .padding(.horizontal, 14)
           .padding(.vertical, 10)
-          .background(.red.gradient, in: Capsule())
+          .background(SBTheme.accentPressed, in: Capsule())
           .padding()
           .transition(.move(edge: .bottom).combined(with: .opacity))
       } else if let message = model.snapStatusMessage {
@@ -176,6 +176,7 @@ struct RootView: View {
 private struct AppleDeletionReauthenticationView: View {
   @Environment(AppModel.self) private var model
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     NavigationStack {
@@ -206,7 +207,7 @@ private struct AppleDeletionReauthenticationView: View {
             model.lastError = error.localizedDescription
           }
         }
-        .signInWithAppleButtonStyle(.black)
+        .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
         .frame(height: 50)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .accessibilityIdentifier("account.appleDeletionReauthenticationButton")
