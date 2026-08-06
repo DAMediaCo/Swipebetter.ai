@@ -39,6 +39,7 @@ enum AppTab: Hashable, CaseIterable {
 
 struct RootView: View {
   @Environment(AppModel.self) private var model
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var selectedTab: AppTab = .audit
 
   init(initialTab: AppTab = .audit) {
@@ -73,12 +74,14 @@ struct RootView: View {
             .tag(AppTab.account)
         }
         .tint(SBTheme.accent)
+        .disabled(model.isBusy)
         .accessibilityIdentifier("root.tabView")
       } else {
         PremiumAuthView()
+          .disabled(model.isBusy)
       }
     }
-    .overlay(alignment: .bottom) {
+    .safeAreaInset(edge: .bottom, spacing: 0) {
       if let error = model.lastError {
         Text(error)
           .font(.footnote.weight(.semibold))
@@ -86,8 +89,9 @@ struct RootView: View {
           .padding(.horizontal, 14)
           .padding(.vertical, 10)
           .background(SBTheme.accentPressed, in: Capsule())
-          .padding()
-          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+          .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
       } else if let message = model.snapStatusMessage {
         Text(message)
           .font(.footnote.weight(.semibold))
@@ -95,8 +99,9 @@ struct RootView: View {
           .padding(.horizontal, 14)
           .padding(.vertical, 10)
           .background(SBTheme.teal, in: Capsule())
-          .padding()
-          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+          .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
       }
     }
     .sheet(
@@ -106,17 +111,6 @@ struct RootView: View {
       )
     ) {
       AppleDeletionReauthenticationView()
-    }
-    .overlay {
-      if model.isBusy {
-        ZStack {
-          Color.black.opacity(0.14).ignoresSafeArea()
-          ProgressView()
-            .controlSize(.large)
-            .padding(22)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
-        }
-      }
     }
     .onChange(of: model.importRevision) { _, _ in
       routeToPendingImportIfNeeded()

@@ -26,82 +26,74 @@ struct PremiumHistoryView: View {
   }
 
   var body: some View {
-    ScrollView {
-      LazyVStack(spacing: 24) {
-        SBWorkspaceHeader(
-          eyebrow: "Your playbook",
-          title: "History",
-          detail: "Revisit profile edits and conversation choices.",
-          systemImage: "clock.arrow.circlepath",
-          status: "\(model.profileHistory.count + model.replyHistory.count) saved",
-          trailing: searchButton
-        )
-
-        if showingSearch {
+    List {
+      if showingSearch {
+        Section {
           TextField("Search history", text: $searchText)
-            .textFieldStyle(.roundedBorder)
-            .padding(.horizontal, 16)
+            .textInputAutocapitalization(.never)
+            .accessibilityIdentifier("history.searchField")
         }
+      }
 
+      Section {
         Picker("History filter", selection: $filter) {
           Text("All").tag("all")
           Text("Audits").tag("audits")
           Text("Replies").tag("replies")
         }
         .pickerStyle(.segmented)
-        .padding(.horizontal, 16)
+      } header: {
+        Text("FILTER")
+      }
 
-        let items = historyItems
-        if items.isEmpty {
-          VStack(spacing: 12) {
-            Image(systemName: "clock.arrow.circlepath")
-              .font(.system(size: 25, weight: .medium))
-              .foregroundStyle(SBTheme.accent)
-              .frame(width: 64, height: 64)
-              .background(SBTheme.surfaceMuted, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            Text("Your playbook is empty")
-              .font(.title3.weight(.semibold))
-              .foregroundStyle(SBTheme.ink)
-            Text("Run an audit or generate replies to save your first result.")
-              .font(.subheadline)
-              .foregroundStyle(SBTheme.secondaryInk)
-              .multilineTextAlignment(.center)
+      if historyItems.isEmpty {
+        Section {
+          SBEmptyState(
+            title: emptyHistoryTitle,
+            detail: emptyHistoryDetail,
+            systemImage: emptyHistoryImage
+          )
+          .frame(maxWidth: .infinity, minHeight: 220)
+          .listRowBackground(Color.clear)
+          .listRowSeparator(.hidden)
+          if filter == "all" && searchText.isEmpty {
             Button("Run your first audit") {
               model.requestedTabIdentifier = "audit"
               model.deepLinkRevision += 1
             }
-            .font(.subheadline.weight(.semibold))
-            .foregroundStyle(.white)
-            .padding(.horizontal, 16)
-            .frame(minHeight: 48)
-            .background(SBTheme.primaryActionFill, in: Capsule())
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .listRowBackground(Color.clear)
+            .listRowSeparator(.hidden)
             .accessibilityIdentifier("history.runFirstAuditButton")
           }
-          .padding(.horizontal, 32)
-          .padding(.top, 84)
-          .frame(maxWidth: .infinity)
-        } else {
-          ForEach(historyGroups) { historyGroup in
-            VStack(alignment: .leading, spacing: 10) {
-              SBSectionHeader(title: historyGroup.date, detail: nil)
-              SBSurface {
-                VStack(spacing: 0) {
-                  ForEach(historyGroup.items) { item in
-                    Button { selectedItem = item } label: {
-                      PremiumHistoryRow(eyebrow: item.eyebrow, title: item.title, trailing: item.trailing, systemImage: item.systemImage)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("history.row.\(item.id)")
-                    .accessibilityLabel("Open \(item.eyebrow) history")
-                  }
-                }
+        }
+      } else {
+        ForEach(historyGroups) { historyGroup in
+          Section(historyGroup.date) {
+            ForEach(historyGroup.items) { item in
+              Button { selectedItem = item } label: {
+                PremiumHistoryRow(
+                  eyebrow: item.eyebrow,
+                  title: item.title,
+                  trailing: item.trailing,
+                  systemImage: item.systemImage,
+                  category: item.category
+                )
               }
+              .buttonStyle(.plain)
+              .accessibilityIdentifier("history.row.\(item.id)")
+              .accessibilityLabel("Open \(item.eyebrow) history")
             }
-            .padding(.horizontal, 16)
           }
         }
       }
-      .padding(.bottom, 36)
+
+      Section {
+        Text("History syncs across your signed-in devices.")
+          .font(.caption)
+          .foregroundStyle(SBTheme.secondaryInk)
+          .fixedSize(horizontal: false, vertical: true)
+      }
     }
     .refreshable { await model.refreshHistory() }
     .task {
@@ -109,10 +101,42 @@ struct PremiumHistoryView: View {
       await model.refreshHistory()
     }
     .sbPageBackground()
-    .navigationBarHidden(true)
+    .scrollContentBackground(.hidden)
+    .listStyle(.insetGrouped)
+    .navigationTitle("History")
+    .navigationBarTitleDisplayMode(.large)
+    .toolbar {
+      ToolbarItem(placement: .topBarTrailing) { searchButton }
+    }
     .accessibilityIdentifier("history.list")
-    .sheet(item: $selectedItem) { item in
+    .navigationDestination(item: $selectedItem) { item in
       PremiumHistoryDetail(item: item)
+    }
+  }
+
+  private var emptyHistoryTitle: String {
+    if !searchText.isEmpty { return "No matching history" }
+    switch filter {
+    case "audits": return "No audits yet"
+    case "replies": return "No replies yet"
+    default: return "Your history is empty"
+    }
+  }
+
+  private var emptyHistoryDetail: String {
+    if !searchText.isEmpty { return "Try another search or clear the filter." }
+    switch filter {
+    case "audits": return "Run a profile audit to save your first edit plan."
+    case "replies": return "Generate replies to save your first conversation choice."
+    default: return "Run an audit or generate replies to save your first result."
+    }
+  }
+
+  private var emptyHistoryImage: String {
+    switch filter {
+    case "audits": return "person.crop.rectangle.stack"
+    case "replies": return "message.badge.waveform"
+    default: return "clock.arrow.circlepath"
     }
   }
 
@@ -125,6 +149,7 @@ struct PremiumHistoryView: View {
           PremiumHistoryItem(
             id: "audit-\($0.stableId)", category: "audit", eyebrow: $0.platform ?? "Profile",
             title: $0.firstTip ?? $0.improvements ?? "Profile audit saved", trailing: $0.overallScore.map(String.init),
+            detail: [$0.improvements, $0.bioSuggestions, $0.photoFeedback].compactMap { $0 }.joined(separator: "\n\n"),
             systemImage: "person.crop.rectangle.stack", dateKey: $0.createdAt ?? "", date: premiumDate($0.createdAt), bucketID: historyBucket($0.createdAt), timestamp: parsedHistoryDate($0.createdAt)
           )
         }
@@ -136,6 +161,7 @@ struct PremiumHistoryView: View {
           PremiumHistoryItem(
             id: "reply-\($0.stableId)", category: "reply", eyebrow: $0.tone?.capitalized ?? "Reply coaching",
             title: $0.conversationContext ?? $0.suggestedReplies?.first ?? "Reply session saved", trailing: nil,
+            detail: $0.suggestedReplies?.joined(separator: "\n\n") ?? "",
             systemImage: "message.badge.waveform", dateKey: $0.createdAt ?? "", date: premiumDate($0.createdAt), bucketID: historyBucket($0.createdAt), timestamp: parsedHistoryDate($0.createdAt)
           )
         }
@@ -223,25 +249,29 @@ struct PremiumHistoryRow: View {
   let title: String
   let trailing: String?
   let systemImage: String
+  let category: String
+
+  private var isReply: Bool { category == "reply" }
+  private var tileTint: Color { isReply ? SBTheme.secondaryInk : SBTheme.accent }
+  private var tileBackground: Color { isReply ? SBTheme.surfaceMuted : SBTheme.accentSoft }
 
   var body: some View {
     HStack(alignment: .top, spacing: 12) {
       Image(systemName: systemImage)
         .font(.system(size: 16, weight: .semibold))
-        .foregroundStyle(SBTheme.accent)
+        .foregroundStyle(tileTint)
         .frame(width: 36, height: 36)
-        .background(SBTheme.accentSoft)
+        .background(tileBackground)
         .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
 
       VStack(alignment: .leading, spacing: 4) {
         Text(eyebrow)
           .font(.caption.weight(.bold))
-          .foregroundStyle(SBTheme.accent)
+          .foregroundStyle(tileTint)
 
         Text(title)
           .font(.subheadline)
           .foregroundStyle(SBTheme.ink)
-          .lineLimit(3)
 
       }
 
@@ -253,6 +283,12 @@ struct PremiumHistoryRow: View {
           .foregroundStyle(SBTheme.teal)
       }
 
+      Image(systemName: "chevron.right")
+        .font(.caption.weight(.bold))
+        .foregroundStyle(SBTheme.secondaryInk)
+        .frame(width: 24, height: 44)
+        .accessibilityHidden(true)
+
     }
     .padding(.vertical, 12)
     .overlay(alignment: .bottom) {
@@ -261,12 +297,13 @@ struct PremiumHistoryRow: View {
   }
 }
 
-private struct PremiumHistoryItem: Identifiable {
+private struct PremiumHistoryItem: Identifiable, Hashable {
   let id: String
   let category: String
   let eyebrow: String
   let title: String
   let trailing: String?
+  let detail: String
   let systemImage: String
   let dateKey: String
   let date: String
@@ -284,6 +321,9 @@ private struct PremiumHistoryGroup: Identifiable {
 struct PremiumAccountView: View {
   @Environment(AppModel.self) private var model
   @State private var showingDeleteConfirmation = false
+  @State private var showingDeleteTypedConfirmation = false
+  @State private var showingLogoutConfirmation = false
+  @State private var deleteEmail = ""
   @State private var setupGuide: SetupGuide?
 
   private enum SetupGuide: String, Identifiable {
@@ -294,34 +334,28 @@ struct PremiumAccountView: View {
   }
 
   var body: some View {
-    ScrollView {
-      LazyVStack(spacing: 24) {
-        SBWorkspaceHeader(
-          eyebrow: "Control room",
-          title: "Account",
-          detail: "Manage access, billing, keyboard tools, and your data.",
-          systemImage: "person.crop.circle",
-          status: accountPlan
-        )
-
-        VStack(spacing: 24) {
-          accountSummary
-          plansSection
-          keyboardSection
-          privacySection
-          helpSection
-          destructiveSection
+    List {
+      accountSummarySection
+      accountPlansSection
+      accountKeyboardSection
+      accountPrivacySection
+      accountSupportSection
+      accountActionsSection
+      if let error = model.lastError {
+        Section {
+          PremiumInlineError(message: error)
         }
-        .padding(.horizontal, 16)
       }
-      .padding(.bottom, 112)
     }
     .refreshable {
       await model.refreshAccount()
       await model.purchases.loadProducts()
     }
     .sbPageBackground()
-    .navigationBarHidden(true)
+    .scrollContentBackground(.hidden)
+    .listStyle(.insetGrouped)
+    .navigationTitle("Account")
+    .navigationBarTitleDisplayMode(.large)
     .sheet(item: $setupGuide) { guide in
       Group {
         switch guide {
@@ -340,16 +374,43 @@ struct PremiumAccountView: View {
       titleVisibility: .visible
     ) {
       Button("Delete Account", role: .destructive) {
-        Task { await model.deleteAccount() }
+        deleteEmail = ""
+        showingDeleteTypedConfirmation = true
       }
       Button("Cancel", role: .cancel) {}
     } message: {
-      Text("This immediately removes saved audits, reply history, credits, and profile data. This cannot be undone. Apple subscriptions must be managed through Apple billing.")
+      Text("This permanently removes your saved audits, reply history, credits, and profile data. The next step requires typing your account email.")
+    }
+    .alert("Type your email to confirm", isPresented: $showingDeleteTypedConfirmation) {
+      TextField("Account email", text: $deleteEmail)
+        .textInputAutocapitalization(.never)
+        .autocorrectionDisabled()
+      Button("Delete Account", role: .destructive) {
+        let expected = model.user?.email?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? ""
+        guard !expected.isEmpty, deleteEmail.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == expected else {
+          model.lastError = "Enter your account email exactly to delete your account."
+          return
+        }
+        Task { await model.deleteAccount() }
+      }
+      .disabled(deleteEmail.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() != (model.user?.email?.lowercased() ?? ""))
+      Button("Cancel", role: .cancel) {}
+    } message: {
+      Text("This safeguard protects your account. Apple subscriptions must still be managed through Apple billing.")
+    }
+    .confirmationDialog("Sign out of SwipeBetter?", isPresented: $showingLogoutConfirmation) {
+      Button("Sign Out", role: .destructive) {
+        Task { await model.logout() }
+      }
+      Button("Cancel", role: .cancel) {}
     }
   }
 
   private var accountPlan: String {
-    model.credits?.planTier?.capitalized
+    if model.credits?.isUnlimited == true || model.me?.proActive == true {
+      return "Unlimited"
+    }
+    return model.credits?.planTier?.capitalized
       ?? model.me?.planType?.capitalized
       ?? "Free"
   }
@@ -361,204 +422,178 @@ struct PremiumAccountView: View {
     return "Free"
   }
 
-  private var accountSummary: some View {
-    SBSurface {
-      VStack(spacing: 14) {
-        HStack(alignment: .center, spacing: 12) {
-          SBLogoMark(size: 46)
+  private var accountCreditsLabel: String {
+    if model.credits?.isUnlimited == true || model.me?.proActive == true {
+      return "Unlimited"
+    }
+    let credits = model.credits?.credits ?? model.me?.oneTimeCredits ?? 0
+    return "\(credits)"
+  }
 
+  private var accountSummarySection: some View {
+    Section {
+        HStack(spacing: 12) {
+          SBLogoMark(size: 44)
           VStack(alignment: .leading, spacing: 3) {
             Text(model.user?.email ?? model.user?.displayName ?? "SwipeBetter member")
               .font(.subheadline.weight(.semibold))
-              .foregroundStyle(SBTheme.ink)
-              .lineLimit(1)
-
-            Text("Signed in securely")
-              .font(.caption)
-              .foregroundStyle(SBTheme.secondaryInk)
-          }
-
-          Spacer()
+              .fixedSize(horizontal: false, vertical: true)
+          Text("Signed in securely")
+            .font(.caption)
+            .foregroundStyle(SBTheme.secondaryInk)
         }
-
-        SBDivider()
-
-        HStack(spacing: 0) {
-          accountStat(label: "Plan", value: accountPlan, tint: SBTheme.teal)
-
-          SBTheme.divider
-            .frame(width: 1, height: 34)
-            .accessibilityHidden(true)
-
-          accountStat(
-            label: "Credits",
-            value: "\(model.credits?.credits ?? model.me?.oneTimeCredits ?? 0)",
-            tint: SBTheme.accent
-          )
-
-          SBTheme.divider
-            .frame(width: 1, height: 34)
-            .accessibilityHidden(true)
-
-          accountStat(
-            label: "Status",
-            value: accountStatus,
-            tint: SBTheme.teal
-          )
-        }
+        Spacer()
       }
+      .frame(minHeight: 52)
+
+      PremiumAccountValueRow(title: "Plan", value: accountPlan, tint: SBTheme.teal)
+      PremiumAccountValueRow(title: "Status", value: accountStatus, tint: SBTheme.teal)
+      PremiumAccountValueRow(title: "Credits", value: accountCreditsLabel, tint: SBTheme.teal)
+    } header: {
+      Text("ACCOUNT")
     }
   }
 
-  private func accountStat(label: String, value: String, tint: Color) -> some View {
-    VStack(alignment: .leading, spacing: 3) {
-      Text(label.uppercased())
-        .font(.caption2.weight(.bold))
-        .foregroundStyle(SBTheme.secondaryInk)
-      Text(value)
-        .font(.subheadline.weight(.bold).monospacedDigit())
-        .foregroundStyle(tint)
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .padding(.horizontal, 4)
-  }
-
-  private var plansSection: some View {
-    VStack(spacing: 10) {
-      SBSectionHeader(
-        title: "Subscription",
-        detail: "App Store pricing and renewal are managed by Apple."
-      )
-
-      SBSurface {
-        VStack(spacing: 0) {
-          if model.purchases.products.isEmpty {
-            if model.purchases.isLoadingProducts {
-              PremiumLoadingRows()
-            } else {
-              PremiumActionRow(title: "Plans unavailable", detail: "Reload App Store products", systemImage: "wifi.exclamationmark") {
-                Task { await model.purchases.loadProducts() }
-              }
-            }
-          } else {
-            ForEach(model.purchases.products, id: \.id) { product in
-              PremiumProductRow(
-                product: product,
-                isPurchasing: model.purchases.purchasingProductId == product.id,
-                isRecommended: product.id == SwipeBetterConfig.monthlyProductId
-              ) {
-                Task { await model.purchase(product) }
-              }
-              .disabled(model.isBusy || model.purchases.purchasingProductId != nil)
-              .accessibilityIdentifier("account.purchaseButton.\(product.id)")
-              if product.id != model.purchases.products.last?.id { SBDivider() }
-            }
+  private var accountPlansSection: some View {
+    Section {
+      if model.purchases.products.isEmpty {
+        if model.purchases.isLoadingProducts {
+          PremiumLoadingRows()
+        } else {
+          PremiumActionRow(title: "Plans unavailable", detail: "Reload App Store products", systemImage: "wifi.exclamationmark") {
+            Task { await model.purchases.loadProducts() }
           }
-
-          SBDivider()
-          PremiumActionRow(title: "Manage subscription", detail: "Open Apple subscription settings", systemImage: "creditcard") {
-            Task { await model.manageSubscriptions() }
+        }
+      } else {
+        ForEach(model.purchases.products, id: \.id) { product in
+          PremiumProductRow(
+            product: product,
+            isPurchasing: model.purchases.purchasingProductId == product.id,
+            isRecommended: product.id == SwipeBetterConfig.monthlyProductId
+          ) {
+            Task { await model.purchase(product) }
           }
-          .accessibilityIdentifier("account.manageSubscriptionButton")
-          SBDivider()
-          PremiumActionRow(title: "Restore purchases", detail: "Sync active App Store access", systemImage: "arrow.clockwise.circle", isLoading: model.purchases.isRestoringPurchases) {
-            Task { await model.restorePurchases() }
-          }
-          .disabled(model.isBusy || model.purchases.isRestoringPurchases)
-          .accessibilityIdentifier("account.restorePurchasesButton")
+          .disabled(model.isBusy || model.purchases.purchasingProductId != nil)
+          .accessibilityIdentifier("account.purchaseButton.\(product.id)")
         }
       }
+
+      PremiumActionRow(title: "Manage subscription", detail: "Open Apple subscription settings", systemImage: "creditcard") {
+        Task { await model.manageSubscriptions() }
+      }
+      .disabled(model.isBusy)
+      .accessibilityIdentifier("account.manageSubscriptionButton")
+
+      PremiumActionRow(title: "Restore purchases", detail: "Sync active App Store access", systemImage: "arrow.clockwise.circle", isLoading: model.purchases.isRestoringPurchases) {
+        Task { await model.restorePurchases() }
+      }
+      .disabled(model.isBusy || model.purchases.isRestoringPurchases)
+      .accessibilityIdentifier("account.restorePurchasesButton")
+
+      PremiumActionRow(title: "Sync App Store access", detail: "Refresh entitlements on this account", systemImage: "arrow.triangle.2.circlepath") {
+        Task {
+          do {
+            _ = try await model.purchases.syncCurrentEntitlements(api: model.api, reportingFailures: true)
+            await model.refreshAccount()
+          } catch {
+            model.lastError = error.localizedDescription
+          }
+        }
+      }
+      .disabled(model.isBusy || model.purchases.isRestoringPurchases)
+      .accessibilityIdentifier("account.syncPurchasesButton")
 
       if let message = model.purchases.lastPurchaseMessage {
         Label(message, systemImage: "checkmark.circle.fill")
           .font(.caption.weight(.medium))
           .foregroundStyle(SBTheme.teal)
-          .frame(maxWidth: .infinity, alignment: .leading)
       }
 
-      Text("Subscriptions renew automatically unless canceled at least 24 hours before the current period ends. Apple charges your account and manages renewal.")
+      Text("Prices and purchase status come from the current App Store products. Subscriptions renew automatically unless canceled in Apple settings.")
         .font(.caption)
         .foregroundStyle(SBTheme.secondaryInk)
-        .frame(maxWidth: .infinity, alignment: .leading)
-
-      HStack(spacing: 16) {
-        Link("Terms", destination: accountURL("/terms"))
-        Link("Privacy", destination: accountURL("/privacy"))
-      }
-      .font(.caption.weight(.semibold))
-      .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
+    } header: {
+      Text("PLANS")
     }
   }
 
-  private var keyboardSection: some View {
-    VStack(spacing: 10) {
-      SBSectionHeader(
-        title: "Extensions",
-        detail: nil
+  private var accountKeyboardSection: some View {
+    Section {
+      PremiumActionRow(title: "SwipeBetter Keyboard", detail: "Context-aware quick replies", systemImage: "keyboard") {
+        setupGuide = .keyboard
+      }
+      .accessibilityIdentifier("account.keyboardSetupButton")
+
+      PremiumActionRow(title: "Snap Back", detail: "Siri or the keyboard", systemImage: "camera.viewfinder") {
+        setupGuide = .snap
+      }
+      .accessibilityIdentifier("account.setupSnapButton")
+    } header: {
+      Text("EXTENSIONS")
+    }
+  }
+
+  private var accountPrivacySection: some View {
+    Section {
+      privacyRow(
+        title: "Screenshots",
+        detail: "Sent for the analysis you request, then excluded from saved history.",
+        systemImage: "photo.badge.checkmark"
       )
-
-      SBSurface {
-        VStack(spacing: 0) {
-          PremiumActionRow(title: "SwipeBetter Keyboard", detail: "Context-aware quick replies", systemImage: "keyboard") {
-            setupGuide = .keyboard
-          }
-          .accessibilityIdentifier("account.keyboardSetupButton")
-          SBDivider()
-          PremiumActionRow(title: "Snap Back", detail: "Siri or the keyboard", systemImage: "camera.viewfinder") {
-            setupGuide = .snap
-          }
-          .accessibilityIdentifier("account.setupSnapButton")
-        }
-      }
-    }
-  }
-
-  private var helpSection: some View {
-    VStack(spacing: 10) {
-      SBSectionHeader(title: "Support")
-
-      SBSurface {
-        VStack(spacing: 0) {
-          PremiumLinkRow(title: "Contact support", systemImage: "questionmark.circle", url: accountURL("/contact"))
-          SBDivider()
-          PremiumLinkRow(title: "Terms of service", systemImage: "doc.text", url: accountURL("/terms"))
-          SBDivider()
-          PremiumLinkRow(title: "Privacy policy", systemImage: "hand.raised", url: accountURL("/privacy"))
-          SBDivider()
-          PremiumLinkRow(title: "Refund policy", systemImage: "arrow.uturn.backward.circle", url: accountURL("/refund-policy"))
-        }
-      }
-    }
-  }
-
-  private var privacySection: some View {
-    VStack(spacing: 10) {
-      SBSectionHeader(
-        title: "Privacy",
-        detail: "What SwipeBetter processes and what remains in your account."
+      privacyRow(
+        title: "Saved history",
+        detail: "Generated advice, scores, suggested replies, and a short conversation summary.",
+        systemImage: "clock.arrow.circlepath"
       )
+      privacyRow(
+        title: "Keyboard",
+        detail: "Reads only text available near the cursor. It cannot inspect the full screen or secure fields.",
+        systemImage: "keyboard"
+      )
+    } header: {
+      Text("PRIVACY")
+    }
+  }
 
-      SBSurface {
-        VStack(spacing: 0) {
-          privacyRow(
-            title: "Screenshots",
-            detail: "Sent for the analysis you request, then excluded from your saved history.",
-            systemImage: "photo.badge.checkmark"
-          )
-          SBDivider()
-          privacyRow(
-            title: "Saved history",
-            detail: "Generated advice, scores, suggested replies, and a short conversation summary.",
-            systemImage: "clock.arrow.circlepath"
-          )
-          SBDivider()
-          privacyRow(
-            title: "Keyboard",
-            detail: "Reads only text available near the cursor. It cannot inspect the full screen or secure fields.",
-            systemImage: "keyboard"
-          )
-        }
+  private var accountSupportSection: some View {
+    Section {
+      PremiumLinkRow(title: "Contact support", systemImage: "questionmark.circle", url: accountURL("/contact"))
+      PremiumLinkRow(title: "Terms of service", systemImage: "doc.text", url: accountURL("/terms"))
+      PremiumLinkRow(title: "Privacy policy", systemImage: "hand.raised", url: accountURL("/privacy"))
+      PremiumLinkRow(title: "Refund policy", systemImage: "arrow.uturn.backward.circle", url: accountURL("/refund-policy"))
+    } header: {
+      Text("SUPPORT")
+    }
+  }
+
+  private var accountActionsSection: some View {
+    Section {
+      Button {
+        showingLogoutConfirmation = true
+      } label: {
+        Label("Log out", systemImage: "rectangle.portrait.and.arrow.right")
       }
+      .frame(minHeight: 44, alignment: .leading)
+      .disabled(model.isBusy)
+      .accessibilityIdentifier("account.logoutButton")
+
+      Button(role: .destructive) {
+        deleteEmail = ""
+        showingDeleteConfirmation = true
+      } label: {
+        Label("Delete account", systemImage: "trash")
+      }
+      .frame(minHeight: 44, alignment: .leading)
+      .disabled(model.isBusy)
+      .accessibilityIdentifier("account.deleteAccountButton")
+
+      Text("SwipeBetter \(appVersion)")
+        .font(.caption2)
+        .foregroundStyle(SBTheme.secondaryInk)
+        .frame(maxWidth: .infinity, alignment: .center)
+    } header: {
+      Text("ACCOUNT ACTIONS")
     }
   }
 
@@ -584,46 +619,32 @@ struct PremiumAccountView: View {
     .padding(.vertical, 11)
   }
 
-  private var destructiveSection: some View {
-    VStack(spacing: 10) {
-      Button {
-        Task { await model.logout() }
-      } label: {
-        Label("Log out", systemImage: "rectangle.portrait.and.arrow.right")
-      }
-      .buttonStyle(SBSecondaryButtonStyle())
-      .accessibilityIdentifier("account.logoutButton")
-
-      Button(role: .destructive) {
-        showingDeleteConfirmation = true
-      } label: {
-        Label("Delete account", systemImage: "trash")
-          .font(.subheadline.weight(.semibold))
-          .foregroundStyle(SBTheme.accentPressed)
-          .frame(maxWidth: .infinity, minHeight: 44)
-      }
-      .accessibilityIdentifier("account.deleteAccountButton")
-
-      Text("SwipeBetter \(appVersion)")
-        .font(.caption2)
-        .foregroundStyle(SBTheme.secondaryInk)
-        .frame(maxWidth: .infinity)
-        .padding(.top, 8)
-    }
-  }
-
-  private var initials: String {
-    let first = model.user?.firstName?.first.map(String.init) ?? "S"
-    let last = model.user?.lastName?.first.map(String.init) ?? "B"
-    return first + last
-  }
-
   private var appVersion: String {
-    Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+    let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
+    return "\(version) (build \(build))"
   }
 
   private func accountURL(_ path: String) -> URL {
     URL(string: "https://swipebetter.ai\(path)")!
+  }
+}
+
+private struct PremiumAccountValueRow: View {
+  let title: String
+  let value: String
+  let tint: Color
+
+  var body: some View {
+    HStack {
+      Text(title)
+        .font(.subheadline.weight(.medium))
+      Spacer()
+      Text(value)
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(tint)
+    }
+    .frame(minHeight: 44)
   }
 }
 
@@ -736,27 +757,29 @@ struct PremiumActionRow: View {
 
 private struct PremiumHistoryDetail: View {
   let item: PremiumHistoryItem
-  @Environment(\.dismiss) private var dismiss
 
   var body: some View {
-    NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 16) {
-          SBSectionHeader(title: item.eyebrow, detail: item.date)
-          SBSurface {
-            Text(item.title)
-              .font(.body)
-              .foregroundStyle(SBTheme.ink)
-              .textSelection(.enabled)
-          }
-        }
-        .padding(16)
+    List {
+      Section(item.eyebrow) {
+        Text(item.title)
+          .font(.body)
+          .foregroundStyle(SBTheme.ink)
+          .textSelection(.enabled)
       }
-      .sbPageBackground()
-      .toolbar {
-        ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+      if !item.detail.isEmpty {
+        Section("Details") {
+          Text(item.detail)
+            .font(.body)
+            .foregroundStyle(SBTheme.ink)
+            .textSelection(.enabled)
+        }
       }
     }
+    .scrollContentBackground(.hidden)
+    .listStyle(.insetGrouped)
+    .sbPageBackground()
+    .navigationTitle(item.date)
+    .navigationBarTitleDisplayMode(.inline)
   }
 }
 

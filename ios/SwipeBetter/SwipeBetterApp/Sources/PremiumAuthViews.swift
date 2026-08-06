@@ -29,6 +29,7 @@ struct PremiumAuthView: View {
                 authForm
                 appleSignIn
                 pricingNote
+                authTrustCopy
                 legalLinks
               }
               .padding(.horizontal, 20)
@@ -43,6 +44,7 @@ struct PremiumAuthView: View {
         }
       }
     }
+    .disabled(model.isBusy)
     .sheet(isPresented: $showingPasswordReset) {
       PremiumPasswordResetSheet(initialEmail: email)
         .environment(model)
@@ -52,6 +54,23 @@ struct PremiumAuthView: View {
   }
 
   private var choiceScreen: some View {
+    GeometryReader { proxy in
+      ScrollView(.vertical, showsIndicators: false) {
+        choiceContent
+          .padding(.horizontal, 24)
+          .padding(.top, 120)
+          .frame(maxWidth: 300, minHeight: proxy.size.height, alignment: .leading)
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.bottom, 24)
+      }
+      .scrollBounceBehavior(.basedOnSize)
+      .background(Color.black.ignoresSafeArea())
+    }
+    .background(Color.black.ignoresSafeArea())
+    .preferredColorScheme(.dark)
+  }
+
+  private var choiceContent: some View {
     VStack(alignment: .leading, spacing: 0) {
       SBLogoMark(size: 62)
 
@@ -68,7 +87,7 @@ struct PremiumAuthView: View {
 
       Spacer(minLength: 30)
 
-      SignInWithAppleButton(.continue) { request in
+      SignInWithAppleButton(.signIn) { request in
         request.requestedScopes = [.fullName, .email]
       } onCompletion: { result in
         if case .success(let authorization) = result,
@@ -81,6 +100,7 @@ struct PremiumAuthView: View {
       .signInWithAppleButtonStyle(.white)
       .frame(height: 52)
       .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .disabled(model.isBusy)
       .accessibilityIdentifier("auth.appleSignInButton")
 
       Button("Continue with email") {
@@ -92,6 +112,7 @@ struct PremiumAuthView: View {
       .frame(maxWidth: .infinity, minHeight: 52)
       .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
       .padding(.top, 12)
+      .disabled(model.isBusy)
       .accessibilityIdentifier("auth.continueWithEmailButton")
 
       Button("Create account") {
@@ -102,6 +123,7 @@ struct PremiumAuthView: View {
       .foregroundStyle(SBTheme.accent)
       .frame(maxWidth: .infinity, minHeight: 44)
       .padding(.top, 4)
+      .disabled(model.isBusy)
       .accessibilityIdentifier("auth.createAccountChoiceButton")
 
       Text("Screenshots are sent only for requested analysis and are excluded from your saved history.")
@@ -112,13 +134,16 @@ struct PremiumAuthView: View {
         .fixedSize(horizontal: false, vertical: true)
         .padding(.top, 6)
 
+      Text("Your signed-in history syncs across devices.")
+        .font(.caption)
+        .foregroundStyle(.white.opacity(0.58))
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+
+      authLegalFooter
+
       Spacer(minLength: 54)
     }
-    .padding(.horizontal, 24)
-    .padding(.top, 120)
-    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-    .background(Color.black.ignoresSafeArea())
-    .preferredColorScheme(.dark)
   }
 
   private var brandHeader: some View {
@@ -212,7 +237,7 @@ struct PremiumAuthView: View {
           Label(isSignup ? "Create account" : "Log in", systemImage: "arrow.right")
         }
         .buttonStyle(SBPrimaryButtonStyle())
-        .disabled(!canSubmit)
+        .disabled(model.isBusy || !canSubmit)
         .opacity(canSubmit ? 1 : 0.48)
         .accessibilityIdentifier(isSignup ? "auth.createAccountButton" : "auth.loginButton")
 
@@ -245,7 +270,7 @@ struct PremiumAuthView: View {
         SBDivider()
       }
 
-      SignInWithAppleButton(.continue) { request in
+      SignInWithAppleButton(.signIn) { request in
         request.requestedScopes = [.fullName, .email]
       } onCompletion: { result in
         if case .success(let authorization) = result,
@@ -258,6 +283,7 @@ struct PremiumAuthView: View {
       .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
       .frame(height: 52)
       .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .disabled(model.isBusy)
       .accessibilityIdentifier("auth.appleSignInButton")
     }
   }
@@ -285,6 +311,30 @@ struct PremiumAuthView: View {
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(SBTheme.tealSoft)
     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+  }
+
+  private var authTrustCopy: some View {
+    VStack(alignment: .leading, spacing: 5) {
+      Text("Your signed-in history syncs across devices.")
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(SBTheme.ink)
+      Text("Screenshots are sent only for requested analysis and excluded from saved history.")
+        .font(.caption)
+        .foregroundStyle(SBTheme.secondaryInk)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private var authLegalFooter: some View {
+    HStack(spacing: 18) {
+      Link("Terms", destination: authURL("/terms"))
+      Link("Privacy", destination: authURL("/privacy"))
+      Link("Support", destination: authURL("/contact"))
+    }
+    .font(.caption.weight(.semibold))
+    .foregroundStyle(.white.opacity(0.72))
+    .frame(maxWidth: .infinity)
   }
 
   private var legalLinks: some View {

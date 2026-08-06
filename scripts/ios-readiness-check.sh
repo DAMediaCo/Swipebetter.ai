@@ -46,6 +46,28 @@ function assertIncludes(haystack, needle, label) {
   }
 }
 
+function assertCountAtLeast(haystack, needle, minimum, label) {
+  const count = haystack.split(needle).length - 1;
+  if (count < minimum) {
+    throw new Error(`${label} expected at least ${minimum} occurrences of ${needle}, found ${count}`);
+  }
+}
+
+function swiftDeclaration(source, signature, label) {
+  const start = source.indexOf(signature);
+  if (start === -1) {
+    throw new Error(`${label} missing declaration ${signature}`);
+  }
+  const bodyStart = source.indexOf("{", start);
+  let depth = 0;
+  for (let index = bodyStart; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    if (source[index] === "}") depth -= 1;
+    if (depth === 0) return source.slice(start, index + 1);
+  }
+  throw new Error(`${label} has an unterminated declaration ${signature}`);
+}
+
 function pngInfo(path) {
   const buffer = fs.readFileSync(path);
   const signature = buffer.subarray(0, 8).toString("hex");
@@ -404,6 +426,142 @@ for (const expected of [
   "Text(product.displayPrice)",
 ]) {
   assertIncludes(premiumAccountPricing, expected, "dynamic App Store pricing UI contract");
+}
+
+const premiumCoachingViews = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/PremiumCoachingViews.swift", "utf8");
+const premiumReplyAssistant = swiftDeclaration(
+  premiumCoachingViews,
+  "struct PremiumReplyAssistantView: View",
+  "active reply coaching UI contract"
+);
+for (const expected of [
+  '@State private var inputMode = "text"',
+  'Picker("Input", selection: $inputMode)',
+  'inputMode == "text" ? conversation : ""',
+  'inputMode == "screenshots" ? images : []',
+  "conversationText: activeConversationText",
+  "images: activeImages",
+  ".disabled(model.isBusy || !canGenerate)",
+]) {
+  assertIncludes(premiumReplyAssistant, expected, "active reply coaching UI contract");
+}
+assertCountAtLeast(
+  premiumReplyAssistant,
+  "conversationText: activeConversationText",
+  2,
+  "active input-mode request contract"
+);
+assertCountAtLeast(
+  premiumReplyAssistant,
+  "images: activeImages",
+  2,
+  "active input-mode request contract"
+);
+const redoReplies = swiftDeclaration(premiumReplyAssistant, "private func redoReplies()", "redo result contract");
+for (const expected of [
+  "guard !model.isBusy, canGenerate else { return }",
+  "let next = await model.generateReplies(",
+  "guard let next,",
+  "setReplyResult(next)",
+]) {
+  assertIncludes(redoReplies, expected, "redo result contract");
+}
+for (const staleRedoBehavior of ["replyDestination = nil", "setReplyResult(nil)"]) {
+  if (redoReplies.includes(staleRedoBehavior)) {
+    throw new Error(`Redo must retain the existing result until a replacement succeeds: ${staleRedoBehavior}`);
+  }
+}
+
+const premiumReplyResultDestination = swiftDeclaration(
+  premiumCoachingViews,
+  "private struct PremiumReplyResultDestination: View",
+  "redo credit disclosure contract"
+);
+for (const expected of [
+  '@State private var showingRedoConfirmation = false',
+  'Button("Redo") { showingRedoConfirmation = true }',
+  'Button(redoActionTitle) { onRedo() }',
+  "Reply coaching uses 1 credit.",
+]) {
+  assertIncludes(premiumReplyResultDestination, expected, "redo credit disclosure contract");
+}
+
+const premiumReplyResults = swiftDeclaration(
+  premiumCoachingViews,
+  "struct PremiumReplyResults: View",
+  "edited reply truthfulness contract"
+);
+for (const expected of [
+  "@State private var hasLocalEdits = false",
+  'Text(hasLocalEdits ? "Edits are local and not saved to History" : "Saved to History")',
+  "hasLocalEdits = true",
+]) {
+  assertIncludes(premiumReplyResults, expected, "edited reply truthfulness contract");
+}
+
+const premiumAuth = swiftDeclaration(
+  premiumAuthViews,
+  "struct PremiumAuthView: View",
+  "active auth UI contract"
+);
+for (const expected of [
+  '"auth.emailField"',
+  '"auth.passwordField"',
+  '"auth.appleSignInButton"',
+  ".disabled(model.isBusy || !canSubmit)",
+]) {
+  assertIncludes(premiumAuth, expected, "active auth UI contract");
+}
+
+const premiumAccount = swiftDeclaration(
+  premiumAccountPricing,
+  "struct PremiumAccountView: View",
+  "active account UI contract"
+);
+for (const expected of [
+  '"account.restorePurchasesButton"',
+  '"account.manageSubscriptionButton"',
+  '"account.syncPurchasesButton"',
+  ".disabled(model.isBusy || model.purchases.purchasingProductId != nil)",
+  ".disabled(model.isBusy || model.purchases.isRestoringPurchases)",
+]) {
+  assertIncludes(premiumAccount, expected, "active account UI contract");
+}
+
+if (!/TabView\(selection: \$selectedTab\)[\s\S]{0,2400}\.disabled\(model\.isBusy\)/.test(rootView)) {
+  throw new Error("Active tab UI must be disabled while an account operation is in progress");
+}
+
+const premiumHistoryDetail = swiftDeclaration(
+  premiumAccountPricing,
+  "private struct PremiumHistoryDetail: View",
+  "history detail navigation contract"
+);
+assertIncludes(premiumHistoryDetail, ".navigationTitle(item.date)", "history detail navigation contract");
+if (premiumHistoryDetail.includes("NavigationStack")) {
+  throw new Error("History detail must use the parent tab navigation stack rather than nesting NavigationStack");
+}
+
+const keyboardController = fs.readFileSync(
+  "ios/SwipeBetter/KeyboardExtension/Sources/KeyboardViewController.swift",
+  "utf8"
+);
+assertIncludes(
+  keyboardController,
+  'button.accessibilityHint = "Double tap to insert"',
+  "keyboard reply accessibility contract"
+);
+for (const disallowedNetworkSymbol of [
+  "URLSession",
+  "URLRequest",
+  "dataTask",
+  "uploadTask",
+  "WebSocket",
+  "NWConnection",
+]) {
+  if (keyboardController.includes(disallowedNetworkSymbol)) {
+    throw new Error(`Keyboard extension must not make network requests: ${disallowedNetworkSymbol}`);
+  }
 }
 
 const appEntry = fs.readFileSync("ios/SwipeBetter/SwipeBetterApp/Sources/SwipeBetterApp.swift", "utf8");

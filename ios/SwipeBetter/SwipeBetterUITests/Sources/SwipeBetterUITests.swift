@@ -12,9 +12,14 @@ final class SwipeBetterUITests: XCTestCase {
 
     XCTAssertTrue(app.staticTexts["SwipeBetter"].waitForExistence(timeout: 8))
     XCTAssertTrue(app.buttons["auth.appleSignInButton"].exists)
+    XCTAssertTrue(app.buttons["auth.appleSignInButton"].label.contains("Sign in with Apple"))
     XCTAssertTrue(app.buttons["auth.continueWithEmailButton"].exists)
     XCTAssertTrue(app.buttons["auth.createAccountChoiceButton"].exists)
     XCTAssertTrue(app.staticTexts["Screenshots are sent only for requested analysis and are excluded from your saved history."].exists)
+    XCTAssertTrue(app.staticTexts["Your signed-in history syncs across devices."].exists)
+    XCTAssertTrue(app.links["Terms"].exists)
+    XCTAssertTrue(app.links["Privacy"].exists)
+    XCTAssertTrue(app.links["Support"].exists)
 
     app.buttons["auth.continueWithEmailButton"].tap()
 
@@ -43,6 +48,8 @@ final class SwipeBetterUITests: XCTestCase {
 
     XCTAssertTrue(app.buttons["account.restorePurchasesButton"].waitForExistence(timeout: 8))
     XCTAssertTrue(app.buttons["account.manageSubscriptionButton"].waitForExistence(timeout: 2))
+    XCTAssertTrue(app.staticTexts["Unlimited"].exists)
+    XCTAssertTrue(app.staticTexts["Active"].exists)
   }
 
   func testRedesignedWorkspacesHaveDistinctHierarchy() throws {
@@ -53,7 +60,7 @@ final class SwipeBetterUITests: XCTestCase {
     audit.launch()
 
     XCTAssertTrue(appText("Profile Audit", in: audit).waitForExistence(timeout: 8))
-    XCTAssertTrue(appText("Dating App", in: audit).exists)
+    XCTAssertTrue(appText("DATING APP", in: audit).exists)
     XCTAssertTrue(audit.buttons["audit.runButton"].isHittable)
 
     let replies = XCUIApplication()
@@ -63,7 +70,7 @@ final class SwipeBetterUITests: XCTestCase {
     replies.launch()
 
     XCTAssertTrue(appText("Replies", in: replies).waitForExistence(timeout: 8))
-    XCTAssertTrue(appText("Conversation", in: replies).exists)
+    XCTAssertTrue(appText("CONVERSATION", in: replies).exists)
     XCTAssertTrue(replies.buttons["replies.generateButton"].isHittable)
   }
 
@@ -91,11 +98,14 @@ final class SwipeBetterUITests: XCTestCase {
     app.launch()
 
     let setupButton = app.buttons["account.setupSnapButton"]
+    for _ in 0..<5 where !setupButton.exists {
+      app.swipeUp()
+    }
     XCTAssertTrue(setupButton.waitForExistence(timeout: 8))
     XCTAssertTrue(setupButton.isHittable)
     app.staticTexts["Snap Back"].tap()
 
-    XCTAssertTrue(app.staticTexts["SwipeBetter Snap"].waitForExistence(timeout: 3))
+    XCTAssertTrue(app.staticTexts["SwipeBetter Snap"].waitForExistence(timeout: 8))
     XCTAssertTrue(app.staticTexts["Step 1 of 3"].exists)
     XCTAssertTrue(app.staticTexts["Allow screenshot access"].exists)
     XCTAssertTrue(app.buttons["snap.photoAccessButton"].exists)
@@ -150,6 +160,7 @@ final class SwipeBetterUITests: XCTestCase {
     mode.buttons["Screenshots"].tap()
     XCTAssertFalse(app.textViews["replies.conversationEditor"].exists)
     XCTAssertTrue(app.buttons["replies.addScreenshotsButton"].exists)
+    XCTAssertTrue(app.buttons["replies.generateButton"].isHittable)
     mode.buttons["Paste text"].tap()
     XCTAssertTrue(app.textViews["replies.conversationEditor"].waitForExistence(timeout: 2))
   }
@@ -161,19 +172,23 @@ final class SwipeBetterUITests: XCTestCase {
     app.launchArguments.append("auditResult")
     app.launch()
 
-    let copyButton = app.buttons["audit.copyButton.2.0"]
-    for _ in 0..<5 where !copyButton.isHittable { app.swipeUp() }
     let firstFixCopy = app.buttons["audit.copyButton.1.0"]
     XCTAssertTrue(firstFixCopy.waitForExistence(timeout: 3))
+    XCTAssertTrue(firstFixCopy.isHittable)
     firstFixCopy.tap()
     XCTAssertEqual(firstFixCopy.label, "First fix copied")
 
     let improvementCopy = app.buttons["audit.copyButton.fixes.0"]
     XCTAssertTrue(improvementCopy.waitForExistence(timeout: 3))
+    for _ in 0..<5 where !improvementCopy.isHittable { app.swipeUp() }
+    XCTAssertTrue(improvementCopy.isHittable)
     improvementCopy.tap()
     XCTAssertEqual(improvementCopy.label, "Copied")
 
+    let copyButton = app.buttons["audit.copyButton.2.0"]
+    for _ in 0..<5 where !copyButton.isHittable { app.swipeUp() }
     XCTAssertTrue(copyButton.waitForExistence(timeout: 3))
+    XCTAssertTrue(copyButton.isHittable)
     copyButton.tap()
     XCTAssertEqual(copyButton.label, "New bio copied")
     XCTAssertTrue(app.buttons["audit.copyButton.fixes.0"].exists)
@@ -205,7 +220,10 @@ final class SwipeBetterUITests: XCTestCase {
     let row = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'history.row.'")).firstMatch
     XCTAssertTrue(row.waitForExistence(timeout: 8))
     row.tap()
-    XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 3))
+    let backButton = app.navigationBars.buttons["History"]
+    XCTAssertTrue(backButton.waitForExistence(timeout: 3))
+    backButton.tap()
+    XCTAssertTrue(app.staticTexts["History"].waitForExistence(timeout: 3))
   }
 
   func testHistoryEmptyStateIsActionable() throws {
@@ -215,7 +233,7 @@ final class SwipeBetterUITests: XCTestCase {
     app.launchArguments.append("historyEmpty")
     app.launch()
 
-    XCTAssertTrue(app.staticTexts["Your playbook is empty"].waitForExistence(timeout: 8))
+    XCTAssertTrue(app.staticTexts["Your history is empty"].waitForExistence(timeout: 8))
     XCTAssertTrue(app.buttons["history.runFirstAuditButton"].isHittable)
   }
 
@@ -248,6 +266,9 @@ final class SwipeBetterUITests: XCTestCase {
     }
 
     XCTAssertTrue(swipeBetterButton.waitForExistence(timeout: 5))
+    XCTAssertTrue(app.buttons["keyboard.confidentReplyButton"].exists)
+    XCTAssertTrue(app.buttons["keyboard.askOutReplyButton"].exists)
+    XCTAssertTrue(app.buttons["keyboard.nextKeyboardButton"].exists)
     XCTAssertTrue(app.buttons["keyboard.deleteBackwardButton"].exists)
     let attachment = XCTAttachment(screenshot: app.screenshot())
     attachment.name = "SwipeBetter Keyboard"

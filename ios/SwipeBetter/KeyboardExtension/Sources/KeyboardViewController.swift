@@ -18,10 +18,12 @@ final class KeyboardViewController: UIInputViewController {
   private var utilityControls: [UIView] = []
   private var accessibilityUtilityWidthConstraints: [NSLayoutConstraint] = []
   private var usesAccessibilityControlLayout = false
+  private var reduceTransparencyObserver: NSObjectProtocol?
 
   private let coral = UIColor { traits in
-    _ = traits
-    return UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1)
+    traits.userInterfaceStyle == .dark
+      ? UIColor(red: 1.0, green: 0.36, blue: 0.40, alpha: 1)
+      : UIColor(red: 0.82, green: 0.16, blue: 0.212, alpha: 1)
   }
   private let stageFill = UIColor { traits in
     traits.userInterfaceStyle == .dark
@@ -33,10 +35,26 @@ final class KeyboardViewController: UIInputViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     buildKeyboard()
+    reduceTransparencyObserver = NotificationCenter.default.addObserver(
+      forName: UIAccessibility.reduceTransparencyStatusDidChangeNotification,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      self?.updateBackgroundAppearance()
+    }
     registerForTraitChanges([UITraitPreferredContentSizeCategory.self]) { (self: Self, _) in
       self.updatePreferredKeyboardHeight()
     }
+    registerForTraitChanges([UITraitUserInterfaceStyle.self]) { (self: Self, _) in
+      self.updateBackgroundAppearance()
+    }
     refreshContext()
+  }
+
+  deinit {
+    if let reduceTransparencyObserver {
+      NotificationCenter.default.removeObserver(reduceTransparencyObserver)
+    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -65,7 +83,12 @@ final class KeyboardViewController: UIInputViewController {
   private func buildKeyboard() {
     view.backgroundColor = .clear
     backgroundEffectView.translatesAutoresizingMaskIntoConstraints = false
+    backgroundEffectView.layer.cornerRadius = 18
+    backgroundEffectView.layer.cornerCurve = .continuous
+    backgroundEffectView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
+    backgroundEffectView.clipsToBounds = true
     view.addSubview(backgroundEffectView)
+    updateBackgroundAppearance()
 
     rootStack.axis = .vertical
     rootStack.spacing = 10
@@ -92,6 +115,20 @@ final class KeyboardViewController: UIInputViewController {
       rootStack.bottomAnchor.constraint(equalTo: view.bottomAnchor),
       preferredHeight,
     ])
+  }
+
+  private func updateBackgroundAppearance() {
+    guard isViewLoaded else { return }
+    let darkMode = traitCollection.userInterfaceStyle == .dark
+    if UIAccessibility.isReduceTransparencyEnabled {
+      backgroundEffectView.effect = nil
+      backgroundEffectView.backgroundColor = darkMode
+        ? UIColor(red: 0.08, green: 0.08, blue: 0.09, alpha: 1)
+        : UIColor.systemBackground
+    } else {
+      backgroundEffectView.effect = UIBlurEffect(style: darkMode ? .systemMaterialDark : .systemUltraThinMaterial)
+      backgroundEffectView.backgroundColor = darkMode ? coral.withAlphaComponent(0.08) : .clear
+    }
   }
 
   private var preferredKeyboardHeight: CGFloat {
@@ -147,6 +184,12 @@ final class KeyboardViewController: UIInputViewController {
     card.backgroundColor = stageFill
     card.layer.cornerCurve = .continuous
     card.layer.cornerRadius = 14
+    card.heightAnchor.constraint(greaterThanOrEqualToConstant: 154).isActive = true
+    let scrollView = UIScrollView()
+    scrollView.alwaysBounceVertical = false
+    scrollView.showsVerticalScrollIndicator = true
+    scrollView.keyboardDismissMode = .interactive
+    scrollView.translatesAutoresizingMaskIntoConstraints = false
     let row = UIStackView()
     replyRowContainer = row
     replyControls = []
@@ -164,12 +207,18 @@ final class KeyboardViewController: UIInputViewController {
     }
     configureControlRows(row, controls: replyControls, forceVertical: true)
     row.translatesAutoresizingMaskIntoConstraints = false
-    card.addSubview(row)
+    scrollView.addSubview(row)
+    card.addSubview(scrollView)
     NSLayoutConstraint.activate([
-      row.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 8),
-      row.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -8),
-      row.topAnchor.constraint(equalTo: card.topAnchor, constant: 4),
-      row.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -4),
+      scrollView.leadingAnchor.constraint(equalTo: card.leadingAnchor, constant: 8),
+      scrollView.trailingAnchor.constraint(equalTo: card.trailingAnchor, constant: -8),
+      scrollView.topAnchor.constraint(equalTo: card.topAnchor, constant: 4),
+      scrollView.bottomAnchor.constraint(equalTo: card.bottomAnchor, constant: -4),
+      row.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+      row.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+      row.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+      row.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+      row.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
     ])
     return card
   }
@@ -240,9 +289,16 @@ final class KeyboardViewController: UIInputViewController {
 
     guard accessibilityLayout else {
       container.axis = .horizontal
-      container.distribution = .fillEqually
+      container.distribution = .fill
       container.spacing = 7
       controls.forEach { container.addArrangedSubview($0) }
+      if controls.count > 3 {
+        let leadingWidth = controls[0].widthAnchor.constraint(equalToConstant: 44)
+        let trailingWidth = controls[3].widthAnchor.constraint(equalToConstant: 44)
+        let middleWidth = controls[1].widthAnchor.constraint(equalTo: controls[2].widthAnchor)
+        NSLayoutConstraint.activate([leadingWidth, trailingWidth, middleWidth])
+        accessibilityUtilityWidthConstraints = [leadingWidth, trailingWidth, middleWidth]
+      }
       return
     }
 
@@ -300,7 +356,7 @@ final class KeyboardViewController: UIInputViewController {
     label.font = scaledFont(size: 16, weight: .regular, textStyle: .body)
     label.adjustsFontForContentSizeCategory = true
     label.textColor = ink
-    label.numberOfLines = 2
+    label.numberOfLines = 0
     label.lineBreakMode = .byWordWrapping
 
     let plus = UIImageView(image: UIImage(systemName: systemImage))
@@ -355,7 +411,7 @@ final class KeyboardViewController: UIInputViewController {
       if let button = replyButtons[style] {
         button.viewWithTag(2001).flatMap { $0 as? UILabel }?.text = reply
         button.accessibilityLabel = reply
-        button.accessibilityValue = "Double tap to insert"
+        button.accessibilityHint = "Double tap to insert"
       }
     }
   }

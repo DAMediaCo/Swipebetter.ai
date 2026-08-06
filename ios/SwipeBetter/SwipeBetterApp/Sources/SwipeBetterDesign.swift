@@ -169,6 +169,7 @@ struct SBSectionHeader: View {
         .foregroundStyle(SBTheme.secondaryInk)
         .textCase(.uppercase)
         .tracking(0.5)
+        .accessibilityAddTraits(.isHeader)
 
       if let detail {
         Text(detail)
