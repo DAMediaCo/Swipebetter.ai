@@ -149,7 +149,9 @@ struct PremiumHistoryView: View {
           PremiumHistoryItem(
             id: "audit-\($0.stableId)", category: "audit", eyebrow: $0.platform ?? "Profile",
             title: $0.firstTip ?? $0.improvements ?? "Profile audit saved", trailing: $0.overallScore.map(String.init),
-            detail: [$0.improvements, $0.bioSuggestions, $0.photoFeedback].compactMap { $0 }.joined(separator: "\n\n"),
+            detail: [$0.improvements, $0.bioSuggestions, $0.photoFeedback]
+              .flatMap { PremiumResultText.items(from: $0) }
+              .joined(separator: "\n\n"),
             systemImage: "person.crop.rectangle.stack", dateKey: $0.createdAt ?? "", date: premiumDate($0.createdAt), bucketID: historyBucket($0.createdAt), timestamp: parsedHistoryDate($0.createdAt)
           )
         }
@@ -775,6 +777,7 @@ private struct PremiumHistoryDetail: View {
         }
       }
     }
+    .safeAreaPadding(.bottom, 72)
     .scrollContentBackground(.hidden)
     .listStyle(.insetGrouped)
     .sbPageBackground()

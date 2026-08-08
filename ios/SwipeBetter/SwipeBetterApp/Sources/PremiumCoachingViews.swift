@@ -359,6 +359,7 @@ private struct PremiumAuditResultDestination: View {
     ScrollView {
       PremiumProfileResult(analysis: analysis, images: images)
         .padding(16)
+        .padding(.bottom, 96)
     }
     .scrollDismissesKeyboard(.interactively)
     .sbPageBackground()
@@ -418,6 +419,7 @@ private struct PremiumReplyResultDestination: View {
     ScrollView {
       PremiumReplyResults(context: context, replies: replies, metadata: metadata)
         .padding(16)
+        .padding(.bottom, 96)
     }
     .scrollDismissesKeyboard(.interactively)
     .sbPageBackground()
