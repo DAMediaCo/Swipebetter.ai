@@ -21,6 +21,7 @@
 		6A733AE70ED1A4E238DD0C5D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3F846A09D1251E63BBECD73F /* Assets.xcassets */; };
 		6E5506767E2267438CD29ED5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 55DBE7184BC113A88DF6FE80 /* PrivacyInfo.xcprivacy */; };
 		7496B065A59C2AC478941A9D /* SwipeBetterBroadcast.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 087ED3B7CDE425EF5B3CA31E /* SwipeBetterBroadcast.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		74A449DC842501EDEF2AC989 /* PremiumScreenCaptureKitScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F019C7A99278BA9C38CDA47 /* PremiumScreenCaptureKitScanView.swift */; };
 		74B3D8FBD9F583F1DE94EBCC /* SwipeBetterScreenScanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B43F661BBAC7773AFF0A04 /* SwipeBetterScreenScanStore.swift */; };
 		782E7C4DB4A26ACB20C3B1E8 /* PremiumScreenScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAD98C57BD359B85CAF72B18 /* PremiumScreenScanView.swift */; };
 		8184072E0217B13542161BB8 /* PremiumResultText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F8086249E1E4A56AEA2E4DA /* PremiumResultText.swift */; };
@@ -116,6 +117,7 @@
 		7FDA0CBDEADFA25C43C3210F /* PremiumAccountViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumAccountViews.swift; sourceTree = "<group>"; };
 		914C5B713F62AA0933BEB32A /* SwipeBetterKeyboard.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SwipeBetterKeyboard.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C364F509F85099ABF89B5E7 /* PremiumAuthViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumAuthViews.swift; sourceTree = "<group>"; };
+		9F019C7A99278BA9C38CDA47 /* PremiumScreenCaptureKitScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumScreenCaptureKitScanView.swift; sourceTree = "<group>"; };
 		9F7CAAB74187DD545E08717C /* KeyboardReplyComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardReplyComposer.swift; sourceTree = "<group>"; };
 		A08A085686780D10B2623316 /* KeyboardReplyComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardReplyComposerTests.swift; sourceTree = "<group>"; };
 		B136CB20FAD0937BFF8EDB42 /* KeyboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardViewController.swift; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				7FDA0CBDEADFA25C43C3210F /* PremiumAccountViews.swift */,
 				9C364F509F85099ABF89B5E7 /* PremiumAuthViews.swift */,
 				CE6D367C4737B23DF55B47D9 /* PremiumCoachingViews.swift */,
+				9F019C7A99278BA9C38CDA47 /* PremiumScreenCaptureKitScanView.swift */,
 				FAD98C57BD359B85CAF72B18 /* PremiumScreenScanView.swift */,
 				65507C0C6BD8ED5497A41B30 /* PurchaseStore.swift */,
 				7BAC957192BE2A009D79F187 /* RootView.swift */,
@@ -467,6 +470,7 @@
 				CDBC2E4E5C2EA79835513940 /* PremiumAuthViews.swift in Sources */,
 				B69016785AEDC8C64CC5C5C9 /* PremiumCoachingViews.swift in Sources */,
 				8184072E0217B13542161BB8 /* PremiumResultText.swift in Sources */,
+				74A449DC842501EDEF2AC989 /* PremiumScreenCaptureKitScanView.swift in Sources */,
 				782E7C4DB4A26ACB20C3B1E8 /* PremiumScreenScanView.swift in Sources */,
 				C53B40A58E51DAE9F0146CAB /* PurchaseStore.swift in Sources */,
 				235495C3F75031A3CC97C7ED /* RootView.swift in Sources */,
@@ -592,7 +596,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = N888C69AGA;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -776,7 +780,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 25;
+				CURRENT_PROJECT_VERSION = 26;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = N888C69AGA;
 				ENABLE_NS_ASSERTIONS = NO;

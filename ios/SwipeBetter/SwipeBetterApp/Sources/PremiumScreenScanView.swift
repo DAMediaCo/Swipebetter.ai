@@ -3,6 +3,18 @@ import SwiftUI
 import Vision
 
 struct PremiumScreenScanView: View {
+  let onImport: ([Data]) -> Void
+
+  var body: some View {
+    if #available(iOS 27.0, *) {
+      PremiumScreenCaptureKitScanView(onImport: onImport)
+    } else {
+      PremiumReplayKitScanView(onImport: onImport)
+    }
+  }
+}
+
+struct PremiumReplayKitScanView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var frames: [Data] = []
   @State private var recognizedText = ""
