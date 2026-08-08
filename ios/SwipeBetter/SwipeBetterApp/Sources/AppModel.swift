@@ -131,16 +131,14 @@ final class AppModel {
   }
 
   func login(email: String, password: String) async {
-    await runBusy {
-      let response: AuthUserResponse = try await api.post("/api/auth/login", body: LoginRequest(email: email, password: password))
-      user = response.user
-      await refreshAfterAuth()
+    await authenticate {
+      try await api.post("/api/auth/login", body: LoginRequest(email: email, password: password))
     }
     await processPendingSnapRequest()
   }
 
   func signup(email: String, password: String, firstName: String, lastName: String, promoCode: String) async {
-    await runBusy {
+    await authenticate {
       let request = SignupRequest(
         email: email,
         password: password,
@@ -148,9 +146,7 @@ final class AppModel {
         lastName: lastName.trimmedNil,
         promoCode: promoCode.trimmedNil
       )
-      let response: AuthUserResponse = try await api.post("/api/auth/signup", body: request)
-      user = response.user
-      await refreshAfterAuth()
+      return try await api.post("/api/auth/signup", body: request)
     }
     await processPendingSnapRequest()
   }
@@ -166,10 +162,8 @@ final class AppModel {
   }
 
   func signInWithApple(credential: ASAuthorizationAppleIDCredential) async {
-    await runBusy {
-      let response = try await authenticateWithApple(credential: credential)
-      user = response.user
-      await refreshAfterAuth()
+    await authenticate {
+      try await authenticateWithApple(credential: credential)
     }
     await processPendingSnapRequest()
   }
@@ -183,8 +177,10 @@ final class AppModel {
 
   func refreshAccount() async {
     do {
-      me = try await api.get("/api/me")
-      credits = try await api.get("/api/credits")
+      async let account: MeResponse = api.get("/api/me")
+      async let balance: CreditsResponse = api.get("/api/credits")
+      me = try await account
+      credits = try await balance
     } catch {
       lastError = error.localizedDescription
     }
@@ -388,6 +384,24 @@ final class AppModel {
     } catch {
       lastError = error.localizedDescription
     }
+  }
+
+  // Unlock the signed-in shell as soon as authentication succeeds. Account,
+  // history, and entitlement refreshes can continue without freezing the app.
+  private func authenticate(_ operation: () async throws -> AuthUserResponse) async {
+    isBusy = true
+    lastError = nil
+    do {
+      let response = try await operation()
+      user = response.user
+    } catch {
+      lastError = error.localizedDescription
+      isBusy = false
+      return
+    }
+
+    isBusy = false
+    await refreshAfterAuth()
   }
 
   private func authenticateWithApple(

@@ -263,6 +263,15 @@ struct PremiumProfileAuditView: View {
         .background(.ultraThinMaterial)
       }
     }
+    .overlay {
+      if model.isBusy {
+        PremiumAnalysisProgressOverlay(
+          title: "Reading your profile",
+          detail: "Reading your photos and prompts the way a first-time viewer would.",
+          steps: ["Read screenshots", "Score photo order", "Draft bio and prompts", "Check ENM language"]
+        )
+      }
+    }
     .onChange(of: pickerItems) { _, newValue in
       Task { images = await loadImages(from: newValue, limit: 10) }
     }
@@ -683,6 +692,15 @@ struct PremiumReplyAssistantView: View {
       .padding(.bottom, 8)
       .background(.ultraThinMaterial)
     }
+    .overlay {
+      if model.isBusy {
+        PremiumAnalysisProgressOverlay(
+          title: "Reading your conversation",
+          detail: "Looking for the natural next message without making you sound scripted.",
+          steps: ["Read the conversation", "Find the tone", "Draft three replies"]
+        )
+      }
+    }
     .onChange(of: pickerItems) { _, newValue in
       guard !newValue.isEmpty else { return }
       inputMode = "screenshots"
@@ -929,6 +947,106 @@ struct PremiumScreenshotStrip: View {
             .aspectRatio(9.0 / 16.0, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
         }
+    }
+  }
+}
+
+private struct PremiumAnalysisProgressOverlay: View {
+  let title: String
+  let detail: String
+  let steps: [String]
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @State private var ringRotation = 0.0
+  @State private var ringScale = 1.0
+
+  var body: some View {
+    ZStack {
+      Color(uiColor: .systemGroupedBackground)
+        .ignoresSafeArea()
+
+      VStack(spacing: 24) {
+        ZStack {
+          Circle()
+            .fill(.regularMaterial)
+            .overlay(Circle().stroke(Color.white.opacity(0.78), lineWidth: 1))
+            .shadow(color: .black.opacity(0.14), radius: 24, y: 12)
+
+          Circle()
+            .trim(from: 0.04, to: 0.82)
+            .stroke(SBTheme.accent, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+            .rotationEffect(.degrees(ringRotation))
+            .padding(10)
+
+          Circle()
+            .trim(from: 0.52, to: 0.94)
+            .stroke(SBTheme.teal, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+            .rotationEffect(.degrees(-ringRotation * 0.7))
+            .padding(25)
+
+          Image(systemName: "sparkles")
+            .font(.system(size: 34, weight: .semibold))
+            .foregroundStyle(SBTheme.accent)
+        }
+        .frame(width: 216, height: 216)
+        .scaleEffect(ringScale)
+
+        VStack(spacing: 8) {
+          Text(title)
+            .font(.title3.weight(.bold))
+            .foregroundStyle(SBTheme.ink)
+          Text(detail)
+            .font(.body)
+            .foregroundStyle(SBTheme.secondaryInk)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: 300)
+        }
+
+        VStack(spacing: 0) {
+          ForEach(Array(steps.enumerated()), id: \.offset) { index, step in
+            HStack(spacing: 12) {
+              if index == 0 {
+                ProgressView()
+                  .tint(SBTheme.accent)
+                  .frame(width: 20, height: 20)
+              } else {
+                Circle()
+                  .stroke(SBTheme.secondaryInk.opacity(0.28), lineWidth: 2)
+                  .frame(width: 20, height: 20)
+              }
+              Text(step)
+                .font(.body)
+                .foregroundStyle(index == 0 ? SBTheme.ink : SBTheme.secondaryInk)
+              Spacer(minLength: 0)
+            }
+            .frame(minHeight: 48)
+            if index < steps.count - 1 {
+              Divider().padding(.leading, 32)
+            }
+          }
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 8)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay {
+          RoundedRectangle(cornerRadius: 24, style: .continuous)
+            .stroke(Color.white.opacity(0.72), lineWidth: 1)
+        }
+        .padding(.horizontal, 16)
+      }
+      .padding(.top, 44)
+      .padding(.bottom, 96)
+    }
+    .accessibilityElement(children: .contain)
+    .accessibilityLabel(title)
+    .onAppear {
+      guard !reduceMotion else { return }
+      withAnimation(.linear(duration: 1.15).repeatForever(autoreverses: false)) {
+        ringRotation = 360
+      }
+      withAnimation(.easeInOut(duration: 2.25).repeatForever(autoreverses: true)) {
+        ringScale = 1.045
+      }
     }
   }
 }
