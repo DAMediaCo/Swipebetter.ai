@@ -37,6 +37,10 @@
   <string>SwipeBetter uses selected screenshots for profile and chat coaching. Snap Back reads only your newest screenshot after you ask Siri or tap Snap Back on the SwipeBetter keyboard.</string>
   <key>UIRequiresFullScreen</key>
   <true/>
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>screen-capture</string>
+  </array>
   <key>UILaunchScreen</key>
   <dict/>
   <key>UISupportedInterfaceOrientations</key>

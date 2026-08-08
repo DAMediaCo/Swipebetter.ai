@@ -3,6 +3,7 @@ import SwiftUI
 
 struct PremiumAuthView: View {
   @Environment(AppModel.self) private var model
+  @Environment(\.colorScheme) private var colorScheme
   @State private var isSignup = false
   @State private var email = ""
   @State private var password = ""
@@ -10,6 +11,7 @@ struct PremiumAuthView: View {
   @State private var lastName = ""
   @State private var promoCode = ""
   @State private var showingPasswordReset = false
+  @State private var showingEmailForm = false
 
   private var canSubmit: Bool {
     !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && password.count >= 8
@@ -17,24 +19,32 @@ struct PremiumAuthView: View {
 
   var body: some View {
     NavigationStack {
-      ScrollView {
-        VStack(alignment: .leading, spacing: 0) {
-          brandHeader
+      Group {
+        if showingEmailForm {
+          ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+              brandHeader
 
-          VStack(alignment: .leading, spacing: 22) {
-            authForm
-            appleSignIn
-            pricingNote
-            legalLinks
+              VStack(alignment: .leading, spacing: 22) {
+                authForm
+                appleSignIn
+                pricingNote
+                authTrustCopy
+                legalLinks
+              }
+              .padding(.horizontal, 20)
+              .padding(.top, 24)
+              .padding(.bottom, 32)
+            }
           }
-          .padding(.horizontal, 20)
-          .padding(.top, 24)
-          .padding(.bottom, 32)
+          .scrollDismissesKeyboard(.interactively)
+          .sbPageBackground()
+        } else {
+          choiceScreen
         }
       }
-      .scrollDismissesKeyboard(.interactively)
-      .sbPageBackground()
     }
+    .disabled(model.isBusy)
     .sheet(isPresented: $showingPasswordReset) {
       PremiumPasswordResetSheet(initialEmail: email)
         .environment(model)
@@ -43,49 +53,130 @@ struct PremiumAuthView: View {
     }
   }
 
+  private var choiceScreen: some View {
+    GeometryReader { proxy in
+      ScrollView(.vertical, showsIndicators: false) {
+        choiceContent
+          .padding(.horizontal, 24)
+          .padding(.top, 120)
+          .frame(maxWidth: 300, minHeight: proxy.size.height, alignment: .leading)
+          .frame(maxWidth: .infinity, alignment: .center)
+          .padding(.bottom, 24)
+      }
+      .scrollBounceBehavior(.basedOnSize)
+      .background(Color.black.ignoresSafeArea())
+    }
+    .background(Color.black.ignoresSafeArea())
+    .preferredColorScheme(.dark)
+  }
+
+  private var choiceContent: some View {
+    VStack(alignment: .leading, spacing: 0) {
+      SBLogoMark(size: 62)
+
+      Text("SwipeBetter")
+        .font(.largeTitle.weight(.bold))
+        .foregroundStyle(.white)
+        .padding(.top, 18)
+
+      Text("Audit your dating profile and get replies that still sound like you.")
+        .font(.body)
+        .foregroundStyle(.white.opacity(0.72))
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, 8)
+
+      Spacer(minLength: 30)
+
+      SignInWithAppleButton(.signIn) { request in
+        request.requestedScopes = [.fullName, .email]
+      } onCompletion: { result in
+        if case .success(let authorization) = result,
+           let credential = authorization.credential as? ASAuthorizationAppleIDCredential {
+          Task { await model.signInWithApple(credential: credential) }
+        } else if case .failure(let error) = result {
+          model.lastError = error.localizedDescription
+        }
+      }
+      .signInWithAppleButtonStyle(.white)
+      .frame(height: 52)
+      .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .disabled(model.isBusy)
+      .accessibilityIdentifier("auth.appleSignInButton")
+
+      Button("Continue with email") {
+        isSignup = false
+        showingEmailForm = true
+      }
+      .font(.headline)
+      .foregroundStyle(.white)
+      .frame(maxWidth: .infinity, minHeight: 52)
+      .background(Color.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .padding(.top, 12)
+      .disabled(model.isBusy)
+      .accessibilityIdentifier("auth.continueWithEmailButton")
+
+      Button("Create account") {
+        isSignup = true
+        showingEmailForm = true
+      }
+      .font(.subheadline.weight(.semibold))
+      .foregroundStyle(SBTheme.accent)
+      .frame(maxWidth: .infinity, minHeight: 44)
+      .padding(.top, 4)
+      .disabled(model.isBusy)
+      .accessibilityIdentifier("auth.createAccountChoiceButton")
+
+      Text("Screenshots are sent only for requested analysis and are excluded from your saved history.")
+        .font(.caption)
+        .foregroundStyle(.white.opacity(0.58))
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, 6)
+
+      Text("Your signed-in history syncs across devices.")
+        .font(.caption)
+        .foregroundStyle(.white.opacity(0.58))
+        .multilineTextAlignment(.center)
+        .frame(maxWidth: .infinity)
+
+      authLegalFooter
+
+      Spacer(minLength: 54)
+    }
+  }
+
   private var brandHeader: some View {
-    VStack(alignment: .leading, spacing: 22) {
+    VStack(alignment: .leading, spacing: 16) {
       HStack(alignment: .center, spacing: 14) {
         SBLogoMark(size: 58)
 
         VStack(alignment: .leading, spacing: 2) {
           Text("SwipeBetter")
-            .font(.system(size: 31, weight: .bold))
-            .foregroundStyle(SBTheme.headerInk)
+            .font(.title2.weight(.bold))
+            .foregroundStyle(SBTheme.ink)
 
           Text("Dating decisions, made clearer.")
             .font(.subheadline.weight(.medium))
-            .foregroundStyle(SBTheme.headerSecondaryInk)
+            .foregroundStyle(SBTheme.secondaryInk)
         }
       }
 
-      Text("Stop guessing what to change.")
-        .font(.system(size: 32, weight: .bold))
-        .foregroundStyle(SBTheme.headerInk)
+      Text("A clearer next move.")
+        .font(.largeTitle.weight(.bold))
+        .foregroundStyle(SBTheme.ink)
         .fixedSize(horizontal: false, vertical: true)
 
-      Text("Bring the profile or the conversation. Leave with a clear next move that still sounds like you.")
+      Text("Bring a profile or conversation and leave with advice that still sounds like you.")
         .font(.subheadline)
-        .foregroundStyle(SBTheme.headerSecondaryInk)
+        .foregroundStyle(SBTheme.secondaryInk)
         .lineSpacing(2)
         .fixedSize(horizontal: false, vertical: true)
     }
     .padding(.horizontal, 20)
-    .padding(.top, 54)
-    .padding(.bottom, 26)
+    .padding(.top, 24)
+    .padding(.bottom, 4)
     .frame(maxWidth: .infinity, alignment: .leading)
-    .background {
-      ZStack(alignment: .bottomLeading) {
-        SBTheme.header
-        HStack(spacing: 0) {
-          SBTheme.accent.frame(maxWidth: .infinity)
-          SBTheme.teal.frame(width: 86)
-          SBTheme.sky.frame(width: 52)
-        }
-        .frame(height: 4)
-      }
-      .ignoresSafeArea(edges: .top)
-    }
   }
 
   private var authForm: some View {
@@ -97,36 +188,35 @@ struct PremiumAuthView: View {
         }
         .pickerStyle(.segmented)
 
-        if isSignup {
-          HStack(spacing: 10) {
-            premiumField("First name", text: $firstName, contentType: .givenName)
-            premiumField("Last name", text: $lastName, contentType: .familyName)
+        VStack(spacing: 0) {
+          if isSignup {
+            HStack(spacing: 12) {
+              premiumField("First name", text: $firstName, contentType: .givenName)
+              premiumField("Last name", text: $lastName, contentType: .familyName)
+            }
+            SBDivider()
           }
-        }
 
-        premiumField("Email", text: $email, contentType: .emailAddress)
-          .keyboardType(.emailAddress)
-          .textInputAutocapitalization(.never)
-          .autocorrectionDisabled()
-          .accessibilityIdentifier("auth.emailField")
-
-        SecureField("Password", text: $password)
-          .textContentType(isSignup ? .newPassword : .password)
-          .padding(.horizontal, 13)
-          .frame(minHeight: 48)
-          .background(SBTheme.canvas)
-          .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-          .overlay {
-            RoundedRectangle(cornerRadius: 7, style: .continuous)
-              .stroke(SBTheme.divider, lineWidth: 1)
-          }
-          .accessibilityIdentifier("auth.passwordField")
-
-        if isSignup {
-          premiumField("Promo code (optional)", text: $promoCode, contentType: nil)
-            .textInputAutocapitalization(.characters)
+          premiumField("Email", text: $email, contentType: .emailAddress)
+            .keyboardType(.emailAddress)
+            .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
-            .accessibilityIdentifier("auth.promoCodeField")
+            .accessibilityIdentifier("auth.emailField")
+
+          SBDivider()
+
+          SecureField("Password", text: $password)
+            .textContentType(isSignup ? .newPassword : .password)
+            .frame(minHeight: 48)
+            .accessibilityIdentifier("auth.passwordField")
+
+          if isSignup {
+            SBDivider()
+            premiumField("Promo code (optional)", text: $promoCode, contentType: nil)
+              .textInputAutocapitalization(.characters)
+              .autocorrectionDisabled()
+              .accessibilityIdentifier("auth.promoCodeField")
+          }
         }
 
         Button {
@@ -147,7 +237,7 @@ struct PremiumAuthView: View {
           Label(isSignup ? "Create account" : "Log in", systemImage: "arrow.right")
         }
         .buttonStyle(SBPrimaryButtonStyle())
-        .disabled(!canSubmit)
+        .disabled(model.isBusy || !canSubmit)
         .opacity(canSubmit ? 1 : 0.48)
         .accessibilityIdentifier(isSignup ? "auth.createAccountButton" : "auth.loginButton")
 
@@ -180,7 +270,7 @@ struct PremiumAuthView: View {
         SBDivider()
       }
 
-      SignInWithAppleButton(.continue) { request in
+      SignInWithAppleButton(.signIn) { request in
         request.requestedScopes = [.fullName, .email]
       } onCompletion: { result in
         if case .success(let authorization) = result,
@@ -190,9 +280,10 @@ struct PremiumAuthView: View {
           model.lastError = error.localizedDescription
         }
       }
-      .signInWithAppleButtonStyle(.black)
-      .frame(height: 50)
-      .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+      .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+      .frame(height: 52)
+      .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+      .disabled(model.isBusy)
       .accessibilityIdentifier("auth.appleSignInButton")
     }
   }
@@ -207,7 +298,7 @@ struct PremiumAuthView: View {
           .font(.caption.weight(.bold))
           .foregroundStyle(SBTheme.ink)
 
-        Text("Starter $3.99 · Monthly $16.99 · Annual $104.99")
+        Text("Starter credit pack, monthly, and annual options are available in Account.")
           .font(.caption)
           .foregroundStyle(SBTheme.secondaryInk)
 
@@ -220,6 +311,30 @@ struct PremiumAuthView: View {
     .frame(maxWidth: .infinity, alignment: .leading)
     .background(SBTheme.tealSoft)
     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+  }
+
+  private var authTrustCopy: some View {
+    VStack(alignment: .leading, spacing: 5) {
+      Text("Your signed-in history syncs across devices.")
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(SBTheme.ink)
+      Text("Screenshots are sent only for requested analysis and excluded from saved history.")
+        .font(.caption)
+        .foregroundStyle(SBTheme.secondaryInk)
+        .fixedSize(horizontal: false, vertical: true)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private var authLegalFooter: some View {
+    HStack(spacing: 18) {
+      Link("Terms", destination: authURL("/terms"))
+      Link("Privacy", destination: authURL("/privacy"))
+      Link("Support", destination: authURL("/contact"))
+    }
+    .font(.caption.weight(.semibold))
+    .foregroundStyle(.white.opacity(0.72))
+    .frame(maxWidth: .infinity)
   }
 
   private var legalLinks: some View {
@@ -240,14 +355,8 @@ struct PremiumAuthView: View {
   ) -> some View {
     TextField(title, text: text)
       .textContentType(contentType)
-      .padding(.horizontal, 13)
       .frame(minHeight: 48)
-      .background(SBTheme.canvas)
-      .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: 7, style: .continuous)
-          .stroke(SBTheme.divider, lineWidth: 1)
-      }
+      .textFieldStyle(.plain)
   }
 
   private func authURL(_ path: String) -> URL {

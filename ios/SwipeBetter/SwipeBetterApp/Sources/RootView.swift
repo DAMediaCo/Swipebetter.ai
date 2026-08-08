@@ -25,9 +25,9 @@ enum AppTab: Hashable, CaseIterable {
 
   static func screenshotInitialTab(from arguments: [String]) -> AppTab {
     switch SwipeBetterScreenshotFixtures.tabArgument(from: arguments) {
-    case "replies":
+    case "replies", "replyResult":
       return .replies
-    case "history":
+    case "history", "historyEmpty":
       return .history
     case "account":
       return .account
@@ -39,6 +39,7 @@ enum AppTab: Hashable, CaseIterable {
 
 struct RootView: View {
   @Environment(AppModel.self) private var model
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
   @State private var selectedTab: AppTab = .audit
 
   init(initialTab: AppTab = .audit) {
@@ -73,21 +74,24 @@ struct RootView: View {
             .tag(AppTab.account)
         }
         .tint(SBTheme.accent)
+        .disabled(model.isBusy)
         .accessibilityIdentifier("root.tabView")
       } else {
         PremiumAuthView()
+          .disabled(model.isBusy)
       }
     }
-    .overlay(alignment: .bottom) {
+    .safeAreaInset(edge: .bottom, spacing: 0) {
       if let error = model.lastError {
         Text(error)
           .font(.footnote.weight(.semibold))
           .foregroundStyle(.white)
           .padding(.horizontal, 14)
           .padding(.vertical, 10)
-          .background(.red.gradient, in: Capsule())
-          .padding()
-          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .background(SBTheme.accentPressed, in: Capsule())
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+          .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
       } else if let message = model.snapStatusMessage {
         Text(message)
           .font(.footnote.weight(.semibold))
@@ -95,8 +99,9 @@ struct RootView: View {
           .padding(.horizontal, 14)
           .padding(.vertical, 10)
           .background(SBTheme.teal, in: Capsule())
-          .padding()
-          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .padding(.horizontal, 16)
+          .padding(.vertical, 8)
+          .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
       }
     }
     .sheet(
@@ -106,17 +111,6 @@ struct RootView: View {
       )
     ) {
       AppleDeletionReauthenticationView()
-    }
-    .overlay {
-      if model.isBusy {
-        ZStack {
-          Color.black.opacity(0.14).ignoresSafeArea()
-          ProgressView()
-            .controlSize(.large)
-            .padding(22)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
-        }
-      }
     }
     .onChange(of: model.importRevision) { _, _ in
       routeToPendingImportIfNeeded()
@@ -176,6 +170,7 @@ struct RootView: View {
 private struct AppleDeletionReauthenticationView: View {
   @Environment(AppModel.self) private var model
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.colorScheme) private var colorScheme
 
   var body: some View {
     NavigationStack {
@@ -206,7 +201,7 @@ private struct AppleDeletionReauthenticationView: View {
             model.lastError = error.localizedDescription
           }
         }
-        .signInWithAppleButtonStyle(.black)
+        .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
         .frame(height: 50)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         .accessibilityIdentifier("account.appleDeletionReauthenticationButton")
@@ -350,7 +345,7 @@ struct AuthView: View {
 
           VStack(alignment: .leading, spacing: 8) {
             Label("iOS pricing includes Apple purchase fees.", systemImage: "info.circle")
-            Text("Starter $3.99, Unlimited $16.99/month, Annual $104.99/year.")
+            Text("Current App Store pricing is shown in Account.")
           }
           .font(.footnote)
           .foregroundStyle(.secondary)
@@ -1118,7 +1113,7 @@ enum SwipeBetterScreenshotFixtures {
   }
 
   static var profileStatus: ProfileStatusResponse? {
-    decode("""
+    decode(#"""
       {
         "jobId": "demo-profile-audit",
         "status": "completed",
@@ -1135,11 +1130,11 @@ enum SwipeBetterScreenshotFixtures {
           "overallScore": 86,
           "improvements": "Swap photo order, remove the generic travel line, and add one prompt that shows confidence without sounding rehearsed.",
           "analysisStatus": "completed",
-          "createdAt": "2026-07-06T12:00:00Z",
+          "createdAt": "2026-08-01T12:00:00.125Z",
           "firstTip": "Move the smiling outdoor photo to slot one so the profile feels warmer in the first second."
         }
       }
-      """)
+      """#)
   }
 
   static var replyResponse: ReplyAnalysisResponse? {
@@ -1154,7 +1149,7 @@ enum SwipeBetterScreenshotFixtures {
             "I'm in. Pick a night that works for you."
           ],
           "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
-          "createdAt": "2026-07-06T12:05:00Z"
+          "createdAt": "2026-07-31T12:05:00.875Z"
         },
         "parsed": {
           "conversationContext": "They seem interested and gave you an easy opening to make a plan.",
