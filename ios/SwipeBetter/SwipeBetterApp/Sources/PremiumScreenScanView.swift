@@ -14,10 +14,25 @@ struct PremiumScreenScanView: View {
     List {
       Section {
         PremiumScreenScanInstructions()
-        BroadcastPickerButton()
-          .frame(height: 52)
-          .accessibilityIdentifier("screenScan.broadcastPicker")
-        Text("Apple will show a system picker. Choose SwipeBetter Screen Scan, then return to the dating app and scroll manually. SwipeBetter never controls or scrolls the other app.")
+        VStack(alignment: .leading, spacing: 10) {
+          Text("1. Tap the capture button")
+            .font(.subheadline.weight(.semibold))
+          HStack(spacing: 12) {
+            BroadcastPickerButton()
+              .frame(width: 58, height: 52)
+              .background(SBTheme.accent, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            Text("Choose **SwipeBetter Screen Scan** in Apple's menu.")
+              .font(.subheadline)
+              .foregroundStyle(SBTheme.secondaryInk)
+              .fixedSize(horizontal: false, vertical: true)
+          }
+          Text("2. Switch to Bumble, Tinder, Hinge, or another dating app")
+            .font(.subheadline.weight(.semibold))
+          Text("3. Scroll through your profile manually, then return here and tap Use captured screens")
+            .font(.subheadline.weight(.semibold))
+        }
+        .accessibilityIdentifier("screenScan.broadcastPicker")
+        Text("There is no separate notification. Apple shows a red recording indicator while the scan is running. SwipeBetter never controls or scrolls the other app.")
           .font(.caption)
           .foregroundStyle(SBTheme.secondaryInk)
           .fixedSize(horizontal: false, vertical: true)
