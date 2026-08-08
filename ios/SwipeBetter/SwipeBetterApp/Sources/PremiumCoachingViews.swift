@@ -13,6 +13,7 @@ struct PremiumProfileAuditView: View {
   @State private var images: [Data] = []
   @State private var result: ProfileStatusResponse?
   @State private var auditDestination: PremiumAuditResultPayload?
+  @State private var showScreenScan = false
   @State private var appliedImportRevision = -1
 
   private let platforms = ["Tinder", "Hinge", "Bumble", "Grindr", "Coffee Meets Bagel", "Other"]
@@ -131,6 +132,16 @@ struct PremiumProfileAuditView: View {
 
   private var auditScreenshotsSection: some View {
     Section {
+      Button {
+        showScreenScan = true
+      } label: {
+        Label("Scan profile from the screen", systemImage: "viewfinder")
+          .font(.subheadline.weight(.semibold))
+          .foregroundStyle(SBTheme.accentPressed)
+          .frame(minHeight: 44, alignment: .leading)
+      }
+      .accessibilityIdentifier("audit.screenScanButton")
+
       if images.isEmpty {
         PhotosPicker(selection: $pickerItems, maxSelectionCount: 10, matching: .images) {
           PremiumImageDropzone(
@@ -236,6 +247,12 @@ struct PremiumProfileAuditView: View {
     }
     .navigationDestination(item: $auditDestination) { destination in
       PremiumAuditResultDestination(analysis: destination.analysis, images: images, shareText: auditShareText)
+    }
+    .navigationDestination(isPresented: $showScreenScan) {
+      PremiumScreenScanView { captured in
+        images = Array(captured.prefix(10))
+        pickerItems = []
+      }
     }
     .safeAreaInset(edge: .bottom, spacing: 0) {
       if auditDestination == nil {
